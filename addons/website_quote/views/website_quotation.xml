@@ -17,9 +17,9 @@
               <thead>
                   <tr>
                       <th>Products</th>
-                      <th>Quantity</th>
-                      <th>Taxes</th>
-                      <th><span t-if="True in [line.discount > 0 for line in quotation.order_line]">Discount</span></th>
+                      <th class="text-right">Quantity</th>
+                      <th class="text-right">Taxes</th>
+                      <th class="text-right"><span t-if="True in [line.discount > 0 for line in quotation.order_line]">Discount</span></th>
                       <th class="text-right">Unit Price</th>
                       <th class="text-right">Price</th>
                       <th></th>
@@ -30,18 +30,18 @@
                       <td>
                           <span t-field="line.name"/>
                       </td>
-                      <td>
+                      <td class="text-right">
                           <div id="quote_qty">
                               <span t-field="line.product_uom_qty"/>
-                              <span t-field="line.product_uom"/>
+                              <span groups="product.group_uom" t-field="line.product_uom"/>
                           </div>
                       </td>
-                      <td>
+                      <td class="text-right">
                           <div t-foreach="line.tax_id" t-as="tax">
                               <t t-esc="tax.name"/>
                           </div>
                       </td>
-                      <td>
+                      <td class=" text-right">
                           <strong t-if="line.discount" class="text-info">
                               <t t-esc="((line.discount % 1) and '%s' or '%d') % line.discount"/>% discount
                           </strong>
@@ -50,14 +50,14 @@
                             <div t-field="line.price_unit"
                                 t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'
                                 t-att-style="line.discount and 'text-decoration: line-through' or ''"
-                                t-att-class="(line.discount and 'text-danger' or '') + 'text-right'"/>
-                            <!-- TODO: apply monetary widget formating -->
+                                t-att-class="(line.discount and 'text-danger' or '') + 'text-right text-nowrap'"/>
                             <div t-if="line.discount">
-                                <t t-esc="'%.2f' % ((1-line.discount / 100.0) * line.price_unit)"/>
+                                <div t-field="line.price_discounted"
+                                     t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'/>
                             </div>
                       </td>
                       <td>
-                          <div class="text-right"
+                          <div class="text-right text-nowrap"
                               t-field="line.price_subtotal"
                               t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'/>
                       </td>
@@ -70,21 +70,21 @@
                   <tr>
                       <td></td><td></td><td></td><td></td>
                       <td class="text-right"><strong>Subtotal:</strong></td>
-                      <td class="text-right">
+                      <td class="text-right text-nowrap">
                           <strong data-id="total_amount" t-field="quotation.amount_untaxed" t-field-options='{"widget": "monetary","display_currency": "quotation.pricelist_id.currency_id"}'/>
                       </td>
                   </tr>
                   <tr>
                       <td></td><td></td><td></td><td></td>
                       <td class="text-right">Taxes:</td>
-                      <td class="text-right">
+                      <td class="text-right text-nowrap">
                           <span data-id="total_amount" t-field="quotation.amount_tax" t-field-options='{"widget": "monetary","display_currency": "quotation.pricelist_id.currency_id"}'/>
                       </td>
                   </tr>
                   <tr>
                       <td></td><td></td><td></td><td></td>
                       <td class="text-right"><strong>Total:</strong></td>
-                      <td class="text-right">
+                      <td class="text-right text-nowrap">
                           <strong data-id="total_amount" t-field="quotation.amount_total" t-field-options='{"widget": "monetary","display_currency": "quotation.pricelist_id.currency_id"}'/>
                       </td>
                   </tr>
@@ -166,12 +166,12 @@
                               <div class="text-center mb16" t-if="quotation.amount_undiscounted &gt; quotation.amount_untaxed">
                                   <p class="text-muted mb8">Your advantage:</p>
                                   <t t-if="quotation.amount_untaxed == quotation.amount_total">
-                                      <strong t-field="quotation.amount_total"
-                                          t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'/>
                                       <strong t-field="quotation.amount_undiscounted"
                                           t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'
                                           style="text-decoration: line-through"
                                           class="text-danger"/>
+                                      <strong t-field="quotation.amount_total"
+                                          t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'/>
                                   </t>
                                   <t t-if="quotation.amount_untaxed != quotation.amount_total">
                                       <strong t-field="quotation.amount_untaxed"
@@ -530,13 +530,14 @@
                                 </strong>
                             </td>
                             <td>
-                                <strong class="text-right">
+                                <strong class="text-right text-nowrap">
                                     <div t-field="option.price_unit"
                                     t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'
                                     t-att-style="option.discount and 'text-decoration: line-through' or ''"
                                     t-att-class="option.discount and 'text-danger' or ''"/>
                                     <div t-if="option.discount">
-                                        <t t-esc="'%.2f' % ((1-option.discount / 100.0) * option.price_unit)"/>
+                                        <div t-field="option.price_discounted"
+                                             t-field-options='{"widget": "monetary", "display_currency": "quotation.pricelist_id.currency_id"}'/>
                                     </div>
                                 </strong>
                             </td>

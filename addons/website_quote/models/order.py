@@ -272,12 +272,20 @@ class sale_order(osv.osv):
 class sale_quote_option(osv.osv):
     _name = "sale.quote.option"
     _description = "Quotation Option"
+
+    def _get_price_discounted(self, cr, uid, ids, field_name, arg, context=None):
+        res = dict.fromkeys(ids, 0.0)
+        for option in self.browse(cr, uid, ids, context=context):
+            res[option.id] = option.price_unit * (1 - (option.discount or 0.0) / 100.0)
+        return res
+
     _columns = {
         'template_id': fields.many2one('sale.quote.template', 'Quotation Template Reference', ondelete='cascade', select=True, required=True),
         'name': fields.text('Description', required=True, translate=True),
         'product_id': fields.many2one('product.product', 'Product', domain=[('sale_ok', '=', True)], required=True),
         'website_description': fields.html('Option Description', translate=True),
         'price_unit': fields.float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price')),
+        'price_discounted': fields.function(_get_price_discounted, type='float', string='Discounted Unit Price', digits_compute=dp.get_precision('Product Price'), help="The Unit Price for this product, after the discount has been applied"),
         'discount': fields.float('Discount (%)', digits_compute= dp.get_precision('Discount')),
         'uom_id': fields.many2one('product.uom', 'Unit of Measure ', required=True),
         'quantity': fields.float('Quantity', required=True, digits_compute= dp.get_precision('Product UoS')),
@@ -317,6 +325,13 @@ class sale_quote_option(osv.osv):
 class sale_order_option(osv.osv):
     _name = "sale.order.option"
     _description = "Sale Options"
+
+    def _get_price_discounted(self, cr, uid, ids, field_name, arg, context=None):
+        res = dict.fromkeys(ids, 0.0)
+        for option in self.browse(cr, uid, ids, context=context):
+            res[option.id] = option.price_unit * (1 - (option.discount or 0.0) / 100.0)
+        return res
+
     _columns = {
         'order_id': fields.many2one('sale.order', 'Sale Order Reference', ondelete='cascade', select=True),
         'line_id': fields.many2one('sale.order.line', on_delete="set null"),
@@ -324,6 +339,7 @@ class sale_order_option(osv.osv):
         'product_id': fields.many2one('product.product', 'Product', domain=[('sale_ok', '=', True)]),
         'website_description': fields.html('Line Description'),
         'price_unit': fields.float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price')),
+        'price_discounted': fields.function(_get_price_discounted, type='float', string='Discounted Unit Price', digits_compute=dp.get_precision('Product Price'), help="The Unit Price for this product, after the discount has been applied"),
         'discount': fields.float('Discount (%)', digits_compute= dp.get_precision('Discount')),
         'uom_id': fields.many2one('product.uom', 'Unit of Measure ', required=True),
         'quantity': fields.float('Quantity', required=True,

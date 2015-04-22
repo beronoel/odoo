@@ -18,7 +18,7 @@
                     <tr>
                         <th>Product</th>
                         <th>Description</th>
-                        <th groups="sale.group_discount_per_so_line"></th>
+                        <th t-if="display_discount" groups="sale.group_discount_per_so_line"></th>
                         <th class="text-right">Unit Price</th>
                     </tr>
                 </thead>
@@ -30,19 +30,20 @@
                         <td>
                             <span t-field="option.name"/>
                         </td>
-                        <td groups="sale.group_discount_per_so_line">
-                            <strong class="text-info">
+                        <td t-if="display_discount" groups="sale.group_discount_per_so_line">
+                            <strong t-if="option.discount" class="text-info">
                                 <t t-esc="((option.discount % 1) and '%s' or '%d') % option.discount"/>% discount
                             </strong>
                         </td>
                         <td>
-                            <strong class="text-right">
+                            <strong class="text-right text-nowrap">
                                 <div t-field="option.price_unit"
                                     t-field-options='{"widget": "monetary", "display_currency": "doc.pricelist_id.currency_id"}'
                                     t-att-style="option.discount and 'text-decoration: line-through' or ''"
                                     t-att-class="option.discount and 'text-danger' or ''"/>
                                 <div t-if="option.discount">
-                                    <t t-esc="'%.2f' % ((1-option.discount / 100.0) * option.price_unit)"/>
+                                    <div t-field="option.price_discounted"
+                                         t-field-options='{"widget": "monetary", "display_currency": "doc.pricelist_id.currency_id"}'/>
                                 </div>
                             </strong>
                         </td>

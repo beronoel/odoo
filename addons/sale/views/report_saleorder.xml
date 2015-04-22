@@ -60,8 +60,8 @@
                     <tr>
                         <th>Description</th>
                         <th class="text-right">Quantity</th>
+                        <th t-if="display_discount" groups="sale.group_discount_per_so_line"></th>
                         <th class="text-right">Unit Price</th>
-                        <th t-if="display_discount" class="text-right"><span groups="sale.group_discount_per_so_line">Disc.(%)</span></th>
                         <th class="text-right">Taxes</th>
                         <th class="text-right">Price</th>
                     </tr>
@@ -75,16 +75,29 @@
                             <span t-field="l.product_uom_qty"/>
                             <span groups="product.group_uom" t-field="l.product_uom"/>
                         </td>
-                        <td class="text-right">
-                            <span t-field="l.price_unit"/>
-                        </td>
-                        <td t-if="display_discount" class="text-right" groups="sale.group_discount_per_so_line">
-                            <span t-field="l.discount"/>
+                        <td t-if="display_discount" groups="sale.group_discount_per_so_line" class="text-right">
+                            <strong t-if="l.discount" class="text-info">
+                                <t t-esc="((l.discount % 1) and '%s' or '%d') % l.discount"/>% discount
+                            </strong>
                         </td>
                         <td>
-                            <span t-esc="', '.join(map(lambda x: x.name, l.tax_id))"/>
+                            <strong class="text-right text-nowrap">
+                                <div t-field="l.price_unit"
+                                  t-field-options='{"widget": "monetary", "display_currency": "doc.pricelist_id.currency_id"}'
+                                  t-att-style="l.discount and 'text-decoration: line-through' or ''"
+                                  t-att-class="l.discount and 'text-danger' or ''"/>
+                                <div t-if="l.discount">
+                                    <div t-field="l.price_discounted"
+                                         t-field-options='{"widget": "monetary", "display_currency": "doc.pricelist_id.currency_id"}'/>
+                                </div>
+                            </strong>
                         </td>
                         <td class="text-right">
+                            <div t-foreach="l.tax_id" t-as="tax">
+                                <t t-esc="tax.name"/>
+                            </div>
+                        </td>
+                        <td class="text-right text-nowrap">
                             <span t-field="l.price_subtotal"
                                 t-field-options='{"widget": "monetary", "display_currency": "doc.pricelist_id.currency_id"}'/>
                         </td>

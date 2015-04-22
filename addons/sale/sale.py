@@ -792,6 +792,12 @@ class sale_order_line(osv.osv):
             res[line.id] = line.price_subtotal / line.product_uom_qty
         return res
 
+    def _get_price_discounted(self, cr, uid, ids, field_name, arg, context=None):
+        res = dict.fromkeys(ids, 0.0)
+        for line in self.browse(cr, uid, ids, context=context):
+            res[line.id] = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+        return res
+
     _name = 'sale.order.line'
     _description = 'Sales Order Line'
     _columns = {
@@ -808,6 +814,7 @@ class sale_order_line(osv.osv):
         'price_unit': fields.float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price'), readonly=True, states={'draft': [('readonly', False)]}),
         'price_subtotal': fields.function(_amount_line, string='Subtotal', digits=0),
         'price_reduce': fields.function(_get_price_reduce, type='float', string='Price Reduce', digits_compute=dp.get_precision('Product Price')),
+        'price_discounted': fields.function(_get_price_discounted, type='float', string='Discounted Unit Price', digits_compute=dp.get_precision('Product Price'), help="The Unit Price for this product, after the discount has been applied"),
         'tax_id': fields.many2many('account.tax', 'sale_order_tax', 'order_line_id', 'tax_id', 'Taxes', readonly=True, states={'draft': [('readonly', False)]}),
         'address_allotment_id': fields.many2one('res.partner', 'Allotment Partner',help="A partner to whom the particular product needs to be allotted."),
         'product_uom_qty': fields.float('Quantity', digits_compute= dp.get_precision('Product UoS'), required=True, readonly=True, states={'draft': [('readonly', False)]}),
