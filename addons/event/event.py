@@ -205,7 +205,7 @@ class event_event(models.Model):
     def create(self, vals):
         res = super(event_event, self).create(vals)
         if res.organizer_id:
-            res.message_subscribe([res.organizer_id.id])
+            res.message_subscribe(partner_ids=[res.organizer_id.id])
         if res.auto_confirm:
             res.button_confirm()
         return res
@@ -214,7 +214,7 @@ class event_event(models.Model):
     def write(self, vals):
         res = super(event_event, self).write(vals)
         if vals.get('organizer_id'):
-            self.message_subscribe([vals['organizer_id']])
+            self.message_subscribe(partner_ids=[vals['organizer_id']])
         return res
 
     @api.one

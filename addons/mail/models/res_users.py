@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from openerp import _, api, fields, models
-import openerp
+from openerp import exceptions
+
+
+_logger = logging.getLogger(__name__)
 
 
 class Users(models.Model):
@@ -10,15 +15,18 @@ class Users(models.Model):
         - make a new user follow itself
         - add a welcome message
         - add suggestion preference
+        - if adding groups to an user, check mail.channels linked to this user
+          group, and the user. This is done by overriding the write method.
     """
     _name = 'res.users'
     _inherit = ['res.users']
-    _inherits = {'mail.alias': 'alias_id'}
+    _inherits = {
+        'mail.alias': 'alias_id',
+    }
 
     alias_id = fields.Many2one('mail.alias', 'Alias', ondelete="restrict", required=True,
-            help="Email address internally associated with this user. Incoming "\
-                 "emails will appear in the user's notifications.", copy=False, auto_join=True)
-
+                               select=True, copy=False, auto_join=True,
+                               help="Email address internally associated with this user. Incoming emails will appear in the user's notifications.")
     def __init__(self, pool, cr):
         """ Override of __init__ to add access rights on notification_email_send
             and alias fields. Access rights are disabled by default, but allowed
@@ -34,9 +42,9 @@ class Users(models.Model):
         return init_res
 
     def _auto_init(self, cr, context=None):
-        """ Installation hook: aliases, partner following themselves """
-        # create aliases for all users and avoid constraint errors
-        return self.pool.get('mail.alias').migrate_to_alias(cr, self._name, self._table, super(Users, self)._auto_init,
+        """ Installation hook: aliases """
+        return self.pool.get('mail.alias').migrate_to_alias(
+            cr, self._name, self._table, super(Users, self)._auto_init,
             self._name, self._columns['alias_id'], 'login', alias_force_key='id', context=context)
 
     @api.model
@@ -44,7 +52,7 @@ class Users(models.Model):
         if not values.get('login', False):
             action = self.env.ref('base.action_res_users')
             msg = _("You cannot create a new user from here.\n To create new user please go to configuration panel.")
-            raise openerp.exceptions.RedirectWarning(msg, action.id, _('Go to the configuration panel'))
+            raise exceptions.RedirectWarning(msg, action.id, _('Go to the configuration panel'))
 
         user = super(Users, self.with_context({
             'alias_model_name': self._name,
@@ -55,6 +63,16 @@ class Users(models.Model):
         # create a welcome message
         user._create_welcome_message()
         return user
+
+    @api.multi
+    def write(self, vals):
+        write_res = super(Users, self).write(vals)
+        if vals.get('groups_id'):
+            # form: {'group_ids': [(3, 10), (3, 3), (4, 10), (4, 3)]} or {'group_ids': [(6, 0, [ids]}
+            user_group_ids = [command[1] for command in vals['groups_id'] if command[0] == 4]
+            user_group_ids += [id for command in vals['groups_id'] if command[0] == 6 for id in command[2]]
+            self.env['mail.channel'].search([('group_ids', 'in', user_group_ids)]).message_subscribe_users(self._ids)
+        return write_res
 
     def copy_data(self, *args, **kwargs):
         data = super(Users, self).copy_data(*args, **kwargs)
@@ -111,7 +129,8 @@ class Users(models.Model):
     def message_update(self, msg_dict, update_vals=None):
         return True
 
-    def message_subscribe(self, partner_ids, subtype_ids=None):
+    @api.multi
+    def message_subscribe(self, partner_ids=None, channel_ids=None, subtype_ids=None):
         return True
 
     @api.cr_uid_context
@@ -138,11 +157,11 @@ class res_users_mail_channel(models.Model):
             # form: {'group_ids': [(3, 10), (3, 3), (4, 10), (4, 3)]} or {'group_ids': [(6, 0, [ids]}
             user_group_ids = [command[1] for command in vals['groups_id'] if command[0] == 4]
             user_group_ids += [id for command in vals['groups_id'] if command[0] == 6 for id in command[2]]
-            self.env['mail.channel'].search([('group_ids', 'in', user_group_ids)]).message_subscribe_users(self._ids)
+            self.env['mail.channel'].search([('group_ids', 'in', user_group_ids)]).message_subscribe_users(self._ids, force=False)
         return write_res
 
 
-class res_groups_mail_channel(models.Model):
+class ResGroups(models.Model):
     """ Update of res.groups class
         - if adding users from a group, check mail.channels linked to this user
           group and subscribe them. This is done by overriding the write method.
@@ -152,7 +171,7 @@ class res_groups_mail_channel(models.Model):
 
     @api.multi
     def write(self, vals, context=None):
-        write_res = super(res_groups_mail_channel, self).write(vals)
+        write_res = super(ResGroups, self).write(vals)
         if vals.get('users'):
             # form: {'group_ids': [(3, 10), (3, 3), (4, 10), (4, 3)]} or {'group_ids': [(6, 0, [ids]}
             user_ids = [command[1] for command in vals['users'] if command[0] == 4]

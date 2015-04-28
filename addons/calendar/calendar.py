@@ -1123,7 +1123,7 @@ class calendar_event(osv.Model):
             if new_attendees:
                 self.write(cr, uid, [event.id], {'attendee_ids': [(4, att) for att in new_attendees]}, context=context)
             if new_att_partner_ids:
-                self.message_subscribe(cr, uid, [event.id], new_att_partner_ids, context=context)
+                self.message_subscribe(cr, uid, [event.id], partner_ids=new_att_partner_ids, context=context)
 
             # We remove old attendees who are not in partner_ids now.
             all_partner_ids = [part.id for part in event.partner_ids]
@@ -1369,14 +1369,6 @@ class calendar_event(osv.Model):
             data['end_type'] = 'end_date'
         return data
 
-    def message_get_subscription_data(self, cr, uid, ids, user_pid=None, context=None):
-        res = {}
-        for virtual_id in ids:
-            real_id = calendar_id2real_id(virtual_id)
-            result = super(calendar_event, self).message_get_subscription_data(cr, uid, [real_id], user_pid=None, context=context)
-            res[virtual_id] = result[real_id]
-        return res
-
     def _track_subtype(self, cr, uid, ids, init_values, context=None):
         record = self.browse(cr, uid, ids[0], context=context)
         if 'start' in init_values and record.start:
@@ -1431,11 +1423,11 @@ class calendar_event(osv.Model):
             del context['default_date']
         return super(calendar_event, self).message_post(cr, uid, thread_id, context=context, **kwargs)
 
-    def message_subscribe(self, cr, uid, ids, partner_ids, subtype_ids=None, context=None):
-        return super(calendar_event, self).message_subscribe(cr, uid, get_real_ids(ids), partner_ids, subtype_ids=subtype_ids, context=context)
+    def message_subscribe(self, cr, uid, ids, partner_ids=None, channel_ids=None, subtype_ids=None, context=None):
+        return super(calendar_event, self).message_subscribe(cr, uid, get_real_ids(ids), partner_ids=partner_ids, channel_ids=channel_ids, subtype_ids=subtype_ids, context=context)
 
-    def message_unsubscribe(self, cr, uid, ids, partner_ids, context=None):
-        return super(calendar_event, self).message_unsubscribe(cr, uid, get_real_ids(ids), partner_ids, context=context)
+    def message_unsubscribe(self, cr, uid, ids, partner_ids=None, user_ids=None, channel_ids=None, context=None):
+        return super(calendar_event, self).message_unsubscribe(cr, uid, get_real_ids(ids), partner_ids=partner_ids, user_ids=user_ids, channel_ids=channel_ids, context=context)
 
     def do_sendmail(self, cr, uid, ids, context=None):
         for event in self.browse(cr, uid, ids, context):

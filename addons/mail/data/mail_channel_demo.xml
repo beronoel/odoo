@@ -4,26 +4,26 @@
 
         <!-- Discussion groups, done in 2 steps to remove creator from followers -->
         <record model="mail.channel" id="channel_1">
-            <field name="name">Best Sales Practices</field>
+            <field name="channel_name">Best Sales Practices</field>
             <field name="description">Discussion about best sales practices and deals.</field>
         </record>
-        <record model="mail.channel" id="channel_1">
-            <field name="message_follower_ids" eval="[(6, 0, [ref('base.partner_demo')])]"/>
-        </record>
+<!--         <record model="mail.channel" id="channel_1">
+            <field name="message_follower_ids" eval="[(6, 0, [])]"/>
+        </record> -->
         <record model="mail.channel" id="channel_2">
-            <field name="name">Board meetings</field>
+            <field name="channel_name">Board meetings</field>
             <field name="description">Board meetings, budgets, strategic plans</field>
         </record>
-        <record model="mail.channel" id="channel_2">
+<!--         <record model="mail.channel" id="channel_2">
             <field name="message_follower_ids" eval="[(6, 0, [])]"/>
-        </record>
+        </record> -->
         <record model="mail.channel" id="channel_3">
-            <field name="name">R&amp;D</field>
+            <field name="channel_name">R&amp;D</field>
             <field name="description">Research and development discussion group</field>
         </record>
-        <record model="mail.channel" id="channel_3">
+<!--         <record model="mail.channel" id="channel_3">
             <field name="message_follower_ids" eval="[(6, 0, [])]"/>
-        </record>
+        </record> -->
 
         <!-- Best sales practices messages -->
         <record id="mail_message_channel_1_1" model="mail.message">
@@ -52,7 +52,6 @@
             <field name="parent_id" ref="mail_message_channel_1_2"/>
             <field name="subtype_id" ref="mt_comment"/>
             <field name="author_id" ref="base.partner_demo"/>
-            <field name="vote_user_ids" eval="[(6, 0, [ref('base.user_demo')])]"/>
             <field name="date" eval="(DateTime.today() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M')"/>
         </record>
 
@@ -158,7 +157,6 @@
             <field name="message_type">comment</field>
             <field name="subtype_id" ref="mt_comment"/>
             <field name="author_id" ref="base.partner_demo"/>
-            <field name="vote_user_ids" eval="[(6, 0, [ref('base.user_demo')])]"/>
             <field name="date" eval="(DateTime.today() - timedelta(days=3)).strftime('%Y-%m-%d %H:%M')"/>
         </record>
 

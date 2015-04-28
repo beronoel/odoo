@@ -58,14 +58,14 @@ class event_track(models.Model):
     @api.model
     def create(self, vals):
         res = super(event_track, self).create(vals)
-        res.message_subscribe(res.speaker_ids.ids)
+        res.message_subscribe(partner_ids=res.speaker_ids.ids)
         return res
 
     @api.multi
     def write(self, vals):
         res = super(event_track, self).write(vals)
         if vals.get('speaker_ids'):
-            self.message_subscribe([speaker['id'] for speaker in self.resolve_2many_commands('speaker_ids', vals['speaker_ids'], ['id'])])
+            self.message_subscribe(partner_ids=[speaker['id'] for speaker in self.resolve_2many_commands('speaker_ids', vals['speaker_ids'], ['id'])])
         return res
 
     @api.multi

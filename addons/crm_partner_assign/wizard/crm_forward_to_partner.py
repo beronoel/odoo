@@ -118,7 +118,7 @@ class crm_lead_forward_to_partner(osv.TransientModel):
             if stage_id:
                 values['stage_id'] = stage_id
             lead_obj.write(cr, uid, lead_ids, values)
-            self.pool.get('crm.lead').message_subscribe(cr, uid, lead_ids, [partner_id], context=context)
+            self.pool.get('crm.lead').message_subscribe(cr, uid, lead_ids, partner_ids=[partner_id], context=context)
         return True
 
     def get_lead_portal_url(self, cr, uid, lead_id, type, context=None):

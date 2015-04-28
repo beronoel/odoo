@@ -146,14 +146,12 @@ var Followers = form_common.AbstractField.extend({
 
     on_remove_follower: function (event) {
         var partner_id = $(event.target).data('id');
-            var name = $(event.target).parent().find("a").html();
-            if (confirm(_.str.sprintf(_t("Warning! \n %s won't be notified of any email or discussion on this document. Do you really want to remove him from the followers ?"), name))) {
-                var context = new data.CompoundContext(this.build_context(), {});
-                return this.ds_model.call('message_unsubscribe', [[this.view.datarecord.id], 
-                                                                  [partner_id], 
-                                                                  context])
-                    .then(this.proxy('read_value'));
-            }
+        var name = $(event.target).parent().find("a").html();
+        if (confirm(_.str.sprintf(_t("Warning! \n %s won't be notified of any email or discussion on this document. Do you really want to remove him from the followers ?"), name))) {
+            var context = new data.CompoundContext(this.build_context(), {});
+            return this.ds_model.call('message_unsubscribe', [[this.view.datarecord.id], [partner_id], [], [], context])
+                .then(this.proxy('read_value'));
+        }
     },
 
     on_follower_clicked: function  (event) {
@@ -192,7 +190,7 @@ var Followers = form_common.AbstractField.extend({
 
     fetch_followers: function (value_) {
         this.value = value_ || [];
-        ajax.jsonRpc('/mail/read_followers', 'call', {'follower_ids': this.value})
+        return ajax.jsonRpc('/mail/read_followers', 'call', {'follower_ids': this.value})
             .then(this.proxy('display_followers'), this.proxy('fetch_generic'))
             .then(this.proxy('display_buttons'))
             .then(this.proxy('fetch_subtypes'));
@@ -247,15 +245,13 @@ var Followers = form_common.AbstractField.extend({
         _(this.followers).each(function (record) {
             var partner = {
                 'id': record['id'],
-                'name': record['name'],
+                'name': record['name'] + '(' + record['res_model'] + ')',
                 'is_uid': record['is_uid'],
                 'is_editable': record['is_editable'],
-                'avatar_url': mail_utils.get_image(session, 'res.partner', 'image_small', record['id']),
+                'avatar_url': mail_utils.get_image(session, record['res_model'], 'image_small', record['id']),
             }
-
             $(qweb.render('mail_followers_partner', {'record': partner, 'widget': self}))
                 .appendTo(node_user_list);
-
             // On mouse-enter it will show the edit_subtype pencil.
             if (partner.is_editable) {
                 self.$('.o_timeline_follower_list').on('mouseenter mouseleave', function(e) {
@@ -413,11 +409,8 @@ var Followers = form_common.AbstractField.extend({
         } 
         else {
             var context = new data.CompoundContext(this.build_context(), {});
-            return this.ds_model.call(action_subscribe, [[this.view.datarecord.id], 
-                                                          follower_ids, 
-                                                          checklist, 
-                                                          context])
-                  .then(this.proxy('read_value'));
+            return this.ds_model.call(action_subscribe, [[this.view.datarecord.id], follower_ids, undefined, checklist, context])
+                .then(this.proxy('read_value'));
         }
     },
 });

@@ -142,6 +142,7 @@ class base_action_rule(osv.osv):
         if values:
             model.write(cr, uid, record_ids, values, context=context)
 
+        # TDE CHECK: what to do with this ? go to channel ?
         if action.act_followers and hasattr(model, 'message_subscribe'):
             follower_ids = map(int, action.act_followers)
             model.message_subscribe(cr, uid, record_ids, follower_ids, context=context)

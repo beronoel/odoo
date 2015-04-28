@@ -903,7 +903,7 @@ class task(osv.osv):
         if new_task.project_id and new_task.project_id.alias_name:  # check left-part is not already an alias
             email_list = filter(lambda x: x.split('@')[0] != new_task.project_id.alias_name, email_list)
         partner_ids = filter(lambda x: x, self._find_partner_from_emails(cr, uid, email_list, check_followers=False))
-        self.message_subscribe(cr, uid, [res], partner_ids, context=context)
+        self.message_subscribe(cr, uid, [res], partner_ids=partner_ids, context=context)
         return res
 
     def message_update(self, cr, uid, ids, msg, update_vals=None, context=None):

@@ -84,12 +84,12 @@ class TestProjectFlow(TestProjectBase):
             EMAIL_TPL, to='project+pigs@mydomain.com, valid.lelitre@agrolait.com', cc='valid.other@gmail.com',
             email_from='%s' % self.user_projectuser.email,
             subject='Frogs', msg_id='<1198923581.41972151344608186760.JavaMail@agrolait.com>',
-            target_model='project.task')
+            target_field='name', target_model='project.task')
 
         # Test: one task created by mailgateway administrator
         self.assertEqual(len(task), 1, 'project: message_process: a new project.task should have been created')
         # Test: check partner in message followers
-        self.assertIn(self.partner_2, task.message_follower_ids, "Partner in message cc is not added as a task followers.")
+        self.assertIn(self.partner_2, task.message_follower_ids.mapped('partner_id'), "Partner in message cc is not added as a task followers.")
         # Test: messages
         self.assertEqual(len(task.message_ids), 2,
                          'project: message_process: newly created task should have 2 messages: creation and email')

@@ -15,7 +15,7 @@ class TestMailGroup(TestMail):
             'mail_create_nolog': True,
             'mail_create_nosubscribe': True
         }).create({
-            'name': 'Private',
+            'channel_name': 'Private',
             'public': 'private'}
         ).with_context({'mail_create_nosubscribe': False})
 
@@ -31,17 +31,17 @@ class TestMailGroup(TestMail):
         with self.assertRaises(except_orm):
             self.group_pigs.sudo(self.user_public).read()
 
-        # Read a private group when being a follower: ok
-        self.group_private.message_subscribe_users(user_ids=[self.user_public.id])
+        # Read a private group when being a member: ok
+        self.group_private.write({'channel_partner_ids': [(4, self.user_public.partner_id.id)]})
         self.group_private.sudo(self.user_public).read()
 
         # Create group: ko, no access rights
         with self.assertRaises(AccessError):
-            self.env['mail.channel'].sudo(self.user_public).create({'name': 'Test'})
+            self.env['mail.channel'].sudo(self.user_public).create({'channel_name': 'Test'})
 
         # Update group: ko, no access rights
         with self.assertRaises(AccessError):
-            self.group_public.sudo(self.user_public).write({'name': 'Broutouschnouk'})
+            self.group_public.sudo(self.user_public).write({'channel_name': 'Broutouschnouk'})
 
         # Unlink group: ko, no access rights
         with self.assertRaises(AccessError):
@@ -54,10 +54,10 @@ class TestMailGroup(TestMail):
         self.group_pigs.sudo(self.user_employee).read()
 
         # Employee can create a group
-        self.env['mail.channel'].sudo(self.user_employee).create({'name': 'Test'})
+        self.env['mail.channel'].sudo(self.user_employee).create({'channel_name': 'Test'})
 
         # Employee update employee-based group: ok
-        self.group_pigs.sudo(self.user_employee).write({'name': 'modified'})
+        self.group_pigs.sudo(self.user_employee).write({'channel_name': 'modified'})
 
         # Employee unlink employee-based group: ok
         self.group_pigs.sudo(self.user_employee).unlink()
@@ -68,23 +68,16 @@ class TestMailGroup(TestMail):
 
         # Employee cannot write on private
         with self.assertRaises(AccessError):
-            self.group_private.sudo(self.user_employee).write({'name': 're-modified'})
+            self.group_private.sudo(self.user_employee).write({'channel_name': 're-modified'})
 
     def test_access_rights_followers_ko(self):
         with self.assertRaises(AccessError):
-            self.group_private.sudo(self.user_portal).name
+            self.group_private.sudo(self.user_portal).channel_name
 
     def test_access_rights_followers_portal(self):
-        # Do: Chell is added into Pigs followers and browse it -> ok for messages, ko for partners (no read permission)
-        self.group_private.message_subscribe_users(user_ids=[self.user_portal.id])
+        # Do: Chell is added into Pigs members and browse it -> ok for messages, ko for partners (no read permission)
+        self.group_private.write({'channel_partner_ids': [(4, self.user_portal.partner_id.id)]})
         chell_pigs = self.group_private.sudo(self.user_portal)
-        trigger_read = chell_pigs.name
+        trigger_read = chell_pigs.channel_name
         for message in chell_pigs.message_ids:
             trigger_read = message.subject
-        for partner in chell_pigs.message_follower_ids:
-            if partner.id == self.user_portal.partner_id.id:
-                # Chell can read her own partner record
-                continue
-            # TODO Change the except_orm to Warning
-            with self.assertRaises(except_orm):
-                trigger_read = partner.name

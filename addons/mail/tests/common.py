@@ -13,10 +13,10 @@ class TestMail(common.SavepointCase):
     def format_and_process(self, template, to='groups@example.com, other@gmail.com', subject='Frogs',
                            extra='', email_from='Sylvie Lelitre <test.sylvie.lelitre@agrolait.com>',
                            cc='', msg_id='<1198923581.41972151344608186760.JavaMail@agrolait.com>',
-                           model=None, target_model='mail.channel', target_field='name'):
+                           model=None, target_model='mail.channel', target_field='channel_name'):
         self.assertFalse(self.env[target_model].search([(target_field, '=', subject)]))
         mail = template.format(to=to, subject=subject, cc=cc, extra=extra, email_from=email_from, msg_id=msg_id)
-        self.env['mail.thread'].message_process(model, mail)
+        self.env['mail.thread'].with_context(mail_channel_noautofollow=True).message_process(model, mail)
         return self.env[target_model].search([(target_field, '=', subject)])
 
     def setUp(self):
@@ -85,11 +85,12 @@ class TestMail(common.SavepointCase):
         # Create test groups without followers and messages by default
         TestMailGroup = cls.env['mail.channel'].with_context({
             'mail_create_nolog': True,
-            'mail_create_nosubscribe': True
+            'mail_create_nosubscribe': True,
+            'mail_channel_noautofollow': True,
         })
         # Pigs: base group for tests
         cls.group_pigs = TestMailGroup.create({
-            'name': 'Pigs',
+            'channel_name': 'Pigs',
             'description': 'Fans of Pigs, unite !',
             'public': 'groups',
             'group_public_id': user_group_employee.id,
@@ -98,14 +99,20 @@ class TestMail(common.SavepointCase):
         ).with_context({'mail_create_nosubscribe': False})
         # Jobs: public group
         cls.group_public = TestMailGroup.create({
-            'name': 'Jobs',
+            'channel_name': 'Jobs',
             'description': 'NotFalse',
             'public': 'public',
             'alias_name': 'public',
             'alias_contact': 'everyone'}
         ).with_context({'mail_create_nosubscribe': False})
 
+        # remove default followers
+        cls.env['mail.followers'].search([
+            ('res_model', '=', 'mail.channel'),
+            ('res_id', 'in', (cls.group_pigs | cls.group_public).ids)]).unlink()
+
         cls._init_mock_build_email()
+
 
     @classmethod
     def tearDownClass(cls):

@@ -32,7 +32,7 @@ class TestMailTemplate(TestMail):
         self.email_template = self.env['mail.template'].create({
             'model_id': self.env['ir.model'].search([('model', '=', 'mail.channel')], limit=1).id,
             'name': 'Pigs Template',
-            'subject': '${object.name}',
+            'subject': '${object.channel_name}',
             'body_html': '${object.description}',
             'user_signature': False,
             'attachment_ids': [(0, 0, self._attachments[0]), (0, 0, self._attachments[1])],
@@ -54,7 +54,7 @@ class TestMailTemplate(TestMail):
         attachments = self.env['ir.attachment'].browse(values['attachment_ids'])
         test_recipients = self.env['res.partner'].search([('email', 'in', ['test1@example.com', 'test2@example.com'])]) | self.partner_1 | self.partner_2 | self.user_employee.partner_id
         test_attachments = self.env['ir.attachment'].search([('name', 'in', ['_Test_First', '_Test_Second'])])
-        self.assertEqual(values['subject'], self.group_pigs.name)
+        self.assertEqual(values['subject'], self.group_pigs.channel_name)
         self.assertEqual(values['body'], '<p>%s</p>' % self.group_pigs.description)
         self.assertEqual(recipients, test_recipients)
         self.assertEqual(set(recipients.mapped('email')), set([self.email_1, self.email_2, self.partner_1.email, self.partner_2.email, self.user_employee.email]))
@@ -74,10 +74,9 @@ class TestMailTemplate(TestMail):
 
         message = self.group_pigs.message_ids[0]
         test_recipients = self.env['res.partner'].search([('email', 'in', ['test1@example.com', 'test2@example.com'])]) | self.partner_1 | self.partner_2 | self.user_employee.partner_id
-        self.assertEqual(message.subject, self.group_pigs.name)
+        self.assertEqual(message.subject, self.group_pigs.channel_name)
         self.assertEqual(message.body, '<p>%s</p>' % self.group_pigs.description)
         self.assertEqual(message.partner_ids, test_recipients)
-        self.assertEqual(message.notified_partner_ids, test_recipients)
         self.assertEqual(set(message.attachment_ids.mapped('res_model')), set(['mail.channel']))
         self.assertEqual(set(message.attachment_ids.mapped('res_id')), set([self.group_pigs.id]))
         # self.assertIn((attach.datas_fname, base64.b64decode(attach.datas)), _attachments_test,
@@ -100,8 +99,8 @@ class TestMailTemplate(TestMail):
         message_1 = self.group_pigs.message_ids[0]
         message_2 = self.group_public.message_ids[0]
 
-        self.assertEqual(message_1.subject, self.group_pigs.name, 'mail.message subject on Pigs incorrect')
-        self.assertEqual(message_2.subject, self.group_public.name, 'mail.message subject on Bird incorrect')
+        self.assertEqual(message_1.subject, self.group_pigs.channel_name, 'mail.message subject on Pigs incorrect')
+        self.assertEqual(message_2.subject, self.group_public.channel_name, 'mail.message subject on Bird incorrect')
         self.assertIn(self.group_pigs.description, message_1.body, 'mail.message body on Pigs incorrect')
         self.assertIn(self.group_public.description, message_2.body, 'mail.message body on Bird incorrect')
         # todo for JDC: ! (False -> <p>False</p>)
@@ -109,7 +108,7 @@ class TestMailTemplate(TestMail):
     def test_mail_template(self):
         mail_id = self.email_template.send_mail(self.group_pigs.id)
         mail = self.env['mail.mail'].browse(mail_id)
-        self.assertEqual(mail.subject, self.group_pigs.name)
+        self.assertEqual(mail.subject, self.group_pigs.channel_name)
         self.assertEqual(mail.email_to, self.email_template.email_to)
         self.assertEqual(mail.email_cc, self.email_template.email_cc)
         self.assertEqual(mail.recipient_ids, self.partner_2 | self.user_employee.partner_id)

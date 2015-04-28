@@ -188,8 +188,14 @@ class mrp_repair(osv.osv):
         @return: Dictionary of values.
         """
         product = False
+        print self, cr, uid, ids, product_id
         if product_id:
             product = self.pool.get("product.product").browse(cr, uid, product_id)
+            print product
+            # import pdb
+            # pdb.set_trace()
+            print '-', product.uom_id
+            print '--', product.uom_id.id
         return {'value': {
                     'guarantee_limit': False,
                     'lot_id': False,

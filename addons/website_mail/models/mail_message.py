@@ -47,9 +47,8 @@ class MailMessage(osv.Model):
         """ Override that adds specific access rights of mail.message, to restrict
         messages to published messages for public users. """
         if uid != SUPERUSER_ID:
-            group_ids = self.pool.get('res.users').browse(cr, uid, uid, context=context).groups_id
-            group_user_id = self.pool.get("ir.model.data").get_object_reference(cr, uid, 'base', 'group_public')[1]
-            if group_user_id in [group.id for group in group_ids]:
+            user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid, context=context)
+            if user.has_group('base.group_public'):
                 args = expression.AND([[('website_published', '=', True)], list(args)])
 
         return super(MailMessage, self)._search(cr, uid, args, offset=offset, limit=limit, order=order,
@@ -61,11 +60,9 @@ class MailMessage(osv.Model):
                 - raise if the type is comment and subtype NULL (internal note)
         """
         if uid != SUPERUSER_ID:
-            group_ids = self.pool.get('res.users').browse(cr, uid, uid, context=context).groups_id
-            group_user_id = self.pool.get("ir.model.data").get_object_reference(cr, uid, 'base', 'group_public')[1]
-            if group_user_id in [group.id for group in group_ids]:
+            user = self.pool.get('res.users').browse(cr, SUPERUSER_ID, uid, context=context)
+            if user.has_group('base.group_public'):
                 cr.execute('SELECT id FROM "%s" WHERE website_published IS FALSE AND id = ANY (%%s)' % (self._table), (ids,))
                 if cr.fetchall():
                     raise AccessError(_('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)') % (self._description, operation))
         return super(MailMessage, self).check_access_rule(cr, uid, ids=ids, operation=operation, context=context)
-

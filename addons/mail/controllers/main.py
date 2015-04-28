@@ -1,5 +1,8 @@
+
 import base64
 from operator import itemgetter
+import mimetypes
+
 import psycopg2
 
 import openerp
@@ -7,7 +10,6 @@ from openerp import SUPERUSER_ID
 from openerp import http
 from openerp.http import request
 from openerp.addons.web.controllers.main import content_disposition
-import mimetypes
 
 
 class MailController(http.Controller):
@@ -16,8 +18,7 @@ class MailController(http.Controller):
     @http.route('/mail/download_attachment', type='http', auth='user')
     def download_attachment(self, model, id, method, attachment_id, **kw):
         # FIXME use /web/binary/saveas directly
-        Model = request.registry.get(model)
-        res = getattr(Model, method)(request.cr, request.uid, int(id), int(attachment_id))
+        res = getattr(request.env[model].browse(int(id)), method)(int(attachment_id))
         if res:
             filecontent = base64.b64decode(res.get('base64'))
             filename = res.get('filename')

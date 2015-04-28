@@ -299,12 +299,6 @@ Andrew</field>
                     {'install_mode': True}"
         />
 
-        <!-- Call Function to set the leads as Unread -->
-        <function model="crm.lead" name="message_mark_as_unread"
-            eval="[ ref('crm_case_1'), ref('crm_case_2'),
-                    ref('crm_case_5'), ref('crm_case_6')], {}"
-        />
-
         <!-- Demo Opportunities -->
         <record id="crm_case_13" model="crm.lead">
             <field name="type">opportunity</field>
@@ -380,9 +374,6 @@ Andrew</field>
             <field name="campaign_id" ref="utm.utm_campaign_email_campaign_products"/>
             <field name="source_id" ref="utm.utm_source_newsletter"/>
         </record>
-        <record id="crm_case_15" model="crm.lead">
-            <field name="message_follower_ids" eval="[(3, ref('base.partner_root')), (4, ref('base.partner_demo'))]"/>
-        </record>
 
         <record id="crm_case_16" model="crm.lead">
             <field name="type">opportunity</field>
@@ -436,9 +427,6 @@ Andrew</field>
             <field name="medium_id" ref="utm.utm_medium_website"/>
             <field name="source_id" ref="utm.utm_source_search_engine"/>
         </record>
-        <record id="crm_case_17" model="crm.lead">
-            <field name="message_follower_ids" eval="[(3, ref('base.partner_root')), (4, ref('base.partner_demo'))]"/>
-        </record>
 
         <record id="crm_case_18" model="crm.lead">
             <field name="type">opportunity</field>
@@ -464,9 +452,6 @@ Andrew</field>
             <field eval="1" name="active"/>
             <field name="campaign_id" ref="utm.utm_campaign_email_campaign_products"/>
             <field name="source_id" ref="utm.utm_source_newsletter"/>
-        </record>
-        <record id="crm_case_18" model="crm.lead">
-            <field name="message_follower_ids" eval="[(4, ref('base.partner_demo'))]"/>
         </record>
 
         <record id="crm_case_19" model="crm.lead">

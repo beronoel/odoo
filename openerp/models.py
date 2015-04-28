@@ -5205,6 +5205,10 @@ class BaseModel(object):
         """ Create an instance attached to `env`; `ids` is a tuple of record
             ids.
         """
+        if cls._name == 'product.product' and ids and not isinstance(ids[0], (int, long)):
+            print '\t--> browsing non int', type(ids[0])
+            # import pdb
+            # pdb.set_trace()
         records = object.__new__(cls)
         records.env = env
         records._ids = ids

@@ -44,8 +44,8 @@ class sale_order(osv.Model):
         assert len(ids) == 1
         document = self.browse(cr, uid, ids[0], context=context)
         partner = document.partner_id
-        if partner not in document.message_follower_ids:
-            self.message_subscribe(cr, uid, ids, [partner.id], context=context)
+        if partner not in document.message_partner_ids:
+            self.message_subscribe(cr, uid, ids, partner_ids=[partner.id], context=context)
         return super(sale_order, self).action_button_confirm(cr, uid, ids, context=context)
 
     def get_signup_url(self, cr, uid, ids, context=None):
@@ -103,8 +103,8 @@ class account_invoice(osv.Model):
         # fetch the partner's id and subscribe the partner to the invoice
         for invoice in self.browse(cr, uid, ids, context=context):
             partner = invoice.partner_id
-            if partner not in invoice.message_follower_ids:
-                self.message_subscribe(cr, uid, [invoice.id], [partner.id], context=context)
+            if partner not in invoice.message_partner_ids:
+                self.message_subscribe(cr, uid, [invoice.id], partner_ids=[partner.id], context=context)
         return super(account_invoice, self).invoice_validate(cr, uid, ids, context=context)
 
     def get_signup_url(self, cr, uid, ids, context=None):

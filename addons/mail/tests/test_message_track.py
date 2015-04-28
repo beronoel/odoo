@@ -6,17 +6,14 @@ from openerp.addons.mail.tests.common import TestMail
 class TestTracking(TestMail):
 
     def test_message_track(self):
-        """ Testing auto tracking of fields. Warning, it has not be cleaned and
-        should probably be. """
-        def _strip_string_spaces(body):
-            return body.replace(' ', '').replace('\n', '')
+        """ Testing auto tracking of fields. """
         Subtype = self.env['mail.message.subtype']
         Data = self.env['ir.model.data']
         note_subtype = self.env.ref('mail.mt_note')
 
         group_system = self.env.ref('base.group_system')
         group_user = self.env.ref('base.group_user')
-        self.group_pigs.message_subscribe_users(user_ids=[self.user_employee.id])
+        self.group_pigs.write({'channel_partner_ids': [(4, self.user_employee.partner_id.id)]})
 
         # mt_private: public field (tracked as onchange) set to 'private' (selection)
         mt_private = Subtype.create({
@@ -70,7 +67,7 @@ class TestTracking(TestMail):
             record = self.browse(cr, uid, ids[0], context=context)
             if 'public' in init_values and record.public == 'private':
                 return 'mail.mt_private'
-            elif 'name' in init_values and record.name == 'supername':
+            elif 'channel_name' in init_values and record.channel_name == 'supername':
                 return 'mail.mt_name_supername'
             elif 'group_public_id' in init_values and record.group_public_id:
                 return 'mail.mt_group_public_set'
@@ -81,7 +78,7 @@ class TestTracking(TestMail):
 
         visibility = {
             'public': 'onchange',
-            'name': 'always',
+            'channel_name': 'always',
             'group_public_id': 'onchange'
         }
         cls = type(self.env['mail.channel'])
@@ -95,24 +92,24 @@ class TestTracking(TestMail):
                 del getattr(cls, key).track_visibility
 
         # Test: change name -> always tracked, not related to a subtype
-        self.group_pigs.sudo(self.user_employee).write({'name': 'my_name'})
+        self.group_pigs.sudo(self.user_employee).write({'channel_name': 'my_name'})
         self.assertEqual(len(self.group_pigs.message_ids), 1)
         last_msg = self.group_pigs.message_ids[-1]
         self.assertEqual(last_msg.subtype_id, note_subtype)
         self.assertEqual(len(last_msg.tracking_value_ids), 1)
-        self.assertEqual(last_msg.tracking_value_ids.field, 'name')
+        self.assertEqual(last_msg.tracking_value_ids.field, 'channel_name')
         self.assertEqual(last_msg.tracking_value_ids.field_desc, 'Name')
         self.assertEqual(last_msg.tracking_value_ids.old_value_char, 'Pigs')
         self.assertEqual(last_msg.tracking_value_ids.new_value_char, 'my_name')
 
         # Test: change name as supername, public as private -> 1 subtype, private
-        self.group_pigs.sudo(self.user_employee).write({'name': 'supername', 'public': 'private'})
+        self.group_pigs.sudo(self.user_employee).write({'channel_name': 'supername', 'public': 'private'})
         self.group_pigs.invalidate_cache()
         self.assertEqual(len(self.group_pigs.message_ids.ids), 2)
         last_msg = self.group_pigs.message_ids[0]
         self.assertEqual(last_msg.subtype_id, mt_private)
         self.assertEqual(len(last_msg.tracking_value_ids), 2)
-        self.assertEqual(set(last_msg.tracking_value_ids.mapped('field')), set(['name', 'public']))
+        self.assertEqual(set(last_msg.tracking_value_ids.mapped('field')), set(['channel_name', 'public']))
         self.assertEqual(set(last_msg.tracking_value_ids.mapped('field_desc')), set(['Name', 'Privacy']))
         self.assertEqual(set(last_msg.tracking_value_ids.mapped('old_value_char')), set(['my_name', 'Selected group of users']))
         self.assertEqual(set(last_msg.tracking_value_ids.mapped('new_value_char')), set(['supername', 'Invited people only']))

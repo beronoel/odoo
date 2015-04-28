@@ -744,7 +744,7 @@ class share_wizard(osv.TransientModel):
             # Record id not found: issue
             if res_id <= 0:
                 raise UserError(_('The share engine has not been able to fetch a record_id for your invitation.'))
-            self.pool[model.model].message_subscribe(cr, uid, [res_id], new_ids + existing_ids, context=context)
+            self.pool[model.model].message_subscribe(cr, uid, [res_id], partner_ids=new_ids + existing_ids, context=context)
             # self.send_invite_email(cr, uid, wizard_data, context=context)
             # self.send_invite_note(cr, uid, model.model, res_id, wizard_data, context=context)
         

@@ -220,7 +220,7 @@ class gamification_challenge(osv.Model):
         if vals.get('report_message_frequency', 'never') != 'never':
             # _recompute_challenge_users do not set users for challenges with no reports, subscribing them now
             for challenge in self.browse(cr, uid, ids, context=context):
-                self.message_subscribe(cr, uid, [challenge.id], [user.partner_id.id for user in challenge.user_ids], context=context)
+                self.message_subscribe_users(cr, uid, [challenge.id], user_ids=[user.id for user in challenge.user_ids], context=context)
 
         if vals.get('state') == 'inprogress':
             self._recompute_challenge_users(cr, uid, ids, context=context)
