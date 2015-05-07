@@ -41,28 +41,47 @@ class stock_history(osv.osv):
     _auto = False
     _order = 'date asc'
 
-    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=True):
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=False):
         res = super(stock_history, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
+
+        product_tmpl_obj = self.pool.get("product.template")
+        product_obj = self.pool.get("product.product")
         if context is None:
             context = {}
         date = context.get('history_date')
         prod_dict = {}
         if 'inventory_value' in fields:
             for line in res:
-                lines = self.search(cr, uid, line.get('__domain', []), context=context)
-                inv_value = 0.0
-                product_tmpl_obj = self.pool.get("product.template")
-                lines_rec = self.browse(cr, uid, lines, context=context)
-                for line_rec in lines_rec:
-                    if line_rec.product_id.cost_method == 'real':
-                        price = line_rec.price_unit_on_quant
+                if line.get('product_id'):
+                    product = product_obj.browse(cr, uid, line['product_id'][0], context=context)
+                    if product.cost_method == 'real':
+                        if line.get('price_unit_on_quant'):
+                            line['inventory_value'] = line['price_unit_on_quant']
+                        else:
+                            import pdb; pdb.set_trace()
                     else:
-                        if not line_rec.product_id.id in prod_dict:
-                            prod_dict[line_rec.product_id.id] = product_tmpl_obj.get_history_price(cr, uid, line_rec.product_id.product_tmpl_id.id, line_rec.company_id.id, date=date, context=context)
-                        price = prod_dict[line_rec.product_id.id]
-                    inv_value += price * line_rec.quantity
-                line['inventory_value'] = inv_value
+                        if not product.id in prod_dict:
+                            prod_dict[product.id] = product_tmpl_obj.get_history_price(cr, uid, product.product_tmpl_id.id, line['company_id'], date=date, context=context)
+                        price = prod_dict[product.id]
+                        line['inventory_value'] = line['quantity'] * price
         return res
+
+        #
+        #     for line in res:
+        #         lines = self.search(cr, uid, line.get('__domain', []), context=context)
+        #         inv_value = 0.0
+        #         product_tmpl_obj = self.pool.get("product.template")
+        #         lines_rec = self.browse(cr, uid, lines, context=context)
+        #         for line_rec in lines_rec:
+        #             if line_rec.product_id.cost_method == 'real':
+        #                 price = line_rec.price_unit_on_quant
+        #             else:
+        #                 if not line_rec.product_id.id in prod_dict:
+        #                     prod_dict[line_rec.product_id.id] = product_tmpl_obj.get_history_price(cr, uid, line_rec.product_id.product_tmpl_id.id, line_rec.company_id.id, date=date, context=context)
+        #                 price = prod_dict[line_rec.product_id.id]
+        #             inv_value += price * line_rec.quantity
+        #         line['inventory_value'] = inv_value
+        # return res
 
     def _get_inventory_value(self, cr, uid, ids, name, attr, context=None):
         if context is None:
@@ -102,7 +121,7 @@ class stock_history(osv.osv):
                 product_categ_id,
                 SUM(quantity) as quantity,
                 date,
-                price_unit_on_quant,
+                SUM(quant_price_unit * quantity) as price_unit_on_quant,
                 source
                 FROM
                 ((SELECT
@@ -115,7 +134,7 @@ class stock_history(osv.osv):
                     product_template.categ_id AS product_categ_id,
                     quant.qty AS quantity,
                     stock_move.date AS date,
-                    quant.cost as price_unit_on_quant,
+                    quant.cost as quant_price_unit,
                     stock_move.origin AS source
                 FROM
                     stock_quant as quant, stock_quant_move_rel, stock_move
@@ -141,7 +160,7 @@ class stock_history(osv.osv):
                     product_template.categ_id AS product_categ_id,
                     - quant.qty AS quantity,
                     stock_move.date AS date,
-                    quant.cost as price_unit_on_quant,
+                    quant.cost as quant_price_unit,
                     stock_move.origin AS source
                 FROM
                     stock_quant as quant, stock_quant_move_rel, stock_move
@@ -158,5 +177,5 @@ class stock_history(osv.osv):
                 (dest_location.company_id is not null and source_location.company_id is null) or dest_location.company_id != source_location.company_id)
                 ))
                 AS foo
-                GROUP BY move_id, location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, source
+                GROUP BY move_id, location_id, company_id, product_id, product_categ_id, date, source
             )""")

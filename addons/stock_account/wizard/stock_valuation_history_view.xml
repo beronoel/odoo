@@ -51,6 +51,7 @@
                 <field name="source"/>
                 <field name="quantity" sum="# of Products "/>
                 <field name="inventory_value" sum="Total Value"/>
+                <field name="price_unit_on_quant" sum="Total price quants" groups="base.group_no_one"/>
            </tree>
         </field>
     </record>

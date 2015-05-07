@@ -13,6 +13,7 @@
         </record>
 
         <record id="product.product_product_consultant" model="product.product">
+            <field name="name">Consultant</field>
             <field name="sale_ok">True</field>
         </record>
 
