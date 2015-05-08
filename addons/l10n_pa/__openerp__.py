@@ -22,7 +22,7 @@ Con la Colaboración de
     "data": [
         "l10n_pa_chart.xml",
         "account_tax.xml",
-        "l10n_pa_wizard.xml",
+        "account_chart_template.yml",
     ],
     "demo_xml": [],
     "installable": False,
