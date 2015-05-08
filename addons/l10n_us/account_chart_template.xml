@@ -1,66 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<openerp>
-  <data>
+<odoo>
 
+        <record id="transfer_account_id_01" model="account.account.template">
+            <field name="name">Transfer Account</field>
+            <field name="code">101</field>
+            <field name="reconcile" eval="True"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        </record>
         <record id="account_chart_template_basic" model="account.chart.template">
             <field name="name">Basic Chart of Account</field>
-            <field name="visible" eval="False" />
-            <field name="complete_tax_set" eval="False" />
-            <field name="use_anglo_saxon" eval="True" />
+            <field name="visible" eval="False"/>
+            <field name="complete_tax_set" eval="False"/>
+            <field name="use_anglo_saxon" eval="True"/>
+            <field name="bank_account_code_prefix">1001</field>
+            <field name="cash_account_code_prefix">1002</field>
+            <field name="currency_id" ref="base.USD"/>
+            <field name="code_digits">6</field>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
+        </record>
+        <record id="transfer_account_id_01" model="account.account.template">
+            <field name="chart_template_id" ref="account_chart_template_basic"/>
         </record>
 
         <record id="account_chart_template_cogs" model="account.chart.template">
             <field name="name">Cost of Goods sold</field>
-            <field name="visible" eval="False" />
+            <field name="visible" eval="False"/>
             <field name="parent_id" ref="account_chart_template_basic"/>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
+            <field name="bank_account_code_prefix">1003</field>
+            <field name="cash_account_code_prefix">1004</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
+
         <record id="account_chart_template_advertising" model="account.chart.template">
             <field name="name">Advertising</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_cogs"/>
+            <field name="bank_account_code_prefix">1005</field>
+            <field name="cash_account_code_prefix">1006</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
+
         <record id="account_chart_template_agriculture" model="account.chart.template">
             <field name="name">Agriculture</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_basic"/>
+            <field name="bank_account_code_prefix">1007</field>
+            <field name="cash_account_code_prefix">1008</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
+
         <record id="account_chart_template_construction" model="account.chart.template">
             <field name="name">Construction Trades (Plumber, Electrician, HVAC, etc.)</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_cogs"/>
+            <field name="bank_account_code_prefix">1009</field>
+            <field name="cash_account_code_prefix">1010</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
 
         <record id="account_chart_template_financial_service" model="account.chart.template">
             <field name="name">Financial Services other than Accounting or Bookkeeping</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_cogs"/>
+            <field name="bank_account_code_prefix">1011</field>
+            <field name="cash_account_code_prefix">1012</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
 
         <record id="account_chart_template_general_service" model="account.chart.template">
             <field name="name">General Service-Based Business</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_cogs"/>
+            <field name="bank_account_code_prefix">1013</field>
+            <field name="cash_account_code_prefix">1014</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
 
         <record id="account_chart_template_legal_service" model="account.chart.template">
             <field name="name">Legal Services</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_basic"/>
+            <field name="bank_account_code_prefix">1015</field>
+            <field name="cash_account_code_prefix">1016</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
 
         <record id="account_chart_template_general_product" model="account.chart.template">
             <field name="name">General Product-Based Business</field>
-            <field name="complete_tax_set" eval="False" />
+            <field name="complete_tax_set" eval="False"/>
             <field name="parent_id" ref="account_chart_template_basic"/>
+            <field name="bank_account_code_prefix">1017</field>
+            <field name="cash_account_code_prefix">1018</field>
             <field name="currency_id" ref="base.USD"/>
+            <field name="transfer_account_id" ref="transfer_account_id_01"/>
         </record>
-    </data>
-</openerp>
+
+</odoo>

@@ -1,21 +1,22 @@
 <openerp>
     <data noupdate="1">
+
         <!-- Taxes -->
         <record id="otaxs" model="account.tax.template">
             <field name="chart_template_id" ref="l10n_us.account_chart_template_basic"/>
             <field name="name">default purchase tax</field>
-            <field eval="0.15" name="amount"/>
+            <field eval="15" name="amount"/>
             <field name="sequence">1</field>
-            <field name="type">percent</field>
+            <field name="amount_type">percent</field>
             <field name="type_tax_use">purchase</field>
         </record>
 
         <record id="otaxx" model="account.tax.template">
             <field name="chart_template_id" ref="l10n_us.account_chart_template_basic"/>
             <field name="name">Exempted Tax (Purchase)</field>
-            <field eval="0.0" name="amount"/>
+            <field eval="0" name="amount"/>
             <field name="sequence">10</field>
-            <field name="type">percent</field>
+            <field name="amount_type">percent</field>
             <field name="type_tax_use">purchase</field>
         </record>
 
@@ -24,18 +25,18 @@
         <record id="itaxs" model="account.tax.template">
             <field name="chart_template_id" ref="l10n_us.account_chart_template_basic"/>
             <field name="name">default sale tax</field>
-            <field eval="0.15" name="amount"/>
+            <field eval="15" name="amount"/>
             <field name="sequence">1</field>
-            <field name="type">percent</field>
+            <field name="amount_type">percent</field>
             <field name="type_tax_use">sale</field>
         </record>
 
         <record id="itaxx" model="account.tax.template">
             <field name="chart_template_id" ref="l10n_us.account_chart_template_basic"/>
             <field name="name">Exempted Tax (Sale)</field>
-            <field eval="0.0" name="amount"/>
+            <field eval="0" name="amount"/>
             <field name="sequence">10</field>
-            <field name="type">percent</field>
+            <field name="amount_type">percent</field>
             <field name="type_tax_use">sale</field>
         </record>
 
