@@ -42,8 +42,9 @@ class stock_history(osv.osv):
     _order = 'date asc'
 
     def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=False):
+        if 'price_unit_on_quant' not in fields:
+            fields.append('price_unit_on_quant')
         res = super(stock_history, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
-
         product_tmpl_obj = self.pool.get("product.template")
         product_obj = self.pool.get("product.product")
         if context is None:
@@ -57,11 +58,10 @@ class stock_history(osv.osv):
                     if product.cost_method == 'real':
                         if line.get('price_unit_on_quant'):
                             line['inventory_value'] = line['price_unit_on_quant']
-                        else:
-                            import pdb; pdb.set_trace()
                     else:
                         if not product.id in prod_dict:
-                            prod_dict[product.id] = product_tmpl_obj.get_history_price(cr, uid, product.product_tmpl_id.id, line['company_id'], date=date, context=context)
+                            prod_dict[product.id] = product_tmpl_obj.get_history_price(cr, uid, product.product_tmpl_id.id, 1, date=date, context=context)
+                            #TODO: change company_id
                         price = prod_dict[product.id]
                         line['inventory_value'] = line['quantity'] * price
         return res
