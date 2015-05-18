@@ -23,8 +23,10 @@ class wizard_valuation_history(osv.osv_memory):
         data = self.read(cr, uid, ids, context=context)[0]
         ctx = context.copy()
         ctx['history_date'] = data['date']
-        ctx['search_default_group_by_product'] = True
-        ctx['search_default_group_by_location'] = True
+        ctx['group_by'] = ['company_id', 'product_id', 'location_id']
+
+        #ctx['search_default_group_by_product'] = True
+        #ctx['search_default_group_by_location'] = True
         return {
             'domain': "[('date', '<=', '" + data['date'] + "')]",
             'name': _('Stock Value At Date'),
@@ -60,28 +62,16 @@ class stock_history(osv.osv):
                             line['inventory_value'] = line['price_unit_on_quant']
                     else:
                         if not product.id in prod_dict:
-                            prod_dict[product.id] = product_tmpl_obj.get_history_price(cr, uid, product.product_tmpl_id.id, 1, date=date, context=context)
-                            #TODO: change company_id
-                        price = prod_dict[product.id]
+                            if line.get('company_id'):
+                                company_id = line['company_id']
+                            elif context.get('company_id'):
+                                company_id = context['company_id']
+                            else:
+                                company_id = 1
+                            prod_dict.setdefault(product.id, {})[company_id] = product_tmpl_obj.get_history_price(cr, uid, product.product_tmpl_id.id, company_id, date=date, context=context)
+                        price = prod_dict[product.id][company_id]
                         line['inventory_value'] = line['quantity'] * price
         return res
-
-        #
-        #     for line in res:
-        #         lines = self.search(cr, uid, line.get('__domain', []), context=context)
-        #         inv_value = 0.0
-        #         product_tmpl_obj = self.pool.get("product.template")
-        #         lines_rec = self.browse(cr, uid, lines, context=context)
-        #         for line_rec in lines_rec:
-        #             if line_rec.product_id.cost_method == 'real':
-        #                 price = line_rec.price_unit_on_quant
-        #             else:
-        #                 if not line_rec.product_id.id in prod_dict:
-        #                     prod_dict[line_rec.product_id.id] = product_tmpl_obj.get_history_price(cr, uid, line_rec.product_id.product_tmpl_id.id, line_rec.company_id.id, date=date, context=context)
-        #                 price = prod_dict[line_rec.product_id.id]
-        #             inv_value += price * line_rec.quantity
-        #         line['inventory_value'] = inv_value
-        # return res
 
     def _get_inventory_value(self, cr, uid, ids, name, attr, context=None):
         if context is None:
