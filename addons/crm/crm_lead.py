@@ -1007,6 +1007,20 @@ Update your business card, phone book, social media,... Send an email right now 
 
         return super(crm_lead, self).message_update(cr, uid, ids, msg, update_vals=update_vals, context=context)
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(crm_lead, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        lead = self.browse(cr, uid, ids[0], context=context)
+        if not lead.user_id:
+            res['follow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+            res['unfollow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+        elif lead.type == 'lead':
+            res['follow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
+            res['unfollow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
+        else:
+            res['follow']['actions'] = [{'url': '#', 'title': 'Won'}, {'url': '#', 'title': 'Lost'}]
+            res['unfollow']['actions'] = [{'url': '#', 'title': 'Won'}, {'url': '#', 'title': 'Lost'}]
+        return res
+
     def log_meeting(self, cr, uid, ids, meeting_subject, meeting_date, duration, context=None):
         if not duration:
             duration = _('unknown')

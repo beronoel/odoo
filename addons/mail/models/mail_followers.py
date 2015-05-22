@@ -80,7 +80,7 @@ class Notification(models.Model):
             :param list partners_to_notify: optional list of partner ids restricting
                 the notifications to process
         """
-        notify_pids = []
+        notify_partners = self.env['res.partner']
         for notification in self:
             if notification.is_read:
                 continue
@@ -94,50 +94,8 @@ class Notification(models.Model):
             # Partner does not want to receive any emails or is opt-out
             if partner.notify_email == 'none':
                 continue
-            notify_pids.append(partner.id)
-        return notify_pids
-
-    @api.model
-    def get_signature_footer(self, user_id, res_model=None, res_id=None, user_signature=True):
-        """ Format a standard footer for notification emails (such as pushed messages
-            notification or invite emails).
-            Format:
-                <p>--<br />
-                    Administrator
-                </p>
-                <div>
-                    <small>Sent from <a ...>Your Company</a> using <a ...>Odoo</a>.</small>
-                </div>
-        """
-        footer = ""
-        if not user_id:
-            return footer
-
-        # add user signature
-        user = self.env.user
-        if user_signature:
-            if self.env.user.signature:
-                signature = user.signature
-            else:
-                signature = "--<br />%s" % user.name
-            footer = tools.append_content_to_html(footer, signature, plaintext=False)
-
-        # add company signature
-        if user.company_id.website:
-            website_url = ('http://%s' % user.company_id.website) if not user.company_id.website.lower().startswith(('http:', 'https:')) \
-                else user.company_id.website
-            company = "<a style='color:inherit' href='%s'>%s</a>" % (website_url, user.company_id.name)
-        else:
-            company = user.company_id.name
-        sent_by = _('Sent by %(company)s using %(odoo)s')
-
-        signature_company = '<br /><small>%s</small>' % (sent_by % {
-            'company': company,
-            'odoo': "<a style='color:inherit' href='https://www.odoo.com/'>Odoo</a>"
-        })
-        footer = tools.append_content_to_html(footer, signature_company, plaintext=False, container_tag='div')
-
-        return footer
+            notify_partners |= partner
+        return notify_partners
 
     def update_message_notification(self, message, partners):
         # update existing notifications
@@ -151,53 +109,10 @@ class Notification(models.Model):
 
     @api.multi
     def _notify_email(self, message, force_send=False, user_signature=True):
-
-        # compute partners
-        email_pids = self.get_partners_to_email(message)
-        if not email_pids:
+        email_partners = self.get_partners_to_email(message)
+        if not email_partners:
             return True
-
-        # compute email body (signature, company data)
-        body_html = message.body
-        # add user signature except for mail.channels, where users are usually adding their own signatures already
-        user_id = message.author_id and message.author_id.user_ids and message.author_id.user_ids[0] and message.author_id.user_ids[0].id or None
-        signature_company = self.get_signature_footer(user_id, res_model=message.model, res_id=message.res_id, user_signature=(user_signature and message.model != 'mail.channel'))
-        if signature_company:
-            body_html = tools.append_content_to_html(body_html, signature_company, plaintext=False, container_tag='div')
-
-        # compute email references
-        references = message.parent_id.message_id if message.parent_id else False
-
-        # custom values
-        custom_values = dict()
-        if message.model and message.res_id and self.pool.get(message.model) and hasattr(self.pool[message.model], 'message_get_email_values'):
-            custom_values = self.env[message.model].browse(message.res_id).message_get_email_values(message)
-
-        # create email values
-        max_recipients = 50
-        chunks = [email_pids[x:x + max_recipients] for x in xrange(0, len(email_pids), max_recipients)]
-        emails = self.env['mail.mail']
-        for chunk in chunks:
-            mail_values = {
-                'mail_message_id': message.id,
-                'auto_delete': self._context.get('mail_auto_delete', True),
-                'mail_server_id': self._context.get('mail_server_id', False),
-                'body_html': body_html,
-                'recipient_ids': [(4, id) for id in chunk],
-                'references': references,
-            }
-            mail_values.update(custom_values)
-            emails |= self.env['mail.mail'].create(mail_values)
-        # NOTE:
-        #   1. for more than 50 followers, use the queue system
-        #   2. do not send emails immediately if the registry is not loaded,
-        #      to prevent sending email during a simple update of the database
-        #      using the command-line.
-        if force_send and len(chunks) < 2 and \
-               (not self.pool._init or
-                getattr(threading.currentThread(), 'testing', False)):
-            emails.send()
-        return True
+        return email_partners.message_send_notification_email(message, force_send=force_send, user_signature=user_signature)
 
     @api.model
     def _notify(self, message, recipients=None, force_send=False, user_signature=True):
@@ -211,6 +126,7 @@ class Notification(models.Model):
             :param bool user_signature: if True, the generated mail.mail body is
                 the body of the related mail.message with the author's signature
         """
+        # browse as SUPERUSER_ID because of access to res_partner not necessarily allowed
         notif_ids = self.sudo().search([('message_id', '=', message.id), ('partner_id', 'in', recipients.ids)])
 
         # update or create notifications
@@ -220,5 +136,4 @@ class Notification(models.Model):
         if self.env.context.get('mail_notify_noemail'):
             return True
 
-        # browse as SUPERUSER_ID because of access to res_partner not necessarily allowed
-        new_notif_ids._notify_email(message, force_send, user_signature)  # tde check this one too
+        return new_notif_ids._notify_email(message, force_send, user_signature)  # tde check this one too

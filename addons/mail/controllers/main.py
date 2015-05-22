@@ -84,3 +84,11 @@ class MailController(http.Controller):
         subtypes_list = sorted(subtypes_list, key=itemgetter('parent_model', 'res_model', 'internal', 'sequence'))
 
         return subtypes_list
+
+    @http.route('/mail/follow', type='http', auth='user')
+    def message_subscribe(self,  model, res_id):
+        request.env[model].browse(res_id).message_subscribe_users()
+
+    @http.route('/mail/unfollow', type='http', auth='user')
+    def message_unsubscribe(self,  model, res_id):
+        request.env[model].browse(res_id).message_unsubscribe_users()

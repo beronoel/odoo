@@ -74,5 +74,78 @@
             <field name="internal" eval="True"/>
             <field name="sequence" eval="100"/>
         </record>
+
+        <!--Default Notification Email template -->
+        <record id="mail_default_notification_email" model="mail.template">
+            <field name="name">Notification Email</field>
+            <field name="subject">${object.subject or (object.record_name and 'Re: %s' % object.record_name) or (object.parent_id and object.parent_id.subject and 'Re: %s' % object.parent_id.subject) or (object.parent_id and object.parent_id.record_name and 'Re: %s' % object.parent_id.record_name)}</field>
+            <field name="model_id" ref="mail.model_mail_message"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+<div class="snippet_row bg-color" style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777" data-snippet-theme="basic_theme">
+    <table cellspacing="0" cellpadding="0" style="width:600px;border-collapse:collapse;background:inherit;color:inherit">
+        <tbody><tr>
+            <td valign="center" width="270" style="padding:10px 10px 10px 5px;font-size: 30px">
+                % if ctx.get('button_access'):
+                &nbsp;
+                <a href="${ctx['button_access']['url']}" style="-webkit-user-select: none; padding: 6px 12px; font-size: 14px; line-height: 20px; color: rgb(255,255,255); border: none; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #428BCA;border-radius:4px" class="o_default_snippet_text">${ctx['button_access']['title']}</a>
+                % endif
+
+                % if ctx.get('button_follow'):
+                &nbsp;
+                <a href="${ctx['button_follow']['url']}" style="-webkit-user-select: none; padding: 6px 12px; font-size: 14px; line-height: 20px; color: rgb(255,255,255); border: none; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #428BCA;border-radius:4px" class="o_default_snippet_text">${ctx['button_follow']['title']}</a>
+                
+                % elif ctx.get('button_unfollow'):
+                &nbsp;
+                <a href="${ctx['button_unfollow']['url']}" style="-webkit-user-select: none; padding: 6px 12px; font-size: 14px; line-height: 20px; color: rgb(255,255,255); border: none; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #428BCA;border-radius:4px" class="o_default_snippet_text">${ctx['button_unfollow']['title']}</a>
+                % endif
+            </td>
+            <td valign="center" align="right" width="270" style="padding:10px 15px 10px 10px">
+                <p class="text-muted">
+                % if ctx.get('actions'):
+                % for action in ctx['actions']:
+                <a href="${action['url']}" style="text-decoration:none;color: inherit"><strong>${action['title']}</strong></a>
+                % endfor
+                % else:
+                <strong>Sent by</strong>
+                % if ctx.get('website_url'):
+                <a href="${ctx['website_url']}" style="text-decoration:none;color: inherit">
+                % endif
+                <strong>${ctx.get('company_name')}</strong>
+                % if ctx.get('website_url'):
+                </a>
+                % endif
+                <strong>using</strong>
+                <a href="www.odoo.com" style="text-decoration:none;color: inherit"><strong>Odoo</strong></a>
+                % endif
+            </td>
+        </tr>
+    </tbody></table>
+</div><div style="padding:0px;width:600px;margin:auto;color:#777777;background-color:#FFFFFF" class="">
+    <table cellspacing="0" cellpadding="0" style="vertical-align:top;padding:0px;font-family:arial;font-size:12px;border-collapse:collapse;background:inherit;color:inherit">
+        <tbody>
+            <tr>
+                <td valign="top" style="width:600px">
+                    <div>
+                        <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0;margin:15px auto;padding:0">
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div><div class="snippet_row bg-color" style="padding:0;width:600px;max-width:600px;margin:0 auto;background: #fff repeat top /100%;color:#777777">
+    <table style="width:100%;text-align:justify;margin:0 auto;background:inherit;color:inherit;border-collapse:collapse;color:inherit">
+        <tbody><tr>
+            <td style="padding:10px 0;font-size:14px">
+                ${object.body | safe}
+                % if ctx.get('signature'):
+                <div class="text-muted">${ctx['signature'] | safe}</div>
+                % endif
+            </td>
+        </tr>
+    </tbody></table>
+</div>]]></field>
+        </record>
+
     </data>
 </openerp>

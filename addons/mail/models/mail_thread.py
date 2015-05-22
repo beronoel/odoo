@@ -543,19 +543,83 @@ class MailThread(models.AbstractModel):
         return action
 
     @api.model
-    def _get_access_link(self, mail, partner):
-        # the parameters to encode for the query and fragment part of url
+    def _get_access_link(self, notification, message_id, model, res_id, partner=None):
+        # TDE note: this code is put here because if put as inheritance in portal -> not seen
+        if partner and not partner.user_ids and hasattr(partner, '_get_signup_url_for_action'):
+            signup_url = partner.with_context(signup_valid=True).sudo()._get_signup_url_for_action(
+                action='mail.action_mail_redirect',
+                model=model,
+                res_id=res_id)[partner.id]
+            return signup_url
         query = {'db': self._cr.dbname}
         fragment = {
-            'login': partner.user_ids[0].login,
             'action': 'mail.action_mail_redirect',
         }
-        if mail.notification:
-            fragment['message_id'] = mail.mail_message_id.id
-        elif mail.model and mail.res_id:
-            fragment.update(model=mail.model, res_id=mail.res_id)
+        if partner and partner.user_ids:
+            fragment['login'] = partner.user_ids[0].login,
+        if notification:
+            fragment['message_id'] = message_id
+        elif model and res_id:
+            fragment.update(model=model, res_id=res_id)
 
         return "/web?%s#%s" % (urlencode(query), urlencode(fragment))
+
+    def _get_actions(self, partner_users):
+        pass
+
+    def _get_recipient_structure(self):
+        return {
+            'button_access': None,
+            'button_follow': False,
+            'button_unfollow': False,
+            'actions': list(),
+            'recipients': None
+        }
+
+    @api.multi
+    def _message_classify_recipients_better(self, message, partners, signups, partner_users, followers, notfollowers):
+        structure = self._get_recipient_structure()
+        access_link = self._get_access_link(True, message.id, message.model, message.res_id)
+        # urlencode({'db': self._cr.dbname}
+        result = {
+            'partner': dict(structure, **{'recipients': partners}),
+            'follow': dict(structure, **{
+                'button_access': {'url': access_link, 'title': _('View')},
+                'button_follow': {'url': '/mail/follow?%s' % urlencode({'model': message.model, 'res_id': message.res_id}), 'title': _('Follow')},
+                'recipients': notfollowers}),
+            'unfollow': dict(structure, **{
+                'button_access': {'url': access_link, 'title': _('View')},
+                'button_unfollow': {'url': '/mail/unfollow?%s' % urlencode({'model': message.model, 'res_id': message.res_id}), 'title': _('Unfollow')},
+                'recipients': followers}),
+        }
+        for partner in signups:
+            new_key = 'signup_%d' % partner.id
+            access_url = self._get_access_link(True, message.id, message.model, message.res_id, partner=partner)
+            result[new_key] = dict(structure, **{'button_access': {'url': access_url, 'title': _('Access')}, 'recipients': partner})
+        # for partner in partner_actions:
+        #     new_key = 'action_%d' % partner.id
+        #     result[new_key] = {'button_access': _('Access'), 'button_follow': False, 'button_unfollow': False, 'actions': list(), 'recipients': partner}
+
+        return result
+
+    @api.multi
+    def _message_classify_recipients(self, message, recipients):
+        # print recipients
+        partners = recipients.sudo().filtered(lambda partner: not partner.user_ids and not hasattr(partner, '_get_signup_url_for_action'))
+        signups = recipients.sudo().filtered(lambda partner: not partner.user_ids and hasattr(partner, '_get_signup_url_for_action'))
+        partner_users = recipients - (partners | signups)
+        # actions = self._get_actions(partner_users)
+        # partner_actions = partner_users.filtered(lambda partner: partner.id in (actions and actions.keys() or []))
+        partner_actions = self.env['res.partner']
+        partner_others = partner_users - partner_actions
+        followers = self.env['mail.followers'].sudo().search([
+            ('res_model', '=', message.model),
+            ('res_id', '=', message.res_id),
+            ('partner_id', 'in', partner_others.ids)])
+        followers = partner_others.filtered(lambda partner: partner in followers.mapped('partner_id'))
+        notfollowers = partner_others - followers
+
+        return self._message_classify_recipients_better(message, partners, signups, partner_users, followers, notfollowers)
 
     # ------------------------------------------------------
     # Email specific

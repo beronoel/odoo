@@ -37,6 +37,7 @@
                             <group>
                                 <field name="model"/>
                                 <field name="res_id"/>
+                                <field name="record_name"/>
                                 <field name="parent_id"/>
                                 <field name="partner_ids" widget="many2many_tags"/>
                                 <field name="notified_partner_ids" widget="many2many_tags"/>
