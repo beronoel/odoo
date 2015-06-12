@@ -57,12 +57,12 @@ class publisher_warranty_contract(AbstractModel):
         msg.update(self.pool.get("res.company").read(cr, uid, [1], ["name", "email", "phone"])[0])
         return msg
 
-    def _get_sys_logs(self, cr, uid):
+    def _get_sys_logs(self, cr, uid, force_ping=False):
         """
         Utility method to send a publisher warranty get logs messages.
         """
         msg = self._get_message(cr, uid)
-        arguments = {'arg0': msg, "action": "update"}
+        arguments = {'arg0': msg, "action": "update", "force_ping": force_ping}
         arguments_raw = werkzeug.urls.url_encode(arguments)
 
         url = config.get("publisher_warranty_url")
@@ -74,7 +74,7 @@ class publisher_warranty_contract(AbstractModel):
         finally:
             uo.close()
 
-    def update_notification(self, cr, uid, ids, cron_mode=True, context=None):
+    def update_notification(self, cr, uid, ids, cron_mode=True, force_ping=False, context=None):
         """
         Send a message to OpenERP's publisher warranty server to check the
         validity of the contracts, get notifications, etc...
@@ -84,7 +84,7 @@ class publisher_warranty_contract(AbstractModel):
         """
         try:
             try:
-                result = self._get_sys_logs(cr, uid)
+                result = self._get_sys_logs(cr, uid, force_ping=force_ping)
             except Exception:
                 if cron_mode:   # we don't want to see any stack trace in cron
                     return False
