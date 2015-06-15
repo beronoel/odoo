@@ -736,6 +736,8 @@
                                     <field name="fresh_record" invisible="1"/>
                                     <field name="product_uom_id" attrs="{'readonly': [('fresh_record', '=', False)]}" groups="product.group_uom"/>
                                     <field name="lot_id" domain="[('product_id','=?', product_id)]" context="{'product_id': product_id}" groups="stock.group_production_lot" attrs="{'readonly': [('fresh_record', '=', False)]}"/>
+                                    <button name="%(stock.lot_split)d" string="Lot Split" type="action" icon="STOCK_INDENT" groups="stock.group_production_lot"
+                                            states="confirmed,assigned,waiting,partially_available"/>
                                     <field name="picking_id" invisible="1"/>
                                     <field name="owner_id" groups="stock.group_tracking_owner"/>
                                     <field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>
