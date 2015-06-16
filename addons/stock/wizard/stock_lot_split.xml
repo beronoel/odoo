@@ -4,18 +4,18 @@
         <field name="name">Split Lot</field>
         <field name="model">stock.lot.split</field>
         <field name="arch" type="xml">
-            <form string="Split in Lots">
-                <group string="What?">
+            <form string="Lot Tracker">
+                <group>
                     <field name="product_id"/>
                     <field name="product_qty"/>
                     <field name="qty_done"/>
                 </group>
-                <group string="Lots">
-                    <field name="line_ids">
+                <group>
+                    <field name="line_ids" nolabel="1">
                         <tree editable="bottom">
-                            <field name="product_qty"/>
-                            <field name="lot"/>
+                            <field name="tracking" invisible="1"/>
                             <field name="lot_id" domain="[('product_id','=', parent.product_id)]"/>
+                            <field name="product_qty" attrs="{'invisible': [('tracking', '=', 'serial')]}"/>
                         </tree>
                     </field>
                 </group>
