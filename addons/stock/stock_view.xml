@@ -1455,6 +1455,8 @@
                                 <field name="return_picking_type_id"/>
                                 <field name="barcode_nomenclature_id"/>
                                 <field name="show_entire_packs" groups="stock.group_tracking_lot"/>
+                                <field name="create_lots" groups="stock.group_production_lot"/>
+                                <field name="exiting_lots" groups="stock.group_production_lot"/>
                             </group>
                         </group>
                         <separator string="Locations"/>
