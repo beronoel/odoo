@@ -7,14 +7,17 @@
             <form string="Lot Tracker">
                 <group>
                     <field name="product_id"/>
-                    <field name="product_qty"/>
-                    <field name="qty_done"/>
+                    <label for="qty_done"/>
+                    <span>
+                        <field name="qty_done" class="oe_inline"/> of
+                        <field name="product_qty" class="oe_inline"/>
+                    </span>
                 </group>
                 <group>
                     <field name="line_ids" nolabel="1">
                         <tree editable="bottom">
                             <field name="tracking" invisible="1"/>
-                            <field name="lot_id" domain="[('product_id','=', parent.product_id)]"/>
+                            <field name="lot_id" domain="[('product_id','=', parent.product_id)]" context="{'product_id': parent.product_id}"/>
                             <field name="product_qty" attrs="{'invisible': [('tracking', '=', 'serial')]}"/>
                         </tree>
                     </field>

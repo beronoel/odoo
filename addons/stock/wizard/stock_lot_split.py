@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp import models, fields, api
+from openerp import models, fields, api, _
 import openerp.addons.decimal_precision as dp
+from openerp.exceptions import UserError
 
 class stock_lot_split(models.TransientModel):
     _name = 'stock.lot.split'
@@ -28,6 +29,10 @@ class stock_lot_split(models.TransientModel):
         active_id = self._context.get('active_id')
         if active_id:
             pack_op = self.env['stock.pack.operation'].browse(active_id)
+            line_ids = []
+            if pack_op.qty_done > 0:
+                line_ids = [(0, 0, {'lot_id': pack_op.lot_id.id,
+                              'product_qty': pack_op.qty_done})]
             res = {
                 'pack_id': pack_op.id,
                 'product_id': pack_op.product_id.id,
@@ -35,17 +40,40 @@ class stock_lot_split(models.TransientModel):
                 'product_qty': pack_op.product_qty,
                 'qty_done': pack_op.qty_done,
                 'lot_id': pack_op.lot_id.id,
-                'line_ids': [(0, 0, {'lot_id': pack_op.lot_id.id,
-                              'product_qty': pack_op.qty_done})]
+                'line_ids': line_ids,
             }
         return res
 
     @api.multi
     def process(self):
         self.ensure_one()
-        # Split pack operations
+        if not self.line_ids:
+            raise UserError (_('Please provide at least one line to replace it with'))
+        #Calculate and check
+        firsttime = True
+        totals_other = 0.0
+        for line in self.line_ids:
+            if firsttime:
+                self.pack_id.write({'lot_id': line.lot_id.id,
+                                   'qty_done': line.product_qty})
+                firsttime = False
+            else:
+                pack_new = self.pack_id.copy()
+                pack_new.write({'lot_id': line.lot_id.id,
+                                'qty_done': line.product_qty,
+                                'product_qty': line.product_qty})
+                totals_other += line.product_qty
+        old_qty = self.pack_id.product_qty
+        if old_qty - totals_other > 0:
+            self.pack_id.product_qty = self.pack_id.product_qty - totals_other
+        else:
+            self.pack_id.product_qty = 0.0
 
-        return {}
+        # Split pack operations
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
 
 
 class stock_lot_split_line(models.TransientModel):

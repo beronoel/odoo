@@ -396,7 +396,7 @@ class stock_quant(osv.osv):
             quants_reconcile.append(quant)
         if to_move_quants:
             to_recompute_move_ids = [x.reservation_id.id for x in to_move_quants if x.reservation_id and x.reservation_id.id != move.id]
-            self.move_quants_write(cr, uid, to_move_quants, move, location_to, dest_package_id, context=context)
+            self.move_quants_write(cr, uid, to_move_quants, move, location_to, dest_package_id, lot_id=lot_id, context=context)
             self.pool.get('stock.move').recalculate_move_state(cr, uid, to_recompute_move_ids, context=context)
         if location_to.usage == 'internal':
             # Do manual search for quant to avoid full table scan (order by id)
@@ -408,11 +408,13 @@ class stock_quant(osv.osv):
                 for quant in quants_reconcile:
                     self._quant_reconcile_negative(cr, uid, quant, move, context=context)
 
-    def move_quants_write(self, cr, uid, quants, move, location_dest_id, dest_package_id, context=None):
+    def move_quants_write(self, cr, uid, quants, move, location_dest_id, dest_package_id, lot_id = False, context=None):
         context=context or {}
         vals = {'location_id': location_dest_id.id,
                 'history_ids': [(4, move.id)],
                 'reservation_id': False}
+        if lot_id and any(x.id for x in quants if not x.lot_id.id):
+            vals['lot_id'] = lot_id
         if not context.get('entire_pack'):
             vals.update({'package_id': dest_package_id})
         self.write(cr, SUPERUSER_ID, [q.id for q in quants], vals, context=context)
@@ -430,6 +432,19 @@ class stock_quant(osv.osv):
         if location.usage in ['inventory', 'production', 'supplier']:
             return quants
         res_qty = qty
+        if restrict_lot_id:
+            if not prefered_domain_list:
+                prefered_domain_list = [[('lot_id', '=', restrict_lot_id)]]
+            else:
+                new_list = []
+                for pref_domain in prefered_domain_list:
+                    pref_lot_domain = pref_domain + [('lot_id', '=', restrict_lot_id)]
+                    new_list.append(pref_lot_domain)
+                    new_list.append(pref_domain)
+                prefered_domain_list = new_list
+
+        print "Preferred domain list:", prefered_domain_list
+
         if not prefered_domain_list:
             return self.quants_get(cr, uid, location, product, qty, domain=domain, restrict_lot_id=restrict_lot_id, restrict_partner_id=restrict_partner_id, context=context)
         for prefered_domain in prefered_domain_list:
@@ -458,7 +473,7 @@ class stock_quant(osv.osv):
         if restrict_partner_id:
             domain += [('owner_id', '=', restrict_partner_id)]
         if restrict_lot_id:
-            domain += [('lot_id', '=', restrict_lot_id)]
+            domain += ['|', ('lot_id', '=', restrict_lot_id), ('lot_id', '=', False)]
         if location:
             removal_strategy = self.pool.get('stock.location').get_removal_strategy(cr, uid, location, product, context=context)
             result += self.apply_removal_strategy(cr, uid, location, product, qty, domain, removal_strategy, context=context)
@@ -2378,7 +2393,7 @@ class stock_move(osv.osv):
                 prefered_domain_list = [prefered_domain] + [fallback_domain] + [fallback_domain2]
                 dom = main_domain + self.pool.get('stock.move.operation.link').get_specific_domain(cr, uid, record, context=context)
                 quants = quant_obj.quants_get_prefered_domain(cr, uid, ops.location_id, move.product_id, record.qty, domain=dom, prefered_domain_list=prefered_domain_list,
-                                                          restrict_lot_id=move.restrict_lot_id.id, restrict_partner_id=move.restrict_partner_id.id, context=context)
+                                                          restrict_lot_id=ops.lot_id.id, restrict_partner_id=ops.owner_id.id, context=context)
                 if ops.product_id:
                     #If a product is given, the result is always put immediately in the result package (if it is False, they are without package)
                     quant_dest_package_id  = ops.result_package_id.id
@@ -4222,8 +4237,8 @@ class stock_move_operation_link(osv.osv):
             #if not given any information about package, we don't open boxes
             domain.append(('package_id', '=', False))
         #if lot info is given, we restrict choice to this lot otherwise we can take any
-        if op.lot_id:
-            domain.append(('lot_id', '=', op.lot_id.id))
+        #if op.lot_id:
+        #    domain.append(('lot_id', '=', op.lot_id.id))
         #if owner info is given, we restrict to this owner otherwise we restrict to no owner
         if op.owner_id:
             domain.append(('owner_id', '=', op.owner_id.id))
