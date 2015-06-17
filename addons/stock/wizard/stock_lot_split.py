@@ -31,8 +31,12 @@ class stock_lot_split(models.TransientModel):
             pack_op = self.env['stock.pack.operation'].browse(active_id)
             line_ids = []
             if pack_op.qty_done > 0:
+                if pack_op.product_id.tracking == 'serial':
+                    product_qty = 1.0
+                else:
+                    product_qty = pack_op.qty_done
                 line_ids = [(0, 0, {'lot_id': pack_op.lot_id.id,
-                              'product_qty': pack_op.qty_done})]
+                              'product_qty': product_qty})]
             res = {
                 'pack_id': pack_op.id,
                 'product_id': pack_op.product_id.id,
@@ -42,6 +46,7 @@ class stock_lot_split(models.TransientModel):
                 'lot_id': pack_op.lot_id.id,
                 'line_ids': line_ids,
             }
+
         return res
 
     @api.multi
