@@ -443,8 +443,6 @@ class stock_quant(osv.osv):
                     new_list.append(pref_domain)
                 prefered_domain_list = new_list
 
-        print "Preferred domain list:", prefered_domain_list
-
         if not prefered_domain_list:
             return self.quants_get(cr, uid, location, product, qty, domain=domain, restrict_lot_id=restrict_lot_id, restrict_partner_id=restrict_partner_id, context=context)
         for prefered_domain in prefered_domain_list:
