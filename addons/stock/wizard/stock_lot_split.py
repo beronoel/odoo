@@ -54,7 +54,7 @@ class stock_lot_split(models.TransientModel):
         self.ensure_one()
         if not self.line_ids:
             raise UserError (_('Please provide at least one line to replace it with'))
-        #Calculate and check
+        # Split pack operations
         firsttime = True
         totals_other = 0.0
         for line in self.line_ids:
@@ -74,11 +74,14 @@ class stock_lot_split(models.TransientModel):
         else:
             self.pack_id.product_qty = 0.0
 
-        # Split pack operations
+        # Reload as the operations where split
         return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
-        }
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'stock.picking',
+                'type': 'ir.actions.act_window',
+                'res_id': self.pack_id.picking_id.id,
+                }
 
 
 class stock_lot_split_line(models.TransientModel):
