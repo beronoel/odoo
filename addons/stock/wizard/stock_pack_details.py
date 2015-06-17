@@ -45,6 +45,7 @@ class stock_pack_details(models.TransientModel):
     def split_quantities(self):
         for wiz in self:
             if wiz.quantity>1 and wiz.qty_done < wiz.quantity:
+
                 pack2 = self.pack_id.copy({'qty_done': 0.0, 'product_qty': wiz.quantity - wiz.qty_done})
                 wiz.quantity = wiz.qty_done
                 self.pack_id.write({'qty_done': wiz.qty_done, 'product_qty': wiz.quantity})
