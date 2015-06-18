@@ -59,6 +59,7 @@ Dashboard / Reports for Warehouse Management will include:
         'wizard/orderpoint_procurement_view.xml',
         'wizard/stock_pack_details.xml',
         'wizard/stock_lot_split.xml',
+        'wizard/stock_put_in_pack.xml',
         'stock_incoterms.xml',
         'stock_report.xml',
         'stock_view.xml',

@@ -10,3 +10,4 @@ import stock_pack_details
 import stock_immediate_transfer
 import stock_backorder_confirmation
 import stock_lot_split
+import stock_put_in_pack

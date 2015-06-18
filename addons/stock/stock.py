@@ -1531,10 +1531,31 @@ class stock_picking(models.Model):
         ctx['do_only_split'] = True
         return self.do_transfer(cr, uid, picking_ids, context=ctx)
 
+    def put_in_pack_wiz(self, cr, uid, ids, context=None):
+        if ids:
+            package_id = self.put_in_pack(cr, uid, ids, context=context)
+            ctx = dict(context)
+            ctx['pack_id'] = package_id
+            if package_id:
+                return {
+                'name': _('Put in Pack'),
+                'view_mode': 'form',
+                'view_type': 'form',
+                'target': 'new',
+                'res_model': 'stock.put.in.pack',
+                'type': 'ir.actions.act_window',
+                'context': ctx
+                    }
+            else:
+                raise UserError(_('Please put some quantities processed first'))
+                return {}
+
+
     def put_in_pack(self, cr, uid, ids, context=None):
         stock_move_obj = self.pool["stock.move"]
         stock_operation_obj = self.pool["stock.pack.operation"]
         package_obj = self.pool["stock.quant.package"]
+        package_id = False
         for pick in self.browse(cr, uid, ids, context=context):
             operations = [x for x in pick.pack_operation_ids if x.qty_done > 0 and (not x.result_package_id)]
             pack_operation_ids = []
@@ -1551,6 +1572,7 @@ class stock_picking(models.Model):
             if operations:
                 package_id = package_obj.create(cr, uid, {}, context=context)
                 stock_operation_obj.write(cr, uid, pack_operation_ids, {'result_package_id': package_id}, context=context)
+        return package_id
 
 
 class stock_production_lot(osv.osv):
