@@ -4,8 +4,5 @@
         <record id="tr_tax" model="account.account.type">
              <field name="name">Vergi</field>
          </record>
-        <record id="tr_view" model="account.account.type">
-             <field name="name">Görünüm</field>
-         </record>
     </data>
  </openerp>
