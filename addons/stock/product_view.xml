@@ -135,7 +135,7 @@
                 </group>
                 <group name="status" position="before">
                     <group name="lot" groups="stock.group_production_lot" string="Lots" attrs="{'invisible':[('type','=','service')]}">
-                        <field name="tracking" on_change="onchange_tracking(tracking)"/>
+                        <field name="tracking" on_change="onchange_tracking(tracking)" widget="radio"/>
                     </group>
                 </group>
                 <group name="weight" position="before">
