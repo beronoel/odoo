@@ -803,7 +803,8 @@ class stock_picking(models.Model):
         if picking_type_id:
             picking_type = self.pool['stock.picking.type'].browse(cr, uid, picking_type_id)
             res['value'] = {'location_id': picking_type.default_location_src_id.id,
-                            'location_dest_id': picking_type.default_location_dest_id.id}
+                            'location_dest_id': picking_type.default_location_dest_id.id,
+                            'lots_visible': picking_type.use_create_lots or picking_type.use_existing_lots,}
         return res
 
     def _default_location_destination(self):
@@ -4048,6 +4049,16 @@ class stock_pack_operation(osv.osv):
             self.write(cr, uid, [id], {'qty_done': 1.0}, context=context)
         return True
 
+    def _compute_lots_visible(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        for pack in self.browse(cr, uid, ids, context=context):
+            pick = pack.picking_id
+            if pick.picking_type_id:
+                res[pack.id] = pick.picking_type_id.use_existing_lots or pick.picking_type_id.use_create_lots
+            else:
+                res[pack.id] = True
+        return res
+
     _columns = {
         'picking_id': fields.many2one('stock.picking', 'Stock Picking', help='The stock operation where the packing has been made', required=True),
         'product_id': fields.many2one('product.product', 'Product', ondelete="CASCADE"),  # 1
@@ -4070,6 +4081,7 @@ class stock_pack_operation(osv.osv):
         'from_loc': fields.function(_compute_location_description, type='char', string='From', multi='loc', readonly=True),
         'to_loc': fields.function(_compute_location_description, type='char', string='To', multi='loc', readonly=True),
         'fresh_record': fields.boolean('Newly created pack operation'),
+        'lots_visible': fields.function(_compute_lots_visible, type='boolean'),
         'state': fields.related('picking_id', 'state', type='selection', selection=[
                 ('draft', 'Draft'),
                 ('cancel', 'Cancelled'),
@@ -4493,8 +4505,8 @@ class stock_picking_type(osv.osv):
         'show_entire_packs': fields.boolean('Show entire packs to move'),
         'warehouse_id': fields.many2one('stock.warehouse', 'Warehouse', ondelete='cascade'),
         'active': fields.boolean('Active'),
-        'create_lots': fields.boolean('Create New Lots'),
-        'existing_lots': fields.boolean('Use Existing Lots'),
+        'use_create_lots': fields.boolean('Create New Lots'),
+        'use_existing_lots': fields.boolean('Use Existing Lots'),
 
         # Statistics for the kanban view
         'last_done_picking': fields.function(_get_tristate_values,
