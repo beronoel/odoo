@@ -1555,7 +1555,6 @@ class stock_picking(models.Model):
                 raise UserError(_('Please put some quantities processed first'))
                 return {}
 
-
     def put_in_pack(self, cr, uid, ids, context=None):
         stock_move_obj = self.pool["stock.move"]
         stock_operation_obj = self.pool["stock.pack.operation"]
@@ -1572,8 +1571,7 @@ class stock_picking(models.Model):
                     stock_operation_obj.write(cr, uid, operation.id, {'product_qty': operation.product_qty - operation.qty_done,'qty_done': 0, 'lot_id': False}, context=context)
                     op = stock_operation_obj.browse(cr, uid, new_operation, context=context)
                 pack_operation_ids.append(op.id)
-                if op.product_id and op.location_id and op.location_dest_id:
-                    stock_move_obj.check_tracking_product(cr, uid, op.product_id, op.lot_id.id, op.location_id, op.location_dest_id, context=context)
+            stock_operation_obj.check_tracking(cr, uid, [x.id for x in pick.pack_operation_ids], context=context)
             if operations:
                 package_id = package_obj.create(cr, uid, {}, context=context)
                 stock_operation_obj.write(cr, uid, pack_operation_ids, {'result_package_id': package_id}, context=context)
@@ -2209,22 +2207,13 @@ class stock_move(osv.osv):
         self.check_recompute_pack_op(cr, uid, ids, context=context)
         return res
 
-    def check_tracking_product(self, cr, uid, product, lot_id, location, location_dest, context=None):
-        check = False
-        if product.track_all and not location_dest.usage == 'inventory':
-            check = True
-        elif product.track_incoming and location.usage in ('supplier', 'transit', 'inventory') and location_dest.usage == 'internal':
-            check = True
-        elif product.track_outgoing and location_dest.usage in ('customer', 'transit') and location.usage == 'internal':
-            check = True
-        if check and not lot_id:
-            raise UserError(_('You must assign a serial number for the product %s') % (product.name))
-
-
     def check_tracking(self, cr, uid, move, lot_id, context=None):
         """ Checks if serial number is assigned to stock move or not and raise an error if it had to.
         """
-        self.check_tracking_product(cr, uid, move.product_id, lot_id, move.location_id, move.location_dest_id, context=context)
+        if move.picking_id and (move.picking_id.picking_type_id.use_existing_lots or move.picking_id.picking_type_id.use_create_lots) and \
+            move.product_id.tracking != 'none':
+            if not lot_id:
+                raise UserError(_('You need to provide a Lot/Serial Number'))
 
     def check_recompute_pack_op(self, cr, uid, ids, context=None):
         pickings = list(set([x.picking_id for x in self.browse(cr, uid, ids, context=context) if x.picking_id]))
@@ -4146,97 +4135,17 @@ class stock_pack_operation(osv.osv):
             raise UserError(_('You can not delete pack operations of a done picking'))
         return super(stock_pack_operation, self).unlink(cr, uid, ids, context=context)
 
-    def action_drop_down(self, cr, uid, ids, context=None):
-        ''' Used by barcode interface to say that pack_operation has been moved from src location 
-            to destination location, if qty_done is less than product_qty than we have to split the
-            operation in two to process the one with the qty moved
-        '''
-        processed_ids = []
-        move_obj = self.pool.get("stock.move")
-        for pack_op in self.browse(cr, uid, ids, context=None):
-            if pack_op.product_id and pack_op.location_id and pack_op.location_dest_id:
-                move_obj.check_tracking_product(cr, uid, pack_op.product_id, pack_op.lot_id.id, pack_op.location_id, pack_op.location_dest_id, context=context)
-            op = pack_op.id
-            if pack_op.qty_done < pack_op.product_qty:
-                # we split the operation in two
-                op = self.copy(cr, uid, pack_op.id, {'product_qty': pack_op.qty_done, 'qty_done': pack_op.qty_done}, context=context)
-                self.write(cr, uid, [pack_op.id], {'product_qty': pack_op.product_qty - pack_op.qty_done, 'qty_done': 0, 'lot_id': False}, context=context)
-            processed_ids.append(op)
-        self.write(cr, uid, processed_ids, {'processed': 'true'}, context=context)
-
-    def create_and_assign_lot(self, cr, uid, id, name, context=None):
-        ''' Used by barcode interface to create a new lot and assign it to the operation
-        '''
-        obj = self.browse(cr,uid,id,context)
-        product_id = obj.product_id.id
-        val = {'product_id': product_id}
-        new_lot_id = False
-        if name:
-            lots = self.pool.get('stock.production.lot').search(cr, uid, ['&', ('name', '=', name), ('product_id', '=', product_id)], context=context)
-            if lots:
-                new_lot_id = lots[0]
-            val.update({'name': name})
-
-        if not new_lot_id:
-            new_lot_id = self.pool.get('stock.production.lot').create(cr, uid, val, context=context)
-        self.write(cr, uid, id, {'lot_id': new_lot_id}, context=context)
-
-    def _search_and_increment(self, cr, uid, picking_id, domain, filter_visible=False, visible_op_ids=False, increment=1, context=None):
-        '''Search for an operation with given 'domain' in a picking, if it exists increment the qty by the value of increment otherwise create it
-
-        :param domain: list of tuple directly reusable as a domain
-        context can receive a key 'current_package_id' with the package to consider for this operation
-        returns True
-        '''
-        if context is None:
-            context = {}
-
-        #if current_package_id is given in the context, we increase the number of items in this package
-        package_clause = [('result_package_id', '=', context.get('current_package_id', False))]
-        existing_operation_ids = self.search(cr, uid, [('picking_id', '=', picking_id)] + domain + package_clause, context=context)
-        todo_operation_ids = []
-        if existing_operation_ids:
-            if filter_visible:
-                todo_operation_ids = [val for val in existing_operation_ids if val in visible_op_ids]
-            else:
-                todo_operation_ids = existing_operation_ids
-        if todo_operation_ids:
-            #existing operation found for the given domain and picking => increment its quantity
-            operation_id = todo_operation_ids[0]
-            op_obj = self.browse(cr, uid, operation_id, context=context)
-            qty = op_obj.qty_done
-            if increment > 0:
-                qty += increment 
-            elif increment < 0:
-                if qty == 0 and op_obj.product_qty == 0:
-                    #we have a line with 0 qty set, so delete it
-                    self.unlink(cr, uid, [operation_id], context=context)
-                    return False
-                else:
-                    qty = max(0, qty-1)
-            self.write(cr, uid, [operation_id], {'qty_done': qty}, context=context)
-        else:
-            #no existing operation found for the given domain and picking => create a new one
-            picking_obj = self.pool.get("stock.picking")
-            picking = picking_obj.browse(cr, uid, picking_id, context=context)
-            values = {
-                'picking_id': picking_id,
-                'product_qty': 0,
-                'location_id': picking.location_id.id, 
-                'location_dest_id': picking.location_dest_id.id,
-                'qty_done': increment,
-                }
-            for key in domain:
-                var_name, dummy, value = key
-                uom_id = False
-                if var_name == 'product_id':
-                    uom_id = self.pool.get('product.product').browse(cr, uid, value, context=context).uom_id.id
-                update_dict = {var_name: value}
-                if uom_id:
-                    update_dict['product_uom_id'] = uom_id
-                values.update(update_dict)
-            operation_id = self.create(cr, uid, values, context=context)
-        return operation_id
+    def check_tracking(self, cr, uid, ids, context=None):
+        """ Checks if serial number is assigned to stock move or not and raise an error if it had to.
+        """
+        operations = self.browse(cr, uid, ids, context=context)
+        for ops in operations:
+            if ops.picking_id and (ops.picking_id.picking_type_id.use_existing_lots or ops.picking_id.picking_type_id.use_create_lots) and \
+                ops.product_id and ops.product_id.tracking != 'none':
+                if not ops.lot_id:
+                    raise UserError(_('You need to provide a Lot/Serial Number'))
+                if ops.product_id.tracking == 'serial' and ops.product_qty != 1.0:
+                    raise UserError(_('You should provide a different Lot for each piece'))
 
 
 class stock_move_operation_link(osv.osv):
@@ -4277,6 +4186,7 @@ class stock_move_operation_link(osv.osv):
         else:
             domain.append(('owner_id', '=', False))
         return domain
+
 
 class stock_warehouse_orderpoint(osv.osv):
     """
@@ -4560,6 +4470,9 @@ class stock_picking_type(osv.osv):
     _defaults = {
         'warehouse_id': _default_warehouse,
         'active': True,
+        'barcode_nomenclature_id': _get_default_nomenclature,
+        'use_existing_lots': True,
+        'use_create_lots': True,
     }
 
 class barcode_rule(models.Model):

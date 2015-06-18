@@ -312,8 +312,8 @@ class product_product(osv.osv):
         templ_ids = list(set([x.product_tmpl_id.id for x in self.browse(cr, uid, ids, context=context)]))
         return template_obj.action_view_routes(cr, uid, templ_ids, context=context)
 
-    def onchange_track_all(self, cr, uid, ids, track_all, context=None):
-        if not track_all:
+    def onchange_tracking(self, cr, uid, ids, tracking, context=None):
+        if not tracking or tracking == 'none':
             return {}
         unassigned_quants = self.pool['stock.quant'].search_count(cr, uid, [('product_id','in', ids), ('lot_id','=', False), ('location_id.usage','=', 'internal')], context=context)
         if unassigned_quants:
@@ -392,11 +392,7 @@ class product_template(osv.osv):
         'loc_rack': fields.char('Rack', size=16),
         'loc_row': fields.char('Row', size=16),
         'loc_case': fields.char('Case', size=16),
-        'tracking': fields.selection(selection=[('serial', 'Require a serial number for each piece'), ('lot', 'Require a lot'), ('none', 'No required tracking')], string="Tracking"),
-        'track_incoming': fields.boolean('Track Incoming Lots', help="Forces to specify a Serial Number for all moves containing this product and coming from a Supplier Location"),
-        'track_outgoing': fields.boolean('Track Outgoing Lots', help="Forces to specify a Serial Number for all moves containing this product and going to a Customer Location"),
-        'track_all': fields.boolean('Full Lots Traceability', help="Forces to specify a Serial Number on each and every operation related to this product"),
-        
+        'tracking': fields.selection(selection=[('serial', 'Require a serial number for each piece'), ('lot', 'Require a lot'), ('none', 'No required tracking')], string="Tracking", required=True),
         # sum of product variant qty
         # 'reception_count': fields.function(_product_available, multi='qty_available',
         #     fnct_search=_search_product_quantity, type='float', string='Quantity On Hand'),
