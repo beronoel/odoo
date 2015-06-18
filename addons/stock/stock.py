@@ -4428,7 +4428,7 @@ class stock_picking_type(osv.osv):
         'default_location_dest_id': fields.many2one('stock.location', 'Default Destination Location'),
         'code': fields.selection([('incoming', 'Suppliers'), ('outgoing', 'Customers'), ('internal', 'Internal')], 'Type of Operation', required=True),
         'return_picking_type_id': fields.many2one('stock.picking.type', 'Picking Type for Returns'),
-        'show_entire_packs': fields.boolean('Show entire packs to move'),
+        'show_entire_packs': fields.boolean('Allow moving packs'),
         'warehouse_id': fields.many2one('stock.warehouse', 'Warehouse', ondelete='cascade'),
         'active': fields.boolean('Active'),
         'use_create_lots': fields.boolean('Create New Lots'),

@@ -430,12 +430,12 @@ class product_template(osv.osv):
         result['domain'] = "[('id','in',[" + ','.join(map(str, route_ids)) + "])]"
         return result
 
-    def onchange_track_all(self, cr, uid, ids, track_all, context=None):
+    def onchange_tracking(self, cr, uid, ids, track_all, context=None):
         if not track_all:
             return {}
         product_product = self.pool['product.product']
         variant_ids = product_product.search(cr, uid, [('product_tmpl_id', 'in', ids)], context=context)
-        return product_product.onchange_track_all(cr, uid, variant_ids, track_all, context=context)
+        return product_product.onchange_tracking(cr, uid, variant_ids, track_all, context=context)
 
     def _get_products(self, cr, uid, ids, context=None):
         products = []
