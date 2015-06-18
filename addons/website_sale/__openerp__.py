@@ -20,7 +20,7 @@ OpenERP E-Commerce
         'views/sale_order.xml',
         'views/snippets.xml',
         'views/report_shop_saleorder.xml',
-        'res_config_view.xml',
+        'views/res_config_view.xml',
         'security/ir.model.access.csv',
         'security/website_sale.xml',
     ],
