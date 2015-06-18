@@ -735,9 +735,10 @@
                                     <field name="product_id" on_change="product_id_change(product_id, product_uom_id, product_qty)" required="1" attrs="{'readonly': [('fresh_record', '=', False)]}"/>
                                     <field name="fresh_record" invisible="1"/>
                                     <field name="product_uom_id" attrs="{'readonly': [('fresh_record', '=', False)]}" groups="product.group_uom"/>
-                                    <field name="lot_id" domain="[('product_id','=?', product_id)]" context="{'product_id': product_id}" groups="stock.group_production_lot" attrs="{'readonly': [('fresh_record', '=', False)]}"/>
+                                    <field name="lot_id" domain="[('product_id','=?', product_id)]" context="{'product_id': product_id}" groups="stock.group_production_lot" attrs="{'readonly': [('fresh_record', '=', False)], 'invisible': [('lots_visible', '=', False)]}"/>
                                     <button name="%(stock.lot_split)d" string="Lot Split" type="action" icon="STOCK_INDENT" groups="stock.group_production_lot"
-                                            states="confirmed,assigned,waiting,partially_available"/>
+                                            attrs="{'invisible': ['|', ('lots_visible', '=', False), ('state', 'not in', ['confirmed', 'assigned', 'waiting', 'partially_available'])]}"/>
+                                    <field name="lots_visible" invisible="1"/>
                                     <field name="picking_id" invisible="1"/>
                                     <field name="owner_id" groups="stock.group_tracking_owner"/>
                                     <field name="location_id" domain="[('id', 'child_of', parent.location_id)]" invisible="1"/>
@@ -1452,8 +1453,8 @@
                                 <field name="return_picking_type_id"/>
                                 <field name="barcode_nomenclature_id"/>
                                 <field name="show_entire_packs" groups="stock.group_tracking_lot"/>
-                                <field name="create_lots" groups="stock.group_production_lot"/>
-                                <field name="existing_lots" groups="stock.group_production_lot"/>
+                                <field name="use_create_lots" groups="stock.group_production_lot"/>
+                                <field name="use_existing_lots" groups="stock.group_production_lot"/>
                             </group>
                         </group>
                         <separator string="Locations"/>
