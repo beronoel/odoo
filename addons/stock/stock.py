@@ -1534,20 +1534,8 @@ class stock_picking(models.Model):
     def put_in_pack_wiz(self, cr, uid, ids, context=None):
         if ids:
             package_id = self.put_in_pack(cr, uid, ids, context=context)
-            ctx = dict(context)
-            ctx['pack_id'] = package_id
-            if package_id:
-                return {
-                'name': _('Put in Pack'),
-                'view_mode': 'form',
-                'view_type': 'form',
-                'target': 'new',
-                'res_model': 'stock.put.in.pack',
-                'type': 'ir.actions.act_window',
-                'context': ctx
-                    }
-            else:
-                raise UserError(_('Please put some quantities processed first'))
+            if not package_id:
+                raise UserError(_('Please process some quantities to put in the pack first!'))
                 return {}
 
     def put_in_pack(self, cr, uid, ids, context=None):
