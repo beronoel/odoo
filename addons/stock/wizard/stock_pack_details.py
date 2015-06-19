@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp import models, fields, api
+from openerp import models, fields, api, _
 import openerp.addons.decimal_precision as dp
+from openerp.exceptions import UserError
 
 class stock_pack_details(models.TransientModel):
     _name = 'stock.pack.details'
@@ -44,18 +45,19 @@ class stock_pack_details(models.TransientModel):
     @api.multi
     def split_quantities(self):
         for wiz in self:
-            if wiz.quantity>1 and wiz.qty_done < wiz.quantity:
-
+            if wiz.quantity>0.0 and wiz.qty_done < wiz.quantity:
                 pack2 = self.pack_id.copy({'qty_done': 0.0, 'product_qty': wiz.quantity - wiz.qty_done})
                 wiz.quantity = wiz.qty_done
                 self.pack_id.write({'qty_done': wiz.qty_done, 'product_qty': wiz.quantity})
                 return {
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.picking',
-                'type': 'ir.actions.act_window',
-                'res_id': self.pack_id.picking_id.id,
+                    'view_type': 'form',
+                    'view_mode': 'form',
+                    'res_model': 'stock.picking',
+                    'type': 'ir.actions.act_window',
+                    'res_id': self.pack_id.picking_id.id,
                 }
+            else:
+                raise UserError(_('Can not split done quantity'))
 
     @api.one
     def process(self):

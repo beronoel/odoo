@@ -4064,6 +4064,16 @@ class stock_pack_operation(osv.osv):
                 res[pack.id] = True
         return res
 
+    def _get_default_from_loc(self, cr, uid, context=None):
+        default_loc = context.get('default_location_id')
+        if default_loc:
+            return self.pool['stock.location'].browse(cr, uid, default_loc, context=context).name
+
+    def _get_default_to_loc(self, cr, uid, context=None):
+        default_loc = context.get('default_location_dest_id')
+        if default_loc:
+            return self.pool['stock.location'].browse(cr, uid, default_loc, context=context).name
+
     _columns = {
         'picking_id': fields.many2one('stock.picking', 'Stock Picking', help='The stock operation where the packing has been made', required=True),
         'product_id': fields.many2one('product.product', 'Product', ondelete="CASCADE"),  # 1
@@ -4104,6 +4114,8 @@ class stock_pack_operation(osv.osv):
         'product_qty': 0.0,
         'processed_boolean': lambda *a: False,
         'fresh_record': True,
+        'from_loc': _get_default_from_loc,
+        'to_loc': _get_default_to_loc,
     }
 
     def write(self, cr, uid, ids, vals, context=None):
