@@ -91,4 +91,4 @@ class stock_lot_split_line(models.TransientModel):
     split_id = fields.Many2one('stock.lot.split')
     lot_id = fields.Many2one('stock.production.lot')
     product_qty = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), default=1.0)
-    tracking = fields.Selection('Is Serial Number', related='split_id.product_id.tracking')
+    tracking = fields.Selection('Is Serial Number', related='split_id.product_id.tracking', readonly=True)
