@@ -4144,7 +4144,7 @@ class stock_pack_operation(osv.osv):
                 ops.product_id and ops.product_id.tracking != 'none':
                 if not ops.lot_id:
                     raise UserError(_('You need to provide a Lot/Serial Number'))
-                if ops.product_id.tracking == 'serial' and ops.product_qty != 1.0:
+                if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0: #TODO: check further
                     raise UserError(_('You should provide a different Lot for each piece'))
 
 

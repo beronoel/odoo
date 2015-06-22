@@ -14,7 +14,18 @@
                     </span>
                 </group>
                 <group>
-                    <field name="line_ids" nolabel="1">
+                    <field name="only_create" invisible="1"/>
+                    <field name="tracking" invisible="1"/>
+                    <field name="line_ids_create" nolabel="1" attrs="{'invisible': [('only_create', '=', False)]}"
+                            context="{'default_created': True, 'default_tracking': tracking}">
+                        <tree editable="bottom">
+                            <field name="tracking" invisible="1"/>
+                            <field name="lot_name"/>
+                            <field name="product_qty" attrs="{'invisible': [('tracking', '=', 'serial')]}"/>
+                        </tree>
+                    </field>
+                    <field name="line_ids_exist" nolabel="1" attrs="{'invisible': [('only_create', '=', True)]}"
+                            context="{'default_created': False, 'default_tracking': tracking}">
                         <tree editable="bottom">
                             <field name="tracking" invisible="1"/>
                             <field name="lot_id" domain="[('product_id','=', parent.product_id)]" context="{'product_id': parent.product_id}"/>
