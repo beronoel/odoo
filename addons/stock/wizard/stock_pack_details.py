@@ -57,7 +57,7 @@ class stock_pack_details(models.TransientModel):
                     'res_id': self.pack_id.picking_id.id,
                 }
             else:
-                raise UserError(_('Can not split done quantity'))
+                raise UserError(_('Can not split 0 quantity'))
 
     @api.one
     def process(self):
