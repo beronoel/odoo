@@ -7,6 +7,7 @@
     <record id="tax_purchase_vat10" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT được khấu trừ 10%</field>
+        <field name="description">Thuế GTGT được khấu trừ 10%</field>
         <field name="amount" eval="10"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart1331"/>
@@ -16,6 +17,7 @@
     <record id="tax_purchase_vat5" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT được khấu trừ 5%</field>
+        <field name="description">Thuế GTGT được khấu trừ 5%</field>
         <field name="amount" eval="5"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart1331"/>
@@ -25,6 +27,7 @@
     <record id="tax_purchase_vat0" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT được khấu trừ 0%</field>
+        <field name="description">Thuế GTGT được khấu trừ 0%</field>
         <field name="amount" eval="0"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart1331"/>
@@ -36,6 +39,7 @@
     <record id="tax_sale_vat10" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT phải nộp 10%</field>
+        <field name="description">Thuế GTGT phải nộp 10%</field>
         <field name="amount" eval="10"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart33311"/>
@@ -45,6 +49,7 @@
     <record id="tax_sale_vat5" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT phải nộp 5%</field>
+        <field name="description">Thuế GTGT phải nộp 5%</field>
         <field name="amount" eval="5"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart33311"/>
@@ -54,6 +59,7 @@
     <record id="tax_sale_vat0" model="account.tax.template">
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Thuế GTGT phải nộp 0%</field>
+        <field name="description">Thuế GTGT phải nộp 0%</field>
         <field name="amount" eval="0"/>
         <field name="amount_type">percent</field>
         <field name="account_id" ref="chart33311"/>
