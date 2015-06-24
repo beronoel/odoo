@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
-
+<odoo>
         <record id="view_order_form_acquirer" model="ir.ui.view">
-            <field name="name">sale.order.form.acquirer</field>
+            <field name="name">sale.order.form.acquirer.inherit</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
@@ -13,6 +11,4 @@
                 </xpath>
             </field>
         </record>
-
-    </data>
-</openerp>
+</odoo>

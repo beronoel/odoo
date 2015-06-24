@@ -1,17 +1,20 @@
-from openerp.tests.common import TransactionCase
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 from mock import patch
+from openerp.http import request
+from openerp.tests.common import TransactionCase
 
 
 class TestWebsitePriceList(TransactionCase):
 
     # Mock nedded because request.session doesn't exist during test
-    def _get_pricelist_available(self, cr, uid, show_visible=False, context=None):
-        return self.get_pl(context.get('show'), context.get('current_pl'), context.get('country'))
+    def _get_pricelist_available(self, show_visible=False):
+        return self.get_pl(self.context.get('show'), self.context.get('current_pl'), self.context.get('country'))
 
     def setUp(self):
         super(TestWebsitePriceList, self).setUp()
-        self.website = self.registry('website').browse(self.cr, self.uid, 1)
-        self.patcher = patch('openerp.addons.website_sale.models.sale_order.website.get_pricelist_available', wraps=self._get_pricelist_available)
+        self.website = self.env['website'].browse(1)
+        self.patcher = patch('openerp.addons.website_sale.models.website.Website.get_pricelist_available', wraps=self._get_pricelist_available)
         self.mock_get_pricelist_available = self.patcher.start()
 
     def get_pl(self, show, current_pl, country):
@@ -37,6 +40,7 @@ class TestWebsitePriceList(TransactionCase):
         }
         for country, result in country_list.items():
             pls = self.get_pl(show, current_pl, country)
+            print "pls showwwwww assert result", len(pls), result
             self.assertEquals(len(pls), result)
 
     def test_get_pricelist_available_not_show(self):
@@ -53,10 +57,11 @@ class TestWebsitePriceList(TransactionCase):
 
         for country, result in country_list.items():
             pls = self.get_pl(show, current_pl, country)
+            print "pls asert result", len(pls), result
             self.assertEquals(len(pls), result)
 
     def test_get_pricelist_available_promocode(self):
-        christmas_pl = self.registry('ir.model.data').xmlid_to_res_id(self.cr, self.uid, 'website_sale.list_christmas')
+        christmas_pl = self.env.ref('website_sale.list_christmas').id
         context = {
             'show': True,
             'current_pl': christmas_pl,
@@ -71,7 +76,9 @@ class TestWebsitePriceList(TransactionCase):
 
         for country, result in country_list.items():
             context['country'] = country
+            self.context = context
             available = self.website.with_context(context).is_pricelist_available(christmas_pl)
+            print "available aseert result", result , available
             if result:
                 self.assertTrue(available)
             else:

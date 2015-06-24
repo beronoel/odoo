@@ -3,10 +3,10 @@
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.website.controllers.main import Website
-from openerp.addons.website_portal.controllers.main import website_account
+from openerp.addons.website_sale.controllers.main import WebsiteSale
 
 
-class website_sale_stock(website_account):
+class website_sale_stock(WebsiteSale):
 
     @http.route([
         '/my/orders/<int:order>',

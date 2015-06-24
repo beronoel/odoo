@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data noupdate="1">
 
 
@@ -68,8 +68,8 @@
                             <div class="col-md-5 col-md-offset-1 mt32">
                                 <h3>Bose Mini Bluetooth Speaker.</h3>
                                 <p>
-                                    The Bose® SoundLink® mini is Bose's smallest portable Bluetooth speaker. Its ultra-compact size fits in the 
-                                    palm of your hand, yet gives you full, natural sound wirelessly from your iPhone, iPad, or iPod. Grab it and go 
+                                    The Bose® SoundLink® mini is Bose's smallest portable Bluetooth speaker. Its ultra-compact size fits in the
+                                    palm of your hand, yet gives you full, natural sound wirelessly from your iPhone, iPad, or iPod. Grab it and go
                                     full-featured. It can do just about everything and
                                     experience music just about anywhere.
                                 </p>
@@ -184,7 +184,7 @@ iOS7
                                 <h3 class="text-muted">There's less of it, but no less to it.</h3>
                                 <p>
                                         Everything you love about iPad — the beautiful screen,
-                                        fast and fluid performance, FaceTime and iSight cameras, 
+                                        fast and fluid performance, FaceTime and iSight cameras,
                                         thousands of amazing apps, 10-hour battery life* — is everything
                                         you’ll love about iPad mini, too. And you can hold it in one hand.
                                 </p>
@@ -366,7 +366,7 @@ Weight: 10.2 grams
                                 <h2>Beautiful widescreen display.</h2>
                                 <h3 class="text-muted">Brilliance onscreen. And behind it.</h3>
                                 <p>
-                                    How did we make an already gorgeous widescreen display even better? By making it 75 percent less reflective. And by re-architecting the LCD and moving it right up against the cover glass. So you see your photos, games, movies, and everything else in vivid, lifelike detail. 
+                                    How did we make an already gorgeous widescreen display even better? By making it 75 percent less reflective. And by re-architecting the LCD and moving it right up against the cover glass. So you see your photos, games, movies, and everything else in vivid, lifelike detail.
                                 </p>
                             </div>
                             <div class="col-md-10 col-md-offset-1">
@@ -628,7 +628,7 @@ Weight: 31 grams</field>
           <field name="name">Network</field>
           <field name="sequence">14</field>
         </record>
-        
+
         <record id="product.services" model="product.public.category">
           <field name="name">Services</field>
           <field name="sequence">16</field>
@@ -838,4 +838,4 @@ Weight: 31 grams</field>
             <field name="country_group_ids" eval="[(6,0,[ref('benelux')])]" />
         </record>
     </data>
-</openerp>
+</odoo>
