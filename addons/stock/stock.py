@@ -4056,10 +4056,11 @@ class stock_pack_operation(osv.osv):
         res = {}
         for pack in self.browse(cr, uid, ids, context=context):
             pick = pack.picking_id
+            product_requires = (pack.product_id.tracking != 'none')
             if pick.picking_type_id:
-                res[pack.id] = pick.picking_type_id.use_existing_lots or pick.picking_type_id.use_create_lots
+                res[pack.id] = pick.picking_type_id.use_existing_lots or pick.picking_type_id.use_create_lots and product_requires
             else:
-                res[pack.id] = True
+                res[pack.id] = product_requires
         return res
 
     def _get_default_from_loc(self, cr, uid, context=None):
@@ -4150,6 +4151,48 @@ class stock_pack_operation(osv.osv):
                     raise UserError(_('You need to provide a Lot/Serial Number for product %s') % ops.product_id.name)
                 if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0: #TODO: check further
                     raise UserError(_('You should provide a different Lot for each piece'))
+
+    def split_lot(self, cr, uid, ids, context=None):
+        assert len(ids) > 0
+        data_obj = self.pool['ir.model.data']
+        pack = self.browse(cr, uid, ids[0], context=context)
+        picking_type = pack.picking_id.picking_type_id
+        serial = (pack.product_id.tracking == 'serial')
+        view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_lot_split')
+        only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
+        line_ids = []
+        if pack.qty_done > 0 and pack.lot_id:
+            if pack.product_id.tracking == 'serial':
+                product_qty = 1.0
+            else:
+                product_qty = pack.qty_done
+            line_ids = [(0, 0, {'lot_id': pack.lot_id.id,
+                                'lot_name': pack.lot_id.name,
+                                'product_qty': product_qty,
+                                })]
+        values = {
+            'pack_id': pack.id,
+            'product_id': pack.product_id.id,
+            'product_uom_id': pack.product_uom_id.id,
+            'product_qty': pack.product_qty,
+            'qty_done': pack.qty_done,
+            'only_create': only_create,
+            'line_ids': line_ids,
+        }
+        wiz_id = self.pool['stock.lot.split'].create(cr, uid, values, context=context)
+        return {
+             'name': _('Split Lot'),
+             'type': 'ir.actions.act_window',
+             'view_type': 'form',
+             'view_mode': 'form',
+             'res_model': 'stock.lot.split',
+             'views': [(view, 'form')],
+             'view_id': view,
+             'target': 'new',
+             'res_id': wiz_id,
+             'context': {'serial': serial,
+                         'only_create': only_create},
+         }
 
 
 class stock_move_operation_link(osv.osv):
