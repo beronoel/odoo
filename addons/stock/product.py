@@ -319,7 +319,7 @@ class product_product(osv.osv):
         if unassigned_quants:
             return {'warning' : {
                     'title': _('Warning!'),
-                    'message' : _("Lots are not defined for all the existing inventory of this product. You should assign serial numbers (e.g. by creating an inventory) first.")
+                    'message' : _("You have products in stock that have no lot number.  You can assign serial numbers by doing an inventory.  ")
             }}
         return {}
 

@@ -10,7 +10,7 @@ class stock_lot_split(models.TransientModel):
     _description = 'Lot split'
 
     @api.one
-    @api.depends('line_ids_exist', 'line_ids_create')
+    @api.depends('line_ids')
     def _compute_qty_done(self):
         self.qty_done = sum([x.product_qty for x in self.line_ids])
 
@@ -24,58 +24,27 @@ class stock_lot_split(models.TransientModel):
     product_qty = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), readonly=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
     product_uom_id = fields.Many2one('product.uom', 'Product Unit of Measure', readonly=True)
-    lot_id = fields.Many2one('stock.production.lot', 'Lot/Serial Number')
     line_ids = fields.One2many('stock.lot.split.line', 'split_id')
-    line_ids_exist = fields.One2many('stock.lot.split.line', 'split_id', domain=[('created', '=', False)])
-    line_ids_create = fields.One2many('stock.lot.split.line', 'split_id', domain=[('created','=',True)])
     qty_done = fields.Float('Processed Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_done')
     only_create = fields.Boolean('Only text', compute='_compute_only_create')
     picking_type_id = fields.Many2one('stock.picking.type', related='pack_id.picking_id.picking_type_id')
-    tracking = fields.Selection('Is Serial Number', related='product_id.tracking', readonly=True)
-
-    @api.model
-    def default_get(self, fields):
-        res = {}
-        active_id = self._context.get('active_id')
-        if active_id:
-            pack_op = self.env['stock.pack.operation'].browse(active_id)
-            line_ids = []
-            picking_type = pack_op.picking_id.picking_type_id
-            only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
-            if pack_op.qty_done > 0:
-                if pack_op.product_id.tracking == 'serial':
-                    product_qty = 1.0
-                else:
-                    product_qty = pack_op.qty_done
-                line_ids = [(0, 0, {'lot_id': not only_create and pack_op.lot_id.id or False,
-                                    'product_qty': product_qty,
-                                    'created': only_create,})]
-            res = {
-                'pack_id': pack_op.id,
-                'product_id': pack_op.product_id.id,
-                'product_uom_id': pack_op.product_uom_id.id,
-                'product_qty': pack_op.product_qty,
-                'qty_done': pack_op.qty_done,
-                'lot_id': pack_op.lot_id.id,
-                'only_create': only_create,
-            }
-            if only_create:
-                res['line_ids_create'] = line_ids
-            else:
-                res['line_ids_exist'] = line_ids
-        return res
 
     @api.multi
     def process(self):
         self.ensure_one()
         if not self.line_ids:
-            raise UserError (_('Please provide at least one line to replace it with'))
+            raise UserError (_('Please provide at least one line'))
         # Split pack operations
         firsttime = True
         totals_other = 0.0
         for line in self.line_ids:
+            if not line.lot_name and not line.lot_id:
+                raise UserError(_('Please provide a lot/serial number for every line'))
             if line.lot_name:
-                lot = self.env['stock.production.lot'].create({'name': line.lot_name, 'product_id': self.pack_id.product_id.id})
+                if self.pack_id.lot_id and line.lot_name == self.pack_id.lot_id.name:
+                    lot = self.pack_id.lot_id
+                else:
+                    lot = self.env['stock.production.lot'].create({'name': line.lot_name, 'product_id': self.pack_id.product_id.id})
             else:
                 lot = line.lot_id
             if firsttime:
@@ -109,8 +78,6 @@ class stock_lot_split_line(models.TransientModel):
     _description = 'Lot split line'
 
     split_id = fields.Many2one('stock.lot.split')
-    created = fields.Boolean('Created')
-    lot_id = fields.Many2one('stock.production.lot')
+    lot_id = fields.Many2one('stock.production.lot', string="Lot/Serial Number")
     lot_name = fields.Char('Name')
     product_qty = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), default=1.0)
-    tracking = fields.Char('Is Serial Number')
