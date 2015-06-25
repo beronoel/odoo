@@ -2196,7 +2196,7 @@ class stock_move(osv.osv):
         if move.picking_id and (move.picking_id.picking_type_id.use_existing_lots or move.picking_id.picking_type_id.use_create_lots) and \
             move.product_id.tracking != 'none':
             if not lot_id:
-                raise UserError(_('You need to provide a Lot/Serial Number'))
+                raise UserError(_('You need to provide a Lot/Serial Number for product %s') % move.product_id.name)
 
     def check_recompute_pack_op(self, cr, uid, ids, context=None):
         pickings = list(set([x.picking_id for x in self.browse(cr, uid, ids, context=context) if x.picking_id]))
@@ -4147,7 +4147,7 @@ class stock_pack_operation(osv.osv):
             if ops.picking_id and (ops.picking_id.picking_type_id.use_existing_lots or ops.picking_id.picking_type_id.use_create_lots) and \
                 ops.product_id and ops.product_id.tracking != 'none':
                 if not ops.lot_id:
-                    raise UserError(_('You need to provide a Lot/Serial Number'))
+                    raise UserError(_('You need to provide a Lot/Serial Number for product %s') % ops.product_id.name)
                 if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0: #TODO: check further
                     raise UserError(_('You should provide a different Lot for each piece'))
 
