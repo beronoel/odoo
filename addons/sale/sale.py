@@ -1148,6 +1148,8 @@ class account_invoice(osv.Model):
 
     _columns = {
         'team_id': fields.many2one('crm.team', 'Sales Team', oldname='section_id'),
+        'sale_ids': fields.many2many('sale.order', 'sale_order_invoice_rel', 'invoice_id', 'order_id', 'Sale Orders',
+                             readonly=True, copy=False, help="This is the list of sale orders related to this invoice. One invoice may have multiple sale orders related. "),
     }
 
     _defaults = {
