@@ -62,7 +62,7 @@ If required, you can manually adjust the descriptions via the CODA configuration
     'data': [
         'l10n_be_coda_view.xml',
     ],
-    'auto_install': True,
+    'auto_install': False,
     'website': 'https://www.odoo.com/page/accounting',
-    'installable': True,
+    'installable': False,
 }

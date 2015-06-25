@@ -37,7 +37,7 @@
     <!-- Account Templates -->
 
     <record id="chart0" model="account.account.template">
-        <field name="code">0</field>
+        <field name="code">101</field>
         <field name="name">Hệ thống tài khoản kế toán Việt Nam</field>
         <field name="user_type_id" ref="account_type_root"/>
         <field name="chart_template_id" ref="vn_template"/>
@@ -1445,6 +1445,8 @@
         <field name="property_account_payable_id" ref="chart331"/>
         <field name="property_account_expense_categ_id" ref="chart1561"/>
         <field name="property_account_income_categ_id" ref="chart5111"/>
+        <field name="income_currency_exchange_account_id" ref="chartgain01"/>
+        <field name="expense_currency_exchange_account_id" ref="chartloss01"/>
     </record>
 
 </data>
