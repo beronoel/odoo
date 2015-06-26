@@ -4,28 +4,26 @@
 import time
 from datetime import datetime
 from dateutil import relativedelta
-from openerp.osv import fields, osv
+from openerp import api,fields, models
 
 
-class payslip_lines_contribution_register(osv.osv_memory):
+class payslip_lines_contribution_register(models.TransientModel):
     _name = 'payslip.lines.contribution.register'
     _description = 'PaySlip Lines by Contribution Registers'
-    _columns = {
-        'date_from': fields.date('Date From', required=True),
-        'date_to': fields.date('Date To', required=True),
-    }
 
-    _defaults = {
-        'date_from': lambda *a: time.strftime('%Y-%m-01'),
-        'date_to': lambda *a: str(datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10],
-    }
+    date_from = fields.Date(
+        string='Date From', required=True, default=lambda *a: time.strftime('%Y-%m-01'))
+    date_to = fields.Date(string='Date To', required=True, default=lambda *a: str(
+        datetime.now() + relativedelta.relativedelta(months=+1, day=1, days=-1))[:10])
 
-    def print_report(self, cr, uid, ids, context=None):
+    @api.multi
+    def print_report(self):
         datas = {
-             'ids': context.get('active_ids', []),
-             'model': 'hr.contribution.register',
-             'form': self.read(cr, uid, ids, context=context)[0]
+            'ids': self.env.context.get('active_ids', []),
+            'model': 'hr.contribution.register',
+            'form': self.read()[0]
         }
-        return self.pool['report'].get_action(
-            cr, uid, [], 'hr_payroll.report_contributionregister', data=datas, context=context
-        )
+        print ">>>>>>>>>>>", self
+        records = self.env['hr.payslip'].browse(self._ids)
+        return self.env['report'].get_action(
+            records, 'hr_payroll.report_contributionregister', data=datas)
