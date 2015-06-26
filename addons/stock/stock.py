@@ -1536,13 +1536,6 @@ class stock_picking(models.Model):
         ctx['do_only_split'] = True
         return self.do_transfer(cr, uid, picking_ids, context=ctx)
 
-    def put_in_pack_wiz(self, cr, uid, ids, context=None):
-        if ids:
-            package_id = self.put_in_pack(cr, uid, ids, context=context)
-            if not package_id:
-                raise UserError(_('Please process some quantities to put in the pack first!'))
-                return {}
-
     def put_in_pack(self, cr, uid, ids, context=None):
         stock_move_obj = self.pool["stock.move"]
         stock_operation_obj = self.pool["stock.pack.operation"]
@@ -1563,6 +1556,8 @@ class stock_picking(models.Model):
             if operations:
                 package_id = package_obj.create(cr, uid, {}, context=context)
                 stock_operation_obj.write(cr, uid, pack_operation_ids, {'result_package_id': package_id}, context=context)
+            else:
+                raise UserError(_('Please process some quantities to put in the pack first!'))
         return package_id
 
 
@@ -4239,7 +4234,6 @@ class stock_move_operation_link(osv.osv):
         else:
             domain.append(('owner_id', '=', False))
         return domain
-
 
 class stock_warehouse_orderpoint(osv.osv):
     """
