@@ -1547,8 +1547,8 @@ class stock_picking(models.Model):
                     stock_operation_obj.write(cr, uid, operation.id, {'product_qty': operation.product_qty - operation.qty_done,'qty_done': 0, 'lot_id': False}, context=context)
                     op = stock_operation_obj.browse(cr, uid, new_operation, context=context)
                 pack_operation_ids.append(op.id)
-            stock_operation_obj.check_tracking(cr, uid, [x.id for x in pick.pack_operation_ids], context=context)
             if operations:
+                stock_operation_obj.check_tracking(cr, uid, pack_operation_ids, context=context)
                 package_id = package_obj.create(cr, uid, {}, context=context)
                 stock_operation_obj.write(cr, uid, pack_operation_ids, {'result_package_id': package_id}, context=context)
             else:
