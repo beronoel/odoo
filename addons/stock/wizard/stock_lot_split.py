@@ -14,19 +14,12 @@ class stock_lot_split(models.TransientModel):
     def _compute_qty_done(self):
         self.qty_done = sum([x.product_qty for x in self.line_ids])
 
-    @api.one
-    @api.depends('pack_id')
-    def _compute_only_create(self): #Not necessary as values are set with defaults
-        picking_type = self.pack_id.picking_id.picking_type_id
-        self.only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
-
     pack_id = fields.Many2one('stock.pack.operation', 'Pack operation')
     product_qty = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), readonly=True)
     product_id = fields.Many2one('product.product', 'Product', readonly=True)
     product_uom_id = fields.Many2one('product.uom', 'Product Unit of Measure', readonly=True)
     line_ids = fields.One2many('stock.lot.split.line', 'split_id')
     qty_done = fields.Float('Processed Qty', digits=dp.get_precision('Product Unit of Measure'), compute='_compute_qty_done')
-    only_create = fields.Boolean('Only text', compute='_compute_only_create')
     picking_type_id = fields.Many2one('stock.picking.type', related='pack_id.picking_id.picking_type_id')
 
     @api.multi

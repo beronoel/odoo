@@ -21,7 +21,8 @@ class StockMove(osv.osv):
 
     def check_tracking(self, cr, uid, move, lot_id, context=None):
         super(StockMove, self).check_tracking(cr, uid, move, lot_id, context=context)
-        # TODO: Need something on company level for tracking manufacturing lots?
+        if move.raw_material_production_id and move.product_id.tracking!='none' and move.location_dest_id.usage == 'production' and move.raw_material_production_id.product_id.tracking != 'none' and not move.consumed_for:
+            raise UserError(_("Because the product %s requires it, you must assign a serial number to your raw material %s to proceed further in your production. Please use the 'Produce' button to do so.") % (move.raw_material_production_id.product_id.name, move.product_id.name))
 
     # TODO master: remove me, no longer used
     def _check_phantom_bom(self, cr, uid, move, context=None):

@@ -14,7 +14,6 @@
                     </span>
                 </group>
                 <group>
-                    <field name="only_create" invisible="1"/>
                     <field name="line_ids" nolabel="1">
                         <tree editable="bottom">
                             <field name="lot_name" invisible="not context.get('only_create', False)"/>
