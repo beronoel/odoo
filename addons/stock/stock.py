@@ -4523,7 +4523,6 @@ class stock_picking_type(osv.osv):
     _defaults = {
         'warehouse_id': _default_warehouse,
         'active': True,
-        'barcode_nomenclature_id': _get_default_nomenclature,
         'use_existing_lots': True,
         'use_create_lots': True,
     }
