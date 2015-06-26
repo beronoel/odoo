@@ -61,5 +61,5 @@ class WebsiteSaleOptions(website_sale):
         return request.website.with_context(context)._render("website_sale_options.modal", {
                 'product': product,
                 'compute_currency': compute_currency,
-                'get_attribute_value_ids': self.get_attribute_value_ids,
+                'get_attribute_value_ids': self.with_context(context).get_attribute_value_ids,
             })
