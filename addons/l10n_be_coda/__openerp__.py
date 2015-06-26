@@ -64,5 +64,5 @@ If required, you can manually adjust the descriptions via the CODA configuration
     ],
     'auto_install': True,
     'website': 'https://www.odoo.com/page/accounting',
-    'installable': True,
+    'installable': False,
 }
