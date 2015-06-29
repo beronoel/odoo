@@ -3,10 +3,10 @@
     <data>
         <report
             string="Picking Operations"
-            id="action_report_picking_operations"
+            id="action_report_picking"
             model="stock.picking"
             report_type="qweb-pdf"
-            name="stock.report_picking_operations"
+            name="stock.report_picking"
             file="stock.report_picking_operations"
         />
         <report 

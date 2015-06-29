@@ -13,7 +13,7 @@
                 </div>
             </xpath>
         </template>
-        <template id="report_picking_operations">
+        <template id="report_picking">
             <t t-call="report.html_container">
                 <t t-foreach="docs" t-as="o">
                     <t t-call="stock.external_layout_barcode_right">

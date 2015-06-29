@@ -42,7 +42,7 @@ class stock_picking_wave(osv.osv):
             raise UserError(_('Nothing to print.'))
         context['active_ids'] = picking_ids
         context['active_model'] = 'stock.picking'
-        return self.pool.get("report").get_action(cr, uid, [], 'stock.report_picking_operations', context=context)
+        return self.pool.get("report").get_action(cr, uid, [], 'stock.report_picking', context=context)
 
     def create(self, cr, uid, vals, context=None):
         if vals.get('name', '/') == '/':
