@@ -19,6 +19,6 @@ Install some generic chart of accounts.
         'data/configurable_account_chart.xml',
         'account_chart_template.yml',
     ],
-    'installable': True,
+    'installable': False,
     'website': 'https://www.odoo.com/page/accounting',
 }
