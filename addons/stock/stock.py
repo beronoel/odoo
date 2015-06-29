@@ -434,13 +434,14 @@ class stock_quant(osv.osv):
         res_qty = qty
         if restrict_lot_id:
             if not prefered_domain_list:
-                prefered_domain_list = [[('lot_id', '=', restrict_lot_id)]]
+                prefered_domain_list = [[('lot_id', '=', restrict_lot_id)],[('lot_id', '=', False)]]
             else:
                 new_list = []
                 for pref_domain in prefered_domain_list:
                     pref_lot_domain = pref_domain + [('lot_id', '=', restrict_lot_id)]
+                    pref_no_lot_domain = pref_domain + [('lot_id', '=', False)]
                     new_list.append(pref_lot_domain)
-                    new_list.append(pref_domain)
+                    new_list.append(pref_no_lot_domain)
                 prefered_domain_list = new_list
 
         if not prefered_domain_list:
@@ -573,6 +574,7 @@ class stock_quant(osv.osv):
         if quant.package_id.id:
             dom += [('package_id', '=', quant.package_id.id)]
         dom += [('id', '!=', quant.propagated_from_id.id)]
+        import pdb; pdb.set_trace()
         quants = self.quants_get_prefered_domain(cr, uid, quant.location_id, quant.product_id, quant.qty, dom,
                                                  restrict_lot_id=quant.lot_id.id, restrict_partner_id=quant.owner_id.id, context=context)
         product_uom_rounding = quant.product_id.uom_id.rounding
