@@ -520,6 +520,16 @@ class stock_quant(osv.osv):
             negative_quant_id = self.create(cr, SUPERUSER_ID, negative_vals, context=context)
             vals.update({'propagated_from_id': negative_quant_id})
 
+        # In case of serial tracking, check if the product does not exist somewhere internally already
+        picking_type = move.picking_id and move.picking_id.picking_type_id or False
+        if move.product_id.tracking == 'serial' and (not picking_type or (picking_type.use_create_lots or picking_type.use_existing_lots)):
+            if qty != 1.0:
+                raise UserError(_('You should only receive by the piece with the same serial number'))
+            other_quants = self.search(cr, uid, [('product_id', '=', move.product_id.id), ('lot_id', '=', lot_id),
+                                                 ('qty', '>', 0.0), ('location_id.usage', '=', 'internal')], context=context)
+            if other_quants:
+                raise UserError(_('The serial number %s is already in stock') % lot_id.name)
+
         #create the quant as superuser, because we want to restrict the creation of quant manually: we should always use this method to create quants
         quant_id = self.create(cr, SUPERUSER_ID, vals, context=context)
         return self.browse(cr, uid, quant_id, context=context)
@@ -4150,7 +4160,7 @@ class stock_pack_operation(osv.osv):
                 ops.product_id and ops.product_id.tracking != 'none':
                 if not ops.lot_id:
                     raise UserError(_('You need to provide a Lot/Serial Number for product %s') % ops.product_id.name)
-                if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0: #TODO: check further
+                if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0:
                     raise UserError(_('You should provide a different Lot for each piece'))
 
     def split_lot(self, cr, uid, ids, context=None):
