@@ -92,7 +92,7 @@
                     <filter name="virtual_stock_negative" string="Forecast Negative Stock" domain="[('virtual_available','&lt;',0)]"/>
                 </field>
                 <filter name="consumable" position="before">
-                   <filter string="Products" icon="terp-accessories-archiver" domain="[('type','=','product')]" help="Stockable products"/>
+                   <filter string="Products" icon="terp-accessories-archiver" domain="[('product_type','=','product')]" help="Stockable products"/>
                 </filter>
             </field>
         </record>
@@ -109,7 +109,7 @@
                     </div>
                 </group>
                 <group name="status" position="before">
-                    <group string="Stock and Expected Variations" attrs="{'invisible': [('type', '=', 'service')]}" groups="base.group_user">
+                    <group string="Stock and Expected Variations" attrs="{'invisible': [('product_type', '=', 'service')]}" groups="base.group_user">
                         <label for="qty_available"/>
                             <div>
                                 <field name="qty_available" class="oe_inline"/>
@@ -127,19 +127,19 @@
                     </group>
                 </group>
                 <group name="status" position="after">
-                    <group name="store" string="Storage Location" attrs="{'invisible':[('type','=','service')]}">
+                    <group name="store" string="Storage Location" attrs="{'invisible':[('product_type','=','service')]}">
                         <field name="loc_rack"/>
                         <field name="loc_row"/>
                         <field name="loc_case"/>
                     </group>
                 </group>
                 <group name="status" position="before">
-                    <group name="lot" groups="stock.group_production_lot" string="Lots" attrs="{'invisible':[('type','=','service')]}">
+                    <group name="lot" groups="stock.group_production_lot" string="Lots" attrs="{'invisible':[('product_type','=','service')]}">
                         <field name="tracking" on_change="onchange_tracking(tracking)" widget="radio"/>
                     </group>
                 </group>
                 <group name="weight" position="before">
-                    <group name="store" groups="stock.group_locations" string="Counter-Part Locations Properties" attrs="{'invisible':[('type','=','service')]}">
+                    <group name="store" groups="stock.group_locations" string="Counter-Part Locations Properties" attrs="{'invisible':[('product_type','=','service')]}">
                         <field name="property_stock_procurement" domain="[('usage','=','procurement')]"/>
                         <field name="property_stock_production" domain="[('usage','=','production')]"/>
                         <field name="property_stock_inventory" domain="[('usage','=','inventory')]"/>
@@ -149,7 +149,7 @@
                     <attribute name="context">{'default_groups_ref': ['base.group_user', 'base.group_sale_manager', 'stock.group_stock_manager']}</attribute>
                 </field>
                 <page name="procurements" position="after">
-                    <page string="Supply Chain" groups="base.group_user" attrs="{'invisible': [('type', '=', 'service')]}">
+                    <page string="Supply Chain" groups="base.group_user" attrs="{'invisible': [('product_type', '=', 'service')]}">
                         <group>
                             <field name="route_ids" widget="many2many_checkboxes"/>
                         </group>
@@ -224,13 +224,13 @@
                    <button class="oe_stat_button"
                            name="%(product_open_quants)d"
                            icon="fa-building-o"
-                           type="action"  attrs="{'invisible':[('type', '=', 'service')]}" groups="stock.group_locations">
+                           type="action"  attrs="{'invisible':[('product_type', '=', 'service')]}" groups="stock.group_locations">
                         <field name="qty_available2" widget="statinfo"/>
                     </button>
-                   <button class="oe_stat_button" string="Moves" name= "%(act_product_stock_move_open)d" type="action" attrs="{'invisible':[('type', '=', 'service')]}" groups="stock.group_stock_user" icon="fa-arrows-v"/>
+                   <button class="oe_stat_button" string="Moves" name= "%(act_product_stock_move_open)d" type="action" attrs="{'invisible':[('product_type', '=', 'service')]}" groups="stock.group_stock_user" icon="fa-arrows-v"/>
                    <button class="oe_stat_button" name="%(product_open_orderpoint)d" type="action" 
-                        attrs="{'invisible':[('type', '=', 'service')]}" icon="fa-refresh" string="Reordering Rules"/>
-                   <button class="oe_stat_button" name="action_view_routes" string="Routes" type="object" icon="fa-cogs" attrs="{'invisible':[('type', '=', 'service')]}" />
+                        attrs="{'invisible':[('product_type', '=', 'service')]}" icon="fa-refresh" string="Reordering Rules"/>
+                   <button class="oe_stat_button" name="action_view_routes" string="Routes" type="object" icon="fa-cogs" attrs="{'invisible':[('product_type', '=', 'service')]}" />
                 </div>
             </field>
         </record>
@@ -244,13 +244,13 @@
                    <button class="oe_stat_button"
                            name="action_open_quants"
                            icon="fa-building-o"
-                           type="object"  attrs="{'invisible':[('type', '=', 'service')]}" groups="stock.group_locations">
+                           type="object"  attrs="{'invisible':[('product_type', '=', 'service')]}" groups="stock.group_locations">
                         <field name="qty_available2" widget="statinfo"/>
                    </button>
-                   <button class="oe_stat_button" string="Moves" name= "action_view_stock_moves" type="object" attrs="{'invisible':[('type', '=', 'service')]}" groups="stock.group_stock_user" icon="fa-arrows-v"/>
+                   <button class="oe_stat_button" string="Moves" name= "action_view_stock_moves" type="object" attrs="{'invisible':[('product_type', '=', 'service')]}" groups="stock.group_stock_user" icon="fa-arrows-v"/>
                    <button class="oe_stat_button" name="action_view_orderpoints" type="object" 
-                        attrs="{'invisible':[('type', 'in', ('service','consu'))]}" icon="fa-refresh" string="Reordering Rules"/>
-                   <button class="oe_stat_button" name="action_view_routes" string="Routes" type="object" icon="fa-cogs" attrs="{'invisible':[('type', '=', 'service')]}" />
+                        attrs="{'invisible':[('product_type', 'in', ('service','consu'))]}" icon="fa-refresh" string="Reordering Rules"/>
+                   <button class="oe_stat_button" name="action_view_routes" string="Routes" type="object" icon="fa-cogs" attrs="{'invisible':[('product_type', '=', 'service')]}" />
                 </div>
             </field>
         </record>

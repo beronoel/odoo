@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
         <menuitem id="base.menu_product" name="Product Variants" parent="base.menu_base_partner" sequence="9"/>
 
         <!-- templates -->
@@ -11,8 +10,8 @@
             <field name="arch" type="xml">
                 <search string="Product">
                     <field name="name" string="Product" filter_domain="['|',('default_code','ilike',self),('name','ilike',self)]"/>
-                    <filter string="Services" name="services" domain="[('type','=','service')]"/>
-                    <filter string="Consumable" name="consumable" icon="terp-accessories-archiver" domain="[('type','=','consu')]" help="Consumable products"/>
+                    <filter string="Services" name="services" domain="[('product_type','=','service')]"/>
+                    <filter string="Consumable" name="consumable" icon="terp-accessories-archiver" domain="[('product_type','=','consu')]" help="Consumable products"/>
                     <separator/>
                     <filter string="Can be Sold" name="filter_to_sell" icon="terp-accessories-archiver-minus" domain="[('sale_ok','=',1)]"/>
                     <field name="categ_id" filter_domain="[('categ_id', 'child_of', self)]"/>
@@ -22,7 +21,7 @@
                     <group expand='0' name="group_by" string='Group by...'>
                        <filter string='Category' domain="[]" context="{'group_by' : 'categ_id'}"/>
                        <filter string='Default Unit of Measure' icon="terp-mrp" domain="[]" context="{'group_by' : 'uom_id'}"/>
-                       <filter string='Type' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'type'}"/>
+                       <filter string='Type' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'product_type'}"/>
                     </group>
                 </search>
             </field>
@@ -35,7 +34,7 @@
                 <tree string="Product">
                     <field name="name"/>
                     <field name="categ_id"/>
-                    <field name="type"/>
+                    <field name="product_type"/>
                     <field name="state"/>
                     <field name="uom_id" invisible="1"/>
                 </tree>
@@ -69,8 +68,8 @@
                             <page string="Information">
                                 <group colspan="4">
                                     <group>
-                                        <field name="type" on_change="onchange_type(type)"/>
-                                        <field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom"/>
+                                        <field name="product_type"/>
+                                        <field name="uom_id" groups="product.group_uom"/>
                                         <field name="list_price"/>
                                     </group>
                                     <group>
@@ -107,13 +106,13 @@
                                         <field name="state"/>
                                         <field name="product_manager"/>
                                     </group>
-                                    <group name="weight" string="Weights" attrs="{'invisible':[('type','=','service')]}">
+                                    <group name="weight" string="Weights" attrs="{'invisible':[('product_type','=','service')]}">
                                         <field digits="(14, 3)" name="volume"/>
                                         <field name="weight"/>
                                         <field name="weight_net"/>
                                     </group>
                                 </group>
-                                <group name="packaging" string="Packaging" attrs="{'invisible':[('type','=','service')]}" groups="product.group_stock_packaging" colspan="4">
+                                <group name="packaging" string="Packaging" attrs="{'invisible':[('product_type','=','service')]}" groups="product.group_stock_packaging" colspan="4">
                                     <field name="packaging_ids" nolabel="1"/>
                                 </group>
                             </page>
@@ -520,7 +519,7 @@
                     <group>
                         <group name="parent" col="4">
                             <field name="parent_id"/>
-                            <field name="type"/>
+                            <field name="cat_type"/>
                         </group>
                     </group>
                 </form>
@@ -612,7 +611,7 @@
                         <group>
                             <field name="name"/>
                             <field name="category_id"/>
-                            <field name="uom_type" on_change="onchange_type(uom_type)"/>
+                            <field name="uom_type"/>
                             <field name="factor"
                                 digits="[42,5]"
                                 attrs="{'invisible':[('uom_type','!=','smaller')],
@@ -684,7 +683,7 @@
         </record>
         <menuitem action="product_uom_categ_form_action" id="menu_product_uom_categ_form_action" parent="product.prod_config_main" sequence="7" groups="base.group_no_one"/>
 
-        <record model="ir.actions.act_window" id="action_packaging_view">
+        <record id="action_packaging_view" model="ir.actions.act_window">
             <field name="name">Packagings</field>
             <field name="res_model">product.packaging</field>
         </record>
@@ -766,5 +765,4 @@
             </field>
         </record>
 
-    </data>
-</openerp>
+</odoo>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
         <menuitem id="base.menu_sale_config_sales" name="Configuration"
             parent="base.menu_base_partner" sequence="100" groups="base.group_configuration"/>
@@ -260,5 +259,4 @@
             action="product_price_type_action" id="menu_product_price_type"
             parent="product.menu_product_pricelist_main" sequence="4" groups="base.group_no_one"/>
 
-    </data>
-</openerp>
+</odoo>

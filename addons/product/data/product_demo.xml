@@ -38,7 +38,7 @@
             <field name="categ_id" ref="product_category_3"/>
             <field name="standard_price">20.5</field>
             <field name="list_price">30.75</field>
-            <field name="type">service</field>
+            <field name="product_type">service</field>
             <field name="uom_id" ref="product_uom_hour"/>
             <field name="uom_po_id" ref="product_uom_hour"/>
             <field name="description">This type of service include basic monitoring of products.</field>
@@ -51,7 +51,7 @@
             <field name="categ_id" ref="product_category_3"/>
             <field name="standard_price">25.5</field>
             <field name="list_price">38.25</field>
-            <field name="type">service</field>
+            <field name="product_type">service</field>
             <field name="uom_id" ref="product_uom_hour"/>
             <field name="uom_po_id" ref="product_uom_hour"/>
             <field name="description">This type of service include assistance for security questions, system configuration requirements, implementation or special needs.</field>
@@ -63,7 +63,7 @@
             <field name="categ_id" ref="product_category_5"/>
             <field name="list_price">450.0</field>
             <field name="standard_price">300.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">17" LCD Monitor
@@ -112,7 +112,7 @@ HDD SH-1</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">500.0</field>
             <field name="list_price">750.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">7.9‑inch (diagonal) LED-backlit, 128Gb
@@ -174,7 +174,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">140.0</field>
             <field name="list_price">247.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Bose's smallest portable Bluetooth speaker</field>
@@ -187,7 +187,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">600.0</field>
             <field name="list_price">147.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Custom computer assembled on order based on customer's requirement.</field>
@@ -199,7 +199,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">800.0</field>
             <field name="list_price">320.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">A1232</field>
@@ -210,7 +210,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">70.0</field>
             <field name="list_price">79.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">A8767</field>
@@ -221,7 +221,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1299.0</field>
             <field name="list_price">1799.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">A1090</field>
@@ -232,7 +232,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">10.0</field>
             <field name="list_price">47.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">AK789</field>
@@ -243,7 +243,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">12.50</field>
             <field name="list_price">14</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">M-Opt</field>
@@ -256,7 +256,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">14</field>
             <field name="list_price">16.50</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">A6678</field>
@@ -291,7 +291,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">18</field>
             <field name="list_price">12.50</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">M-Wir</field>
@@ -302,7 +302,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">78.0</field>
             <field name="list_price">85.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">RAM-SR5</field>
@@ -313,7 +313,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">87.0</field>
             <field name="list_price">95.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">RAM-SR2</field>
@@ -324,7 +324,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">80.0</field>
             <field name="list_price">85.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">RAM-SR3</field>
@@ -335,7 +335,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">20.0</field>
             <field name="list_price">25.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">C-Case</field>
@@ -346,7 +346,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">860.0</field>
             <field name="list_price">975.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">HDD-SH1</field>
@@ -357,7 +357,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1020.0</field>
             <field name="list_price">1150.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">HDD-SH2</field>
@@ -368,7 +368,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1100.0</field>
             <field name="list_price">1250.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">On demand hard-disk having capacity based on requirement.</field>
@@ -380,7 +380,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1700.0</field>
             <field name="list_price">1950.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">MBi9</field>
@@ -391,7 +391,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1790.0</field>
             <field name="list_price">2000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">MBa20</field>
@@ -402,7 +402,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">2010.0</field>
             <field name="list_price">2100.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">CPUi5</field>
@@ -413,7 +413,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">1910.0</field>
             <field name="list_price">1980.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">CPUa8</field>
@@ -424,7 +424,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">876.0</field>
             <field name="list_price">885.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">CARD</field>
@@ -435,7 +435,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">2870.0</field>
             <field name="list_price">2950.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">17" Monitor
@@ -450,7 +450,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">3000.0</field>
             <field name="list_price">3245.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">17" Monitor
@@ -465,7 +465,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">3300.0</field>
             <field name="list_price">3645.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Custom Laptop based on customer's requirement.</field>
@@ -477,7 +477,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">390.0</field>
             <field name="list_price">405.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">EXT-HDD</field>
@@ -489,7 +489,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">90.0</field>
             <field name="list_price">100.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">PD-SP2</field>
@@ -501,7 +501,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">126.0</field>
             <field name="list_price">145.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">PD-SP4</field>
@@ -512,7 +512,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">134.0</field>
             <field name="list_price">150.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">.</field>
@@ -524,7 +524,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">57.0</field>
             <field name="list_price">62.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Hands free headset for laptop PC with in-line microphone and headphone plug.</field>
@@ -536,7 +536,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">60.0</field>
             <field name="list_price">65.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Headset for laptop PC with USB connector.</field>
@@ -549,7 +549,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">38.0</field>
             <field name="list_price">45.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">WCAM</field>
@@ -561,7 +561,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">18.40</field>
             <field name="list_price">20.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_dozen"/>
             <field name="uom_po_id" ref="product_uom_dozen"/>
             <field name="default_code">CD</field>
@@ -573,7 +573,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">21.60</field>
             <field name="list_price">24.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_dozen"/>
             <field name="uom_po_id" ref="product_uom_dozen"/>
             <field name="default_code">DVD</field>
@@ -585,7 +585,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">4258.0</field>
             <field name="list_price">4410.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">All in one hi-speed printer with fax and scanner.</field>
@@ -598,7 +598,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">60.0</field>
             <field name="list_price">65.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">INK</field>
@@ -610,7 +610,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">66.0</field>
             <field name="list_price">70.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">TONER</field>
@@ -622,7 +622,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_4"/>
             <field name="standard_price">330.0</field>
             <field name="list_price">470.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">Win7</field>
@@ -634,7 +634,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_4"/>
             <field name="standard_price">540.0</field>
             <field name="list_price">620.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">WServer</field>
@@ -646,7 +646,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_4"/>
             <field name="standard_price">110.0</field>
             <field name="list_price">170.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Office Editing Software with word processing, spreadsheets, presentations, graphics, and databases...</field>
@@ -659,7 +659,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_4"/>
             <field name="standard_price">235.0</field>
             <field name="list_price">280.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">Zplus</field>
@@ -671,7 +671,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_4"/>
             <field name="standard_price">155.0</field>
             <field name="list_price">173.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Full featured image editing software.</field>
@@ -684,7 +684,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">55.0</field>
             <field name="list_price">60.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">ROUT_430</field>
@@ -696,7 +696,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">35.0</field>
             <field name="list_price">40.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">DC</field>
@@ -708,7 +708,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">55.0</field>
             <field name="list_price">70.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">SW24</field>
@@ -720,7 +720,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">13.0</field>
             <field name="list_price">18.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">ADPT</field>
@@ -732,7 +732,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">46900.0</field>
             <field name="list_price">44000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">DELL15</field>
@@ -744,7 +744,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">26400.0</field>
             <field name="list_price">25000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">LIN12</field>
@@ -756,7 +756,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">725.0</field>
             <field name="list_price">600.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">SIW162</field>
@@ -768,7 +768,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">300.0</field>
             <field name="list_price">250.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">RJ45</field>
@@ -780,7 +780,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">3500.0</field>
             <field name="list_price">3000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">TDKEY1</field>
@@ -792,7 +792,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">400.0</field>
             <field name="list_price">300.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">ERMO85</field>
@@ -804,7 +804,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">2000.0</field>
             <field name="list_price">1800.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">DSKTAB96</field>
@@ -816,7 +816,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">200.0</field>
             <field name="list_price">180.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">DSKLM12</field>
@@ -827,7 +827,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">25000.0</field>
             <field name="list_price">23500.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Dvorak keyboard 
@@ -840,7 +840,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">45000.0</field>
             <field name="list_price">40000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">raid 1 
@@ -853,7 +853,7 @@ QWERTY keyboard</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">65000.0</field>
             <field name="list_price">60000.0</field>
-            <field name="type">consu</field>
+            <field name="product_type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">raid 10 

@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-
 {
     'name': 'Products & Pricelists',
     'version': '1.1',
     'author': 'OpenERP SA',
     'category': 'Sales Management',
     'depends': ['base', 'decimal_precision', 'mail', 'report'],
-    'demo': [
-        'product_demo.xml',
-        'product_image_demo.xml',
-    ],
     'website': 'https://www.odoo.com',
     'description': """
 This is the base module for managing products and pricelists in OpenERP.
@@ -37,12 +32,14 @@ Print product labels with barcode.
         'security/product_security.xml',
         'security/ir.model.access.csv',
         'wizard/product_price_view.xml',
-        'res_config_view.xml',
-        'product_data.xml',
+        'views/res_config_view.xml',
+        'data/product_data.xml',
+        'data/product_demo.xml',
+        'data/product_image_demo.xml',
         'product_report.xml',
-        'product_view.xml',
-        'pricelist_view.xml',
-        'partner_view.xml',
+        'views/product_view.xml',
+        'views/pricelist_view.xml',
+        'views/partner_view.xml',
         'views/report_pricelist.xml',
         'views/report_productlabel.xml'
     ],
