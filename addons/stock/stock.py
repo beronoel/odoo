@@ -432,21 +432,22 @@ class stock_quant(osv.osv):
         domain = domain or [('qty', '>', 0.0)]
         quants = [(None, qty)]
         if ops:
-            restrict_lot_id = ops.lot_id
+            restrict_lot_id = ops.lot_id.id
             location = ops.location_id
             domain += [('owner_id', '=', ops.owner_id.id)]
             if ops.package_id and not ops.product_id:
-                domain += [('package_id', 'child_of', ops.package_id)]
+                domain += [('package_id', 'child_of', ops.package_id.id)]
             else:
                 domain += [('package_id', '=', ops.package_id.id)]
             domain += [('location_id', '=', ops.location_id.id)]
         else:
-            restrict_lot_id = move.restrict_lot_id
+            restrict_lot_id = move.restrict_lot_id.id
             location = move.location_id
             domain += [('owner_id', '=', move.restrict_partner_id.id)]
             domain += [('location_id', 'child_of', move.location_id.id)]
         removal_strategy = self.pool.get('stock.location').get_removal_strategy(cr, uid, qty, move, ops=False, context=context)
         product = move.product_id
+        domain += [('product_id', '=', move.product_id.id)]
 
         #don't look for quants in location that are of type production, supplier or inventory.
         if location.usage in ['inventory', 'production', 'supplier']:
@@ -454,7 +455,7 @@ class stock_quant(osv.osv):
         res_qty = qty
         if restrict_lot_id:
             if not preferred_domain_list:
-                preferred_domain_list = [[('lot_id', '=', restrict_lot_id)],[('lot_id', '=', False)]]
+                preferred_domain_list = [[('lot_id', '=', restrict_lot_id)], [('lot_id', '=', False)]]
             else:
                 lot_list = []
                 no_lot_list = []
@@ -585,11 +586,28 @@ class stock_quant(osv.osv):
         """
         solving_quant = quant
         dom = [('qty', '<', 0)]
+        order = 'in_date'
+        dom += [('location_id', '=', quant.location_id.id), ('product_id', '=', quant.product_id.id)]
         if quant.package_id.id:
             dom += [('package_id', '=', quant.package_id.id)]
+        if quant.lot_id:
+            dom += ['|', ('lot_id', '=', False), ('lot_id', '=', quant.lot_id.id)]
+            order = 'lot_id, in_date'
         dom += [('id', '!=', quant.propagated_from_id.id)]
-        quants = self.quants_get_preferred_domain(cr, uid, quant.location_id, quant.product_id, quant.qty, dom,
-                                                 restrict_lot_id=quant.lot_id.id, restrict_partner_id=quant.owner_id.id, context=context)
+        quants_search = self.search(cr, uid, dom, order=order, context=context)
+        product = quant.product_id
+        quants = []
+        quantity = quant.qty
+        for quant in self.browse(cr, uid, quants_search, context=context):
+            rounding = product.uom_id.rounding
+            if float_compare(quantity, abs(quant.qty), precision_rounding=rounding) >= 0:
+                quants += [(quant, abs(quant.qty))]
+                quantity -= abs(quant.qty)
+            elif float_compare(quantity, 0.0, precision_rounding=rounding) != 0:
+                quants += [(quant, quantity)]
+                quantity = 0
+                break
+
         product_uom_rounding = quant.product_id.uom_id.rounding
         for quant_neg, qty in quants:
             if not quant_neg or not solving_quant:
