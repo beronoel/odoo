@@ -436,13 +436,14 @@ class stock_quant(osv.osv):
             if not prefered_domain_list:
                 prefered_domain_list = [[('lot_id', '=', restrict_lot_id)],[('lot_id', '=', False)]]
             else:
-                new_list = []
+                lot_list = []
+                no_lot_list = []
                 for pref_domain in prefered_domain_list:
                     pref_lot_domain = pref_domain + [('lot_id', '=', restrict_lot_id)]
                     pref_no_lot_domain = pref_domain + [('lot_id', '=', False)]
-                    new_list.append(pref_lot_domain)
-                    new_list.append(pref_no_lot_domain)
-                prefered_domain_list = new_list
+                    lot_list.append(pref_lot_domain)
+                    no_lot_list.append(pref_no_lot_domain)
+                prefered_domain_list = lot_list + no_lot_list
 
         if not prefered_domain_list:
             return self.quants_get(cr, uid, location, product, qty, domain=domain, restrict_lot_id=restrict_lot_id, restrict_partner_id=restrict_partner_id, context=context)
