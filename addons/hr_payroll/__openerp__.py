@@ -43,9 +43,6 @@ Generic Payroll system.
         'views/report_payslip_templates.xml',
         'views/report_payslip_details_templates.xml',
     ],
-    'test': [
-        'test/payslip.yml',
-    ],
     'demo': ['data/hr_payroll_demo.xml'],
     'installable': True,
     'auto_install': False,

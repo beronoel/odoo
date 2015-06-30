@@ -23,7 +23,6 @@ class payslip_lines_contribution_register(models.TransientModel):
             'model': 'hr.contribution.register',
             'form': self.read()[0]
         }
-        print ">>>>>>>>>>>", self
         records = self.env['hr.payslip'].browse(self._ids)
         return self.env['report'].get_action(
             records, 'hr_payroll.report_contributionregister', data=datas)
