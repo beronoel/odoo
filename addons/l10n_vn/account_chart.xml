@@ -2,14 +2,8 @@
 <odoo>
 <data noupdate="1">
     <!-- Account types -->
-    <record id="account_type_evaluation" model="account.account.type">
-        <field name="name">9. XÁC ĐỊNH KẾT QUẢ KINH DOANH</field>
-    </record>
     <record id="account_type_other" model="account.account.type">
         <field name="name">X. TÀI KHOẢN NGOÀI BẢNG</field>
-    </record>
-    <record id="account_type_root" model="account.account.type">
-        <field name="name">CHỈ XEM</field>
     </record>
 </data>
 
@@ -35,13 +29,6 @@
     </record>
 
     <!-- Account Templates -->
-
-    <record id="chart0" model="account.account.template">
-        <field name="code">101</field>
-        <field name="name">Hệ thống tài khoản kế toán Việt Nam</field>
-        <field name="user_type_id" ref="account_type_root"/>
-        <field name="chart_template_id" ref="vn_template"/>
-    </record>
 
     <!-- Loại 1 -->
     <record id="chart1111" model="account.account.template">
@@ -1357,15 +1344,6 @@
         <field name="user_type_id" ref="account.data_account_type_expenses"/>
         <field name="chart_template_id" ref="vn_template"/>
         <field name="name">Chi phí thuế TNDN hoãn lại</field>
-    </record>
-
-    <!-- Loại 9 -->
-    <record id="chart911" model="account.account.template">
-        <field name="code">911</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account_type_evaluation"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Xác định kết quả kinh doanh</field>
     </record>
 
     <!-- Loại 10 -->
