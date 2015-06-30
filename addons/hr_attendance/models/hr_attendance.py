@@ -9,7 +9,7 @@ from openerp.tools.translate import _
 from openerp.exceptions import UserError
 
 
-class hr_action_reason(osv.osv):
+class HrActionReason(osv.osv):
     _name = "hr.action.reason"
     _description = "Action Reason"
     _columns = {
@@ -26,7 +26,7 @@ def _employee_get(obj, cr, uid, context=None):
     return ids and ids[0] or False
 
 
-class hr_attendance(osv.osv):
+class HrAttendance(osv.osv):
     _name = "hr.attendance"
     _description = "Attendance"
 
@@ -93,7 +93,7 @@ class hr_attendance(osv.osv):
     _order = 'name desc'
 
 
-class hr_employee(osv.osv):
+class HrEmployee(osv.osv):
     _inherit = "hr.employee"
     _description = "Employee"
 

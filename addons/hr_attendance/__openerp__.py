@@ -13,20 +13,20 @@ This module aims to manage employee's attendances.
 Keeps account of the attendances of the employees on the basis of the
 actions(Sign in/Sign out) performed by them.
        """,
-    'author': 'OpenERP SA',
+    'author': 'Odoo SA',
     'website': 'https://www.odoo.com/page/employees',
     'depends': ['hr', 'report'],
     'data': [
         'security/ir_rule.xml',
         'security/ir.model.access.csv',
-        'hr_attendance_view.xml',
-        'hr_attendance_report.xml',
-        'wizard/hr_attendance_error_view.xml',
-        'views/report_attendanceerrors.xml',
+        'views/hr_attendance_view.xml',
+        'views/hr_attendance_report.xml',
         'views/hr_attendance.xml',
-        'hr_dashboard.xml',
+        'views/hr_dashboard.xml',
+        'views/report_attendanceerrors.xml',
+        'wizard/hr_attendance_error_view.xml',
     ],
-    'demo': ['hr_attendance_demo.xml'],
+    'demo': ['demo/hr_attendance_demo.xml'],
     'test': [
         'test/attendance_process.yml',
         'test/hr_attendance_report.yml',

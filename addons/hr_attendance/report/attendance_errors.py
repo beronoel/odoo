@@ -7,10 +7,10 @@ from openerp.osv import osv
 from openerp.report import report_sxw
 
 
-class attendance_print(report_sxw.rml_parse):
+class AttendancePrint(report_sxw.rml_parse):
 
     def __init__(self, cr, uid, name, context):
-        super(attendance_print, self).__init__(cr, uid, name, context=context)
+        super(AttendancePrint, self).__init__(cr, uid, name, context=context)
         self.localcontext.update({
             'time': time,
             'lst': self._lst,
@@ -58,8 +58,8 @@ class attendance_print(report_sxw.rml_parse):
         return [result_dict]
 
 
-class report_hr_attendanceerrors(osv.AbstractModel):
+class ReportHrAttendanceerrors(osv.AbstractModel):
     _name = 'report.hr_attendance.report_attendanceerrors'
     _inherit = 'report.abstract_report'
     _template = 'hr_attendance.report_attendanceerrors'
-    _wrapped_report_class = attendance_print
+    _wrapped_report_class = AttendancePrint

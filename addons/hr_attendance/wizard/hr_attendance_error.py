@@ -7,7 +7,7 @@ from openerp.tools.translate import _
 from openerp.exceptions import UserError
 
 
-class hr_attendance_error(osv.osv_memory):
+class HrAttendanceError(osv.osv_memory):
 
     _name = 'hr.attendance.error'
     _description = 'Print Error Attendance Report'
