@@ -4,6 +4,7 @@ odoo.define('mail.mail', function (require) {
 var mail_utils = require('mail.utils');
 var core = require('web.core');
 var data = require('web.data');
+var Dialog = require('web.Dialog');
 var form_common = require('web.form_common');
 var session = require('web.session');
 var SystrayMenu = require('web.SystrayMenu');
@@ -49,6 +50,7 @@ var TimelineRecordThread = form_common.AbstractField.extend ({
             'readonly': this.node.attrs.readonly || false,
             'compose_placeholder' : this.node.attrs.placeholder || false,
             'display_log_button' : this.options.display_log_button || true,
+            'internal_subtypes' : this.options.internal_subtypes || [],
             'show_compose_message': true,
             'show_link': this.parent.is_action_enabled('edit') || true,
         }, this.node.params);
@@ -1047,14 +1049,25 @@ var ComposeMessage = Attachment.extend ({
         this.view = parent.view;
         this.session = session;
 
-        core.bus.on('clear_uncommitted_changes', this, function (e) {
-            if (this.show_composer && !e.isDefaultPrevented()) {
-                if (!confirm(_t("You are currently composing a message, your message will be discarded.\n\nAre you sure you want to leave this page ?"))) {
-                    e.preventDefault();
-                }
-                else {
-                    this.on_cancel();
-                }
+        core.bus.on('clear_uncommitted_changes', this, function (chain_callbacks) {
+            if (this.show_composer) {
+                chain_callbacks(function() {
+                    var def = $.Deferred();
+                    var message = _t("You are currently composing a message, your message will be discarded. Are you sure you want to leave this page ?");
+                    var options = {
+                        title: _t("Warning"),
+                        confirm_callback: function() {
+                            def.resolve();
+                        },
+                        cancel_callback: function() {
+                            def.reject();
+                        },
+                    };
+                    Dialog.confirm(this, message, options);
+                    return def;
+                });
+            } else {
+                this.on_cancel();
             }
         });
     },
@@ -1206,10 +1219,16 @@ var ComposeMessage = Attachment.extend ({
             'content_subtype': 'plaintext',
         };
 
-        if(log){
-            values.subtype = false;
-        }else{
-            values.subtype = 'mail.mt_comment';
+        if (log) {
+            var subtype_id = parseInt(this.$('select').first().val());
+            if (_.indexOf(_.pluck(self.options.internal_subtypes, 'id'), subtype_id) == -1) {
+                values['subtype'] = 'mail.mt_note'
+            }
+            else {
+                values['subtype_id'] = subtype_id;
+            }
+        } else {
+            values['subtype'] = 'mail.mt_comment';
         }
 
         this.parent_thread.ds_thread._model.call('message_post', [this.context.default_res_id], values).done(function (message_id) {
