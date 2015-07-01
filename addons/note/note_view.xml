@@ -41,7 +41,7 @@
       <field name="name">note.note.kanban</field>
       <field name="model">note.note</field>
       <field name="arch" type="xml">
-        <kanban default_group_by="stage_id" class="oe_notes oe_kanban_quickcreate_textarea">
+        <kanban default_group_by="stage_id" class="oe_notes oe_kanban_quickcreate_textarea o_kanban_small_column">
           <field name="color"/>
           <field name="sequence"/>
           <field name="name"/>
@@ -67,7 +67,7 @@
                 </div>
                   <span>
                     <a name="onclick_note_is_done" type="object" t-if="record.open.raw_value"><i class="fa fa-check"/></a>
-                    <a name="onclick_note_not_done" type="object" t-if="!record.open.raw_value"><i class="fa fa-check"/></a>
+                    <a name="onclick_note_not_done" type="object" t-if="!record.open.raw_value"><i class="fa fa-undo"/></a>
                   </span>
                 <!-- kanban note -->
                 <span t-attf-class="oe_kanban_content #{record.open.raw_value ? '' : 'note_text_line_through'}">

@@ -1519,20 +1519,34 @@ class procurement_order(osv.osv):
                     qty = uom_obj._compute_qty_obj(cr, uid, proc.product_uom, proc.product_qty, uom_id)
 
                     if lines_to_update.get(po_line):
-                        lines_to_update[po_line] += [(proc.id, qty)]
+                        lines_to_update[po_line] += [(proc, qty)]
                     else:
-                        lines_to_update[po_line] = [(proc.id, qty)]
+                        lines_to_update[po_line] = [(proc, qty)]
                 else:
                     procs_to_create.append(proc)
 
             procs = []
+
+            # FIXME: these are not real tracking values, it should be fixed if tracking values for one2many 
+            # are managed
+            def format_message(message_description, tracked_values):
+                message = ''
+                if message_description:
+                    message = '<span>%s</span>' % message_description
+                for name, values in tracked_values.iteritems():
+                    message += '<div> &nbsp; &nbsp; &bull; <b>%s</b>: ' % name
+                    message += '%s</div>' % values
+                return message
+
             # Update the quantities of the lines that need to
             for line in lines_to_update.keys():
                 tot_qty = 0
                 for proc, qty in lines_to_update[line]:
                     tot_qty += qty
-                    self.message_post(cr, uid, proc, body=_("Quantity added in existing Purchase Order Line"), context=context)
-                line_values += [(1, line.id, {'product_qty': line.product_qty + tot_qty, 'procurement_ids': [(4, x[0]) for x in lines_to_update[line]]})]
+                    self.message_post(cr, uid, proc.id, body=_("Quantity added in existing Purchase Order Line"), context=context)
+                    msg = format_message(_('Quantity added in existing Purchase Order Line'), {'Product': proc.product_id.name, 'Quantity': proc.product_qty, 'Procurement': proc.origin})
+                    po_obj.message_post(cr, uid, [add_purchase], body=msg, context=context)
+                line_values += [(1, line.id, {'product_qty': line.product_qty + tot_qty, 'procurement_ids': [(4, x[0].id) for x in lines_to_update[line]]})]
 
             # Create lines for which no line exists yet
             if procs_to_create:
@@ -1542,6 +1556,8 @@ class procurement_order(osv.osv):
                 line_values += [(0, 0, value_lines[x]) for x in value_lines.keys()]
                 for proc in procs_to_create:
                     self.message_post(cr, uid, [proc.id], body=_("Purchase line created and linked to an existing Purchase Order"), context=context)
+                    msg = format_message(_('Purchase order line added'), {'Product': proc.product_id.name, 'Quantity': proc.product_qty, 'Procurement': proc.origin})
+                    po_obj.message_post(cr, uid, [add_purchase], body=msg, context=context)
             po_obj.write(cr, uid, [add_purchase], {'order_line': line_values},context=context)
 
 
@@ -1649,11 +1665,14 @@ class product_product(osv.Model):
     _inherit = 'product.product'
     
     def _purchase_count(self, cr, uid, ids, field_name, arg, context=None):
-        Purchase = self.pool['purchase.order.line']
-        return {
-            product_id: Purchase.search_count(cr,uid, [('product_id', '=', product_id)], context=context)
-            for product_id in ids
-        }
+        r = dict.fromkeys(ids, 0)
+        domain = [
+            ('state', 'in', ['confirmed', 'approved', 'except_picking', 'except_invoice', 'done']),
+            ('product_id', 'in', ids),
+        ]
+        for group in self.pool['purchase.report'].read_group(cr, uid, domain, ['product_id', 'quantity'], ['product_id'], context=context):
+            r[group['product_id'][0]] = group['quantity']
+        return r
 
     def action_view_purchases(self, cr, uid, ids, context=None):
         if isinstance(ids, (int, long)):
