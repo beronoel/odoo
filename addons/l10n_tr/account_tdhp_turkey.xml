@@ -155,6 +155,13 @@
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
+    <record id="tr191" model="account.account.template">
+        <field name="name">İndirilecek KDV</field>
+        <field name="code">191</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
+    </record>
+
     <record id="tr251" model="account.account.template">
         <field name="name">Yer Altı Ve Yer Üstü Düzenleri</field>
         <field name="code">251</field>
@@ -544,42 +551,42 @@
     <record id="tr360" model="account.account.template">
         <field name="name">Ödenecek Vergi Ve Fonlar</field>
         <field name="code">360</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr361" model="account.account.template">
         <field name="name">Ödenecek Sosyal Güvenlük Kesintileri</field>
         <field name="code">361</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr368" model="account.account.template">
         <field name="name">Vadesi Geçmiş, Ertelenmiş Veya Taksitlendirilmiş Vergi Ve Diğer Yükümlülükler</field>
         <field name="code">368</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr369" model="account.account.template">
         <field name="name">Ödenecek Diğer Yükümlülükler</field>
         <field name="code">369</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr370" model="account.account.template">
         <field name="name">Dönem Kârı Vergi Ve Diğer Yasal Yükümlülük Karşılıkları</field>
         <field name="code">370</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr371" model="account.account.template">
         <field name="name">Dönem Kârının Peşin Ödenen Vergi Ve Diğer Yükümlülükler(-)</field>
         <field name="code">371</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
@@ -607,21 +614,21 @@
     <record id="tr380" model="account.account.template">
         <field name="name">Gelecek Aylara Ait Gelirler</field>
         <field name="code">380</field>
-        <field name="user_type_id" ref="account.data_account_type_revenue"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr391" model="account.account.template">
         <field name="name">Hesaplanan KDV</field>
         <field name="code">391</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr392" model="account.account.template">
         <field name="name">Diğer KDV</field>
         <field name="code">392</field>
-        <field name="user_type_id" ref="tr_tax"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
@@ -930,13 +937,6 @@
         <field name="name">Yurt İçi Satışlar</field>
         <field name="code">600</field>
         <field name="user_type_id" ref="account.data_account_type_revenue"/>
-        <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
-    </record>
-
-    <record id="tr191" model="account.account.template">
-        <field name="name">İndirilecek KDV</field>
-        <field name="code">191</field>
-        <field name="user_type_id" ref="tr_tax"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 

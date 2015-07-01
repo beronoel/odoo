@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <!-- account.account.type -->
-    <record id="tr_tax" model="account.account.type">
-        <field name="name">Vergi</field>
-    </record>
- </odoo>
