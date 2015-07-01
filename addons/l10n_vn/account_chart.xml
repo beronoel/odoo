@@ -9,8 +9,8 @@
 
 <data>
     <record id="transfer_account_id" model="account.account.template">
-        <field name="name">chuyển khoản</field>
-        <field name="code">11</field>
+        <field name="name">Tiền đang chuyển</field>
+        <field name="code">113</field>
         <field name="reconcile" eval="True"/>
         <field name="user_type_id" ref="account.data_account_type_current_assets"/>
     </record>
@@ -20,7 +20,8 @@
         <field name="name">VN - Chart of Accounts</field>
         <field name="code_digits">0</field>
         <field name="currency_id" ref="base.VND"/>
-        <field name="bank_account_code_char">BNK</field>
+        <field name="bank_account_code_prefix">112</field>
+        <field name="cash_account_code_prefix">111</field>
         <field name="transfer_account_id" ref="transfer_account_id"/>
     </record>
 
@@ -31,65 +32,6 @@
     <!-- Account Templates -->
 
     <!-- Loại 1 -->
-    <record id="chart1111" model="account.account.template">
-        <field name="code">1111</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền mặt : Tiền Việt Nam</field>
-    </record>
-    <record id="chart1112" model="account.account.template">
-        <field name="code">1112</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền mặt : Ngoại tệ</field>
-    </record>
-    <record id="chart1113" model="account.account.template">
-        <field name="code">1113</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền mặt : Vàng bạc, kim khí quý, đá quý</field>
-    </record>
-
-    <record id="chart1121" model="account.account.template">
-        <field name="code">1121</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền gửi ngân hàng : Tiền Việt Nam</field>
-    </record>
-    <record id="chart1122" model="account.account.template">
-        <field name="code">1122</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền gửi ngân hàng : Ngoại tệ</field>
-    </record>
-    <record id="chart1123" model="account.account.template">
-        <field name="code">1123</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền gửi ngân hàng : Vàng bạc, kim khí quý, đá quý</field>
-    </record>
-
-    <record id="chart1131" model="account.account.template">
-        <field name="code">1131</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền đang chuyển : Tiền Việt Nam</field>
-    </record>
-    <record id="chart1132" model="account.account.template">
-        <field name="code">1132</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Tiền đang chuyển : Ngoại tệ</field>
-    </record>
-
     <record id="chart1211" model="account.account.template">
         <field name="code">1211</field>
         <field name="reconcile" eval="False"/>
@@ -1395,27 +1337,6 @@
         <field name="name">Dự toán chi sự nghiệp, dự án</field>
     </record>
 
-    <record id="chartoba" model="account.account.template">
-        <field name="code">OBA</field>
-        <field name="reconcile" eval="False"/>
-        <field name="user_type_id" ref="account_type_other"/>
-        <field name="chart_template_id" ref="vn_template"/>
-        <field name="name">Opening Balance Account </field>
-    </record>
-
-    <record id="chartgain01" model="account.account.template">
-        <field name="code">GAIN01</field>
-        <field name="name">Tài khoản của Gain</field>
-        <field name="user_type_id" ref="account.data_account_type_other_income"/>
-        <field name="chart_template_id" ref="vn_template"/>
-    </record>
-
-    <record id="chartloss01" model="account.account.template">
-        <field name="code">LOSS01</field>
-        <field name="name">Tài khoản lỗ</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
-        <field name="chart_template_id" ref="vn_template"/>
-    </record>
 
     <!-- Chart template -->
     <record id="vn_template" model="account.chart.template">
@@ -1423,8 +1344,8 @@
         <field name="property_account_payable_id" ref="chart331"/>
         <field name="property_account_expense_categ_id" ref="chart1561"/>
         <field name="property_account_income_categ_id" ref="chart5111"/>
-        <field name="income_currency_exchange_account_id" ref="chartgain01"/>
-        <field name="expense_currency_exchange_account_id" ref="chartloss01"/>
+        <field name="income_currency_exchange_account_id" ref="chart515"/>
+        <field name="expense_currency_exchange_account_id" ref="chart635"/>
     </record>
 
 </data>
