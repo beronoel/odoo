@@ -1754,14 +1754,14 @@
     <!-- Gain / Loss account -->
     <record id="tr801" model="account.account.template">
         <field name="name">Kazanç Hesabı</field>
-        <field name="code">701</field>
+        <field name="code">801</field>
         <field name="user_type_id" ref="account.data_account_type_other_income"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr802" model="account.account.template">
         <field name="name">Zarar Hesabı</field>
-        <field name="code">702</field>
+        <field name="code">802</field>
         <field name="user_type_id" ref="account.data_account_type_expenses"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
