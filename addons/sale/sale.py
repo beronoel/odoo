@@ -432,7 +432,7 @@ class sale_order(osv.osv):
         for line in order.order_line:
             if line.state == 'cancel':
                 continue
-            if line.product_id and (line.product_id.type != 'service'):
+            if line.product_id and (line.product_id.product_type != 'service'):
                 return False
         return True
 
@@ -998,7 +998,6 @@ class sale_order_line(osv.osv):
             ctx_product['partner_id'] = partner_id
         elif lang:
             ctx_product['lang'] = lang
-
         if not product:
             return {'value': {'th_weight': 0,
                     'product_uos_qty': qty}, 'domain': {'product_uom': [],
@@ -1029,7 +1028,6 @@ class sale_order_line(osv.osv):
             fpos = self.pool['account.fiscal.position'].browse(cr, uid, fiscal_position_id)
         if update_tax:  # The quantity only have changed
             result['tax_id'] = self.pool['account.fiscal.position'].map_tax(cr, uid, fpos, product_obj.taxes_id)
-
         if not flag:
             result['name'] = Product.name_get(cr, uid, [product_obj.id], context=ctx_product)[0][1]
             if product_obj.description_sale:

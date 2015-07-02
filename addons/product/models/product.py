@@ -90,8 +90,9 @@ class ProductUom(models.Model):
     def _compute_factor_inv(self, factor):
         return factor and (1.0 / factor) or 0.0
 
-    def _factor_inv_write(self, value):
-        self.factor = self._compute_factor_inv(value)
+    @api.one
+    def _factor_inv_write(self):
+        self.factor = self._compute_factor_inv(self.factor)
 
     @api.model
     def name_create(self):
@@ -352,17 +353,17 @@ class ProductTemplate(models.Model):
     @api.model
     def _default_category(self):
         context = self.env.context or {}
-        if 'categ_id' in context and context['categ_id']:
+        if 'categ_id' in context:
             return context['categ_id']
-        res = False
         try:
-            res = self.env.ref['product.product_category_all']
+            res = self.env.ref('product.product_category_all')
         except ValueError:
             res = False
         return res
 
-    def _get_uom_id(self, *args):
-        return self.env["product.uom"].search([], limit=1, order='id')[0]
+    def _get_uom_id(self):
+        result = self.env["product.uom"].search([], limit=1, order='id')[0]
+        return result
 
     name = fields.Char(required=True, translate=True, index=True)
     sequence = fields.Integer(default=1, help='Gives the sequence order when displaying a product list')
@@ -377,7 +378,7 @@ class ProductTemplate(models.Model):
              "This description will be copied to every Sale Order, Delivery Order and Customer Invoice/Refund")
     rental = fields.Boolean('Can be Rent')
     product_type = fields.Selection([('consu', 'Consumable'), ('service','Service')], string='Product Type', required=True, default='consu', help="Consumable are product where you don't manage stock, a service is a non-material product provided by a company or an individual.")
-    categ_id = fields.Many2one('product.category', string='Internal Category', required=True, change_default=True, domain="[('type','=','normal')]", default=_default_category, help="Select category for the current product")
+    categ_id = fields.Many2one('product.category', string='Internal Category', required=True, change_default=True, domain="[('cat_type','=','normal')]", default=_default_category, help="Select category for the current product")
     price = fields.Float(compute='_product_template_price', inverse='_set_product_template_price', digits=dp.get_precision('Product Price'))
     list_price = fields.Float(string='Sale Price', default=1.0, digits=dp.get_precision('Product Price'), help="Base price to compute the customer price. Sometimes called the catalog price.")
     lst_price = fields.Float(related='list_price', string='Public Price', digits=dp.get_precision('Product Price'))
@@ -441,7 +442,7 @@ class ProductTemplate(models.Model):
     barcode = fields.Char(related='product_variant_ids.barcode', string='Barcode', oldname='ean13')
     default_code = fields.Char(related='product_variant_ids.default_code', string='Internal Reference')
 
-    @api.multi
+    @api.one
     def _product_template_price(self):
         PriceList = self.env['product.pricelist']
         if self.pricelist_id:
@@ -452,7 +453,7 @@ class ProductTemplate(models.Model):
 
             if isinstance(self.pricelist_id, (int, long)):
                 qtys = map(lambda x: (x, quantity, partner), self.ids)
-                price = PriceList._price_get_multi(self.pricelist_id, qtys)
+                price = self.pricelist_id._price_get_multi(qtys)
                 for record in self:
                     record.price = price.get(record.id, 0.0)
         for product in self:
@@ -521,35 +522,36 @@ class ProductTemplate(models.Model):
     def _price_get_list_price(self, product):
         return 0.0
 
-    def _price_get(self, products, ptype='list_price'):
-        if 'currency_id' in self.env.context:
+    @api.multi
+    def _price_get(self, ptype='list_price'):
+        context = self.env.context or {}
+        if 'currency_id' in context:
             PriceType = self.env['product.price.type']
             price_type_currency_id = PriceType.search([('field', '=', ptype)], limit=1).currency_id.id
 
         ProductUom = self.env['product.uom']
-        price = 0.0
-        for product in products:
+        # price = 0.0
+        for product in self:
             # standard_price field can only be seen by users in base.group_user
             # Thus, in order to compute the sale price from the cost price for users not in this group
             # We fetch the standard price as the superuser
             if ptype != 'standard_price':
-                price = product[ptype] or 0.0
+                price = product[0].standard_price
             else:
                 company_id = product.env.user.company_id.id
                 product = product.with_context(force_company=company_id)
-                price = product.sudo()[ptype]
+                price = product.sudo().list_price
             if ptype == 'list_price':
                 price += product._name == "product.product" and product.price_extra or 0.0
-            if 'uom' in self.env.context:
+            if 'uom' in context:
                 uom = product.uom_id or product.uos_id
                 price = ProductUom._compute_price(
-                        uom.id, res[product.id], context['uom'])
+                        uom.id, product.price, context['uom'])
             # Convert from price_type currency to asked one
-            if 'currency_id' in self.env.context:
+            if 'currency_id' in context:
                 # Take the price_type currency from the product field
                 # This is right cause a field cannot be in more than one currency
-                price = self.env['res.currency'].compute(price_type_currency_id,
-                    context['currency_id'], price)
+                price = price_type_currency_id.compute(price, context['currency_id'])
         return price
 
     @api.onchange('product_type')
@@ -682,6 +684,7 @@ class ProductTemplate(models.Model):
             pass
         return super(ProductTemplate, self).name_get()
 
+    @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         # Only use the product.product heuristics if there is a search term and the domain
         # does not specify a match on `product.template` IDs.
@@ -723,14 +726,14 @@ class Product(models.Model):
     image_variant = fields.Binary("Variant Image",
         help="This field holds the image used as image for the product variant, limited to 1024x1024px.")
 
-    image = fields.Binary(compute='_get_image_variant', inverse='_set_image',
+    image = fields.Binary(compute='_compute_image_variant', inverse='_inverse_image',
         string="Big-sized image",
         help="Image of the product variant (Big-sized image of product template if false). It is automatically "\
              "resized as a 1024x1024px image, with aspect ratio preserved.")
-    image_small = fields.Binary(compute='_get_image_variant', inverse='_set_image_small',
+    image_small = fields.Binary(compute='_compute_image_variant', inverse='_inverse_image_small',
         string="Small-sized image",
         help="Image of the product variant (Small-sized image of product template if false).")
-    image_medium = fields.Binary(compute='_get_image_variant', inverse='_set_image_medium',
+    image_medium = fields.Binary(compute='_compute_image_variant', inverse='_inverse_image_medium',
         string="Medium-sized image",
         help="Image of the product variant (Medium-sized image of product template if false).")
 
@@ -739,12 +742,12 @@ class Product(models.Model):
         PriceList = self.env['product.pricelist']
         context = self.env.context or {}
         quantity = context.get('quantity') or 1.0
-        pricelist = context.get('pricelist', False)
-        partner = context.get('partner', False)
+        partner = context.get('partner_id', False)
+        pricelist = PriceList.browse(context.get('pricelist'))
         if pricelist:
             # Support context pricelists specified as display_name or ID for compatibility
             if isinstance(pricelist, basestring):
-                pricelist_ids = PriceList.name_search(
+                pricelist_ids = pricelist.name_search(
                     pricelist, operator='=', limit=1)
                 pricelist = pricelist_ids[0][0] if pricelist_ids else pricelist
 
@@ -753,7 +756,7 @@ class Product(models.Model):
                 price_list = PriceList.browse(pricelist)
                 price = price_list.with_context(context)._price_get_multi(qtys)
                 for record in self:
-                    record.price = price
+                    record.price = price.get(record.id, 0.0)
         for record in self:
             record.price = 0.0
 
@@ -777,15 +780,16 @@ class Product(models.Model):
                 price = ProductUom._compute_price(uom.id, product.list_price, context['uom'])
             else:
                 price = product.list_price
-            self.lst_price = price + product.price_extra
+            product.lst_price = price + product.price_extra
 
     @api.one
-    def _set_product_lst_price(self, value):
+    def _set_product_lst_price(self):
         context = self.env.context or {}
+        value = self.price
         ProductUom = self.env['product.uom']
         if 'uom' in context:
             uom = self.uos_id or self.uom_id
-            value = ProductUom._compute_price(context['uom'], value, uom.id)
+            value = ProductUom._compute_price(context['uom'], self.price, uom.id)
         value -= self.price_extra
         return self.write({'list_price': value})
 
@@ -820,46 +824,23 @@ class Product(models.Model):
             product.is_product_variant = True
 
     @api.one
-    @api.depends('product_tmpl_id.image')
-    def _get_image_variant(self):
-        image_data = self.product_tmpl_id.read(['image'])
-        image = image_data[0]['image']
-        res = tools.image_get_resized_images(image)
-        self.image_variant = res['image_medium']
-        self.image = res['image_medium']
-        self.image_medium = res['image_medium']
-        self.image_small = res['image_small']
+    @api.depends('image_variant')
+    def _compute_image_variant(self):
+        self.image = self.image_variant
+        self.image_medium = self.image_variant
+        self.image_small = self.image_variant
 
     @api.one
-    def _set_image(self):
-        res = tools.image_get_resized_images(self.image)
-        self.image_variant = res['image_medium']
-        if not self.product_tmpl_id.image:
-            self.image_variant = False
-            self.product_tmpl_id.image = res['image_medium']
+    def _inverse_image(self):
+        self.image_variant = tools.image_resize_image_big(self.image)
 
     @api.one
-    def _set_image_medium(self):
-        res = tools.image_get_resized_images(self.image_medium)
-        self.image_variant = res['image_medium']
-        if not self.product_tmpl_id.image:
-            self.image_variant = False
-            self.product_tmpl_id.image = res['image_medium']
+    def _inverse_image_medium(self):
+        self.image_variant = tools.image_resize_image_medium(self.image_medium)
 
     @api.one
-    def _set_image_small(self):
-        res = tools.image_get_resized_images(self.image_small)
-        self.image_variant = res['image_small']
-        if not self.product_tmpl_id.image:
-            self.image_variant = False
-            self.product_tmpl_id.image = res['image_small']
-    # @api.one
-    # def _set_image_variant(self, value):
-    #     image = tools.image_resize_image_big(value)
-    #     self.image_variant = image
-    #     if not self.product_tmpl_id.image:
-    #         self.image_variant = None
-    #         self.product_tmpl_id.image = image
+    def _inverse_image_small(self):
+        self.image_variant = tools.image_resize_image_small(self.image_small)
 
     @api.model
     def view_header_get(self, view_id, view_type):
@@ -906,6 +887,7 @@ class Product(models.Model):
     def on_order(self, orderline, quantity):
         pass
 
+    @api.multi
     def name_get(self):
         context = self.env.context or {}
 
@@ -954,6 +936,7 @@ class Product(models.Model):
                 result.append(_name_get(mydict))
         return result
 
+    @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         context = self.env.context or {}
         if not args:
@@ -994,15 +977,15 @@ class Product(models.Model):
                     products = self.search([('product_tmpl_id.seller_ids', 'in', supplier_ids)], limit=limit)
         else:
             products = self.search(args, limit=limit)
-        result = self.name_get()
+        result = products.name_get()
         return result
 
     #
     # Could be overrided for variants matrices prices
     #
-
+    @api.multi
     def price_get(self, ptype='list_price'):
-        return self.env['product.template']._price_get(self, ptype=ptype)
+        return self.product_tmpl_id._price_get(ptype=ptype)
 
     @api.one
     def copy(self, default=None):
@@ -1014,6 +997,7 @@ class Product(models.Model):
             default['name'] = _("%s (copy)") % (self.name,)
         return super(Product, self).with_context(context).copy(default=default)
 
+    @api.model
     def search(self, args, offset=0, limit=None, order=None, count=False):
         context = self.env.context or {}
         if context.get('search_default_categ_id'):
