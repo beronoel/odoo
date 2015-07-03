@@ -4173,7 +4173,7 @@ class stock_pack_operation(osv.osv):
             else:
                 product_qty = pack.qty_done
             line_ids = [(0, 0, {'lot_id': pack.lot_id.id,
-                                'lot_name': pack.lot_id.name,
+                                'lot_name': pack.lot_id.name if only_create else '',
                                 'product_qty': product_qty,
                                 })]
         values = {

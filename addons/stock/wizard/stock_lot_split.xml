@@ -11,6 +11,7 @@
                     <span>
                         <field name="qty_done" class="oe_inline"/> of
                         <field name="product_qty" class="oe_inline"/>
+                        <field name="product_uom_id" class="oe_inline" groups="product.group_uom"/>
                     </span>
                 </group>
                 <group>

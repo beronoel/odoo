@@ -28,11 +28,12 @@ class stock_lot_split(models.TransientModel):
         if not self.line_ids:
             raise UserError (_('Please provide at least one line'))
         # Split pack operations
-        firsttime = True
+        firstline = True
         totals_other = 0.0
         for line in self.line_ids:
             if not line.lot_name and not line.lot_id:
                 raise UserError(_('Please provide a lot/serial number for every line'))
+            # In case of only creating lots, we will have the text in lot_name, otherwise the lot_id
             if line.lot_name:
                 if self.pack_id.lot_id and line.lot_name == self.pack_id.lot_id.name:
                     lot = self.pack_id.lot_id
@@ -40,10 +41,10 @@ class stock_lot_split(models.TransientModel):
                     lot = self.env['stock.production.lot'].create({'name': line.lot_name, 'product_id': self.pack_id.product_id.id})
             else:
                 lot = line.lot_id
-            if firsttime:
+            if firstline:
                 self.pack_id.write({'lot_id': lot.id,
                                    'qty_done': line.product_qty})
-                firsttime = False
+                firstline = False
             else:
                 pack_new = self.pack_id.copy()
                 pack_new.write({'lot_id': lot.id,
