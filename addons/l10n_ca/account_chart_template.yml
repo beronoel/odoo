@@ -1,0 +1,7 @@
+# -
+#   !python {model: account.chart.template, id: ca_fr_chart_template_fr}: |
+#     self[0].try_loading_for_current_company()
+
+-
+  !python {model: account.chart.template, id: ca_en_chart_template_en}: |
+    self[0].try_loading_for_current_company()

@@ -18,5 +18,6 @@ Please keep in mind that you should review and adapt it with your Accountant, be
     'demo': [],
     'data': ['account_chart.xml', 'account_tax.xml', 'account_chart_template.yml'],
     'auto_install': False,
-    'installable': True
+    'installable': False
+
 }
