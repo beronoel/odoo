@@ -205,7 +205,6 @@ class ProductCategory(models.Model):
                 res.append(cat.name)
                 cat = cat.parent_id
             return res
-
         return [(cat.id, " / ".join(reversed(get_names(cat)))) for cat in self]
 
     @api.model
@@ -236,12 +235,10 @@ class ProductCategory(models.Model):
             category = self.search(args, limit=limit)
         return category.name_get()
 
-
-
     @api.constrains('parent_id')
     def check_recursion(self):
         if not self._check_recursion():
-            raise ValidationError(_('Error ! You cannot create recursive categories.'))
+            raise ValidationError(_("Error ! You cannot have 'Parent Category' same as category name."))
 
 
 class ProducePriceHistory(models.Model):
@@ -353,16 +350,14 @@ class ProductTemplate(models.Model):
     @api.model
     def _default_category(self):
         context = self.env.context or {}
-        if 'categ_id' in context:
-            return context['categ_id']
-        try:
-            res = self.env.ref('product.product_category_all')
-        except ValueError:
-            res = False
-        return res
+        category = self.env.ref('product.product_category_all')
+        if context.get('categ_id'):
+            category = context['categ_id']
+        return category
 
+    @api.model
     def _get_uom_id(self):
-        result = self.env["product.uom"].search([], limit=1, order='id')[0]
+        result = self.env["product.uom"].search([], limit=1, order='id')
         return result
 
     name = fields.Char(required=True, translate=True, index=True)
@@ -442,7 +437,7 @@ class ProductTemplate(models.Model):
     barcode = fields.Char(related='product_variant_ids.barcode', string='Barcode', oldname='ean13')
     default_code = fields.Char(related='product_variant_ids.default_code', string='Internal Reference')
 
-    @api.one
+    @api.multi
     def _product_template_price(self):
         PriceList = self.env['product.pricelist']
         if self.pricelist_id:
@@ -450,14 +445,11 @@ class ProductTemplate(models.Model):
             if isinstance(self.pricelist_id, basestring):
                 pricelist_ids = PriceList.name_search(self.pricelist, operator='=', limit=1)
                 pricelist = pricelist_ids[0][0] if pricelist_ids else self.pricelist
-
             if isinstance(self.pricelist_id, (int, long)):
                 qtys = map(lambda x: (x, quantity, partner), self.ids)
                 price = self.pricelist_id._price_get_multi(qtys)
                 for record in self:
                     record.price = price.get(record.id, 0.0)
-        for product in self:
-            product.price = 0.0
 
     @api.one
     @api.depends('image')
@@ -485,12 +477,11 @@ class ProductTemplate(models.Model):
 
     @api.one
     def _set_product_template_price(self, value):
-        ProductUom = self.env['product.uom']
         context = self.env.context or {}
         if 'uom' in context:
             uom = self.uos_id or self.uom_id
-            value = ProductUom._compute_price(context['uom'], value, uom.id)
-        return self.write({'list_price': value})
+            value = uom._compute_price(context['uom'], value, uom.id)
+        self.list_price = value
 
     @api.model
     def get_history_price(self, product_tmpl, date=None):
@@ -527,10 +518,7 @@ class ProductTemplate(models.Model):
         context = self.env.context or {}
         if 'currency_id' in context:
             PriceType = self.env['product.price.type']
-            price_type_currency_id = PriceType.search([('field', '=', ptype)], limit=1).currency_id.id
-
-        ProductUom = self.env['product.uom']
-        # price = 0.0
+            price_type_currency_id = PriceType.search([('field', '=', ptype)], limit=1).currency_id
         for product in self:
             # standard_price field can only be seen by users in base.group_user
             # Thus, in order to compute the sale price from the cost price for users not in this group
@@ -545,7 +533,7 @@ class ProductTemplate(models.Model):
                 price += product._name == "product.product" and product.price_extra or 0.0
             if 'uom' in context:
                 uom = product.uom_id or product.uos_id
-                price = ProductUom._compute_price(
+                price = uom._compute_price(
                         uom.id, product.price, context['uom'])
             # Convert from price_type currency to asked one
             if 'currency_id' in context:
@@ -563,6 +551,7 @@ class ProductTemplate(models.Model):
         if self.uom_id:
             self.uom_po_id = self.uom_id
 
+    @api.multi
     def create_variant_ids(self):
         Product = self.env['product.product']
         ctx = self.env.context and self.env.context.copy() or {}
@@ -770,14 +759,14 @@ class Product(models.Model):
             product.price_extra = price_extra
 
     @api.multi
+    @api.depends('price_extra', 'list_price')
     def _product_lst_price(self):
-        ProductUom = self.env['product.uom']
         context = self.env.context or {}
         price = 0.0
         for product in self:
             if 'uom' in context:
                 uom = product.uos_id or product.uom_id
-                price = ProductUom._compute_price(uom.id, product.list_price, context['uom'])
+                price = uom._compute_price(uom.id, product.list_price, context['uom'])
             else:
                 price = product.list_price
             product.lst_price = price + product.price_extra
@@ -789,7 +778,7 @@ class Product(models.Model):
         ProductUom = self.env['product.uom']
         if 'uom' in context:
             uom = self.uos_id or self.uom_id
-            value = ProductUom._compute_price(context['uom'], self.price, uom.id)
+            value = uom._compute_price(context['uom'], self.price, uom.id)
         value -= self.price_extra
         return self.write({'list_price': value})
 
@@ -1045,9 +1034,9 @@ class Product(models.Model):
             # in product's default UoM/UoS
             qty_default_uom = uom_obj._compute_qty_obj(uom, qty, self.uom_id)  # qty in product's default UoM
             qty_default_uos = qty_default_uom * self.uos_coeff
-            return Uom._compute_qty_obj(self.uos_id, qty_default_uos, uos)
+            return self.uos_id._compute_qty_obj(self.uos_id, qty_default_uos, uos)
         else:
-            return Uom._compute_qty_obj(uom, qty, uos)
+            return self.uos_id._compute_qty_obj(uom, qty, uos)
 
 
 class ProductPackaging(models.Model):
@@ -1068,14 +1057,17 @@ class ProductSupplierinfo(models.Model):
     _order = 'sequence'
 
     @api.multi
+    @api.depends('min_qty')
     def _calc_qty(self, fields):
-        result = {}
-        for supplier_info in self:
-            for field in fields:
-                result[supplier_info.id] = {field: False}
-            qty = supplier_info.min_qty
-            result[supplier_info.id]['qty'] = qty
-        return result
+        # result = {}
+        for record in self:
+            record.qty = record.min_qty
+        # for supplier_info in self:
+        #     for field in fields:
+        #         result[supplier_info.id] = {field: False}
+        #     qty = supplier_info.min_qty
+        #     result[supplier_info.id]['qty'] = qty
+        # return result
 
     name = fields.Many2one('res.partner', string='Supplier', required=True, domain=[('supplier', '=', True)], ondelete='cascade', help="Supplier of this product")
     product_name = fields.Char(string='Supplier Product Name', help="This supplier's product name will be used when printing a request for quotation. Keep empty to use the internal one.")

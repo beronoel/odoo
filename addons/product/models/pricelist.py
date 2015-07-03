@@ -168,7 +168,7 @@ class ProductPricelist(models.Model):
         date = date[0:10]
 
         products = map(lambda x: x[0], products_by_qty_by_partner)
-        currency_obj = self.env['res.currency']
+        # currency_obj = self.env['res.currency']
         # product_obj = self.env['product.template']
         product_uom_obj = self.env['product.uom']
         price_type_obj = self.env['product.price.type']
@@ -226,10 +226,10 @@ class ProductPricelist(models.Model):
             # An intermediary unit price may be computed according to a different UoM, in
             # which case the price_uom_id contains that UoM.
             # The final price will be converted to match `qty_uom_id`.
-            qty_uom_id = context.get('uom') or product.uom_id.id
+            qty_uom_id = context.get('uom') or product.uom_id
             price_uom_id = product.uom_id
             qty_in_product_uom = qty
-            if qty_uom_id != product.uom_id.id:
+            if qty_uom_id.id != product.uom_id.id:
                 try:
                     qty_in_product_uom = product_uom_obj._compute_qty(
                         context['uom'], qty, product.uom_id.id or product.uos_id.id)
@@ -261,8 +261,7 @@ class ProductPricelist(models.Model):
                                 qty, partner)])
                         ptype_src = rule.base_pricelist_id.currency_id
                         price_uom_id = qty_uom_id
-                        price = ptype_src.compute(pricelist.currency_id.id,
-                                price_tmp, round=False)
+                        price = ptype_src.compute(price_tmp, pricelist.currency_id.id, round=False)
                 else:
                     if rule.base not in price_types:
                         price_types[rule.base] = price_type_obj.browse(int(rule.base))
@@ -306,13 +305,13 @@ class ProductPricelist(models.Model):
                 break
 
             # Final price conversion to target UoM
-            price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id)
+            price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id.id)
             results[product.product_tmpl_id.id] = (price, rule_id)
         return results
 
     @api.multi
     def price_get(self, prod_id, qty, partner=None):
-        return dict((key, price[0]) for key, price in self.price_rule_get(prod_id, qty, partner=partner).items())
+        return dict((key, price) for key, price in self.price_rule_get(prod_id, qty, partner=partner).items())
 
     @api.multi
     def price_rule_get(self, prod_id, qty, partner=None):
