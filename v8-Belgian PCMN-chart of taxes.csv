@@ -1,0 +1,32 @@
+tax case name,code,period sum
+Opérations soumises à un régime particulier,00,2000.0
+Opérations avec TVA à 6%,01,2000.0
+Opérations avec TVA à 12%,02,2000.0
+Opérations avec TVA à 21%,03,2000.0
+Services intra-communautaires,44,1000.0
+Opérations avec TVA due par le cocontractant,45,1000.0
+Livraisons biens intra-communautaire exemptées,46L,1000.0
+ABC intra-communautaires,46T,1000.0
+Autres opérations exemptées,47,1000.0
+Notes de crédit aux opérations grille [44],48s44,1000.0
+Notes de crédit aux opérations grille [46L],48s46L,1000.0
+Notes de crédit aux opérations grille [46T],48s46T,1000.0
+Notes de crédit aux opérations du point II,49,10000.0
+"TVA sur opérations des grilles [01], [02], [03]",54,780.0
+TVA sur opérations des grilles [86] et [88],55,3120.0
+TVA sur opérations de la grille [87],56,2340.0
+TVA relatives aux importations,57,2340.0
+TVA déductible,59,11303.52
+Diverses régularisations en faveur de l'Etat,61,0.0
+Régularisations TVA en faveur du déclarant,62,0.0
+TVA à reverser sur notes de crédit reçues,63,3503.52
+TVA à recuperer sur notes de crédit delivrées,64,780.0
+"Marchandises, matières premières et auxiliaires",81,0.0
+Services et biens divers,82,210.0
+Biens d'investissement,83,0.0
+Notes de crédits sur opérations case [86] et [88],84,32000.0
+Notes de crédits autres opérations,85,84036.48
+Acquisition intra-communautaires et ventes ABC,86,0.0
+Autres opérations,87,0.0
+Acquisition services intra-communautaires,88,0.0
+TVA due pour la période du 1er au 20 décembre,91,0.0

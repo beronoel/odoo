@@ -9,7 +9,7 @@
 
     <record id="transfer_account_id" model="account.account.template">
        <field name="name">Cuentas de Transferencia</field>
-       <field name="code">188</field>
+       <field name="code">112.</field>
        <field name="reconcile" eval="True"/>
        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
    </record>
@@ -17,9 +17,9 @@
     <!-- Account Chart Templates -->
     <record id="l10npa_chart_template" model="account.chart.template">
         <field name="name">Panamá - Plan de Cuentas</field>
-        <field name="bank_account_code_prefix">101</field>
-        <field name="cash_account_code_prefix">102</field>
-        <field name="code_digits">6</field>
+        <field name="bank_account_code_prefix">111.</field>
+        <field name="cash_account_code_prefix">113.</field>
+        <field name="code_digits">7</field>
         <field name="currency_id" ref="base.PAB"/>
         <field name="transfer_account_id" ref="transfer_account_id"/>
     </record>
@@ -29,9 +29,6 @@
     </record>
     <!-- Account Templates -->
 
-            <record id="111_001" model="account.account.template"><field name="name">Caja y Bancos - Caja / efectivo PAB</field><field name="code">111.001</field><field name="reconcile" eval="False"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/></record>
-            <record id="112_001" model="account.account.template"><field name="name">Caja y Bancos - Caja / efectivo USD</field><field name="code">112.001</field><field name="reconcile" eval="False"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/><field name="currency_id" ref="base.USD"/></record>
-            <record id="113_001" model="account.account.template"><field name="name">Caja y Bancos - Fondos fijos / caja menuda 01 PAB</field><field name="code">113.001</field><field name="reconcile" eval="False"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/></record>
             <record id="114_001" model="account.account.template"><field name="name">Caja y Bancos.../ BCO. CTA CTE PAB</field><field name="code">114.001</field><field name="reconcile" eval="True"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/></record>
             <record id="115" model="account.account.template"><field name="name">Caja y Bancos - Valores a Depositar </field><field name="code">115</field><field name="reconcile" eval="False"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/></record>
             <record id="116" model="account.account.template"><field name="name">Caja y Bancos - Recaudaciones a Depositar </field><field name="code">116</field><field name="reconcile" eval="False"/><field ref="account.data_account_type_current_assets" name="user_type_id"/><field name="chart_template_id" ref="l10npa_chart_template"/></record>
