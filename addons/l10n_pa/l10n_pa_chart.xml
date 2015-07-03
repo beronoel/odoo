@@ -5,7 +5,6 @@
 
     <record id="account_account_type_NCLASIFICADO" model="account.account.type">
         <field name="name">Cuentas No Clasificadas</field>
-        <field name="code">NCLASIFICADO</field>
     </record>
 
     <record id="transfer_account_id" model="account.account.template">
