@@ -1,4 +1,4 @@
-id,code,name,user_type/id,tax_ids/id,reconcile,currency_id/id,chart_template_id/id
+id,code,name,user_type_id/id,tax_ids/id,reconcile,currency_id/id,chart_template_id/id
 A11101,A11101,普通預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
 A11102,A11102,当座預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
 A11103,A11103,定期預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
@@ -120,3 +120,5 @@ B72201,B72201,投資有価証券売却損(特損),account.data_account_type_expe
 B72202,B72202,投資有価証券評価損(特損),account.data_account_type_expenses,,FALSE,,l10n_jp1
 B80101,B80101,法人税、住民税及び事業税,account.data_account_type_expenses,,FALSE,,l10n_jp1
 B90001,B90001,期間利益,account.data_account_type_expenses,,FALSE,,l10n_jp1
+C1001,C1001,アカウントを取得,account.data_account_type_other_income,,FALSE,,l10n_jp1
+C1002,C1002,損失勘定,account.data_account_type_expenses,,FALSE,,l10n_jp1

@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Account Types -->
+    <record model="account.account.type" id="data_account_type_tax">
+        <field name="name">Tax</field>
+        <field name="type">other</field>
+        <field name="include_initial_balance" eval="True"/>
+    </record>
+    
+    <!-- Chart Template -->
     <record id="transfer_account_id" model="account.account.template">
         <field name="code">505</field>
-        <field name="name">Transfer Account</field>
+        <field name="name">振替口座</field>
         <field name="reconcile" eval='True'/>
-        <field name="user_type" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
     </record>
     <record id="l10n_jp1" model="account.chart.template">
         <field name="name">日本勘定設定テンプレート</field>
         <field name="code_digits">4</field>
-        <field name="bank_account_code_char">550</field>
+        <field name="bank_account_code_prefix">101</field>
+        <field name="cash_account_code_prefix">102</field>
         <field name="currency_id" ref="base.USD"/>
         <field name="transfer_account_id" ref="transfer_account_id"/>
     </record>
     <record id="transfer_account_id" model="account.account.template">
         <field name="chart_template_id" ref="l10n_jp1"/>
-    </record>
-
-    <record model="account.account.type" id="data_account_type_tax">
-        <field name="name">Tax</field>
-        <field name="type">other</field>
-        <field name="include_initial_balance" eval="True"/>
     </record>
 </odoo>
