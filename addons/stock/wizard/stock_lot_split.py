@@ -57,14 +57,7 @@ class stock_lot_split(models.TransientModel):
         else:
             self.pack_id.product_qty = 0.0
 
-        # Reload as the operations where split
-        return {
-                'view_type': 'form',
-                'view_mode': 'form',
-                'res_model': 'stock.picking',
-                'type': 'ir.actions.act_window',
-                'res_id': self.pack_id.picking_id.id,
-                }
+        return True
 
 
 class stock_lot_split_line(models.TransientModel):

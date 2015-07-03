@@ -49,13 +49,7 @@ class stock_pack_details(models.TransientModel):
                 pack2 = self.pack_id.copy({'qty_done': 0.0, 'product_qty': wiz.quantity - wiz.qty_done})
                 wiz.quantity = wiz.qty_done
                 self.pack_id.write({'qty_done': wiz.qty_done, 'product_qty': wiz.quantity})
-                return {
-                    'view_type': 'form',
-                    'view_mode': 'form',
-                    'res_model': 'stock.picking',
-                    'type': 'ir.actions.act_window',
-                    'res_id': self.pack_id.picking_id.id,
-                }
+                return True
             else:
                 raise UserError(_('Can not split 0 quantity'))
 
@@ -72,4 +66,4 @@ class stock_pack_details(models.TransientModel):
                 'location_dest_id': self.location_dest_id.id,
                 'result_package_id': self.result_package_id.id,
         })
-        return {}
+        return True
