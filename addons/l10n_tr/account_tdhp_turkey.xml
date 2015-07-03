@@ -319,280 +319,280 @@
     <record id="tr220" model="account.account.template">
         <field name="name">Alıcılar</field>
         <field name="code">220</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr221" model="account.account.template">
         <field name="name">Alacak Senetleri</field>
         <field name="code">221</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr222" model="account.account.template">
         <field name="name">Alacak Senetleri Reeskontu(-)</field>
         <field name="code">222</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr224" model="account.account.template">
         <field name="name">Kazaqnılmamış Finansal Kiralama Faiz Gelirleri(-)</field>
         <field name="code">224</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr226" model="account.account.template">
         <field name="name">Verilen Depozito Ve Teminatlar</field>
         <field name="code">226</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr229" model="account.account.template">
         <field name="name">Şüpheli Ticari Alacaklar Karşılığı(-)</field>
         <field name="code">229</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr231" model="account.account.template">
         <field name="name">Ortaklardan Alacaklar</field>
         <field name="code">231</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr232" model="account.account.template">
         <field name="name">İştiraklerden Alacaklar</field>
         <field name="code">232</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr233" model="account.account.template">
         <field name="name">Bağlı Ortaklıklardan Alacaklar</field>
         <field name="code">233</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr235" model="account.account.template">
         <field name="name">Personelden Alacaklar</field>
         <field name="code">235</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr236" model="account.account.template">
         <field name="name">Diğer Çeşitli Alacaklar</field>
         <field name="code">236</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr237" model="account.account.template">
         <field name="name">Diğer Alacak Senetleri Reeskontu(-)</field>
         <field name="code">237</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr240" model="account.account.template">
         <field name="name">Bağlı Menkul Kıymetler</field>
         <field name="code">240</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr241" model="account.account.template">
         <field name="name">Bağlı Menkul Kıymetler Değer Düşüklüğü Karşılığı(-)</field>
         <field name="code">241</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr242" model="account.account.template">
         <field name="name">İştirakler</field>
         <field name="code">242</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr243" model="account.account.template">
         <field name="name">İştiraklere Sermaye Taahhütleri(-)</field>
         <field name="code">243</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr244" model="account.account.template">
         <field name="name">İştirakler Sermaye Payları Değer Düşüklüğü Karşılığı(-)</field>
         <field name="code">244</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr245" model="account.account.template">
         <field name="name">Bağlı Ortaklıklar</field>
         <field name="code">245</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr246" model="account.account.template">
         <field name="name">Bağlı Ortaklıklara Sermaye Taahhütleri(-)</field>
         <field name="code">246</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr247" model="account.account.template">
         <field name="name">Bağlı Ortaklıklar Sermaye Payları Değer Düşüklüğü Karşılığı(-)</field>
         <field name="code">247</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr248" model="account.account.template">
         <field name="name">Diğer Mali Duran Varlıklar</field>
         <field name="code">248</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr249" model="account.account.template">
         <field name="name">Diğer Mali Duran Varlıklar Karşılığı(-)</field>
         <field name="code">249</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr250" model="account.account.template">
         <field name="name">Arazi Ve Arsalar</field>
         <field name="code">250</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr251" model="account.account.template">
         <field name="name">Yer Altı Ve Yer Üstü Düzenleri</field>
         <field name="code">251</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr252" model="account.account.template">
         <field name="name">Binalar</field>
         <field name="code">252</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr253" model="account.account.template">
         <field name="name">Tesis, Makine Ve Cihazlar</field>
         <field name="code">253</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr254" model="account.account.template">
         <field name="name">Taşıtlar</field>
         <field name="code">254</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr255" model="account.account.template">
         <field name="name">Demirbaşlar</field>
         <field name="code">255</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr256" model="account.account.template">
         <field name="name">Diğer Maddi Duran Varlıklar</field>
         <field name="code">256</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr257" model="account.account.template">
         <field name="name">Birikmiş Amortismanlar(-)</field>
         <field name="code">257</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr258" model="account.account.template">
         <field name="name">Yapılmakta Olan Yatırımlar</field>
         <field name="code">258</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr259" model="account.account.template">
         <field name="name">Verilen Avanslar</field>
         <field name="code">259</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr260" model="account.account.template">
         <field name="name">Haklar</field>
         <field name="code">260</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr261" model="account.account.template">
         <field name="name">Şerefiye</field>
         <field name="code">261</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr262" model="account.account.template">
         <field name="name">Kuruluş Ve Örgütlenme Giderleri</field>
         <field name="code">262</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr263" model="account.account.template">
         <field name="name">Araştırma Ve Geliştirme Giderleri</field>
         <field name="code">263</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr264" model="account.account.template">
         <field name="name">Özel Maliyetler</field>
         <field name="code">264</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr267" model="account.account.template">
         <field name="name">Diğer Maddi Olmayan Duran Varlıklar</field>
         <field name="code">267</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr268" model="account.account.template">
         <field name="name">Birikmiş Amortismanlar(-)</field>
         <field name="code">268</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr269" model="account.account.template">
         <field name="name">Verilen Avanslar</field>
         <field name="code">269</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
@@ -936,7 +936,7 @@
     <record id="tr381" model="account.account.template">
         <field name="name">Gider Tahakkukları</field>
         <field name="code">381</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
@@ -957,21 +957,21 @@
     <record id="tr393" model="account.account.template">
         <field name="name">Merkez Ve Şubeler Cari Hesabı</field>
         <field name="code">393</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr397" model="account.account.template">
         <field name="name">Sayım Ve Tesellüm Fazlaları</field>
         <field name="code">397</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr399" model="account.account.template">
         <field name="name">Diğer Çeşitli Yabancı Kaynaklar</field>
         <field name="code">399</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
@@ -1153,112 +1153,112 @@
     <record id="tr500" model="account.account.template">
         <field name="name">Sermaye</field>
         <field name="code">500</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr501" model="account.account.template">
         <field name="name">Ödenmiş Sermaye(-)</field>
         <field name="code">501</field>
-        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr520" model="account.account.template">
         <field name="name">Hisse Senetleri İhraç Primleri</field>
         <field name="code">520</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr521" model="account.account.template">
         <field name="name">Hisse Senedi İptal Kârları</field>
         <field name="code">521</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr522" model="account.account.template">
         <field name="name">Maddi Duran Varlık Yeniden Değerlenme Artışları</field>
         <field name="code">522</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr524" model="account.account.template">
         <field name="name">Maliyet Artışları Fonu</field>
         <field name="code">524</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr529" model="account.account.template">
         <field name="name">Diğer Sermaye Yedekleri</field>
         <field name="code">529</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr540" model="account.account.template">
         <field name="name">Yasal Yedekler</field>
         <field name="code">540</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr541" model="account.account.template">
         <field name="name">Statü Yedekleri</field>
         <field name="code">541</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr542" model="account.account.template">
         <field name="name">Olağanüstü Yedekler</field>
         <field name="code">542</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr548" model="account.account.template">
         <field name="name">Diğer Kâr Yedekleri</field>
         <field name="code">548</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr549" model="account.account.template">
         <field name="name">Özel Fonlar</field>
         <field name="code">549</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr570" model="account.account.template">
         <field name="name">Geçmiş Yıllar Kârları</field>
         <field name="code">570</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr580" model="account.account.template">
         <field name="name">Geçmiş Yıllar Zararları(-)</field>
         <field name="code">580</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr590" model="account.account.template">
         <field name="name">Dönem Net Kârı</field>
         <field name="code">590</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
     <record id="tr591" model="account.account.template">
         <field name="name">Dönem Net Zararı(-)</field>
         <field name="code">591</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="account.data_account_type_equity"/>
         <field name="chart_template_id" ref="l10ntr_tek_duzen_hesap"/>
     </record>
 
