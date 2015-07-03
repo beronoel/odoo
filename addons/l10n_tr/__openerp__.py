@@ -25,5 +25,5 @@ Bu modül kurulduktan sonra, Muhasebe yapılandırma sihirbazı çalışır
         'account_chart_template.yml',
     ],
     'demo': [],
-    'installable': True,
+    'installable': False,
 }
