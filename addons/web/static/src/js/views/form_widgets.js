@@ -14,6 +14,7 @@ var Model = require('web.Model');
 var pyeval = require('web.pyeval');
 var session = require('web.session');
 var utils = require('web.utils');
+var ace_call = require('web.ace_call');
 
 var _t = core._t;
 var QWeb = core.qweb;
@@ -1644,6 +1645,91 @@ var FieldToggleBoolean = common.AbstractField.extend({
     },
 });
 
+/**
+    This widget is intended to be used on Text fields. It will provide Ace Editor for editing XMLs.
+*/
+var AceEditor = common.AbstractField.extend(common.ReinitializeFieldMixin, {
+    resizing: false,
+    refX: 0,
+    minWidth: 40,
+    template: "AceEditor",
+    render_value: function() {
+        console.log("Inside render value ::: ");
+        if (! this.get("effective_readonly")) {
+            //This intialization part of ACE should go in start
+            ace_call.load();
+            this.aceEditor = ace.edit(this.$('.ace-view-editor')[0]);
+            this.aceEditor.setTheme("ace/theme/monokai");
+            //var show_value = formats.format_value(this.get('value'), this, '');
+            var show_value = this.get("value") || '';
+            this.display_view(show_value);
+        } else {
+            var txt = this.get("value") || '';
+            this.$(".oe_form_text_content").text(txt);
+        }
+    },
+    display_view: function (show_value) {
+        var self = this;
+        console.log("show_value is ::: ", show_value);
+        var editingSession = new ace.EditSession(show_value);
+        editingSession.setMode("ace/mode/xml");
+        editingSession.setUndoManager(new ace.UndoManager());
+        editingSession.on("change", function () {
+            console.log("Inside change of editingSession :::: ");
+        });
+        this.aceEditor.setSession(editingSession);
+        this.aceEditor.setOption("showInvisibles", true);
+
+        var $editor = self.$('.ace_editor');
+        function resizeEditor (target) {
+            var width = Math.min(document.body.clientWidth, Math.max(parseInt(target, 10), self.minWidth));
+            $editor.width(width);
+            self.aceEditor.resize();
+            self.$el.width(width);
+        }
+        function resizeEditorHeight(height, elementPosition) {
+            self.$el.find('.ace-view-editor').css('top', elementPosition.top);
+            self.$('.ace_editor').css('bottom', elementPosition.top);
+            //self.$el.css('top', height);
+            //self.$('.ace_editor').css('bottom', height);
+            /*
+            setTimeout(function() {
+                self.$el.css('position', 'relative !important');
+                self.$('.ace_editor').css('position', 'static !important');
+            }, 100);
+            */
+        }
+        function storeEditorWidth() {
+            window.localStorage.setItem('ace_editor_width', self.$el.width());
+        }
+        function readEditorWidth(elementWidth) {
+            var width = window.localStorage.getItem('ace_editor_width');
+            return parseInt(width || elementWidth || 720, 10);
+        }
+        function startResizing (e) {
+            self.refX = e.pageX;
+            self.resizing = true;
+        }
+        function stopResizing () {
+            self.resizing = false;
+        }
+        function updateWidth (e) {
+            if (self.resizing) {
+                var offset = e.pageX - self.refX;
+                var width = self.$el.width() - offset;
+                self.refX = e.pageX;
+                resizeEditor(width);
+                storeEditorWidth();
+            }
+        }
+        
+        this.getParent().on('change:height', this, function () {
+            resizeEditorHeight(this.getParent().$el.outerHeight()+2);
+        });
+        //resizeEditor(readEditorWidth(this.$el.outerWidth()));
+        //resizeEditorHeight(this.getParent().$el.outerHeight()+2, this.$el.position());
+    },
+});
 
 /**
  * Registry of form fields, called by :js:`instance.web.FormView`.
@@ -1680,7 +1766,8 @@ core.form_widget_registry
     .add('kanban_state_selection', KanbanSelection)
     .add('statinfo', StatInfo)
     .add('timezone_mismatch', TimezoneMismatch)
-    .add('label_selection', LabelSelection);
+    .add('label_selection', LabelSelection)
+    .add('ace', AceEditor);
 
 
 /**

@@ -215,6 +215,7 @@ var ViewEditor = Widget.extend({
             method: 'read',
             args: [[viewId], ['arch'], website.get_context()],
         }).then(function(result) {
+            console.log("result[0].arch is ::: ", result[0].arch);
             var editingSession = self.buffers[viewId] = new ace.EditSession(result[0].arch);
             editingSession.setMode("ace/mode/xml");
             editingSession.setUndoManager(new ace.UndoManager());
