@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
         <!--
         Country
@@ -126,5 +125,4 @@
 
           <menuitem action="action_country_state" id="menu_country_state_partner" parent="menu_localisation" sequence="2" groups="base.group_no_one"/>
 
-    </data>
-</openerp>
+</odoo>
