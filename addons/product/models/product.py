@@ -1063,7 +1063,7 @@ class ProductSupplierinfo(models.Model):
 
     @api.multi
     @api.depends('min_qty')
-    def _calc_qty(self, fields):
+    def _calc_qty(self):
         for record in self:
             record.qty = record.min_qty
 
