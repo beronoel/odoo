@@ -1,6 +1,24 @@
 <openerp>
     <data noupdate="1">
 
+        <!-- Account Tax Tags -->
+        <record id="tag_purchase_default" model="account.account.tag">
+            <field name="name">default purchase tax</field>
+            <field name="applicability">taxes</field>
+        </record>
+        <record id="tag_purchase_exempted" model="account.account.tag">
+            <field name="name">Exempted Tax (Purchase)</field>
+            <field name="applicability">taxes</field>
+        </record>
+        <record id="tag_sale_default" model="account.account.tag">
+            <field name="name">default sale tax</field>
+            <field name="applicability">taxes</field>
+        </record>
+        <record id="tag_sale_exempted" model="account.account.tag">
+            <field name="name">Exempted Tax (Sale)</field>
+            <field name="applicability">taxes</field>
+        </record>
+
         <!-- Taxes -->
         <record id="otaxs" model="account.tax.template">
             <field name="chart_template_id" ref="l10n_us.account_chart_template_basic"/>
