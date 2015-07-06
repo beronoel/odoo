@@ -23,8 +23,9 @@ class product_price_list(models.TransientModel):
         """
         context = self.env.context or {}
         datas = {'ids': context.get('active_ids', [])}
-        res = self.with_context(context).read(['price_list','qty1', 'qty2','qty3','qty4','qty5'])
+        res = self.with_context(context).read(['price_list', 'qty1', 'qty2', 'qty3', 'qty4', 'qty5'])
         res = res and res[0] or {}
         res['price_list'] = res['price_list'][0]
         datas['form'] = res
-        return self.env['report'].with_context(context).get_action('product.report_pricelist', data=datas)
+        records = self.env['product.product'].browse(datas['ids'])
+        return self.env['report'].with_context(context).get_action(records, 'product.report_pricelist', data=datas)

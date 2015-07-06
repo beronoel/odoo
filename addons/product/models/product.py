@@ -182,7 +182,7 @@ class ProductCategory(models.Model):
     name = fields.Char(required=True, translate=True, index=True)
     complete_name = fields.Char(compute='_name_get_fnc', string="Name")
     parent_id = fields.Many2one('product.category', string="Parent Category", index=True, ondelete='cascade')
-    child_id = fields.One2many(comodel_name='product.category', inverse_name='parent_id', string="Child Categories")
+    child_id = fields.One2many('product.category', 'parent_id', string="Child Categories")
     sequence = fields.Integer(index=True, help="Gives the sequence order when displaying a list of product categories.")
     cat_type = fields.Selection([('view', 'View'), ('normal', 'Normal')], string="Category Type", default='normal',
                             help="A category of the view type is a virtual category that can be used as the parent of another category to create a hierarchical structure.")
@@ -264,9 +264,9 @@ class ProductAttribute(models.Model):
     _order = 'sequence,id'
 
     name = fields.Char(translate=True, required=True)
-    value_ids = fields.One2many(comodel_name='product.attribute.value', inverse_name='attribute_id', string="Values", copy=True)
+    value_ids = fields.One2many('product.attribute.value', 'attribute_id', string="Values", copy=True)
     sequence = fields.Integer(help="Determine the display order")
-    attribute_line_ids = fields.One2many(comodel_name='product.attribute.line', inverse_name='attribute_id', string='Lines')
+    attribute_line_ids = fields.One2many('product.attribute.line', 'attribute_id', string='Lines')
 
 
 class ProductAttributeValue(models.Model):
@@ -279,7 +279,7 @@ class ProductAttributeValue(models.Model):
     product_ids = fields.Many2many('product.product', id1='att_id', id2='prod_id', string="Variants", readonly=True)
     price_extra = fields.Float(compute='_get_price_extra', string='Attribute Price Extra', inverse='_set_price_extra', digits=dp.get_precision('Product Price'),
                                help="Price Extra: Extra price for the variant with this attribute value on sale price. eg. 200 price extra, 1000 + 200 = 1200.")
-    price_ids = fields.One2many(comodel_name='product.attribute.price', inverse_name='value_id', string='Attribute Prices', readonly=True)
+    price_ids = fields.One2many('product.attribute.price', 'value_id', string='Attribute Prices', readonly=True)
 
     @api.multi
     def _get_price_extra(self):
@@ -294,7 +294,7 @@ class ProductAttributeValue(models.Model):
         ProductObj = self.env['product.attribute.price']
         p_ids = ProductObj.search([('value_id', '=', id), ('product_tmpl_id', '=', self.env.context['active_id'])])
         if p_ids:
-            ProductObj.write(p_ids, {'price_extra': value})
+            p_ids.write({'price_extra': value})
         else:
             ProductObj.create({
                 'product_tmpl_id': self.env.context['active_id'],
@@ -438,15 +438,21 @@ class ProductTemplate(models.Model):
     default_code = fields.Char(related='product_variant_ids.default_code', string='Internal Reference')
 
     @api.multi
+    @api.depends('pricelist_id')
     def _product_template_price(self):
         PriceList = self.env['product.pricelist']
-        if self.pricelist_id:
+
+        context = self.env.context or {}
+        quantity = context.get('quantity') or 1.0
+        pricelist = context.get('pricelist', False)
+        partner = context.get('partner', False)
+        if pricelist:
             # Support context pricelists specified as display_name or ID for compatibility
-            if isinstance(self.pricelist_id, basestring):
-                pricelist_ids = PriceList.name_search(self.pricelist, operator='=', limit=1)
-                pricelist = pricelist_ids[0][0] if pricelist_ids else self.pricelist
-            if isinstance(self.pricelist_id, (int, long)):
-                qtys = map(lambda x: (x, quantity, partner), self.ids)
+            if isinstance(pricelist, basestring):
+                pricelist_ids = PriceList.name_search(pricelist, operator='=', limit=1)
+                pricelist = pricelist_ids[0][0] if pricelist_ids else pricelist
+            if isinstance(pricelist, (int, long)):
+                qtys = map(lambda x: (x, quantity, partner), self)
                 price = self.pricelist_id._price_get_multi(qtys)
                 for record in self:
                     record.price = price.get(record.id, 0.0)
@@ -476,12 +482,14 @@ class ProductTemplate(models.Model):
         return False
 
     @api.one
-    def _set_product_template_price(self, value):
+    def _set_product_template_price(self):
+        Uom = self.env['product.uom']
         context = self.env.context or {}
+        price = self.price
         if 'uom' in context:
             uom = self.uos_id or self.uom_id
-            value = uom._compute_price(context['uom'], value, uom.id)
-        self.list_price = value
+            price = Uom._compute_price(context['uom'], self.price, uom.id)
+        self.list_price = price
 
     @api.model
     def get_history_price(self, product_tmpl, date=None):
@@ -524,17 +532,17 @@ class ProductTemplate(models.Model):
             # Thus, in order to compute the sale price from the cost price for users not in this group
             # We fetch the standard price as the superuser
             if ptype != 'standard_price':
-                price = product[0].standard_price
+                price = product.standard_price
             else:
                 company_id = product.env.user.company_id.id
                 product = product.with_context(force_company=company_id)
                 price = product.sudo().list_price
             if ptype == 'list_price':
-                price += product._name == "product.product" and product.price_extra or 0.0
+                price += product._name == "product.product" and product.price_extra
             if 'uom' in context:
                 uom = product.uom_id or product.uos_id
                 price = uom._compute_price(
-                        uom.id, product.price, context['uom'])
+                        uom.id, product.list_price, context['uom'])
             # Convert from price_type currency to asked one
             if 'currency_id' in context:
                 # Take the price_type currency from the product field
@@ -546,7 +554,7 @@ class ProductTemplate(models.Model):
     def onchange_type(self):
         return {}
 
-    @api.onchange('uom_id', 'uom_id')
+    @api.onchange('uom_id')
     def onchange_uom(self):
         if self.uom_id:
             self.uom_po_id = self.uom_id
@@ -871,7 +879,7 @@ class Product(models.Model):
     def onchange_uom(self):
         if self.uom_id and self.uom_po_id:
             if self.uom_id.category_id.id != self.uom_po_id.category_id.id:
-                self.uom_po_id = self.uom_po_id
+                self.uom_po_id = self.uom_id
 
     def on_order(self, orderline, quantity):
         pass
@@ -882,7 +890,7 @@ class Product(models.Model):
 
         def _name_get(d):
             name = d.get('name', '')
-            code = context.get('display_default_code', True) and d.get('default_code', False) or False
+            code = context.get('display_default_code', True) and d.get('default_code', False)
             if code:
                 name = '[%s] %s' % (code, name)
             return (d['id'], name)
@@ -1004,12 +1012,14 @@ class Product(models.Model):
 
     @api.model
     def create(self, vals):
-        return super(Product, self).create(vals)
+        ctx = dict(self.env.context or {}, create_product_product=True)
+        return super(Product, self.with_context(ctx)).create(vals)
 
     @api.multi
     def need_procurement(self):
         return False
 
+#### Method does not seems to be used from anywhere, Could be removed
     @api.one
     def _compute_uos_qty(self, uom, qty, uos):
         '''
@@ -1022,21 +1032,16 @@ class Product(models.Model):
         if not uom or not qty or not uos:
             return qty
         Uom = self.env['product.uom']
-        # product_id = ids[0] if isinstance(ids, (list, tuple)) else ids
-        # product = self.browse(cr, uid, product_id, context=context)
-        # if isinstance(uos, (int, long)):
-        #     uos = Uom.browse(uos)
-        # if isinstance(uom, (int, long)):
-        #     uom = Uom.browse(cr, uid, uom, context=context)
+        uos_id, uom_id = self.browse([uos, uom])
         if self.uos_id:  # Product has UoS defined
             # We cannot convert directly between units even if the units are of the same category
             # as we need to apply the conversion coefficient which is valid only between quantities
             # in product's default UoM/UoS
-            qty_default_uom = uom_obj._compute_qty_obj(uom, qty, self.uom_id)  # qty in product's default UoM
+            qty_default_uom = Uom._compute_qty_obj(uom_id, qty, self.uom_id)  # qty in product's default UoM
             qty_default_uos = qty_default_uom * self.uos_coeff
-            return self.uos_id._compute_qty_obj(self.uos_id, qty_default_uos, uos)
+            return Uom._compute_qty_obj(self.uos_id, qty_default_uos, uos_id)
         else:
-            return self.uos_id._compute_qty_obj(uom, qty, uos)
+            return Uom._compute_qty_obj(uom_id, qty, uos_id)
 
 
 class ProductPackaging(models.Model):
@@ -1059,15 +1064,8 @@ class ProductSupplierinfo(models.Model):
     @api.multi
     @api.depends('min_qty')
     def _calc_qty(self, fields):
-        # result = {}
         for record in self:
             record.qty = record.min_qty
-        # for supplier_info in self:
-        #     for field in fields:
-        #         result[supplier_info.id] = {field: False}
-        #     qty = supplier_info.min_qty
-        #     result[supplier_info.id]['qty'] = qty
-        # return result
 
     name = fields.Many2one('res.partner', string='Supplier', required=True, domain=[('supplier', '=', True)], ondelete='cascade', help="Supplier of this product")
     product_name = fields.Char(string='Supplier Product Name', help="This supplier's product name will be used when printing a request for quotation. Keep empty to use the internal one.")

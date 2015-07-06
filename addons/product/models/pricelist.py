@@ -226,10 +226,10 @@ class ProductPricelist(models.Model):
             # An intermediary unit price may be computed according to a different UoM, in
             # which case the price_uom_id contains that UoM.
             # The final price will be converted to match `qty_uom_id`.
-            qty_uom_id = context.get('uom') or product.uom_id
+            qty_uom_id = context.get('uom') or product.uom_id.id
             price_uom_id = product.uom_id
             qty_in_product_uom = qty
-            if qty_uom_id.id != product.uom_id.id:
+            if qty_uom_id != product.uom_id.id:
                 try:
                     qty_in_product_uom = product_uom_obj._compute_qty(
                         context['uom'], qty, product.uom_id.id or product.uos_id.id)
@@ -276,7 +276,7 @@ class ProductPricelist(models.Model):
                             qty_in_seller = qty
                             seller_uom = seller.product_uom and seller.product_uom.id or False
                             if qty_uom_id != seller_uom:
-                                qty_in_seller = qty_uom_id._compute_qty(qty, to_uom_id=seller_uom)
+                                qty_in_seller = product_uom_obj._compute_qty(qty_uom_id, qty, to_uom_id=seller_uom)
                             for line in seller.pricelist_ids:
                                 if line.min_quantity <= qty_in_seller:
                                     price = line.price
@@ -305,7 +305,7 @@ class ProductPricelist(models.Model):
                 break
 
             # Final price conversion to target UoM
-            price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id.id)
+            price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id)
             results[product.product_tmpl_id.id] = (price, rule_id)
         return results
 
@@ -385,11 +385,11 @@ class ProductPricelistItem(models.Model):
         return result
 
 # Added default function to fetch the Price type Based on Pricelist type.
-    def _get_default_base(self, fields):
+    def _get_default_base(self):
         PriceType = self.env['product.price.type']
-        if fields.get('type') == 'purchase':
+        if self.base_pricelist_id.type == 'purchase':
             product_price_type_ids = PriceType.search([('field', '=', 'standard_price')])
-        elif fields.get('type') == 'sale':
+        elif self.base_pricelist_id.type == 'sale':
             product_price_type_ids = PriceType.search([('field','=','list_price')])
         else:
             return -1

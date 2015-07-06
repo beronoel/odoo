@@ -17,7 +17,7 @@
                     </div>
                     <div class="col-xs-3">
                         <strong>Print date</strong>:<br/>
-                        <t t-esc="formatLang(time.strftime('%Y-%m-%d'), date=True)"/>
+                        <t t-esc="time.strftime('%Y-%m-%d')"/>
                     </div>
                 </div>
 
@@ -37,7 +37,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <t t-foreach="get_categories(objects,data['form'])" t-as="c">
+                        <t t-foreach="get_categories(docs, data['form'])" t-as="c">
                             <tr>
                                 <td colspan="100">
                                     <strong t-esc="c['name']"/>
