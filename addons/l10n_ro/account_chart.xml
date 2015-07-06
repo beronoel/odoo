@@ -1991,7 +1991,7 @@
     <record id="pcg_542" model="account.account.template">
         <field name="name">Avansuri de trezorerie</field>
         <field name="code">542</field>
-        <field name="user_type_id" ref="account.data_account_type_receivable"/>
+        <field name="user_type_id" ref="account.data_account_type_non_current_assets"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
         <field name="note">in acest cont vor fi evidentiate si sumele acordate prin sistemul de carduri</field>
     </record>
