@@ -2105,7 +2105,7 @@
         <record id="chart9902" model="account.account.template">
             <field name="code">9902</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_other_income"/>
+            <field name="user_type_id" ref="account.data_account_type_expenses"/>
             <field name="name">Verlust-Rechnung</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
