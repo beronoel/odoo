@@ -37,5 +37,5 @@ and the Lempira currency.""",
         'account_chart_template.yml',
     ],
     'demo': [],
-    'installable': True,
+    'installable': False,
 }
