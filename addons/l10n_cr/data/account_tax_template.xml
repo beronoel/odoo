@@ -5,7 +5,17 @@
         Account tax templates for Costa Rica
         -->
 
+    <!-- Account Tags -->
 
+        <record id="tax_IVSale" model="account.account.tag">
+            <field name="name">IVSale</field>
+            <field name="applicability">taxes</field>
+        </record>
+
+        <record id="tax_IVPurchase" model="account.account.tag">
+            <field name="name">IVPurchase</field>
+            <field name="applicability">taxes</field>
+        </record>
 
         <record id="account_tax_template_IV_0" model="account.tax.template">
             <field name="name">0 Sales Tax</field>
@@ -18,6 +28,7 @@
             <field name="chart_template_id" ref="account_chart_template_0"/>
             <field name="refund_account_id" ref="account_account_template_0_212101"/>
             <field name="account_id" ref="account_account_template_0_212101"/>
+            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVSale')])]"/>
         </record>
         <record id="account_tax_template_IV_x" model="account.tax.template">
             <field name="name">x Sales Tax</field>
@@ -30,6 +41,7 @@
             <field name="chart_template_id" ref="account_chart_template_x"/>
             <field name="refund_account_id" ref="account_account_template_x212101"/>
             <field name="account_id" ref="account_account_template_x212101"/>
+            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVSale')])]"/>
         </record>
 
 
@@ -44,6 +56,7 @@
             <field name="chart_template_id" ref="account_chart_template_0"/>
             <field name="refund_account_id" ref="account_account_template_0_212101"/>
             <field name="account_id" ref="account_account_template_0_212101"/>
+            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVPurchase')])]"/>
         </record>
         <record id="account_tax_template_IV_x1" model="account.tax.template">
             <field name="name">x Purchase Tax</field>
@@ -56,6 +69,7 @@
             <field name="chart_template_id" ref="account_chart_template_x"/>
             <field name="refund_account_id" ref="account_account_template_x212101"/>
             <field name="account_id" ref="account_account_template_x212101"/>
+            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVPurchase')])]"/>
         </record>
 
 

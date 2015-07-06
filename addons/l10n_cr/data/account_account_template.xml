@@ -825,15 +825,15 @@
             <field name="reconcile" eval="False"/>
             <field name="user_type_id" ref="account.data_account_type_other_income"/>
             <field name="name">victoria de Konto</field>
-            <field name="chart_template_id" ref="account_chart_template_x"/>
+            <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
 
         <record id="account_account_template_0_530006" model="account.account.template">
-            <field name="code">0530005</field>
+            <field name="code">0530006</field>
             <field name="reconcile" eval="False"/>
             <field name="user_type_id" ref="account.data_account_type_expenses"/>
             <field name="name">Cuenta de Pérdidas</field>
-            <field name="chart_template_id" ref="account_chart_template_x"/>
+            <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
 
         <record id="account_chart_template_0" model="account.chart.template">
