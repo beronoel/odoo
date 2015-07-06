@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Account Tax Tags -->
+    <record id="tag_ventas_22" model="account.account.tag">
+        <field name="name">IVA Ventas (22%)</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="tag_ventas_10" model="account.account.tag">
+        <field name="name">IVA Ventas (10%)</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="tag_ventas_exentos" model="account.account.tag">
+        <field name="name">Ventas Exentos IVA</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="tag_compras_22" model="account.account.tag">
+        <field name="name">IVA Compras (22%)</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="tag_compras_10" model="account.account.tag">
+        <field name="name">IVA Compras (10%)</field>
+        <field name="applicability">taxes</field>
+    </record>
+    <record id="tag_compras_exento" model="account.account.tag">
+        <field name="name">Compras Exentos IVA</field>
+        <field name="applicability">taxes</field>
+    </record>
+
     <!-- Account Tax Template -->
     <record id="vat1" model="account.tax.template">
       <field name="chart_template_id" ref="uy_chart_template"/>
