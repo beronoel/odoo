@@ -58,11 +58,12 @@ please go to http://translations.launchpad.net/openerp-costa-rica.
     'data': [
         'l10n_cr_base_data.xml',
         'data/account_account_type.xml',
-        'data/account_account_template.xml',
         'data/account_chart_template.xml',
+        'data/account_account_template.xml',
         'data/account_tax_template.xml',
-        'l10n_wizard.xml',
+        'data/account_chart_template.yml',
     ],
-    'installable': False,
+    'license': 'Other OSI approved licence',
+    'installable':True,
     'auto_install': False,
 }
