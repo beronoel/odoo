@@ -1176,6 +1176,15 @@ class account_invoice(osv.Model):
         return super(account_invoice, self).unlink(cr, uid, ids, context=context)
 
 
+class account_invoice_line(osv.Model):
+    _inherit = 'account.invoice.line'
+
+    _columns= {
+        'sale_line_ids': fields.many2many('sale.order.line', 'sale_order_line_invoice_rel', 'invoice_id', 'order_line_id',
+                                          'Sale Order Lines', readonly=True, copy=False)
+    }
+
+
 class procurement_order(osv.osv):
     _inherit = 'procurement.order'
     _columns = {

@@ -195,14 +195,18 @@ class stock_picking(osv.osv):
         invoice_id = super(stock_picking, self)._create_invoice_from_picking(cr, uid, picking, vals, context=context)
         return invoice_id
 
-    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move, context=None):
-        inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, move, context=context)
-        if move.purchase_line_id and move.purchase_line_id.order_id:
-            purchase = move.purchase_line_id.order_id
-            inv_vals.update({
-                'fiscal_position_id': purchase.fiscal_position_id.id,
-                'payment_term_id': purchase.payment_term_id.id,
-                })
+    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
+        inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
+        purchases = []
+        for move in moves:
+            if move.purchase_line_id and move.purchase_line_id.order_id:
+                purchase = move.purchase_line_id.order_id
+                inv_vals.update({
+                    'fiscal_position': purchase.fiscal_position.id,
+                    'payment_term': purchase.payment_term_id.id,
+                    })
+                purchases.append(purchase.id)
+        inv_vals['purchase_ids'] = [(6, 0, list(set(purchases)))]
         return inv_vals
 
 

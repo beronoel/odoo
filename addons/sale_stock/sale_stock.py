@@ -470,18 +470,20 @@ class stock_picking(osv.osv):
         invoice_id = super(stock_picking, self)._create_invoice_from_picking(cr, uid, picking, vals, context=context)
         return invoice_id
 
-    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move, context=None):
-        inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, move, context=context)
-        sale = move.picking_id.sale_id
-        if sale:
-            inv_vals.update({
-                'fiscal_position_id': sale.fiscal_position_id.id,
-                'payment_term_id': sale.payment_term_id.id,
-                'user_id': sale.user_id.id,
-                'team_id': sale.team_id.id,
-                'name': sale.client_order_ref or '',
-                'comment': sale.note,
-                })
+    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
+        inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
+        if inv_type in ('out_invoice', 'out_refund'):
+            sales = [x.picking_id.sale_id for x in moves]
+            if sales:
+                sale = sales[0]
+                inv_vals.update({
+                    'fiscal_position': sale.fiscal_position.id,
+                    'payment_term': sale.payment_term.id,
+                    'user_id': sale.user_id.id,
+                    'team_id': sale.team_id.id,
+                    'name': sale.client_order_ref or '',
+                    'sale_ids': (6, 0, list(set([x.id for x in sales]))),
+                    })
         return inv_vals
 
 class account_invoice(osv.Model):
