@@ -4,17 +4,13 @@
 
     <!-- Account Types -->
 
-        <record model="account.account.type" id="account_type_tax">
-          <field name="name">Steuer</field>
-        </record>
-
         <record model="account.account.type" id="account_type_other">
           <field name="name">Sonstige</field>
         </record>
 
 
         <record id="transfer_account_id" model="account.account.template">
-            <field name="code">505</field>
+            <field name="code">2809</field>
             <field name="reconcile" eval="True"/>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="name">Transfer Konto</field>
@@ -24,8 +20,8 @@
         <record id="austria_chart_template" model="account.chart.template">
             <field name="name">Austria - Chart of Accounts</field>
             <field name="code_digits">6</field>
-            <field name="bank_account_code_prefix">102</field>
-            <field name="cash_account_code_prefix">103</field>
+            <field name="bank_account_code_prefix">2800</field>
+            <field name="cash_account_code_prefix">2700</field>
             <field name="currency_id" ref="base.EUR"/>
             <field name="transfer_account_id" ref="transfer_account_id"/>
         </record>
@@ -38,7 +34,7 @@
         <record id="chart0010" model="account.account.template">
             <field name="code">0010</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Aufwendungen füs das Ingangssetzen u. Erweitern eines Betriebes</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -46,7 +42,7 @@
         <record id="chart0090" model="account.account.template">
             <field name="code">0090</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -54,7 +50,7 @@
         <record id="chart0100" model="account.account.template">
             <field name="code">0100</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Konzessionen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -62,7 +58,7 @@
         <record id="chart0110" model="account.account.template">
             <field name="code">0110</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Patentrechte und Lizenzen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -70,7 +66,7 @@
         <record id="chart0120" model="account.account.template">
             <field name="code">0120</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Datenverarbeitungsprogramme</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -78,7 +74,7 @@
         <record id="chart0130" model="account.account.template">
             <field name="code">0130</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Marken, Warenzeichen und Musterschutzrechte</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -86,7 +82,7 @@
         <record id="chart0140" model="account.account.template">
             <field name="code">0140</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Pacht- und Mietrechte</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -94,7 +90,7 @@
         <record id="chart0150" model="account.account.template">
             <field name="code">0150</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geschäfts(Firmen)wert</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -102,7 +98,7 @@
         <record id="chart0180" model="account.account.template">
             <field name="code">0180</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geleistete Anzahlungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -110,7 +106,7 @@
         <record id="chart0190" model="account.account.template">
             <field name="code">0190</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record> 
@@ -118,7 +114,7 @@
         <record id="chart0200" model="account.account.template">
             <field name="code">0200</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Unbebaute Grundstücke</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -126,7 +122,7 @@
         <record id="chart0210" model="account.account.template">
             <field name="code">0210</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Bebaute Grundstücke (Grundwert)</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -134,7 +130,7 @@
         <record id="chart0220" model="account.account.template">
             <field name="code">0220</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Grundstücksgleiche Rechte</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record> 
@@ -142,7 +138,7 @@
         <record id="chart0300" model="account.account.template">
             <field name="code">0300</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Betriebs- und Geschäftsgebäude auf eigenem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -150,7 +146,7 @@
         <record id="chart0310" model="account.account.template">
             <field name="code">0310</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Wohn- und Sozialgebäude auf eigenem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -158,7 +154,7 @@
         <record id="chart0320" model="account.account.template">
             <field name="code">0320</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Betriebs- und Geschäftsgebäude auf fremdem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -166,7 +162,7 @@
         <record id="chart0330" model="account.account.template">
             <field name="code">0330</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Wohn- und Sozialgebäude auf fremdem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -174,7 +170,7 @@
         <record id="chart0340" model="account.account.template">
             <field name="code">0340</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Grundstückseinrichtunten auf eigenem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record> 
@@ -182,7 +178,7 @@
         <record id="chart0350" model="account.account.template">
             <field name="code">0350</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Grundstückseinrichtunten auf fremdem Grund</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -190,7 +186,7 @@
         <record id="chart0360" model="account.account.template">
             <field name="code">0360</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Bauliche Investitionen in fremden (gepachteten) Betriebs- und Geschäftsgebäuden</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -199,7 +195,7 @@
         <record id="chart0370" model="account.account.template">
             <field name="code">0370</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Bauliche Investitionen in fremden (gepachteten) Wohn- und Sozialgebäuden</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -207,7 +203,7 @@
         <record id="chart0390" model="account.account.template">
             <field name="code">0390</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -215,7 +211,7 @@
         <record id="chart0400" model="account.account.template">
             <field name="code">0400</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Fertigungsmaschinen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -223,7 +219,7 @@
         <record id="chart0410" model="account.account.template">
             <field name="code">0410</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Antriebsmaschinen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -231,14 +227,14 @@
         <record id="chart0420" model="account.account.template">
             <field name="code">0420</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Energieversorgungsanlagen</field>
         </record>         
                     
         <record id="chart0430" model="account.account.template">
             <field name="code">0430</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Transportanlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>         
@@ -246,7 +242,7 @@
         <record id="chart0440" model="account.account.template">
             <field name="code">0440</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">44 bis 49 Sonstige Maschinen und maschinelle Anlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record> 
@@ -254,7 +250,7 @@
         <record id="chart0500" model="account.account.template">
             <field name="code">0500</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Maschinenwerkzeuge</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -262,7 +258,7 @@
         <record id="chart0510" model="account.account.template">
             <field name="code">0510</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Allgemeine Werkzeuge und Handwerkzeuge</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -270,7 +266,7 @@
         <record id="chart0520" model="account.account.template">
             <field name="code">0520</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Vorrichtungen, Formen und Modelle</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -278,7 +274,7 @@
         <record id="chart0530" model="account.account.template">
             <field name="code">0530</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Andere Erzeugungshilfsmittel</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -286,7 +282,7 @@
         <record id="chart0540" model="account.account.template">
             <field name="code">0540</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Hebezeuge und Montageanlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -294,7 +290,7 @@
         <record id="chart0550" model="account.account.template">
             <field name="code">0550</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geringwertige Vermögensgegenstände, soweit im Erzeugerprozess verwendet</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -302,7 +298,7 @@
         <record id="chart0600" model="account.account.template">
             <field name="code">0600</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Beheizungs- und Beleuchtungsanlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -310,7 +306,7 @@
         <record id="chart0610" model="account.account.template">
             <field name="code">0610</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Nachrichten- und Kontrollanlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -318,7 +314,7 @@
         <record id="chart0620" model="account.account.template">
             <field name="code">0620</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Büromaschinen, EDV - Anlagen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -326,7 +322,7 @@
         <record id="chart0630" model="account.account.template">
             <field name="code">0630</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">PKW</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -334,7 +330,7 @@
         <record id="chart0640" model="account.account.template">
             <field name="code">0640</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">LKW</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -342,7 +338,7 @@
         <record id="chart0650" model="account.account.template">
             <field name="code">0650</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Andere Beförderungsmittel</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -350,7 +346,7 @@
         <record id="chart0660" model="account.account.template">
             <field name="code">0660</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Andere Betriebs- und Geschäftsausstattung</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -358,7 +354,7 @@
         <record id="chart0670" model="account.account.template">
             <field name="code">0670</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Gebinde</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -366,7 +362,7 @@
         <record id="chart0680" model="account.account.template">
             <field name="code">0680</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geringwertige Vermögensgegenstände, soweit nicht im Erzeugungsprozess verwendet</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -374,7 +370,7 @@
         <record id="chart0690" model="account.account.template">
             <field name="code">0690</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -382,7 +378,7 @@
         <record id="chart0700" model="account.account.template">
             <field name="code">0700</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geleistete Anzahlungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -390,7 +386,7 @@
         <record id="chart0710" model="account.account.template">
             <field name="code">0710</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Anlagen im Bau</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -398,7 +394,7 @@
         <record id="chart0790" model="account.account.template">
             <field name="code">0790</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -406,7 +402,7 @@
         <record id="chart0800" model="account.account.template">
             <field name="code">0800</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Anteile an verbundenen Unternehmen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -414,7 +410,7 @@
         <record id="chart0810" model="account.account.template">
             <field name="code">0810</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Beteiligungen an Gemeinschaftunternehmen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -422,7 +418,7 @@
         <record id="chart0820" model="account.account.template">
             <field name="code">0820</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Beteiligungen an angeschlossenen (assoziierten) Unternehmen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -430,7 +426,7 @@
         <record id="chart0830" model="account.account.template">
             <field name="code">0830</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Sonstige Beteiligungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -438,7 +434,7 @@
         <record id="chart0840" model="account.account.template">
             <field name="code">0840</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Ausleihungen an  verbundene Unternehmen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -446,7 +442,7 @@
         <record id="chart0850" model="account.account.template">
             <field name="code">0850</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Ausleihungen an  verbundene Unternehmen, mit denen ein Beteiligungsverhälnis besteht</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -454,7 +450,7 @@
         <record id="chart0860" model="account.account.template">
             <field name="code">0860</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Sonstige Ausleihungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -462,7 +458,7 @@
         <record id="chart0870" model="account.account.template">
             <field name="code">0870</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Anteile an Kapitalgesellschaften ohne Beteiligungscharakter</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -470,7 +466,7 @@
         <record id="chart0880" model="account.account.template">
             <field name="code">0880</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Anteile an Personengesellschaften ohne Beteiligungscharakter</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -478,7 +474,7 @@
         <record id="chart0900" model="account.account.template">
             <field name="code">0900</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Genossenschaften ohne Beteiligungscharakter</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -486,7 +482,7 @@
         <record id="chart0910" model="account.account.template">
             <field name="code">0910</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Anteile an Investmentfonds</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -494,7 +490,7 @@
         <record id="chart0920" model="account.account.template">
             <field name="code">0920</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">920 bis 930 Festverzinsliche Wertpapiere des Anlagevermögens</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -502,7 +498,7 @@
         <record id="chart0940" model="account.account.template">
             <field name="code">0940</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">940 bis 970 Sonstige Finanzanlagen, Wertrechte</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -510,7 +506,7 @@
         <record id="chart0980" model="account.account.template">
             <field name="code">0980</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Geleistete Anzahlungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -518,7 +514,7 @@
         <record id="chart0990" model="account.account.template">
             <field name="code">0990</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_fixed_assets"/>
             <field name="name">Kumulierte Abschreibungen</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -790,7 +786,7 @@
         <record id="chart2501" model="account.account.template">
             <field name="code">2501</field>
             <field name="reconcile" eval="False"/>    
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="name">Vorsteuer aus ig. Erwerb 20%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -798,7 +794,7 @@
         <record id="chart2502" model="account.account.template">
             <field name="code">2502</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="name">Vorsteuer §19/Art 19 ( reverse charge ) </field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -806,7 +802,7 @@
         <record id="chart2503" model="account.account.template">
             <field name="code">2503</field>
             <field name="reconcile" eval="False"/>    
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="name">Vorsteuer aus ig. Erwerb 10%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -867,14 +863,6 @@
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
         
-        <record id="chart2700" model="account.account.template">
-            <field name="code">2700</field>
-            <field name="reconcile" eval="True"/>
-            <field name="user_type_id" ref="account.data_account_type_receivable"/>
-            <field name="name">Kassenbestand</field>
-            <field name="chart_template_id" ref="austria_chart_template"/>
-        </record>
-                
         <record id="chart2730" model="account.account.template">
             <field name="code">2730</field>
             <field name="reconcile" eval="True"/>
@@ -907,14 +895,6 @@
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
                                         
-        <record id="chart2800" model="account.account.template">
-            <field name="code">2800</field>
-            <field name="reconcile" eval="True"/>
-            <field name="user_type_id" ref="account.data_account_type_receivable"/>
-            <field name="name">Bank / Guthaben bei Kreditinstituten</field>
-            <field name="chart_template_id" ref="austria_chart_template"/>
-        </record>
-                                            
         <record id="chart2890" model="account.account.template">
             <field name="code">2890</field>
             <field name="reconcile" eval="True"/>
@@ -1097,7 +1077,7 @@
         <record id="chart3501" model="account.account.template">
             <field name="code">3501</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Umsatzsteuer aus i.g. Erwerb 20%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1105,7 +1085,7 @@
         <record id="chart3502" model="account.account.template">
             <field name="code">3502</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">USt. §19 /art (reverse charge)</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1113,7 +1093,7 @@
         <record id="chart3503" model="account.account.template">
             <field name="code">3503</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Umsatzsteuer aus i.g. Erwerb 10%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>    
@@ -1121,7 +1101,7 @@
         <record id="chart3510" model="account.account.template">
             <field name="code">3510</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Umsatzsteuer aus i.g. Lieferungen 20%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1129,7 +1109,7 @@
         <record id="chart3511" model="account.account.template">
             <field name="code">3511</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Umsatzsteuer aus i.g. Lieferungen 10%</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1137,7 +1117,7 @@
         <record id="chart3520" model="account.account.template">
             <field name="code">3520</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Umsatzsteuer Zahllast</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1145,7 +1125,7 @@
         <record id="chart3530" model="account.account.template">
             <field name="code">3530</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="name">Verrechnung Finanzamt</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>   
@@ -1537,7 +1517,7 @@
         <record id="chart7100" model="account.account.template">
             <field name="code">7100</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_expenses"/>
             <field name="name">7100 bis 7190 Sonstige Steuern</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1933,7 +1913,7 @@
         <record id="chart8400" model="account.account.template">
             <field name="code">8400</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_revenue"/>
+            <field name="user_type_id" ref="account.data_account_type_other_income"/>
             <field name="name">8400 bis 8440 Außerordentliche Erträge</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -1949,7 +1929,7 @@
         <record id="chart8500" model="account.account.template">
             <field name="code">8500</field>
             <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_expenses"/>
             <field name="name">8500 bis 8590 Steuern vom Einkommen und vom Ertrag</field>
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
@@ -2094,22 +2074,6 @@
             <field name="chart_template_id" ref="austria_chart_template"/>
         </record>
 
-        <record id="chart9891" model="account.account.template">
-            <field name="code">9901</field>
-            <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="name">win Konto</field>
-            <field name="chart_template_id" ref="austria_chart_template"/>
-        </record>
-        
-        <record id="chart9902" model="account.account.template">
-            <field name="code">9902</field>
-            <field name="reconcile" eval="False"/>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
-            <field name="name">Verlust-Rechnung</field>
-            <field name="chart_template_id" ref="austria_chart_template"/>
-        </record>
-
         <record id="austria_chart_template" model="account.chart.template">
             <field name="property_account_receivable_id" ref="chart2000"/>
             <field name="property_account_payable_id" ref="chart3300"/>
@@ -2117,8 +2081,8 @@
             <field name="property_account_income_categ_id" ref="chart4000"/>
             <field name="property_account_expense_id" ref="chart5000"/>
             <field name="property_account_income_id" ref="chart4000"/>
-            <field name="income_currency_exchange_account_id" ref="chart9891"/>
-            <field name="expense_currency_exchange_account_id" ref="chart9902"/>
+            <field name="income_currency_exchange_account_id" ref="chart8400"/>
+            <field name="expense_currency_exchange_account_id" ref="chart8450"/>
         </record>
             
     </data>
