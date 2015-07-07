@@ -406,6 +406,7 @@ class stock_move(osv.osv):
                 res['price_unit'] = sale_line.price_unit
             uos_coeff = move.product_uom_qty and move.product_uos_qty / move.product_uom_qty or 1.0
             res['price_unit'] = res['price_unit'] / uos_coeff
+            res['sale_line_ids'] = [(4, sale_line.id)]
         return res
 
     def _get_moves_taxes(self, cr, uid, moves, inv_type, context=None):
