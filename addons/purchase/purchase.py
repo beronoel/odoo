@@ -713,15 +713,16 @@ class purchase_order(osv.osv):
             #Check procurements and set them to False
             cancel_procurements = []
             cancel_moves = []
-            for line in purchase.order_line:
-                if line.procurement_ids:
-                    cancel_procurements += [x.id for x in line.procurement_ids if x.state!='cancel']
-                    # TODO: Check propagate
-                    cancel_moves += [x.move_dest_id.id for x in line.procurement_ids if x.move_dest_id and x.move_dest_id.state!='cancel']
-            if cancel_moves:
-                self.pool['stock.move'].action_cancel(cr, uid, cancel_moves, context=context)
-            if cancel_procurements:
-                self.pool['procurement.order'].write(cr, uid, cancel_procurements, {'state': 'cancel'}, context=context)
+            if not context.get('cancel_procurement'):
+                for line in purchase.order_line:
+                    if line.procurement_ids:
+                        cancel_procurements += [x.id for x in line.procurement_ids if x.state!='cancel']
+                        # TODO: Check propagate
+                        cancel_moves += [x.move_dest_id.id for x in line.procurement_ids if x.move_dest_id and x.move_dest_id.state!='cancel']
+                if cancel_moves:
+                    self.pool['stock.move'].action_cancel(cr, uid, cancel_moves, context=context)
+                if cancel_procurements:
+                    self.pool['procurement.order'].write(cr, uid, cancel_procurements, {'state': 'cancel'}, context=context)
 
             for inv in purchase.invoice_ids:
                 if inv and inv.state not in ('cancel', 'draft'):
