@@ -279,9 +279,9 @@ class stock_picking(osv.osv):
             'user_id': user_id,
             'partner_id': partner.id,
             'account_id': account_id,
-            'payment_term_id': payment_term,
+            'payment_term': payment_term,
             'type': inv_type,
-            'fiscal_position_id': partner.property_account_position_id.id,
+            'fiscal_position': partner.property_account_position_id.id,
             'company_id': company_id,
             'currency_id': currency_id,
             'journal_id': journal_id,
@@ -307,6 +307,7 @@ class stock_picking(osv.osv):
             else:
                 invoices_moves[key] += [move]
 
+        inv_moves={}
         for key in invoices_moves.keys():
             moves_key = invoices_moves[key]
             invoice_vals = self._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves_key, context=context)
@@ -314,26 +315,25 @@ class stock_picking(osv.osv):
             invoice_line_vals = []
             for move in moves_key:
                 line_vals = move_obj._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)
+                if not is_extra_move[move.id]:
+                    product_price_unit[line_vals['product_id'], line_vals['uos_id']] = line_vals['price_unit']
+                if is_extra_move[move.id] and (line_vals['product_id'], line_vals['uos_id']) in product_price_unit:
+                    line_vals['price_unit'] = product_price_unit[line_vals['product_id'], line_vals['uos_id']]
+                if is_extra_move[move.id]:
+                    desc = (inv_type in ('out_invoice', 'out_refund') and move.product_id.product_tmpl_id.description_sale) or \
+                        (inv_type in ('in_invoice','in_refund') and move.product_id.product_tmpl_id.description_purchase)
+                    line_vals['name'] += ' ' + desc if desc else ''
+                    if extra_move_tax[move.picking_id, move.product_id]:
+                        line_vals['invoice_line_tax_ids'] = extra_move_tax[move.picking_id, move.product_id]
+                    #the default product taxes
+                    elif (0, move.product_id) in extra_move_tax:
+                        line_vals['invoice_line_tax_ids'] = extra_move_tax[0, move.product_id]
                 invoice_line_vals += [(0, 0, line_vals)]
-
-
-            if not is_extra_move[move.id]:
-                product_price_unit[invoice_line_vals['product_id'], invoice_line_vals['uos_id']] = invoice_line_vals['price_unit']
-            if is_extra_move[move.id] and (invoice_line_vals['product_id'], invoice_line_vals['uos_id']) in product_price_unit:
-                invoice_line_vals['price_unit'] = product_price_unit[invoice_line_vals['product_id'], invoice_line_vals['uos_id']]
-            if is_extra_move[move.id]:
-                desc = (inv_type in ('out_invoice', 'out_refund') and move.product_id.product_tmpl_id.description_sale) or \
-                    (inv_type in ('in_invoice','in_refund') and move.product_id.product_tmpl_id.description_purchase)
-                invoice_line_vals['name'] += ' ' + desc if desc else ''
-                if extra_move_tax[move.picking_id, move.product_id]:
-                    invoice_line_vals['invoice_line_tax_ids'] = extra_move_tax[move.picking_id, move.product_id]
-                #the default product taxes
-                elif (0, move.product_id) in extra_move_tax:
-                    invoice_line_vals['invoice_line_tax_ids'] = extra_move_tax[0, move.product_id]
             invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
             move_obj.write(cr, uid, [x.id for x in moves_key], {'invoice_state': 'invoiced'}, context=context)
             #TODO: write the invoice_state afterwards, then we can re-use this for dual invoicing
-        return invoices.values()
+            inv_moves[invoice_id] = moves_key
+        return inv_moves
 
     def _prepare_values_extra_move(self, cr, uid, op, product, remaining_qty, context=None):
         """

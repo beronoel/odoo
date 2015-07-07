@@ -464,13 +464,6 @@ class stock_picking(osv.osv):
         'sale_id': fields.function(_get_sale_id, type="many2one", relation="sale.order", string="Sale Order"),
     }
 
-    def _create_invoice_from_picking(self, cr, uid, picking, vals, context=None):
-        sale_obj = self.pool.get('sale.order')
-        sale_line_obj = self.pool.get('sale.order.line')
-        invoice_line_obj = self.pool.get('account.invoice.line')
-        invoice_id = super(stock_picking, self)._create_invoice_from_picking(cr, uid, picking, vals, context=context)
-        return invoice_id
-
     def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
         inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
         if inv_type in ('out_invoice', 'out_refund'):
@@ -478,8 +471,8 @@ class stock_picking(osv.osv):
             if sales:
                 sale = sales[0]
                 inv_vals.update({
-                    'fiscal_position': sale.fiscal_position.id,
-                    'payment_term': sale.payment_term.id,
+                    'fiscal_position': sale.fiscal_position_id.id,
+                    'payment_term': sale.payment_term_id.id,
                     'user_id': sale.user_id.id,
                     'team_id': sale.team_id.id,
                     'name': sale.client_order_ref or '',
