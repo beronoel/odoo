@@ -64,7 +64,7 @@ A33101,A33101,利益準備金,account.data_account_type_equity,,FALSE,,l10n_jp1
 A33202,A33202,特別償却準備金,account.data_account_type_equity,,FALSE,,l10n_jp1
 A33204,A33204,任意積立金,account.data_account_type_equity,,FALSE,,l10n_jp1
 A33209,A33209,繰越利益剰余金,account.data_account_type_equity,,FALSE,,l10n_jp1
-B41001,B41001,売上高,account.data_account_type_other_income,,FALSE,,l10n_jp1
+B41001,B41001,売上高,account.data_account_type_revenue,,FALSE,,l10n_jp1
 B42001,B42001,売上原価,account.data_account_type_other_income,,FALSE,,l10n_jp1
 B42091,B42091,購買価格差異,account.data_account_type_other_income,,FALSE,,l10n_jp1
 B42092,B42092,棚卸調整,account.data_account_type_other_income,,FALSE,,l10n_jp1
