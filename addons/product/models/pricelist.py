@@ -214,7 +214,6 @@ class ProductPricelist(models.Model):
 
         item_ids = [x[0] for x in self._cr.fetchall()]
         items = self.env['product.pricelist.item'].browse(item_ids)
-
         price_types = {}
 
         results = {}
@@ -258,10 +257,10 @@ class ProductPricelist(models.Model):
                 if rule.base == -1:
                     if rule.base_pricelist_id:
                         price_tmp = rule.base_pricelist_id._price_get_multi([(product,
-                                qty, partner)])
+                                qty, partner)])[product.id]
                         ptype_src = rule.base_pricelist_id.currency_id
                         price_uom_id = qty_uom_id
-                        price = ptype_src.compute(price_tmp, pricelist.currency_id.id, round=False)
+                        price = ptype_src.compute(price_tmp, self.currency_id, round=False)
                 else:
                     if rule.base not in price_types:
                         price_types[rule.base] = price_type_obj.browse(int(rule.base))
@@ -280,19 +279,17 @@ class ProductPricelist(models.Model):
                             for line in seller.pricelist_ids:
                                 if line.min_quantity <= qty_in_seller:
                                     price = line.price
-
                 if price is not False:
                     price_limit = price
                     price = price * (1.0+(rule.price_discount or 0.0))
                     if rule.price_round:
                         price = tools.float_round(price, precision_rounding=rule.price_round)
 
-                    convert_to_price_uom = (lambda price: product.product_tmpl_id.uom_id._compute_price(product.product_tmpl_id.uom_id.id,
+                    convert_to_price_uom = (lambda price: product_uom_obj._compute_price(product.uom_id.id,
                                                 price, price_uom_id.id))
                     if rule.price_surcharge:
                         price_surcharge = convert_to_price_uom(rule.price_surcharge)
                         price += price_surcharge
-
                     if rule.price_min_margin:
                         price_min_margin = convert_to_price_uom(rule.price_min_margin)
                         price = max(price, price_limit + price_min_margin)
@@ -303,15 +300,14 @@ class ProductPricelist(models.Model):
 
                     rule_id = rule.id
                 break
-
             # Final price conversion to target UoM
             price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id)
-            results[product.product_tmpl_id.id] = (price, rule_id)
+            results[product.id] = (price, rule_id)
         return results
 
     @api.multi
     def price_get(self, prod_id, qty, partner=None):
-        return dict((key, price) for key, price in self.price_rule_get(prod_id, qty, partner=partner).items())
+        return dict((key, price[0]) for key, price in self.price_rule_get(prod_id, qty, partner=partner).items())
 
     @api.multi
     def price_rule_get(self, prod_id, qty, partner=None):

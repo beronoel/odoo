@@ -16,7 +16,7 @@
     mes_type: fixed
     name: HR Manager
     standard_price: 1.0
-    type: service
+    product_type: service
     uom_id: product.product_uom_hour
     uom_po_id: product.product_uom_hour
     volume: 0.0

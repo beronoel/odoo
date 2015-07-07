@@ -4,7 +4,7 @@
   !record {model: product.product, id: auto_task_service}: 
     auto_create_task: True
     name: Advanced auto task Service
-    type: service
+    product_type: service
     list_price: 150.0
     standard_price: 100.0
     uom_id: product.product_uom_day

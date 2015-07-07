@@ -833,7 +833,7 @@ class pos_order(osv.osv):
 
             move_list = []
             for line in order.lines:
-                if line.product_id and line.product_id.type == 'service':
+                if line.product_id and line.product_id.product_type == 'service':
                     continue
 
                 move_list.append(move_obj.create(cr, uid, {

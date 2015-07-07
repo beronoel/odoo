@@ -438,24 +438,21 @@ class ProductTemplate(models.Model):
     default_code = fields.Char(related='product_variant_ids.default_code', string='Internal Reference')
 
     @api.multi
-    @api.depends('pricelist_id')
+    @api.depends('list_price', 'pricelist_id')
     def _product_template_price(self):
         PriceList = self.env['product.pricelist']
-
         context = self.env.context or {}
         quantity = context.get('quantity') or 1.0
         pricelist = context.get('pricelist', False)
         partner = context.get('partner', False)
         if pricelist:
-            # Support context pricelists specified as display_name or ID for compatibility
-            if isinstance(pricelist, basestring):
-                pricelist_ids = PriceList.name_search(pricelist, operator='=', limit=1)
-                pricelist = pricelist_ids[0][0] if pricelist_ids else pricelist
-            if isinstance(pricelist, (int, long)):
-                qtys = map(lambda x: (x, quantity, partner), self)
-                price = self.pricelist_id._price_get_multi(qtys)
-                for record in self:
-                    record.price = price.get(record.id, 0.0)
+            qtys = map(lambda x: (x, quantity, partner), self)
+            price_list = PriceList.browse(pricelist)
+            price = price_list._price_get_multi(qtys)
+            for record in self:
+                record.price = price.get(record.id, 0.0)
+        for product in self:
+            if not product.price: product.price = 0.0
 
     @api.one
     @api.depends('image')
@@ -523,6 +520,7 @@ class ProductTemplate(models.Model):
 
     @api.multi
     def _price_get(self, ptype='list_price'):
+        ProductUom = self.env['product.uom']
         context = self.env.context or {}
         if 'currency_id' in context:
             PriceType = self.env['product.price.type']
@@ -532,7 +530,7 @@ class ProductTemplate(models.Model):
             # Thus, in order to compute the sale price from the cost price for users not in this group
             # We fetch the standard price as the superuser
             if ptype != 'standard_price':
-                price = product.standard_price
+                price = product.list_price
             else:
                 company_id = product.env.user.company_id.id
                 product = product.with_context(force_company=company_id)
@@ -541,7 +539,7 @@ class ProductTemplate(models.Model):
                 price += product._name == "product.product" and product.price_extra
             if 'uom' in context:
                 uom = product.uom_id or product.uos_id
-                price = uom._compute_price(
+                price = ProductUom._compute_price(
                         uom.id, product.list_price, context['uom'])
             # Convert from price_type currency to asked one
             if 'currency_id' in context:
@@ -630,7 +628,7 @@ class ProductTemplate(models.Model):
     def create(self, vals):
         ''' Store the initial standard price in order to be able to retrieve the cost of a product template for a given date'''
         context = self.env.context or {}
-        product_template_id = super(ProductTemplate, self).create(vals)
+        product_template_id = super(ProductTemplate, self.with_context(context)).create(vals)
         if not context or "create_product_product" not in context:
             product_template_id.create_variant_ids()
         product_template_id._set_standard_price(vals.get('standard_price', 0.0))
@@ -740,22 +738,16 @@ class Product(models.Model):
         context = self.env.context or {}
         quantity = context.get('quantity') or 1.0
         partner = context.get('partner_id', False)
-        pricelist = PriceList.browse(context.get('pricelist'))
+        pricelist = context.get('pricelist')
         if pricelist:
             # Support context pricelists specified as display_name or ID for compatibility
-            if isinstance(pricelist, basestring):
-                pricelist_ids = pricelist.name_search(
-                    pricelist, operator='=', limit=1)
-                pricelist = pricelist_ids[0][0] if pricelist_ids else pricelist
-
-            if isinstance(pricelist, (int, long)):
-                qtys = map(lambda x: (x, quantity, partner), self)
-                price_list = PriceList.browse(pricelist)
-                price = price_list.with_context(context)._price_get_multi(qtys)
-                for record in self:
-                    record.price = price.get(record.id, 0.0)
+            qtys = map(lambda x: (x, quantity, partner), self)
+            price_list = PriceList.browse(pricelist)
+            price = price_list._price_get_multi(qtys)
+            for record in self:
+                record.price = price.get(record.id, 0.0)
         for record in self:
-            record.price = 0.0
+            if not record.price: record.price = 0.0
 
     @api.depends('attribute_value_ids.price_ids.price_extra')
     def _get_price_extra(self):
@@ -769,12 +761,13 @@ class Product(models.Model):
     @api.multi
     @api.depends('price_extra', 'list_price')
     def _product_lst_price(self):
+        ProductUom = self.env['product.uom']
         context = self.env.context or {}
         price = 0.0
         for product in self:
             if 'uom' in context:
                 uom = product.uos_id or product.uom_id
-                price = uom._compute_price(uom.id, product.list_price, context['uom'])
+                price = ProductUom._compute_price(uom.id, product.list_price, context['uom'])
             else:
                 price = product.list_price
             product.lst_price = price + product.price_extra
@@ -786,9 +779,9 @@ class Product(models.Model):
         ProductUom = self.env['product.uom']
         if 'uom' in context:
             uom = self.uos_id or self.uom_id
-            value = uom._compute_price(context['uom'], self.price, uom.id)
+            value = ProductUom._compute_price(context['uom'], self.price, uom.id)
         value -= self.price_extra
-        return self.write({'list_price': value})
+        self.lst_price = value
 
     @api.multi
     def _get_partner_code_name(self, product, partner_id):
@@ -992,7 +985,7 @@ class Product(models.Model):
             default['product_tmpl_id'] = self.product_tmpl_id.id
         elif 'name' not in default:
             default['name'] = _("%s (copy)") % (self.name,)
-        return super(Product, self).with_context(context).copy(default=default)
+        return super(Product, self.with_context(context)).copy(default=default)
 
     @api.model
     def search(self, args, offset=0, limit=None, order=None, count=False):

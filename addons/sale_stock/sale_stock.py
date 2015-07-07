@@ -179,7 +179,7 @@ class sale_order(osv.osv):
             for order_line in order.order_line:
                 if order_line.state == 'cancel':
                     continue
-                if order_line.product_id and order_line.product_id.type in ('product', 'consu'):
+                if order_line.product_id and order_line.product_id.product_type in ('product', 'consu'):
                     return True
         return False
 
@@ -191,7 +191,7 @@ class product_product(osv.osv):
         #when sale/product is installed alone, there is no need to create procurements, but with sale_stock
         #we must create a procurement for each product that is not a service.
         for product in self.browse(cr, uid, ids, context=context):
-            if product.type != 'service':
+            if product.product_type != 'service':
                 return True
         return super(product_product, self).need_procurement(cr, uid, ids, context=context)
 
@@ -373,7 +373,7 @@ class stock_move(osv.osv):
             })
             sale_line_obj = self.pool.get('sale.order.line')
             invoice_line_obj = self.pool.get('account.invoice.line')
-            sale_line_ids = sale_line_obj.search(cr, uid, [('order_id', '=', move.procurement_id.sale_line_id.order_id.id), ('invoiced', '=', False), '|', ('product_id', '=', False), ('product_id.type', '=', 'service')], context=context)
+            sale_line_ids = sale_line_obj.search(cr, uid, [('order_id', '=', move.procurement_id.sale_line_id.order_id.id), ('invoiced', '=', False), '|', ('product_id', '=', False), ('product_id.product_type', '=', 'service')], context=context)
             if sale_line_ids:
                 created_lines = sale_line_obj.invoice_line_create(cr, uid, sale_line_ids, context=context)
                 invoice_line_obj.write(cr, uid, created_lines, {'invoice_id': invoice_line_vals['invoice_id']}, context=context)

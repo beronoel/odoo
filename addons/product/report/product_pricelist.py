@@ -83,9 +83,10 @@ class ProductPricelist(models.AbstractModel):
 
     @api.multi
     def render_html(self, data=None):
+        context = self.env.context or {}
         self.pricelist = False
         self.quantity = []
-        selected_records = self.env['product.product'].browse(data['ids'])
+        selected_records = self.env['product.product'].browse(context.get('active_ids'))
         report_obj = self.env['report']
         report = report_obj._get_report_from_name('product.report_pricelist')
         docargs = {
@@ -100,4 +101,5 @@ class ProductPricelist(models.AbstractModel):
             'get_price': self._get_price,
             'get_titles': self._get_titles,
         }
+
         return report_obj.render('product.report_pricelist', docargs)

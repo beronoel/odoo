@@ -872,7 +872,7 @@ class mrp_production(osv.osv):
 
         scheduled_qty = OrderedDict()
         for scheduled in production.product_lines:
-            if scheduled.product_id.type == 'service':
+            if scheduled.product_id.product_type == 'service':
                 continue
             qty = uom_obj._compute_qty(cr, uid, scheduled.product_uom.id, scheduled.product_qty, scheduled.product_id.uom_id.id)
             if scheduled_qty.get(scheduled.product_id.id):
@@ -1181,7 +1181,7 @@ class mrp_production(osv.osv):
         stock_move = self.pool.get('stock.move')
         loc_obj = self.pool.get('stock.location')
         # Internal shipment is created for Stockable and Consumer Products
-        if product.type not in ('product', 'consu'):
+        if product.product_type not in ('product', 'consu'):
             return False
         # Take routing location as a Source Location.
         source_location_id = production.location_src_id.id
@@ -1254,7 +1254,7 @@ class mrp_production(osv.osv):
 
             stock_moves = []
             for line in production.product_lines:
-                if line.product_id.type != 'service':
+                if line.product_id.product_type != 'service':
                     stock_move_id = self._make_production_consume_line(cr, uid, line, context=context)
                     stock_moves.append(stock_move_id)
                 else:

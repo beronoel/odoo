@@ -547,7 +547,7 @@ class purchase_order(osv.osv):
         for po in self.browse(cr, uid, ids, context=context):
             if not any(line.state != 'cancel' for line in po.order_line):
                 raise UserError(_('You cannot confirm a purchase order without any purchase order line.'))
-            if po.invoice_method == 'picking' and not any([l.product_id and l.product_id.type in ('product', 'consu') and l.state != 'cancel' for l in po.order_line]):
+            if po.invoice_method == 'picking' and not any([l.product_id and l.product_id.product_type in ('product', 'consu') and l.state != 'cancel' for l in po.order_line]):
                 raise osv.except_osv(
                     _('Error!'),
                     _("You cannot confirm a purchase order with Invoice Control Method 'Based on incoming shipments' that doesn't contain any stockable item."))
@@ -573,7 +573,7 @@ class purchase_order(osv.osv):
         fpos = po_line.order_id.fiscal_position_id or False
         #For anglo-saxon accounting
         account_id = fiscal_obj.map_account(cr, uid, fpos, acc_id)
-        if po_line.company_id.anglo_saxon_accounting and po_line.product_id and not po_line.product_id.type == 'service':
+        if po_line.company_id.anglo_saxon_accounting and po_line.product_id and not po_line.product_id.product_type == 'service':
             acc_id = po_line.product_id.property_stock_account_input and po_line.product_id.property_stock_account_input.id
             if not acc_id:
                 acc_id = po_line.product_id.categ_id.property_stock_account_input_categ_id and po_line.product_id.categ_id.property_stock_account_input_categ_id.id
@@ -699,7 +699,7 @@ class purchase_order(osv.osv):
             for order_line in order.order_line:
                 if order_line.state == 'cancel':
                     continue
-                if order_line.product_id and order_line.product_id.type in ('product', 'consu'):
+                if order_line.product_id and order_line.product_id.product_type in ('product', 'consu'):
                     return True
         return False
 
@@ -811,7 +811,7 @@ class purchase_order(osv.osv):
             if not order_line.product_id:
                 continue
 
-            if order_line.product_id.type in ('product', 'consu'):
+            if order_line.product_id.product_type in ('product', 'consu'):
                 for vals in self._prepare_order_line_move(cr, uid, order, order_line, picking_id, new_group, context=context):
                     move = stock_move.create(cr, uid, vals, context=context)
                     todo_moves.append(move)
@@ -1765,7 +1765,7 @@ class account_invoice_line(osv.Model):
         inv = i_line.invoice_id
         company_currency = inv.company_id.currency_id.id
         if i_line.product_id and i_line.product_id.valuation == 'real_time':
-            if i_line.product_id.type != 'service':
+            if i_line.product_id.product_type != 'service':
                 # get the price difference account at the product
                 acc = i_line.product_id.property_account_creditor_price_difference and i_line.product_id.property_account_creditor_price_difference.id
                 if not acc:

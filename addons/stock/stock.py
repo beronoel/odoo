@@ -2234,7 +2234,7 @@ class stock_move(osv.osv):
                 #in case the move is returned, we want to try to find quants before forcing the assignment
                 if not move.origin_returned_move_id:
                     continue
-            if move.product_id.type == 'consu':
+            if move.product_id.product_type == 'consu':
                 to_assign_moves.append(move.id)
                 continue
             else:

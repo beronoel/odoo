@@ -72,7 +72,7 @@
     uom_id: product.product_uom_hour
     uom_po_id: product.product_uom_hour
     categ_id: product.product_category_all
-    type: service
+    product_type: service
     company_id: False
 -
   Create a user for each company
