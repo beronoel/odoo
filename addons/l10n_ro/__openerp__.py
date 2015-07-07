@@ -22,7 +22,6 @@ Romanian accounting chart and localization.
     "demo" : [],
     "data" : ['partner_view.xml',
               'account_chart.xml',
-              'account_chart_template.xml',
               'account_tax_template.xml',
               'fiscal_position_template.xml',
               'account_chart_template.yml',
