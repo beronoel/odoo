@@ -2,6 +2,10 @@
 <odoo>
 <data noupdate="0">
 
+    <record id="data_account_type_not_classified" model="account.account.type">
+        <field name="name">CONTURI IN AFARA BILANTULUI</field>
+    </record>
+
     <record id="pcg_581" model="account.account.template">
         <field name="name">Viramente interne</field>
         <field name="code">581</field>
@@ -2747,217 +2751,217 @@
     <record id="pcg_8011" model="account.account.template">
         <field name="name">Giruri si garantii acordate</field>
         <field name="code">8011</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8018" model="account.account.template">
         <field name="name">Alte angajamente acordate </field>
         <field name="code">8018</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8021" model="account.account.template">
         <field name="name">Giruri si garantii primite</field>
         <field name="code">8021</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8028" model="account.account.template">
         <field name="name">Alte angajamente primite</field>
         <field name="code">8028</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8031" model="account.account.template">
         <field name="name">Imobilizari corporale luate cu chirie</field>
         <field name="code">8031</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8032" model="account.account.template">
         <field name="name">Valori materiale primite spre prelucrare sau reparare</field>
         <field name="code">8032</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8033" model="account.account.template">
         <field name="name">Valori materiale primite in pastrare sau custodie</field>
         <field name="code">8033</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8034" model="account.account.template">
         <field name="name">Debitori scosi din activ, urmariti in continuare</field>
         <field name="code">8034</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8035" model="account.account.template">
         <field name="name">Stocuri de natura obiectelor de inventar date in folosinta</field>
         <field name="code">8035</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8036" model="account.account.template">
         <field name="name">Redevente, locatii de gestiune, chirii si alte datorii asimilate</field>
         <field name="code">8036</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8037" model="account.account.template">
         <field name="name">Efecte scontate neajunse la scadenta</field>
         <field name="code">8037</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8038" model="account.account.template">
         <field name="name">Bunuri publice primite in administrare, concesiune si cu chirie</field>
         <field name="code">8038</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8039" model="account.account.template">
         <field name="name">Alte valori in afara bilantului</field>
         <field name="code">8039</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8045" model="account.account.template">
         <field name="name">Amortizarea aferenta gradului de neutilizare a mijloacelor fixe </field>
         <field name="code">8045</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8051" model="account.account.template">
         <field name="name">Dobanzi de platit</field>
         <field name="code">8051</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_8052" model="account.account.template">
         <field name="name">Dobanzi de incasat</field>
         <field name="code">8052</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_806" model="account.account.template">
         <field name="name">Certificate de emisii de gaze cu efect de sera</field>
         <field name="code">806</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_807" model="account.account.template">
         <field name="name">Active contingente</field>
         <field name="code">807</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_808" model="account.account.template">
         <field name="name">Datorii contingente</field>
         <field name="code">808</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_891" model="account.account.template">
         <field name="name">Bilant de deschidere</field>
         <field name="code">891</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
     <record id="pcg_892" model="account.account.template">
         <field name="name">Bilant de inchidere</field>
         <field name="code">892</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_901" model="account.account.template">
         <field name="name">Decontari interne privind cheltuielile</field>
         <field name="code">901</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_902" model="account.account.template">
         <field name="name">Decontari interne privind productia obtinuta</field>
         <field name="code">902</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_903" model="account.account.template">
         <field name="name">Decontari interne privind diferentele de pret</field>
         <field name="code">903</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_921" model="account.account.template">
         <field name="name">Cheltuielile activitatii de baza</field>
         <field name="code">921</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_922" model="account.account.template">
         <field name="name">Cheltuielile activitatilor auxiliare</field>
         <field name="code">922</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_923" model="account.account.template">
         <field name="name">Cheltuieli indirecte de productie</field>
         <field name="code">923</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_924" model="account.account.template">
         <field name="name">Cheltuieli generale de administratie</field>
         <field name="code">924</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_925" model="account.account.template">
         <field name="name">Cheltuieli de desfacere</field>
         <field name="code">925</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_931" model="account.account.template">
         <field name="name">Costul productiei obtinute</field>
         <field name="code">931</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
     
     <record id="pcg_933" model="account.account.template">
         <field name="name">Costul productiei de executie</field>
         <field name="code">933</field>
-        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="user_type_id" ref="data_account_type_not_classified"/>
         <field name="chart_template_id" ref="ro_chart_template"/>
     </record>
 
