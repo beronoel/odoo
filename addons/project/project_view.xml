@@ -611,10 +611,10 @@
             <field name="inherit_id" ref="product.product_template_search_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='services']" position="replace">
-                    <filter string="Services" name="services" domain="[('type','=','service')]" invisible="context.get('consumable_services', False)"/>
+                    <filter string="Services" name="services" domain="[('product_type','=','service')]" invisible="context.get('consumable_services', False)"/>
                  </xpath>
                  <xpath expr="//filter[@name='consumable']" position="replace">
-                     <filter string="Consumable" name="consumable" domain="[('type','=','consu')]" help="Consumable products" invisible="context.get('consumable_services', False)"/>
+                     <filter string="Consumable" name="consumable" domain="[('product_type','=','consu')]" help="Consumable products" invisible="context.get('consumable_services', False)"/>
                  </xpath>
             </field>
         </record>

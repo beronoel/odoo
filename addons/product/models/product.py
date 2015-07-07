@@ -356,7 +356,7 @@ class ProductTemplate(models.Model):
         return category
 
     @api.model
-    def _get_uom_id(self):
+    def _default_uom_id(self):
         result = self.env["product.uom"].search([], limit=1, order='id')
         return result
 
@@ -391,9 +391,9 @@ class ProductTemplate(models.Model):
         ('sellable','Normal'),
         ('end','End of Lifecycle'),
         ('obsolete','Obsolete')], string='Status')
-    uom_id = fields.Many2one('product.uom', string='Unit of Measure', required=True, default=_get_uom_id, help="Default Unit of Measure used for all stock operation.")
+    uom_id = fields.Many2one('product.uom', string='Unit of Measure', required=True, default=_default_uom_id, help="Default Unit of Measure used for all stock operation.")
     uom_rel_id = fields.Many2one(related='uom_id', readonly=True, string='Default UoM')
-    uom_po_id = fields.Many2one('product.uom', string='Purchase Unit of Measure', required=True, default=_get_uom_id, help="Default Unit of Measure used for purchase orders. It must be in the same category than the default unit of measure.")
+    uom_po_id = fields.Many2one('product.uom', string='Purchase Unit of Measure', required=True, default=_default_uom_id, help="Default Unit of Measure used for purchase orders. It must be in the same category than the default unit of measure.")
     uos_id = fields.Many2one('product.uom', string='Unit of Sale',
         help='Specify a unit of measure here if invoicing is made in another unit of measure than inventory. Keep empty to use the default unit of measure.')
     uos_coeff = fields.Float(string='Unit of Measure -> UOS Coeff', default=1.0, digits= dp.get_precision('Product UoS'),

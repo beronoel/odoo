@@ -17,9 +17,9 @@
             <field name="inherit_id" ref="product.product_template_form_view"/>
             <field name="arch" type="xml">
                 <group name="procurement" position="after">
-                    <group string="Project Management Information" attrs="{'invisible': [('type', '!=', 'service')]}">
+                    <group string="Project Management Information" attrs="{'invisible': [('product_type', '!=', 'service')]}">
                         <field name="auto_create_task"/>
-                        <field name="project_id" attrs="{'invisible':['|', ('type','!=','service'), ('auto_create_task', '=', False)]}"/>
+                        <field name="project_id" attrs="{'invisible':['|', ('product_type','!=','service'), ('auto_create_task', '=', False)]}"/>
                     </group>
                 </group>
             </field>
@@ -51,7 +51,7 @@
             <field name="view_type">form</field>
             <field name="search_view_id" ref="project.product_search_form_view_procurment_consume"/>
             <field name="view_id" ref="product.product_template_kanban_view"/>
-            <field name="context">{'search_default_services': 1,'default_auto_create_task':True,'default_sale_ok':True,'default_purchase_ok':False,'default_type':'service'}</field>
+            <field name="context">{'search_default_services': 1,'default_auto_create_task':True,'default_sale_ok':True,'default_purchase_ok':False,'default_product_type':'service'}</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to define a new service.

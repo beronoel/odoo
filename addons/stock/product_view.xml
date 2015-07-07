@@ -166,7 +166,7 @@
             <field name="inherit_id" ref="product.product_template_kanban_view"/>
             <field name="arch" type="xml">
                 <field name="lst_price" position="after">
-                    <field name="type"/>
+                    <field name="product_type"/>
                 </field>
                 <ul position="inside">
                     <li t-if="record.type.raw_value != 'service'">On hand: <field name="qty_available"/> <field name="uom_id"/></li>
