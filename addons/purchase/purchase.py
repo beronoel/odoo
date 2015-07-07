@@ -704,6 +704,7 @@ class purchase_order(osv.osv):
         self.set_order_line_status(cr, uid, ids, 'cancel', context=context)
 
     def action_cancel(self, cr, uid, ids, context=None):
+        context = context or {}
         for purchase in self.browse(cr, uid, ids, context=context):
             for pick in purchase.picking_ids:
                 for move in pick.move_lines:
