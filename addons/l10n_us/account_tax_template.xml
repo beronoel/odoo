@@ -1,4 +1,5 @@
-<openerp>
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
     <data noupdate="1">
 
         <!-- Account Tax Tags -->
@@ -27,6 +28,7 @@
             <field name="sequence">1</field>
             <field name="amount_type">percent</field>
             <field name="type_tax_use">purchase</field>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_purchase_default')])]"/>
         </record>
 
         <record id="otaxx" model="account.tax.template">
@@ -36,6 +38,7 @@
             <field name="sequence">10</field>
             <field name="amount_type">percent</field>
             <field name="type_tax_use">purchase</field>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_purchase_exempted')])]"/>
         </record>
 
         <!-- Sales + Input VAT -->
@@ -47,6 +50,7 @@
             <field name="sequence">1</field>
             <field name="amount_type">percent</field>
             <field name="type_tax_use">sale</field>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_sale_default')])]"/>
         </record>
 
         <record id="itaxx" model="account.tax.template">
@@ -56,6 +60,7 @@
             <field name="sequence">10</field>
             <field name="amount_type">percent</field>
             <field name="type_tax_use">sale</field>
+            <field name="tag_ids" eval="[(6,0,[ref('tag_sale_exempted')])]"/>
         </record>
 
 
@@ -92,5 +97,4 @@
         </record>
 
     </data>
-</openerp>
-
+</odoo>
