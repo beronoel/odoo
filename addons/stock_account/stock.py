@@ -263,7 +263,7 @@ class stock_picking(osv.osv):
                                 self.pool.get('account.invoice.line').write(cr, uid, [ol.id], {'account_id': a})
         return invoices
 
-    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move, context=None):
+    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
         if context is None:
             context = {}
         partner, currency_id, company_id, user_id = key
@@ -273,12 +273,8 @@ class stock_picking(osv.osv):
         else:
             account_id = partner.property_account_payable_id.id
             payment_term = partner.property_supplier_payment_term_id.id or False
-        if not move.origin:
-            origin = move.picking_id.name
-        else:
-            origin = move.picking_id.name + ', ' + move.origin
         return {
-            'origin': origin,
+            'origin': ','.join(list(set([x.picking_id.name for x in moves]))),
             'date_invoice': context.get('date_inv', False),
             'user_id': user_id,
             'partner_id': partner.id,
