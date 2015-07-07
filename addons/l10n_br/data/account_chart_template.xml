@@ -5,13 +5,14 @@
         <field name="name">transferência de Conta</field>
         <field name="code">101</field>
         <field name="reconcile" eval="True"/>
-        <field ref="account.data_account_type_current_assets" name="user_type"/>
+        <field ref="account.data_account_type_current_assets" name="user_type_id"/>
     </record>
 
 	<record id="l10n_br_account_chart_template" model="account.chart.template">
 		<field name="name">Planilha de Contas Brasileira</field>
 		<field name="code_digits">6</field>
-		<field name="bank_account_code_char">BNK</field>
+        <field name="bank_account_code_prefix">112</field>
+        <field name="cash_account_code_prefix">111</field>
 		<field name="currency_id" ref="base.BRL"/>
 		<field name="transfer_account_id" ref="transfer_account_id"/>
 	</record>

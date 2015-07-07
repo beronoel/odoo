@@ -53,7 +53,6 @@ come with any additional paid permission for online use of 'private modules'.
                 'data/account_tax_template.xml',
                 'account_view.xml',
                 'account_chart_template.yml',
-                'report_vat_statement.xml'
     ],
     'installable': True,
 }
