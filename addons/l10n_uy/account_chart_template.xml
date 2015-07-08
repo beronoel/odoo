@@ -2,57 +2,26 @@
 <odoo>
     <data noupdate="1">
 
-        <record id="uy_code_11101" model="account.account.template">
-            <field name="code">11101</field>
+        <record id="uy_code_11120" model="account.account.template">
+            <field name="code">11120</field>
             <field name="reconcile" eval="True"/>
-            <field name="name">Caja Moneda Nacional</field>
+            <field name="name">Movimientos Banco (def)</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
         </record>
 
         <record id="uy_chart_template" model="account.chart.template">
             <field name="name">Plan de Cuentas Uruguay - Template</field>
             <field name="code_digits">6</field>
-            <field name="bank_account_code_prefix">1101</field>
-            <field name="cash_account_code_prefix">1102</field>
+            <field name="bank_account_code_prefix">1111</field>
+            <field name="cash_account_code_prefix">1112</field>
             <field name="currency_id" ref="base.UYU"/>
-            <field name="transfer_account_id" ref="uy_code_11101"/>
-        </record>
-
-        <record id="uy_code_11101" model="account.account.template">
-            <field name="chart_template_id" ref="uy_chart_template"/>
-        </record>
-
-        <record id="uy_code_11111" model="account.account.template">
-            <field name="code">11111</field>
-            <field name="reconcile" eval="True"/>
-            <field name="name">Caja Moneda Extranjera</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field name="chart_template_id" ref="uy_chart_template"/>
+            <field name="transfer_account_id" ref="uy_code_11120"/>
         </record>
 
         <record id="uy_code_11120" model="account.account.template">
-            <field name="code">11120</field>
-            <field name="reconcile" eval="True"/>
-            <field name="name">Movimientos Banco (def)</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
-        <record id="uy_code_11121" model="account.account.template">
-            <field name="code">11121</field>
-            <field name="reconcile" eval="True"/>
-            <field name="name">Banco Cuenta Corriente</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field name="chart_template_id" ref="uy_chart_template"/>
-        </record>
-
-        <record id="uy_code_11122" model="account.account.template">
-            <field name="code">11122</field>
-            <field name="reconcile" eval="True"/>
-            <field name="name">Banco Cuenta Corriente ME</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field name="chart_template_id" ref="uy_chart_template"/>
-        </record>
 
         <record id="uy_code_11201" model="account.account.template">
             <field name="code">11201</field>
@@ -146,7 +115,7 @@
             <field name="code">11311</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Prevision para Deudores Incobrables</field>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -154,7 +123,7 @@
             <field name="code">11312</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Prevision p/dtos y Bonificaciones</field>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -249,7 +218,7 @@
             <field name="code">11505</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva Pagos</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -257,7 +226,7 @@
             <field name="code">11506</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva Retenciones</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -265,7 +234,7 @@
             <field name="code">11507</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva Importación</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -273,7 +242,7 @@
             <field name="code">11508</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva Anticipo Importación</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -281,7 +250,7 @@
             <field name="code">11601</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Irae Anticipo</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -289,7 +258,7 @@
             <field name="code">11602</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Patrimonio Anticipo</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -297,7 +266,7 @@
             <field name="code">11603</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Icosa Anticipo</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -305,7 +274,7 @@
             <field name="code">11621</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Diversos</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -729,7 +698,7 @@
             <field name="code">21403</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -737,7 +706,7 @@
             <field name="code">21404</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Iva Retenido</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -745,7 +714,7 @@
             <field name="code">21411</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Irpf Retenido</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -753,7 +722,7 @@
             <field name="code">21421</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Bps</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -761,7 +730,7 @@
             <field name="code">21501</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Irae del Ejercicio</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -769,7 +738,7 @@
             <field name="code">21502</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Irae a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -777,7 +746,7 @@
             <field name="code">21503</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Irae Anticipo a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -785,7 +754,7 @@
             <field name="code">21601</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Patrimonio del Ejercicio</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -793,7 +762,7 @@
             <field name="code">21602</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Patrimonio a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -801,7 +770,7 @@
             <field name="code">21603</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Patrimonio Anticipo a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -809,7 +778,7 @@
             <field name="code">21701</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Icosa del Ejercicio</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -817,7 +786,7 @@
             <field name="code">21702</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Icosa a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -825,7 +794,7 @@
             <field name="code">21703</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Icosa Anticipo a Pagar</field>
-            <field name="user_type_id" ref="type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -873,7 +842,7 @@
             <field name="code">3111</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Capital Integrado</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -881,7 +850,7 @@
             <field name="code">3221</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Revaluaciones fiscales</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -889,7 +858,7 @@
             <field name="code">3222</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Revaluaciones voluntarias</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -897,7 +866,7 @@
             <field name="code">3311</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Reservas Legales</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -905,7 +874,7 @@
             <field name="code">3312</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Reservas Voluntarias</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -913,7 +882,7 @@
             <field name="code">3313</field>
             <field name="reconcile" eval="False"/>
             <field name="name">Pérdidas y Ganancias</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -921,7 +890,7 @@
             <field name="code">33201</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Resultados ejercicios anteriores</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -929,7 +898,7 @@
             <field name="code">33201</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Resultados del ejercicio</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -937,7 +906,7 @@
             <field name="code">33220</field>
             <field name="reconcile" eval="True"/>
             <field name="name">Dividendos provisorios</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+            <field name="user_type_id" ref="account.data_account_type_equity"/>
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
@@ -1267,27 +1236,13 @@
             <field name="chart_template_id" ref="uy_chart_template"/>
         </record>
 
-        <!-- Gain/Loss accounts -->
-        <record id="uy_code_81" model="account.account.template">
-            <field name="code">81</field>
-            <field name="name">Gain Account</field>
-            <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="chart_template_id" ref="uy_chart_template"/>
-        </record>
-        <record id="uy_code_82" model="account.account.template">
-            <field name="code">82</field>
-            <field name="name">Loss Account</field>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
-            <field name="chart_template_id" ref="uy_chart_template"/>
-        </record>
-
         <record id="uy_chart_template" model="account.chart.template">
             <field name="property_account_receivable_id" ref="uy_code_11300"/>
             <field name="property_account_payable_id" ref="uy_code_21100"/>
             <field name="property_account_income_categ_id" ref="uy_code_4100"/>
             <field name="property_account_expense_categ_id" ref="uy_code_5100"/>
-            <field name="income_currency_exchange_account_id" ref="uy_code_81"/>
-            <field name="expense_currency_exchange_account_id" ref="uy_code_82"/>
+            <field name="income_currency_exchange_account_id" ref="uy_code_4302"/>
+            <field name="expense_currency_exchange_account_id" ref="uy_code_5302"/>
         </record>
 
     </data>

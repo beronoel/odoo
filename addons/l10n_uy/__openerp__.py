@@ -16,7 +16,6 @@ Provide Templates for Chart of Accounts, Taxes for Uruguay.
 """,
     'depends': ['account'],
     'data': [
-        'account_types.xml',
         'account_chart_template.xml',
         'taxes_template.xml',
         'account_chart_template.yml',
