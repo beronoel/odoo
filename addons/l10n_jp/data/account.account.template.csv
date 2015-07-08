@@ -1,8 +1,6 @@
 id,code,name,user_type_id/id,tax_ids/id,reconcile,currency_id/id,chart_template_id/id
 A11101,A11101,普通預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
-A11102,A11102,当座預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
 A11103,A11103,定期預金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
-A11105,A11105,小口現金,account.data_account_type_liquidity,,FALSE,,l10n_jp1
 A11211,A11211,売掛金,account.data_account_type_receivable,,TRUE,,l10n_jp1
 A11212,A11212,売掛金(USD),account.data_account_type_receivable,,TRUE,base.USD,l10n_jp1
 A11215,A11215,受取手形,account.data_account_type_receivable,,TRUE,,l10n_jp1
