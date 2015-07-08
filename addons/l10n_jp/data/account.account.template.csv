@@ -21,7 +21,7 @@ A11802,A11802,前渡金,account.data_account_type_current_assets,,FALSE,,l10n_jp
 A11804,A11804,前払費用,account.data_account_type_current_assets,,FALSE,,l10n_jp1
 A11805,A11805,立替金,account.data_account_type_current_assets,,FALSE,,l10n_jp1
 A11806,A11806,仮払金,account.data_account_type_current_assets,,FALSE,,l10n_jp1
-A11807,A11807,仮払消費税,data_account_type_tax,,FALSE,,l10n_jp1
+A11807,A11807,仮払消費税,account.data_account_type_current_assets,,FALSE,,l10n_jp1
 A11901,A11901,貸倒引当金,account.data_account_type_current_assets,,FALSE,,l10n_jp1
 A12111,A12111,建物及び構築物,account.data_account_type_current_assets,,FALSE,,l10n_jp1
 A12112,A12112,建物及び構築物減償累計額,account.data_account_type_current_assets,,FALSE,,l10n_jp1
@@ -48,12 +48,12 @@ A21401,A21401,未払金,account.data_account_type_payable,,TRUE,,l10n_jp1
 A21404,A21404,未払金(クレジット),account.data_account_type_payable,,TRUE,,l10n_jp1
 A21407,A21407,未払配当金,account.data_account_type_payable,,TRUE,,l10n_jp1
 A21501,A21501,未払費用,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
-A21601,A21601,未払法人税等,data_account_type_tax,,FALSE,,l10n_jp1
+A21601,A21601,未払法人税等,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A21802,A21802,前受金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A21803,A21803,預り金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A21804,A21804,仮受金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A21806,A21806,賞与引当金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
-A21807,A21807,仮受消費税,data_account_type_tax,,FALSE,,l10n_jp1
+A21807,A21807,仮受消費税,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A22001,A22001,社債,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A22002,A22002,長期借入金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
 A22005,A22005,退職給付引当金,account.data_account_type_current_liabilities,,FALSE,,l10n_jp1
@@ -120,5 +120,3 @@ B72201,B72201,投資有価証券売却損(特損),account.data_account_type_expe
 B72202,B72202,投資有価証券評価損(特損),account.data_account_type_expenses,,FALSE,,l10n_jp1
 B80101,B80101,法人税、住民税及び事業税,account.data_account_type_expenses,,FALSE,,l10n_jp1
 B90001,B90001,期間利益,account.data_account_type_expenses,,FALSE,,l10n_jp1
-C1001,C1001,アカウントを取得,account.data_account_type_other_income,,FALSE,,l10n_jp1
-C1002,C1002,損失勘定,account.data_account_type_expenses,,FALSE,,l10n_jp1
