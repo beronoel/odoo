@@ -476,9 +476,24 @@ class stock_picking(osv.osv):
                     'user_id': sale.user_id.id,
                     'team_id': sale.team_id.id,
                     'name': sale.client_order_ref or '',
-                    'sale_ids': (6, 0, list(set([x.id for x in sales]))),
+                    'sale_ids': [(6, 0, list(set([x.id for x in sales])))],
                     })
         return inv_vals
+
+    def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
+        res = super(stock_picking, self).get_service_line_vals(cr, uid, moves, partner, inv_type, context=context)
+        invoice_line_obj = self.pool.get('account.invoice.line')
+        if inv_type in ('out_invoice', 'out_refund'):
+            sale_line_obj = self.pool.get('sale.order.line')
+            orders = list(set([x.procurement_id.sale_line_id.order_id.id for x in moves if x.procurement_id.sale_line_id.order_id.id]))
+            sale_line_ids = sale_line_obj.search(cr, uid, [('order_id', 'in', orders), ('invoiced', '=', False), '|', ('product_id', '=', False),
+                                                           ('product_id.type', '=', 'service')], context=context)
+            if sale_line_ids:
+                # Could be done with the get values also
+                created_lines = sale_line_obj.invoice_line_create(cr, uid, sale_line_ids, context=context)
+                res += [(4, x) for x in created_lines]
+        return res
+
 
 class account_invoice(osv.Model):
     _inherit = 'account.invoice'

@@ -202,6 +202,23 @@ class stock_picking(osv.osv):
         inv_vals['purchase_ids'] = [(6, 0, list(set(purchases)))]
         return inv_vals
 
+    def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
+        invoice_line_obj = self.pool['account.invoice.line']
+        purchase_obj = self.pool['purchase.order']
+        purchase_line_obj = self.pool['purchase.order.line']
+        res = super(stock_picking, self).get_service_line_vals(cr, uid, moves, partner, inv_type, context=context)
+        if inv_type in ('in_invoice', 'in_refund'):
+            purchase_ids = list(set([x.purchase_line_id.order_id.id for x in moves if x.purchase_line_id.order_id.id]))
+            purchase_line_ids = purchase_line_obj.search(cr, uid, [('order_id', 'in', purchase_ids), ('invoice_lines', '=', False), '|', ('product_id', '=', False),
+                                                                   ('product_id.type', '=', 'service')], context=context)
+            if purchase_line_ids:
+                for po_line in purchase_line_obj.browse(cr, uid, purchase_line_ids, context=context):
+                    acc_id = purchase_obj._choose_account_from_po_line(cr, uid, po_line, context=context)
+                    inv_line_data = purchase_obj._prepare_inv_line(cr, uid, acc_id, po_line, context=context)
+                    inv_line_data['purchase_line_ids'] = [(4, po_line.id)]
+                    res += [(0, 0, inv_line_data)]
+        return res
+
 
 class stock_warehouse(osv.osv):
     _inherit = 'stock.warehouse'

@@ -287,11 +287,15 @@ class stock_picking(osv.osv):
             'journal_id': journal_id,
         }
 
+    def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
+        return []
+
     def _invoice_create_line(self, cr, uid, moves, journal_id, inv_type='out_invoice', context=None):
         invoice_obj = self.pool.get('account.invoice')
         move_obj = self.pool.get('stock.move')
         invoices = {}
         is_extra_move, extra_move_tax = move_obj._get_moves_taxes(cr, uid, moves, inv_type, context=context)
+
         product_price_unit = {}
         invoices_moves = {}
         for move in moves:
@@ -330,6 +334,7 @@ class stock_picking(osv.osv):
                         line_vals['invoice_line_tax_ids'] = extra_move_tax[0, move.product_id]
                 invoice_line_vals += [(0, 0, line_vals)]
             invoice_vals['invoice_line_ids'] = invoice_line_vals
+            invoice_vals['invoice_line_ids'] += self.get_service_line_vals(cr, uid, moves_key, partner, inv_type, context=context)
             invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
             move_obj.write(cr, uid, [x.id for x in moves_key], {'invoice_state': 'invoiced'}, context=context)
             #TODO: write the invoice_state afterwards, then we can re-use this for dual invoicing
