@@ -2,6 +2,98 @@
 <odoo>
     <data noupdate="1">
 
+    <!-- Account Tags -->
+
+    <record id="tag_sg_sale_tax_es_0" model="account.account.tag">
+        <field name="name">Sales Tax 0% ES33</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_sale_tax_ds_7" model="account.account.tag">
+        <field name="name">Sales Tax 7% DS</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_sale_tax_esn_0" model="account.account.tag">
+        <field name="name">Sales Tax 0% ESN33</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_sale_tax_os_0" model="account.account.tag">
+        <field name="name">Sales Tax 0% OS</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_sale_tax_zr_0" model="account.account.tag">
+        <field name="name">Sales Tax 0% ZR</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_sale_tax_sr_7" model="account.account.tag">
+        <field name="name">Sales Tax 7% SR</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_txn33_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% TX-N33</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_txe33_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% TX-E33</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_bl_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% BL</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_im_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% IM</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_txre_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% TX-RE</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_me_0" model="account.account.tag">
+        <field name="name">Purchase Tax 0% ME</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_nr_0" model="account.account.tag">
+        <field name="name">Purchase Tax 0% NR</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_zp_0" model="account.account.tag">
+        <field name="name">Purchase Tax 0% ZP</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_op_0" model="account.account.tag">
+        <field name="name">Purchase Tax 0% OP</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_ep_0" model="account.account.tag">
+        <field name="name">Purchase Tax 0% EP</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_mes_0" model="account.account.tag">
+        <field name="name">Purchase Tax MES</field>
+        <field name="applicability">taxes</field>
+    </record>
+
+    <record id="tag_sg_purchase_tax_tx7_7" model="account.account.tag">
+        <field name="name">Purchase Tax 7% TX7</field>
+        <field name="applicability">taxes</field>
+    </record>
+
     <!-- Sales Tax -->
 
     <record id="sg_sale_tax_es_0" model="account.tax.template">
@@ -14,6 +106,7 @@
         <field name="account_id" ref="account_account_791"/>
         <field name="refund_account_id" ref="account_account_791"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_es_0')])]"/>
     </record>
 
     <record id="sg_sale_tax_ds_7" model="account.tax.template">
@@ -26,6 +119,7 @@
         <field name="account_id" ref="account_account_792"/>
         <field name="refund_account_id" ref="account_account_792"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_ds_7')])]"/>
     </record>
 
     <record id="sg_sale_tax_esn_0" model="account.tax.template">
@@ -38,6 +132,7 @@
         <field name="account_id" ref="account_account_793"/>
         <field name="refund_account_id" ref="account_account_793"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_esn_0')])]"/>
     </record>
 
     <record id="sg_sale_tax_os_0" model="account.tax.template">
@@ -50,6 +145,7 @@
         <field name="account_id" ref="account_account_794"/>
         <field name="refund_account_id" ref="account_account_794"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_os_0')])]"/>
     </record>
 
     <record id="sg_sale_tax_zr_0" model="account.tax.template">
@@ -62,6 +158,7 @@
         <field name="account_id" ref="account_account_795"/>
         <field name="refund_account_id" ref="account_account_795"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_zr_0')])]"/>
     </record>
 
     <record id="sg_sale_tax_sr_7" model="account.tax.template">
@@ -74,6 +171,7 @@
         <field name="account_id" ref="account_account_796"/>
         <field name="refund_account_id" ref="account_account_796"/>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_sale_tax_sr_7')])]"/>
     </record>
 
     <!-- Purchases Tax -->
@@ -88,6 +186,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_txn33_7')])]"/>
     </record>
 
     <record id="sg_purchase_tax_txe33_7" model="account.tax.template">
@@ -100,6 +199,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_txe33_7')])]"/>
     </record>
 
     <record id="sg_purchase_tax_bl_7" model="account.tax.template">
@@ -112,6 +212,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_bl_7')])]"/>
     </record>
 
     <record id="sg_purchase_tax_im_7" model="account.tax.template">
@@ -124,6 +225,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_im_7')])]"/>
     </record>
 
     <record id="sg_purchase_tax_txre_7" model="account.tax.template">
@@ -136,6 +238,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_txre_7')])]"/>
     </record>
 
     <record id="sg_purchase_tax_me_0" model="account.tax.template">
@@ -148,6 +251,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_me_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_nr_0" model="account.tax.template">
@@ -160,6 +264,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_nr_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_zp_0" model="account.tax.template">
@@ -172,6 +277,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_zp_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_op_0" model="account.tax.template">
@@ -184,6 +290,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_op_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_ep_0" model="account.tax.template">
@@ -196,6 +303,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_ep_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_mes_0" model="account.tax.template">
@@ -208,6 +316,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_mes_0')])]"/>
     </record>
 
     <record id="sg_purchase_tax_tx7_7" model="account.tax.template">
@@ -220,6 +329,7 @@
         <field name="amount_type">percent</field>
         <field name="type_tax_use">purchase</field>
         <field name="chart_template_id" ref="sg_chart_template"/>
+        <field name="tag_ids" eval="[(6,0,[ref('tag_sg_purchase_tax_tx7_7')])]"/>
     </record>
 
     </data>
