@@ -613,7 +613,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">850.00</field>
           <field name="name">Odoo Start Workshop</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/openbig.jpg"/>
         </record>
@@ -622,7 +622,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Odoo Consulting</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/bhc.jpg"/>
         </record>
@@ -631,7 +631,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Eezee-It</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/eezee-it.png"/>
         </record>
@@ -640,7 +640,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Ekomurz.nl</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/ekomurz.gif"/>
         </record>
@@ -657,7 +657,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Vauxoo.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/vauxoo.png"/>
         </record>
@@ -666,7 +666,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Datalp.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/datalp.jpg"/>
         </record>
@@ -675,7 +675,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">camptocamp.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/camptocamp.png"/>
         </record>
@@ -684,7 +684,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">EGGS-solutions.fr</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/eggs-solutions.jpg"/>
         </record>
@@ -693,7 +693,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">3500.00</field>
           <field name="name">Odoo primary scoping &amp; analysis package (£900, £450, £30)</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>
@@ -702,7 +702,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">900.00</field>
           <field name="name">3rd party system analysis</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>
@@ -711,7 +711,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">30.00</field>
           <field name="name">Odoo enterprise agreement</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>
@@ -720,7 +720,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">850.00</field>
           <field name="name">Odoo Start Workshop</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/openbig.jpg"/>
         </record>
@@ -729,7 +729,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Odoo Consulting</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/bhc.jpg"/>
         </record>
@@ -738,7 +738,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Eezee-It</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/eezee-it.png"/>
         </record>
@@ -747,7 +747,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Ekomurz.nl</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/ekomurz.gif"/>
         </record>
@@ -764,7 +764,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Vauxoo.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/vauxoo.png"/>
         </record>
@@ -773,7 +773,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">Datalp.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/datalp.jpg"/>
         </record>
@@ -782,7 +782,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">camptocamp.com</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/camptocamp.png"/>
         </record>
@@ -791,7 +791,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">999.99</field>
           <field name="name">EGGS-solutions.fr</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/eggs-solutions.jpg"/>
         </record>
@@ -800,7 +800,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">3500.00</field>
           <field name="name">Odoo primary scoping &amp; analysis package (£900, £450, £30)</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>
@@ -809,7 +809,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">900.00</field>
           <field name="name">3rd party system analysis</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>
@@ -818,7 +818,7 @@
           <field name="available_in_pos">True</field>
           <field name="list_price">30.00</field>
           <field name="name">Odoo enterprise agreement</field>
-          <field name="type">service</field>
+          <field name="product_type">service</field>
           <field name="pos_categ_id" ref="partner_services"/>
           <field name="image" type="base64" file="point_of_sale/static/img/partners/opusvl.png"/>
         </record>

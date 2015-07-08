@@ -277,28 +277,34 @@ class ProductAttributeValue(models.Model):
     name = fields.Char(string="Value", translate=True, required=True)
     attribute_id = fields.Many2one('product.attribute', string="Attribute", required=True, ondelete='cascade')
     product_ids = fields.Many2many('product.product', id1='att_id', id2='prod_id', string="Variants", readonly=True)
-    price_extra = fields.Float(compute='_get_price_extra', string='Attribute Price Extra', inverse='_set_price_extra', digits=dp.get_precision('Product Price'),
+    price_extra = fields.Float(compute='_get_price_extra', inverse='_set_price_extra', string='Attribute Price Extra', digits=dp.get_precision('Product Price'),
                                help="Price Extra: Extra price for the variant with this attribute value on sale price. eg. 200 price extra, 1000 + 200 = 1200.")
     price_ids = fields.One2many('product.attribute.price', 'value_id', string='Attribute Prices', readonly=True)
 
     @api.multi
+    @api.depends('price_ids.price_extra')
     def _get_price_extra(self):
-        for obj in self:
-            for price_id in obj.price_ids:
-                if price_id.product_tmpl_id.id == self.env.context.get('active_id'):
-                    obj.price_extra = price_id.price_extra
-                    break
+        context = self.env.context or {}
+        price_extra = 0.0
+        if not context.get('active_id'):
+            self.price_extra = price_extra
+        else:
+            for obj in self:
+                for price_id in obj.price_ids:
+                    if price_id.product_tmpl_id.id == self.env.context.get('active_id'):
+                        obj.price_extra = price_id.price_extra
+                        break
 
     @api.one
-    def _set_price_extra(self, value):
+    def _set_price_extra(self):
         ProductObj = self.env['product.attribute.price']
-        p_ids = ProductObj.search([('value_id', '=', id), ('product_tmpl_id', '=', self.env.context['active_id'])])
-        if p_ids:
-            p_ids.write({'price_extra': value})
+        products = ProductObj.search([('value_id', '=', self.id), ('product_tmpl_id', '=', self.env.context['active_id'])])
+        if products:
+            products.write({'price_extra': self.price_extra})
         else:
             ProductObj.create({
                 'product_tmpl_id': self.env.context['active_id'],
-                'value_id': id, 'price_extra': value,
+                'value_id': self.id, 'price_extra': self.price_extra,
             })
 
     @api.multi
@@ -448,7 +454,7 @@ class ProductTemplate(models.Model):
         if pricelist:
             qtys = map(lambda x: (x, quantity, partner), self)
             price_list = PriceList.browse(pricelist)
-            price = price_list._price_get_multi(qtys)
+            price = price_list.with_context(context)._price_get_multi(qtys)
             for record in self:
                 record.price = price.get(record.id, 0.0)
         for product in self:
@@ -737,13 +743,13 @@ class Product(models.Model):
         PriceList = self.env['product.pricelist']
         context = self.env.context or {}
         quantity = context.get('quantity') or 1.0
-        partner = context.get('partner_id', False)
+        partner = context.get('partner', False)
         pricelist = context.get('pricelist')
         if pricelist:
             # Support context pricelists specified as display_name or ID for compatibility
             qtys = map(lambda x: (x, quantity, partner), self)
             price_list = PriceList.browse(pricelist)
-            price = price_list._price_get_multi(qtys)
+            price = price_list.with_context(context)._price_get_multi(qtys)
             for record in self:
                 record.price = price.get(record.id, 0.0)
         for record in self:
@@ -759,7 +765,7 @@ class Product(models.Model):
             product.price_extra = price_extra
 
     @api.multi
-    @api.depends('price_extra', 'list_price')
+    @api.depends('price_extra', 'lst_price')
     def _product_lst_price(self):
         ProductUom = self.env['product.uom']
         context = self.env.context or {}

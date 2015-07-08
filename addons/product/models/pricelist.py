@@ -137,11 +137,11 @@ class ProductPricelist(models.Model):
         return super(ProductPricelist, self).name_search(
             name, args, operator=operator, limit=limit)
 
-
-
+    @api.multi
     def price_get_multi(self, products_by_qty_by_partner):
         return dict((key, dict((key, price[0]) for key, price in value.items())) for key, value in self.price_rule_get_multi(products_by_qty_by_partner).items())
 
+    @api.multi
     def price_rule_get_multi(self, products_by_qty_by_partner):
         """multi products 'price_get'.
            @param ids:
@@ -159,17 +159,17 @@ class ProductPricelist(models.Model):
                 results[product_id][pricelist.id] = price
         return results
 
+    @api.multi
     def _price_get_multi(self, products_by_qty_by_partner):
         return dict((key, price[0]) for key, price in self._price_rule_get_multi(products_by_qty_by_partner).items())
 
+    @api.multi
     def _price_rule_get_multi(self, products_by_qty_by_partner):
         context = self.env.context or {}
         date = context.get('date') or fields.Date.context_today(self)
         date = date[0:10]
 
         products = map(lambda x: x[0], products_by_qty_by_partner)
-        # currency_obj = self.env['res.currency']
-        # product_obj = self.env['product.template']
         product_uom_obj = self.env['product.uom']
         price_type_obj = self.env['product.price.type']
 
@@ -200,7 +200,6 @@ class ProductPricelist(models.Model):
         else:
             prod_ids = [product.id for product in products]
             prod_tmpl_ids = [product.product_tmpl_id.id for product in products]
-
         # Load all rules
         self._cr.execute(
             'SELECT i.id '
@@ -235,7 +234,6 @@ class ProductPricelist(models.Model):
                 except UserError:
                     # Ignored - incompatible UoM in context, use default product UoM
                     pass
-
             price_type = 'standard_price' if self.type == 'purchase' else 'list_price'
             # if Public user try to access standard price from website sale, need to call _price_get.
             price = product.product_tmpl_id._price_get(price_type)
@@ -243,16 +241,16 @@ class ProductPricelist(models.Model):
                 if rule.min_quantity and qty_in_product_uom < rule.min_quantity:
                     continue
                 if is_product_template:
-                    if rule.product_tmpl_id and product.product_tmpl_id.id != rule.product_tmpl_id.id:
+                    if rule.product_tmpl_id and product.id != rule.product_tmpl_id.id:
                         continue
                     if rule.product_id and \
-                            (product.product_variant_count > 1 or product.product_tmpl_id.product_variant_ids[0].id != rule.product_id.id):
+                            (product.product_variant_count > 1 or product.product_variant_ids[0].id != rule.product_id.id):
                         # product rule acceptable on template if has only one variant
                         continue
                 else:
                     if rule.product_tmpl_id and product.product_tmpl_id.id != rule.product_tmpl_id.id:
                         continue
-                    if rule.product_id and product.product_tmpl_id.id != rule.product_id.id:
+                    if rule.product_id and product.id != rule.product_id.id:
                         continue
                 if rule.base == -1:
                     if rule.base_pricelist_id:
@@ -265,11 +263,10 @@ class ProductPricelist(models.Model):
                     if rule.base not in price_types:
                         price_types[rule.base] = price_type_obj.browse(int(rule.base))
                     price_type = price_types[rule.base]
-
                     # price_get returns the price in the context UoM, i.e. qty_uom_id
                     price_uom_id = qty_uom_id
                     price = price_type.currency_id.compute(product.product_tmpl_id._price_get(price_type.field), self.currency_id, round=False)
-                    for seller in product.product_tmpl_id.seller_ids:
+                    for seller in product.seller_ids:
                         partner = partner.id if partner and not isinstance(partner, int) else partner
                         if seller.name.id == partner:
                             qty_in_seller = qty
@@ -286,7 +283,7 @@ class ProductPricelist(models.Model):
                         price = tools.float_round(price, precision_rounding=rule.price_round)
 
                     convert_to_price_uom = (lambda price: product_uom_obj._compute_price(product.uom_id.id,
-                                                price, price_uom_id.id))
+                                                price, price_uom_id))
                     if rule.price_surcharge:
                         price_surcharge = convert_to_price_uom(rule.price_surcharge)
                         price += price_surcharge
@@ -300,8 +297,7 @@ class ProductPricelist(models.Model):
 
                     rule_id = rule.id
                 break
-            # Final price conversion to target UoM
-            price = product.uom_id._compute_price(product.uom_id.id, price, qty_uom_id)
+            price = product_uom_obj._compute_price(product.uom_id.id, price, qty_uom_id)
             results[product.id] = (price, rule_id)
         return results
 
@@ -437,8 +433,8 @@ class ProductPricelistItem(models.Model):
                 if main_pricelist == other_pricelist:
                     raise UserError('Error! You cannot assign the Main Pricelist as Other Pricelist in PriceList Item!')
 
-    @api.constrains('price_min_margin', 'price_max_margin')
     @api.one
+    @api.constrains('price_min_margin', 'price_max_margin')
     def _check_margin(self):
         for item in self:
             if item.price_max_margin and item.price_min_margin and (item.price_min_margin > item.price_max_margin):
