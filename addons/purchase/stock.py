@@ -195,8 +195,8 @@ class stock_picking(osv.osv):
             if move.purchase_line_id and move.purchase_line_id.order_id:
                 purchase = move.purchase_line_id.order_id
                 inv_vals.update({
-                    'fiscal_position': purchase.fiscal_position_id.id,
-                    'payment_term': purchase.payment_term_id.id,
+                    'fiscal_position_id': purchase.fiscal_position_id.id,
+                    'payment_term_id': purchase.payment_term_id.id,
                     })
                 purchases.append(purchase.id)
         inv_vals['purchase_ids'] = [(6, 0, list(set(purchases)))]

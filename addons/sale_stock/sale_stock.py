@@ -471,8 +471,8 @@ class stock_picking(osv.osv):
             if sales:
                 sale = sales[0]
                 inv_vals.update({
-                    'fiscal_position': sale.fiscal_position_id.id,
-                    'payment_term': sale.payment_term_id.id,
+                    'fiscal_position_id': sale.fiscal_position_id.id,
+                    'payment_term_id': sale.payment_term_id.id,
                     'user_id': sale.user_id.id,
                     'team_id': sale.team_id.id,
                     'name': sale.client_order_ref or '',

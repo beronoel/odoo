@@ -279,9 +279,9 @@ class stock_picking(osv.osv):
             'user_id': user_id,
             'partner_id': partner.id,
             'account_id': account_id,
-            'payment_term': payment_term,
+            'payment_term_id': payment_term,
             'type': inv_type,
-            'fiscal_position': partner.property_account_position_id.id,
+            'fiscal_position_id': partner.property_account_position_id.id,
             'company_id': company_id,
             'currency_id': currency_id,
             'journal_id': journal_id,
@@ -329,6 +329,7 @@ class stock_picking(osv.osv):
                     elif (0, move.product_id) in extra_move_tax:
                         line_vals['invoice_line_tax_ids'] = extra_move_tax[0, move.product_id]
                 invoice_line_vals += [(0, 0, line_vals)]
+            invoice_vals['invoice_line_ids'] = invoice_line_vals
             invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
             move_obj.write(cr, uid, [x.id for x in moves_key], {'invoice_state': 'invoiced'}, context=context)
             #TODO: write the invoice_state afterwards, then we can re-use this for dual invoicing
