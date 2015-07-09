@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
+
         <record id="res_lang_tree" model="ir.ui.view">
             <field name="name">res.lang.tree</field>
             <field name="model">res.lang</field>
@@ -109,5 +109,5 @@
             <field name="search_view_id" ref="res_lang_search"/>
         </record>
         <menuitem action="res_lang_act_window" id="menu_res_lang_act_window" parent="menu_translation" groups="base.group_no_one" sequence="1"/>
-    </data>
-</openerp>
+
+</odoo>

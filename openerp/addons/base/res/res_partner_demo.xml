@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data noupdate="0">
+<odoo>
         <!--
         Resource: res.partner.category
         -->
@@ -540,6 +539,4 @@
             <field name="supplier">1</field>
             <field eval="0" name="customer"/>
         </record>
-    </data>
-</openerp>
-
+</odoo>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<openerp>
-    <data>
+<odoo>
+
         <report id="preview_report" model="res.company" name="preview.report" multi="True" rml="base/report/preview_report.rml" string="Preview Report"/>
         <record id="bank_account_update" model="ir.actions.act_window">
             <field name="name">Company Bank Accounts</field>
@@ -50,25 +50,25 @@
                                         <field name="street2"/>
                                         <div>
                                             <field name="city" placeholder="City" style="width: 40%%"/>
-                                            <field name="state_id" class="oe_no_button" placeholder="State" on_change="onchange_state(state_id)" style="width: 24%%" options='{"no_open": True}'/>
+                                            <field name="state_id" class="oe_no_button" placeholder="State"
+                                             style="width: 24%%" options='{"no_open": True}'/>
                                             <field name="zip" placeholder="ZIP" style="width: 34%%"/>
                                         </div>
-                                        <field name="country_id" placeholder="Country" class="oe_no_button" options='{"no_open": True}' on_change="on_change_country(country_id)"/>
+                                        <field name="country_id" placeholder="Country" class="oe_no_button" options='{"no_open": True}'/>
                                     </div>
-                                    <field name="website" widget="url" placeholder="e.g. www.odoo.com"
-                                        on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
+                                    <field name="website" widget="url" placeholder="e.g. www.odoo.com"/>
                                 </group>
                                 <group>
-                                    <field name="phone" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
-                                    <field name="fax" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
-                                    <field name="email" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
-                                    <field name="vat" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
-                                    <field name="company_registry" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
+                                    <field name="phone"/>
+                                    <field name="fax"/>
+                                    <field name="email"/>
+                                    <field name="vat"/>
+                                    <field name="company_registry"/>
                                 </group>
                             </group>
                             <group string="Bank Accounts">
                                 <field name="bank_ids" nolabel="1" context="{'default_company_id': active_id, 'footer_hide': False}"
-                                    on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)">
+                                   >
                                     <tree>
                                         <field name="acc_number"/>
                                         <field name="bank_name"/>
@@ -86,17 +86,17 @@
                         </page>
                         <page name="report" string="Report Configuration">
                             <group string="Configuration">
-                                <field name="custom_footer" on_change="onchange_footer(custom_footer, phone, fax, email, website, vat, company_registry, bank_ids)"/>
+                                <field name="custom_footer"/>
                                 <field name="rml_footer" attrs="{'invisible': [('custom_footer','=',False)]}"/>
                                 <field name="rml_footer_readonly" attrs="{'invisible': [('custom_footer','=',True)]}"/>
                             </group>
 
                             <group string="Configuration (RML)" col="2" groups="base.group_no_one">
-                                <field name="rml_paper_format" on_change="onchange_rml_paper_format(rml_paper_format)"/>
+                                <field name="rml_paper_format"/>
 
                                 <label for="font" />
                                 <div>
-                                    <field name="font" class="oe_inline" on_change="onchange_font_name(font, rml_header, rml_header2, rml_header3)" />
+                                    <field name="font" class="oe_inline"/>
                                     <button string="(reload fonts)" name="act_discover_fonts" type="object" class="oe_link" colspan="1"/>
                                 </div>
                                 <group col="1" colspan="2">
@@ -154,5 +154,4 @@
             <field eval="'ir.actions.act_window,%d'%company_normal_action_tree" name="value"/>
         </record>
 
-    </data>
-</openerp>
+</odoo>
