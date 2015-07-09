@@ -159,11 +159,9 @@ class ProductPricelist(models.Model):
                 results[product_id][pricelist.id] = price
         return results
 
-    @api.multi
     def _price_get_multi(self, products_by_qty_by_partner):
         return dict((key, price[0]) for key, price in self._price_rule_get_multi(products_by_qty_by_partner).items())
 
-    @api.multi
     def _price_rule_get_multi(self, products_by_qty_by_partner):
         context = self.env.context or {}
         date = context.get('date') or fields.Date.context_today(self)
@@ -297,7 +295,7 @@ class ProductPricelist(models.Model):
 
                     rule_id = rule.id
                 break
-            price = product_uom_obj._compute_price(product.uom_id.id, price, qty_uom_id)
+            price = product_uom_obj._compute_price(price_uom_id, price, qty_uom_id)
             results[product.id] = (price, rule_id)
         return results
 

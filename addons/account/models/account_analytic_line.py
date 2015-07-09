@@ -83,7 +83,7 @@ class AccountAnalyticLine(models.Model):
             # price_get() will respect a 'uom' in its context, in order
             # to return a default price for those units
             ctx['uom'] = unit
-        amount_unit = prod.price_get(pricetype.field, context=ctx)[prod.id]
+        amount_unit = prod.with_context(ctx).price_get(pricetype.field)
         amount = amount_unit * quantity or 0.0
         cur_record = self.browse(cr, uid, id, context=context)
         currency = cur_record.exists() and cur_record.currency_id or prod.company_id.currency_id
