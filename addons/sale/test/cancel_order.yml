@@ -51,7 +51,7 @@
     invoice_ids = self.pool.get('sale.order').browse(cr, uid, ref("sale_order_8")).invoice_ids
     assert len(invoice_ids) == 3, "All invoices are not created"
     for invoice in invoice_ids:
-        assert invoice.amount_total in (7290,5,20), "Invoice total is not correct"
+        assert invoice.amount_total in (7290,135,-110), "Invoice total is not correct"
 -
   I cancel all the invoices.
 -
