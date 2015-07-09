@@ -63,5 +63,5 @@ References
     'test': [],
     'demo': [],
     'auto_install': False,
-    'installable': True,
+    'installable': False,
 }
