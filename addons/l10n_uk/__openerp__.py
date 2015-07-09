@@ -19,7 +19,6 @@ This is the latest UK OpenERP localisation necessary to run OpenERP accounting f
     'depends': ['base_iban', 'base_vat'],
     'data': [
         'data/account_chart_template.xml',
-        'data/account.account.type.csv',
         'data/account.account.template.csv',
         'data/account.chart.template.csv',
         'data/account.account.tag.csv',
