@@ -2,9 +2,9 @@
 <openerp>
   <data noupdate="0">
 
-        <record id="1001" model="account.account.template">
+        <record id="999" model="account.account.template">
             <field name="name">Transfer Account</field>
-            <field name="code">1001</field>
+            <field name="code">999</field>
             <field name="reconcile" eval="True"/>
             <field  name="user_type_id" ref="account.data_account_type_current_assets"/>
         </record>
@@ -16,10 +16,10 @@
             <field name="cash_account_code_prefix">551</field>
             <field name="code_digits">6</field>
             <field name="currency_id" ref="base.GBP"/>
-            <field name="transfer_account_id" ref="1001"/>
+            <field name="transfer_account_id" ref="999"/>
         </record>
 
-        <record id="1001" model="account.account.template">
+        <record id="999" model="account.account.template">
             <field name="chart_template_id" ref="l10n_uk"/>
         </record>
 
