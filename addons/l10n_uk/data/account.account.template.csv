@@ -98,5 +98,3 @@
 "4910","4910","Investment Interest received","account.data_account_type_revenue","FALSE","l10n_uk"
 "7900","7900","Interest paid","account.data_account_type_expenses","FALSE","l10n_uk"
 "8800","8800","Corporation tax expense","account.data_account_type_expenses","FALSE","l10n_uk"
-"9101","9101","Gain Account","account.data_account_type_other_income","FALSE","l10n_uk"
-"9102","9102","Loss Account","account.data_account_type_expenses","FALSE","l10n_uk"
