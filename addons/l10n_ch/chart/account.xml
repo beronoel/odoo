@@ -2,6 +2,8 @@
 <odoo>
     <data noupdate="1">
 
+         <!-- Account Tags -->
+
         <record id="transfer_account_id" model="account.account.template">
             <field name="code">8901</field>
             <field name="name">De transfert de compte</field>
@@ -11,8 +13,8 @@
         <record id="l10nch_chart_template" model="account.chart.template">
             <field name="name">Plan comptable 2015</field>
             <field name="code_digits">6</field>
-            <field name="bank_account_code_prefix">112</field>
-            <field name="cash_account_code_prefix">111</field>
+            <field name="bank_account_code_prefix">1020</field>
+            <field name="cash_account_code_prefix">1030</field>
             <field name="currency_id" ref="base.CHF"/>
             <field name="transfer_account_id" ref="transfer_account_id"/>
         </record>
@@ -24,21 +26,6 @@
             <field name="code">1000</field>
             <field name="name">Caisse</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field eval="False" name="reconcile"/>
-            <field name="chart_template_id" ref="l10nch_chart_template"/>
-        </record>
-        <record id="ch_coa_1020" model="account.account.template">
-            <field name="code">1020</field>
-            <field name="name">Banque</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field eval="False" name="reconcile"/>
-            <field name="chart_template_id" ref="l10nch_chart_template"/>
-        </record>
-        <record id="ch_coa_1021" model="account.account.template">
-            <field name="code">1021</field>
-            <field name="name">Banque EUR</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field name="currency_id" ref="base.EUR"/>
             <field eval="False" name="reconcile"/>
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
