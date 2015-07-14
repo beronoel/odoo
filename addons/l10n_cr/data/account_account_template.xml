@@ -359,7 +359,7 @@
         <record id="account_account_template_0_212101" model="account.account.template">
             <field name="code">0-212101</field>
             <field name="name">0-Impuesto de ventas por pagar</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
@@ -367,7 +367,7 @@
         <record id="account_account_template_0_212102" model="account.account.template">
             <field name="code">0-212102</field>
             <field name="name">0-Impuesto de ventas pagado</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
@@ -375,7 +375,7 @@
         <record id="account_account_template_0_212201" model="account.account.template">
             <field name="code">0-212201</field>
             <field name="name">0-Impuesto de renta por pagar</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
@@ -383,7 +383,7 @@
         <record id="account_account_template_0_212202" model="account.account.template">
             <field name="code">0-212202</field>
             <field name="name">0-Adelantos de impuesto de renta</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
@@ -391,7 +391,7 @@
         <record id="account_account_template_0_212203" model="account.account.template">
             <field name="code">0-212203</field>
             <field name="name">0-Retenciones de impuesto de renta</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
@@ -824,7 +824,7 @@
             <field name="code">0530005</field>
             <field name="reconcile" eval="False"/>
             <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="name">victoria de Konto</field>
+            <field name="name">cuenta de Ganancia</field>
             <field name="chart_template_id" ref="account_chart_template_0"/>
         </record>
 
@@ -1186,7 +1186,7 @@
         <record id="account_account_template_x212101" model="account.account.template">
             <field name="code">x212101</field>
             <field name="name">xImpuesto de ventas por pagar</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
@@ -1194,7 +1194,7 @@
         <record id="account_account_template_x212102" model="account.account.template">
             <field name="code">x212102</field>
             <field name="name">xImpuesto de ventas pagado</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
@@ -1202,7 +1202,7 @@
         <record id="account_account_template_x212201" model="account.account.template">
             <field name="code">x212201</field>
             <field name="name">xImpuesto de renta por pagar</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
@@ -1210,7 +1210,7 @@
         <record id="account_account_template_x212202" model="account.account.template">
             <field name="code">x212202</field>
             <field name="name">xAdelantos de impuesto de renta</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
@@ -1218,7 +1218,7 @@
         <record id="account_account_template_x212203" model="account.account.template">
             <field name="code">x212203</field>
             <field name="name">xRetenciones de impuesto de renta</field>
-            <field name="user_type_id" ref="account_account_type_tax"/>
+            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field name="reconcile" eval="True"/>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
@@ -1640,7 +1640,7 @@
             <field name="code">x530005</field>
             <field name="reconcile" eval="False"/>
             <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="name">victoria de Konto</field>
+            <field name="name">cuenta de Ganancia</field>
             <field name="chart_template_id" ref="account_chart_template_x"/>
         </record>
 
