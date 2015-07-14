@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<template id="mail_actions" name="Invitation View">
+    <t t-call="mail.mail_actions_layout">
+        <div class="well col-md-8 col-md-offset-2 text-center">
+            <strong>Action is perfomed successfully!</strong>
+            <br/>Thank you.
+        </div>
+    </t>
+</template>
+</odoo>

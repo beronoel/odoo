@@ -302,6 +302,18 @@ class project_issue(osv.Model):
     # Mail gateway
     # -------------------------------------------------------
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(project_issue, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        issue = self.browse(cr, uid, ids[0], context=context)
+        if not issue.user_id:
+            res['follow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+            res['unfollow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+        else:
+            issue_action = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'project_issue.project_issue_categ_act0')
+            res['follow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, issue_action), 'title': 'New Issue'}]
+            res['unfollow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, issue_action), 'title': 'New Issue'}]
+        return res
+
     def _track_subtype(self, cr, uid, ids, init_values, context=None):
         record = self.browse(cr, uid, ids[0], context=context)
         if 'kanban_state' in init_values and record.kanban_state == 'blocked':

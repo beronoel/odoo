@@ -1609,6 +1609,14 @@ class stock_picking(models.Model):
                 raise UserError(_('Please process some quantities to put in the pack first!'))
         return package_id
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(stock_picking, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        picking = self.browse(cr, uid, ids[0], context=context)
+        if picking.state == 'draft':
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, picking.id, 'action_confirm'), 'title': 'Mark as Todo'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, picking.id, 'action_confirm'), 'title': 'Mark as Todo'}]
+        return res
+
 
 class stock_production_lot(osv.osv):
     _name = 'stock.production.lot'

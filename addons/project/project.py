@@ -651,6 +651,18 @@ class task(osv.osv):
             }, context=context)
         return True
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(task, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        task_record = self.browse(cr, uid, ids[0], context=context)
+        if not task_record.user_id:
+            res['follow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+            res['unfollow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+        else:
+            task_action = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'project.action_view_task')
+            res['follow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, task_action), 'title': 'New Task'}]
+            res['unfollow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, task_action), 'title': 'New Task'}]
+        return res
+
     # ------------------------------------------------
     # CRUD overrides
     # ------------------------------------------------

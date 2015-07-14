@@ -92,3 +92,9 @@ class MailController(http.Controller):
     @http.route('/mail/unfollow', type='http', auth='user')
     def message_unsubscribe(self,  model, res_id):
         request.env[model].browse(res_id).message_unsubscribe_users()
+
+    @http.route('/mail/execute', type='http', auth='user')
+    def message_execute(self, model, res_id, action, **kwargs):
+        if hasattr(request.env[model], action):
+            getattr(request.env[model].browse(int(res_id)), action)()
+        return request.render('mail.mail_actions', {})

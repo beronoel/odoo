@@ -303,6 +303,14 @@ class sale_order(osv.osv):
     def button_dummy(self, cr, uid, ids, context=None):
         return True
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(sale_order, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        order = self.browse(cr, uid, ids[0], context=context)
+        if order.state in ['draft', 'sent']:
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, order.id, 'action_button_confirm'), 'title': 'Confirm Sale'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, order.id, 'action_button_confirm'), 'title': 'Confirm Sale'}]
+        return res
+
     # FIXME: deprecated method, overriders should be using _prepare_invoice() instead.
     #        can be removed after 6.1.
     def _inv_get(self, cr, uid, order, context=None):

@@ -49,6 +49,8 @@ Main Features
         'views/ir_actions_views.xml',
         'views/res_partner_views.xml',
         'views/contact_views.xml',
+        'views/mail_actions_layout.xml',
+        'views/mail_actions_templates.xml',
     ],
     'demo': [
         'data/mail_demo.xml',

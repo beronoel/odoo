@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="mail_actions_layout" name="Calendar layout">&lt;!DOCTYPE html&gt;
+        <html>
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="initial-scale=1"/>
+                <title><t t-esc="title or 'Odoo Mail Action'"/></title>
+                <!-- <link rel="stylesheet" href="/calendar/static/src/css/calendar.css"/> -->
+                <link rel='stylesheet' href='/web/static/lib/bootstrap/css/bootstrap.css'/>
+                <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
+            </head>
+            <body class="openerp container">
+                <div id="wrapwrap">
+                    <main>
+                        <t t-raw="0"/>
+                    </main>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>

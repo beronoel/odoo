@@ -1017,8 +1017,9 @@ Update your business card, phone book, social media,... Send an email right now 
             res['follow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
             res['unfollow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
         else:
-            res['follow']['actions'] = [{'url': '#', 'title': 'Won'}, {'url': '#', 'title': 'Lost'}]
-            res['unfollow']['actions'] = [{'url': '#', 'title': 'Won'}, {'url': '#', 'title': 'Lost'}]
+            if lead.probability < 100:
+                res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_won'), 'title': 'Won'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_lost'), 'title': 'Lost'}]
+                res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_won'), 'title': 'Won'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_lost'), 'title': 'Lost'}]
         return res
 
     def log_meeting(self, cr, uid, ids, meeting_subject, meeting_date, duration, context=None):

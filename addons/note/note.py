@@ -156,6 +156,13 @@ class note_note(osv.osv):
             return super(note_note, self).read_group(cr, uid, domain, fields, groupby,
                 offset=offset, limit=limit, context=context, orderby=orderby,lazy=lazy)
 
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(note_note, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        note_action = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'note.action_note_note')
+        res['follow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, note_action), 'title': 'New Note'}]
+        res['unfollow']['actions'] = [{'url': '#view_type=form&model=%s&action=%d' % (self._name, note_action), 'title': 'New Note'}]
+        return res
+
 
 class res_users(osv.Model):
     _name = 'res.users'

@@ -173,6 +173,18 @@ class Forum(models.Model):
         tags = self.env['forum.tag'].search([('forum_id', '=', self.id), ('posts_count', '>', 0)])
         return sorted(set([tag.name[0].upper() for tag in tags]))
 
+    @api.multi
+    def _message_classify_recipients_better(self, message, partners, signups, partner_users, followers, notfollowers):
+        self.ensure_one()
+        res = super(Forum, self)._message_classify_recipients_better(message, partners, signups, partner_users, followers, notfollowers)
+        slug_forum =  slug(self)
+        res['follow']['actions'] = [{'url': '/forum/%s/ask?post_type=question' % (slug_forum), 'title': 'New Question'},
+                                    {'url': '/forum/%s/ask?post_type=discussion' % (slug_forum), 'title': 'New Discussion'},
+                                    {'url': '/forum/%s/ask?post_type=link' % (slug_forum), 'title': 'New Link'}]
+        res['unfollow']['actions'] = [{'url': '/forum/%s/ask?post_type=question' % (slug_forum), 'title': 'New Question'},
+                                    {'url': '/forum/%s/ask?post_type=discussion' % (slug_forum), 'title': 'New Discussion'},
+                                    {'url': '/forum/%s/ask?post_type=link' % (slug_forum), 'title': 'New Link'}]
+        return res
 
 class Post(models.Model):
 
