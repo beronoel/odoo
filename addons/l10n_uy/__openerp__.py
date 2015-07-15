@@ -21,5 +21,5 @@ Provide Templates for Chart of Accounts, Taxes for Uruguay.
         'account_chart_template.yml',
     ],
     'demo': [],
-    'installable': True,
+    'installable': False,
 }
