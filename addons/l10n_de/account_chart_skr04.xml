@@ -378,14 +378,6 @@
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
     </record>
 
-    <record id="chart_skr04_100" model="account.account.template">
-      <field name="code">0100</field>
-      <field name="name">Konzessionen- gewerbliche Schutzrechte und ähnliche Rechte und Werte sowie Lizenzen an solchen Rechten und Werten</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
     <record id="chart_skr04_110" model="account.account.template">
       <field name="code">0110</field>
       <field name="name">Konzessionen </field>
@@ -453,14 +445,6 @@
     <record id="chart_skr04_179" model="account.account.template">
       <field name="code">0179</field>
       <field name="name">Anzahlungen auf Geschäfts- oder Firmenwert</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
-    <record id="chart_skr04_200" model="account.account.template">
-      <field name="code">0200</field>
-      <field name="name">Grundstücke- grundstücksgleiche Rechte und Bauten einschließlich der Bauten auf fremden Grundstücken</field>
       <field name="reconcile" eval="False"/>
       <field name="user_type_id" ref="account.data_account_type_current_assets"/>
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
@@ -698,14 +682,6 @@
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
     </record>
 
-    <record id="chart_skr04_400" model="account.account.template">
-      <field name="code">0400</field>
-      <field name="name">Technische Anlagen und Maschinen</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
     <record id="chart_skr04_420" model="account.account.template">
       <field name="code">0420</field>
       <field name="name">Technische Anlagen </field>
@@ -733,14 +709,6 @@
     <record id="chart_skr04_470" model="account.account.template">
       <field name="code">0470</field>
       <field name="name">Betriebsvorrichtungen</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
-    <record id="chart_skr04_500" model="account.account.template">
-      <field name="code">0500</field>
-      <field name="name">Andere Anlagen- Betriebs- und Geschäftsaustattung</field>
       <field name="reconcile" eval="False"/>
       <field name="user_type_id" ref="account.data_account_type_current_assets"/>
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
@@ -829,14 +797,6 @@
     <record id="chart_skr04_690" model="account.account.template">
       <field name="code">0690</field>
       <field name="name">Sonstige Betriebs- und Geschäftsausstattung</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
-    <record id="chart_skr04_700" model="account.account.template">
-      <field name="code">0700</field>
-      <field name="name">Geleistete Anzahlungen und Anlagen im Bau</field>
       <field name="reconcile" eval="False"/>
       <field name="user_type_id" ref="account.data_account_type_current_assets"/>
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
@@ -970,14 +930,6 @@
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
     </record>
 
-    <record id="chart_skr04_820" model="account.account.template">
-      <field name="code">0820</field>
-      <field name="name">Beteiligungen</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
     <record id="chart_skr04_829" model="account.account.template">
       <field name="code">0829</field>
       <field name="name">Beteiligungen einer GmbH Co. KG an einer Komplementär GmbH</field>
@@ -1021,14 +973,6 @@
     <record id="chart_skr04_880" model="account.account.template">
       <field name="code">0880</field>
       <field name="name">Ausleihungen an Unternehmen- mit denen ein Beteiligungsverhältnis besteht</field>
-      <field name="reconcile" eval="False"/>
-      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-      <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
-    </record>
-
-    <record id="chart_skr04_900" model="account.account.template">
-      <field name="code">0900</field>
-      <field name="name">Wertpapiere des Anlagevermögens</field>
       <field name="reconcile" eval="False"/>
       <field name="user_type_id" ref="account.data_account_type_current_assets"/>
       <field name="chart_template_id" ref="l10n_chart_de_skr04"/>
