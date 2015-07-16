@@ -467,7 +467,7 @@ class stock_picking(osv.osv):
     def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
         inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
         if inv_type in ('out_invoice', 'out_refund'):
-            sales = [x.picking_id.sale_id for x in moves]
+            sales = [x.picking_id.sale_id for x in moves if x.picking_id.sale_id]
             if sales:
                 sale = sales[0]
                 inv_vals.update({

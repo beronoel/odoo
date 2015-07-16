@@ -199,7 +199,8 @@ class stock_picking(osv.osv):
                     'payment_term_id': purchase.payment_term_id.id,
                     })
                 purchases.append(purchase.id)
-        inv_vals['purchase_ids'] = [(6, 0, list(set(purchases)))]
+        if purchases:
+            inv_vals['purchase_ids'] = [(6, 0, list(set(purchases)))]
         return inv_vals
 
     def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
