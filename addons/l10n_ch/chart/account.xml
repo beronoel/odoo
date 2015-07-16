@@ -14,7 +14,6 @@
             <field name="name">Plan comptable 2015</field>
             <field name="code_digits">6</field>
             <field name="bank_account_code_prefix">1020</field>
-            <field name="cash_account_code_prefix">1030</field>
             <field name="currency_id" ref="base.CHF"/>
             <field name="transfer_account_id" ref="transfer_account_id"/>
         </record>
