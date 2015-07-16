@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <!--
-        Resource: account.tax.template
-        Account tax templates for Costa Rica
-        -->
 
     <!-- Account Tags -->
 
