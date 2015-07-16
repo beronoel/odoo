@@ -24,23 +24,4 @@
         <field name="chart_template_id" ref="account_chart_template_0"/>
     </record>
 
-    <record id="transfer_account_x_id" model="account.account.template">
-        <field name="name">cuenta de Transferencia</field>
-        <field name="code">x</field>
-        <field name="reconcile" eval="True"/>
-        <field ref="account.data_account_type_current_assets" name="user_type_id"/>
-    </record>
-
-    <record id="account_chart_template_x" model="account.chart.template">
-        <field name="name">Costa Rica - Company 1</field>
-        <field name="currency_id" ref="base.CRC"/>
-        <field name="code_digits">6</field>
-        <field name="transfer_account_id" ref="transfer_account_x_id"/>
-        <field name="bank_account_code_prefix">104</field>
-        <field name="cash_account_code_prefix">105</field>
-    </record>
-
-    <record id="transfer_account_x_id" model="account.account.template">
-        <field name="chart_template_id" ref="account_chart_template_x"/>
-    </record>
 </odoo>

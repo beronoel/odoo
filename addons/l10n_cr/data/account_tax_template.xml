@@ -30,20 +30,6 @@
             <field name="account_id" ref="account_account_template_0_212101"/>
             <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVSale')])]"/>
         </record>
-        <record id="account_tax_template_IV_x" model="account.tax.template">
-            <field name="name">x Sales Tax</field>
-            <field name="description">IVSale</field>
-            <field name="sequence">10</field>
-            <field name="amount">1300</field>
-            <field name="amount_type">percent</field>
-            <field name="type_tax_use">sale</field>
-            <field name="include_base_amount" eval="False"/>
-            <field name="chart_template_id" ref="account_chart_template_x"/>
-            <field name="refund_account_id" ref="account_account_template_x212101"/>
-            <field name="account_id" ref="account_account_template_x212101"/>
-            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVSale')])]"/>
-        </record>
-
 
         <record id="account_tax_template_IV_1" model="account.tax.template">
             <field name="name">0 Purchase Tax</field>
@@ -58,19 +44,6 @@
             <field name="account_id" ref="account_account_template_0_212101"/>
             <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVPurchase')])]"/>
         </record>
-        <record id="account_tax_template_IV_x1" model="account.tax.template">
-            <field name="name">x Purchase Tax</field>
-            <field name="description">IVPurchase</field>
-            <field name="sequence">10</field>
-            <field name="amount">1300</field>
-            <field name="amount_type">percent</field>
-            <field name="type_tax_use">purchase</field>
-            <field name="include_base_amount" eval="False"/>
-            <field name="chart_template_id" ref="account_chart_template_x"/>
-            <field name="refund_account_id" ref="account_account_template_x212101"/>
-            <field name="account_id" ref="account_account_template_x212101"/>
-            <field name="tag_ids" eval="[(6,0,[ref('l10n_cr.tax_IVPurchase')])]"/>
-        </record>
 
 
         <!--
@@ -79,8 +52,5 @@
         -->
         <record id="account_account_template_0_410001" model="account.account.template">
             <field name="tax_ids" eval="[(6,0,[ref('account_tax_template_IV_0'), ref('account_tax_template_IV_1')])]"/>
-        </record>
-        <record id="account_account_template_x410001" model="account.account.template">
-            <field name="tax_ids" eval="[(6,0,[ref('account_tax_template_IV_x'), ref('account_tax_template_IV_x1')])]"/>
         </record>
 </odoo>
