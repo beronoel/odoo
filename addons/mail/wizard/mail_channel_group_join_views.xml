@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="mail_channel_group_join_view_form" model="ir.ui.view">
+        <field name="name">mail.channel.group.join.form</field>
+        <field name="model">mail.channel.group.join</field>
+        <field name="arch" type="xml">
+            <form string="Join channels">
+                <header>
+                    <button
+                        string="Create channel"
+                        class="oe_highlight"
+                        name="action_create_channel"
+                        type="object"/>
+                </header>
+                <sheet>
+                    <label for="member_channel_ids"/>
+                    <field name="member_channel_ids" readonly="1">
+                        <tree create="0" edit="0" delete="0">
+                            <field name="channel_name" readonly="1"/>
+                            <field name="public" readonly="1"/>
+                            <button
+                                string="Leave"
+                                icon="gtk-remove"
+                                name="action_unfollow"
+                                type="object"/>
+                        </tree>
+                    </field>
+
+                    <label for="open_channel_ids"/>
+                    <field name="open_channel_ids" readonly="1">
+                        <tree create="0" edit="0" delete="0">
+                            <field name="channel_name" readonly="1"/>
+                            <field name="public" readonly="1"/>
+                            <button
+                                string="Join"
+                                icon="gtk-add"
+                                name="action_follow"
+                                type="object"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <footer>
+                    <group>
+                        <button string="Close" class="oe_link" special="cancel"/>
+                    </group>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

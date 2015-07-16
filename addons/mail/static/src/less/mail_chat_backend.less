@@ -1,0 +1,47 @@
+
+/* PartnerInviteDialog */
+.o_mail_chat_partner_invite{
+    height: 50px;
+}
+
+/* ABstractAddMoreSearch */
+.o_mail_chat_add_more_search{
+
+}
+
+/* ChatMailThread Client Action */
+.o_mail_chat {
+    // Get the 100% height of its flex parent
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+
+    .o_mail_chat_sidebar {
+        flex: 0 0 20%;
+        background-color: yellow;
+    }
+
+    .o_mail_chat_content {
+        flex: 0 0 80%;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .o_mail_chat_messages {
+            flex: 1 0 0;
+            overflow: auto;
+            background-color: blue
+        }
+
+        .o_mail_chat_composer {
+            flex: 0 0 auto;
+            background-color: red;
+        }
+    }
+}

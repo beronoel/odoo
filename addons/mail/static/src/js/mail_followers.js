@@ -13,7 +13,7 @@ var web_client = require('web.web_client');
 var _t = core._t;
 var qweb = core.qweb;
 
-/** 
+/**
  * ------------------------------------------------------------
  * timeline_followers Widget
  * ------------------------------------------------------------
@@ -40,7 +40,7 @@ var Followers = form_common.AbstractField.extend({
         this.value = [];
         this.followers = [];
         this.data_subtype = {};
-        
+
         this.view_is_editable = this.__parentedParent.is_action_enabled('edit');
     },
 
@@ -112,7 +112,7 @@ var Followers = form_common.AbstractField.extend({
                         size: 'small',
                         title: _t('Edit Subscription of ') + $currentTarget.siblings('a').text(),
                         buttons: [
-                                { text: _t("Apply"), click: function() { 
+                                { text: _t("Apply"), click: function() {
                                     self.do_update_subscription(event, user_pid);
                                     this.parents('.modal').modal('hide');
                                 }},
@@ -287,7 +287,7 @@ var Followers = form_common.AbstractField.extend({
 
         if (user_pid) {
             dialog = true;
-        } 
+        }
         else {
             var subtype_list_ul = this.$('.o_timeline_subtype_list ul').empty();
             if (! this.message_is_follower) {
@@ -310,7 +310,7 @@ var Followers = form_common.AbstractField.extend({
     display_subtypes:function (data, dialog) {
         var self = this;
         var $list = this.$('.o_timeline_subtype_list ul');
-    
+
         if (_.isEmpty(this.data_subtype)) {
             this.data_subtype = data;
 
@@ -334,7 +334,7 @@ var Followers = form_common.AbstractField.extend({
                 }
                 old_parent_model = record.parent_model;
                 record.followed = record.followed || undefined;
-                $(qweb.render('mail_followers_subtype', {'record': record, 
+                $(qweb.render('mail_followers_subtype', {'record': record,
                                                          'dialog': dialog}))
                 .appendTo($list);
             });
@@ -344,9 +344,9 @@ var Followers = form_common.AbstractField.extend({
     do_follow: function () {
         var context = new data.CompoundContext(this.build_context(), {});
         this.$('.o_timeline_subtype_list > .dropdown-toggle').attr('disabled', false);
-        this.ds_model.call('message_subscribe_users', [[this.view.datarecord.id], 
-                                                       [session.uid], 
-                                                       undefined, 
+        this.ds_model.call('message_subscribe_users', [[this.view.datarecord.id],
+                                                       [session.uid],
+                                                       undefined,
                                                        context])
             .then(this.proxy('read_value'));
 
@@ -354,7 +354,7 @@ var Followers = form_common.AbstractField.extend({
             $(record).attr('checked', 'checked');
         });
     },
-    
+
     do_unfollow: function (user_pid) {
         if (confirm(_t("Warning! \nYou won't be notified of any email or discussion on this document. Do you really want to unfollow this document ?"))) {
             _(this.$('.o_timeline_msg_subtype_check')).each(function (record) {
@@ -371,7 +371,7 @@ var Followers = form_common.AbstractField.extend({
             }
 
             var context = new data.CompoundContext(this.build_context(), {});
-            return this.ds_model.call(action_unsubscribe, [[this.view.datarecord.id], 
+            return this.ds_model.call(action_unsubscribe, [[this.view.datarecord.id],
                                                            follower_ids, context])
                    .then(this.proxy('read_value'));
         }
@@ -404,9 +404,9 @@ var Followers = form_common.AbstractField.extend({
                 $(event.target).attr("checked", "checked");
             }
             else {
-                  self.$('.o_timeline_subtype_list ul').empty(); 
+                  self.$('.o_timeline_subtype_list ul').empty();
             }
-        } 
+        }
         else {
             var context = new data.CompoundContext(this.build_context(), {});
             return this.ds_model.call(action_subscribe, [[this.view.datarecord.id], follower_ids, undefined, checklist, context])

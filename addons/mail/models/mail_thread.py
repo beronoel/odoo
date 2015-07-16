@@ -344,6 +344,9 @@ class MailThread(models.AbstractModel):
                         ('res_model', 'in', [False, self._name]),
                         ('internal', '=', True)], ['name', 'description', 'sequence'])
                     options['internal_subtypes'] = internal_subtypes
+                # emoji list
+                options['emoji_list'] = self.env['mail.shortcode'].search([('shortcode_type', '=', 'image')]).read(['source', 'description', 'substitution'])
+                # save options on the node
                 node.set('options', json.dumps(options))
             res['arch'] = etree.tostring(doc)
         return res
@@ -1455,6 +1458,9 @@ class MailThread(models.AbstractModel):
                     to the related document. Should only be set by Chatter.
             :return int: ID of newly created mail.message
         """
+        print "MESSAGE POST"
+        print kwargs, body, subtype
+        print context
         if attachments is None:
             attachments = {}
         if self.ids and not self.ensure_one():

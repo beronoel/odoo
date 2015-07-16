@@ -1,4 +1,8 @@
 
+/* emoji size */
+.o_mail_emoji img{
+    height: 20px;
+}
 
 
 .openerp_style { /* base style of openerp */

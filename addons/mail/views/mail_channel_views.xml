@@ -31,7 +31,7 @@
                 </form>
             </field>
         </record>
-        
+
         <record id="mail_channel_partner_action" model="ir.actions.act_window">
             <field name="name">Channels/Partner</field>
             <field name="res_model">mail.channel.partner</field>
@@ -186,6 +186,51 @@
         <menuitem id="mail_channel_menu_settings" parent="base.menu_email" sequence="90"
             name="Channels" action="mail_channel_action_view"
             groups="base.group_no_one"/>
+
+
+
+
+
+    <!-- TODO JEM : SLACK test client action-->
+
+    <record id="mail_channel_action_client_slack" model="ir.actions.client">
+            <field name="name">Slack View</field>
+            <field name="tag">mail.chat.instant_messaging</field>
+            <field name="res_model">mail.channel</field>
+            <!--
+            <field name="context">{
+                'default_channel_id': 'channel_inbox',
+                'default_model': 'res.users',
+                'default_res_id': uid,
+            }</field>
+            -->
+            <field name="params" eval="&quot;{
+                'view_mailbox': True,
+                'view_inbox': True,
+                'read_action': 'read',
+                'default_active_id': 'channel_inbox'
+            }&quot;"/>
+            <field name="help" type="html">
+                <p>
+                    There is no message in this channel.
+                </p><p>
+                    Your "Inbox" contains your "needaction" also known as the message where you are mentioned, and the message you get when you follow a document as a person.<br/>
+                    Your "Starred" contains your favorite messages.
+                    <br/><br/>
+                    In the "Channels" section, you will find the public and restricted channel.<br/>
+                    The "Direct Message" allow you to talk directly to one person.<br/>
+                    "Private Group" contains the private group conversation. You need to be invited to this group to see it.
+                </p>
+            </field>
+        </record>
+
+    <menuitem
+        id="mail.mail_channel_menu_root_slack"
+        name="Slack"
+        action="mail_channel_action_client_slack"
+        icon="fa-envelope"
+        groups="base.group_user"
+        sequence="1"/>
 
     </data>
 </openerp>

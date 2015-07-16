@@ -46,7 +46,9 @@ class ImBus(models.Model):
     @api.model
     def sendmany(self, notifications):
         channels = set()
+        print 'NOTIFIY'
         for channel, message in notifications:
+            print channel
             channels.add(channel)
             values = {
                 "channel": json_dump(channel),

@@ -1,0 +1,38 @@
+
+.o_mail_thread{
+
+    /* Starred and Needaction on message */
+    .o_mail_thread_message_star, .o_mail_thread_message_needaction {
+        opacity: 0.5;
+        color: black;
+    }
+    .o_mail_thread_message_star:hover, .o_mail_thread_message_needaction:hover{
+        opacity: 1;
+        cursor: pointer;
+    }
+    .o_mail_thread_message_star.o_mail_message_starred{
+        color: orange;
+    }
+    /* author avatar */
+    .o_mail_thread_avatar{
+        width: 80%;
+    }
+    /* message layout */
+    .o_mail_thread_message{
+        margin-bottom: 10px;
+    }
+    .o_mail_thread_message_core{
+        padding: 5px;
+    }
+    .o_mail_thread_message_info{
+        margin-top: 0;
+    }
+}
+
+.o_mail_compose_message{
+
+    // Emoji size in the popover
+    .o_mail_compose_message_emoji_img img{
+        height: 26px;
+    }
+}

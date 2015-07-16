@@ -13,15 +13,15 @@ DISCONNECTION_TIMER = TIMEOUT + 5
 AWAY_TIMER = 600 # 10 minutes
 
 
-class ImChatPresence(models.Model):
-    """ User Chat Presence
+class BusPresence(models.Model):
+    """ User Presence
         Its status is 'online', 'away' or 'offline'. This model should be a one2one, but is not
         attached to res_users to avoid database concurrence errors. Since the 'update' method is executed
         at each poll, if the user have multiple opened tabs, concurrence errors can happend, but are 'muted-logged'.
     """
 
-    _name = 'im_chat.presence'
-    _description = 'User Chat Presence'
+    _name = 'bus.presence'
+    _description = 'User Presence'
 
     _sql_constraints = [('im_chat_user_status_unique', 'unique(user_id)', 'A user can only have one IM status.')]
 

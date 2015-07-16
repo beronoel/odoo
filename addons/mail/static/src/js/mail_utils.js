@@ -5,7 +5,7 @@ odoo.define('mail.utils', function () {
  * ------------------------------------------------------------
  * ChatterUtils
  * ------------------------------------------------------------
- * 
+ *
  * This class holds a few tools method for Chatter.
  * Some regular expressions not used anymore, kept because I want to
  * - (^|\s)@((\w|@|\.)*): @login@log.log
@@ -45,24 +45,6 @@ function get_attachment_url(session, message_id, attachment_id) {
 }
 
 /**
- * Replaces some expressions
- * - :name - shortcut to an image
- */
-function do_replace_expressions(string) {
-    var icon_list = ['al', 'pinky'];
-    /* special shortcut: :name, try to find an icon if in list */
-    var regex_login = new RegExp(/(^|\s):((\w)*)/g);
-    var regex_res = regex_login.exec(string);
-    while (regex_res !== null) {
-        var icon_name = regex_res[2];
-        if (_.include(icon_list, icon_name))
-            string = string.replace(regex_res[0], regex_res[1] + '<img src="/mail/static/src/img/_' + icon_name + '.png" width="22px" height="22px" alt="' + icon_name + '"/>');
-        regex_res = regex_login.exec(string);
-    }
-    return string;
-}
-
-/**
  * Replaces textarea text into html text (add <p>, <a>)
  * TDE note : should be done server-side, in Python -> use mail.compose.message ?
  */
@@ -72,7 +54,7 @@ function get_text2html(text) {
         .replace(/[\n\r]/g,'<br/>');
 }
 
-/* Returns the complete domain with "&" 
+/* Returns the complete domain with "&"
  * TDE note: please add some comments to explain how/why
  */
 function expand_domain(domain) {
@@ -123,15 +105,37 @@ function bindTooltipTo($el, value, position) {
     });
 }
 
+
+/**
+ * ------------------------------------------------------------
+ * MailChat Utils
+ * ------------------------------------------------------------
+ */
+
+ /**
+  * Apply the given shortcode to the 'str' message.
+  * @param str : the text to substitute (html).
+  * @param shortcodes : dict where key is the shortcode, and the value is the substitution
+  */
+function apply_shortcode(str, shortcodes){
+    var re_escape = function(str){
+        return String(str).replace(/([.*+?=^!:${}()|[\]\/\\])/g, '\\$1');
+    };
+    _.each(_.keys(shortcodes), function(key){
+        str = str.replace( new RegExp("(?:^|\\s|<[a-z]*>)(" + re_escape(key) + ")(?:\\s|$|</[a-z]*>)"), ' <span class="o_mail_emoji">'+shortcodes[key]+'</span> ');
+    });
+    return str;
+}
+
 return {
     parse_email: parse_email,
     get_image: get_image,
     get_attachment_url: get_attachment_url,
-    do_replace_expressions: do_replace_expressions,
     get_text2html: get_text2html,
     expand_domain: expand_domain,
     breakword: breakword,
     bindTooltipTo: bindTooltipTo,
+    apply_shortcode: apply_shortcode,
 };
 
 });
