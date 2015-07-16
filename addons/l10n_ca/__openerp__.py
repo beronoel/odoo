@@ -36,9 +36,9 @@ position.
     """,
     'depends': [
         'base',
-        'account',
         'base_iban',
         'base_vat',
+        'stock_account',
     ],
     'data': [
         'account_chart_en.xml',
@@ -49,8 +49,8 @@ position.
         'account_chart_template_fr.xml',
         'account_tax_fr.xml',
         'fiscal_templates_fr.xml',
-        'l10n_ca_wizard.xml'
+        'account_chart_template.yml',
     ],
     'demo': [],
-    'installable': False,
+    'installable': True,
 }
