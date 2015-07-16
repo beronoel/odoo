@@ -127,7 +127,7 @@ class delivery_carrier(osv.osv):
                     'operator': '>=',
                     'max_value': record.amount,
                     'standard_price': 0.0,
-                    'list_price': 0.0,
+                    'list_base_price': 0.0,
                 }
                 grid_line_pool.create(cr, uid, line_data, context=context)
             if isinstance(record.normal_price,float):
@@ -138,7 +138,7 @@ class delivery_carrier(osv.osv):
                     'operator': '>=',
                     'max_value': 0.0,
                     'standard_price': record.normal_price,
-                    'list_price': record.normal_price,
+                    'list_base_price': record.normal_price,
                 }
                 grid_line_pool.create(cr, uid, line_data, context=context)
         return True
