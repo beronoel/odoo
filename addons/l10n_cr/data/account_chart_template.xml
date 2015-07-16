@@ -14,8 +14,7 @@
     <record id="account_chart_template_0" model="account.chart.template">
         <field name="name">Costa Rica - Company 0</field>
         <field name="code_digits">6</field>
-        <field name="bank_account_code_prefix">102</field>
-        <field name="cash_account_code_prefix">103</field>
+        <field name="bank_account_code_prefix">0-111200</field>
         <field name="currency_id" ref="base.CRC"/>
         <field name="transfer_account_id" ref="transfer_account_0_id"/>
     </record>
