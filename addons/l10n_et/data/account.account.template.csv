@@ -94,3 +94,5 @@
 "l10n_et6432","6432","Payments of interest and bank charges on foreign debt","account.data_account_type_expenses","",l10n_et.l10n_et
 "l10n_et6433","6433","Payments on the principal of local debt","account.data_account_type_expenses","",l10n_et.l10n_et
 "l10n_et6434","6434","Payments of interest and bank charges on local debt","account.data_account_type_expenses","",l10n_et.l10n_et
+"l10n_et6435","6435","Gain account","account.data_account_type_other_income","",l10n_et.l10n_et
+"l10n_et6436","6436","Loss account","account.data_account_type_expenses","",l10n_et.l10n_et
