@@ -11,6 +11,7 @@
 
 /* ChatMailThread Client Action */
 .o_mail_chat {
+    /* Layout */
     // Get the 100% height of its flex parent
     position: absolute;
     top: 0;
@@ -23,12 +24,13 @@
     flex-direction: row;
 
     .o_mail_chat_sidebar {
-        flex: 0 0 20%;
+        flex: 0 0 15%;
+        overflow-y: scroll;
         background-color: yellow;
     }
 
     .o_mail_chat_content {
-        flex: 0 0 80%;
+        flex: 0 0 85%;
         display: flex;
         flex-direction: column;
         height: 100%;
@@ -44,4 +46,16 @@
             background-color: red;
         }
     }
+
+    /* Style */
+    .o_mail_chat_sidebar{
+        padding-left: 10px;
+        h4{
+            text-transform: uppercase;
+        }
+        .o_mail_chat_channel_unread{
+            font-weight: bold;
+        }
+    }
+
 }

@@ -34,11 +34,35 @@
 
 
 
-
+    <!--
+        ChatMailThread
+        Layout of the client action
+    -->
     <t t-name="mail.chat.ChatMailThread">
         <div class="o_mail_chat">
             <div class="o_mail_chat_sidebar">
-                Sidebar
+                <!-- Static channel list -->
+                <ul class="nav nav-sidebar">
+                    <li class="o_mail_chat_channel_item" data-channel-id="channel_inbox">
+                        <a href="#">Inbox</a>
+                    </li>
+                    <li class="o_mail_chat_channel_item" data-channel-id="channel_starred">
+                        <a href="#">Starred</a>
+                    </li>
+                </ul>
+                <!-- Channel list -->
+                <h4><t t-esc="_t('Channels')"/></h4>
+                <t t-call="mail.chat.ChatMailThread.channels">
+                    <t t-set="channel_slot" t-value="'channel_channel'"/>
+                </t>
+                <!-- Direct Message list (res.users)-->
+                <h4><t t-esc="_t('Direct Message')"/></h4>
+                <t t-call="mail.chat.ChatThreadMessage.partners"/>
+                <!-- Private Group list -->
+                <h4><t t-esc="_t('Private Group')"/></h4>
+                <t t-call="mail.chat.ChatMailThread.channels">
+                    <t t-set="channel_slot" t-value="'channel_private_group'"/>
+                </t>
             </div>
             <div class="o_mail_chat_content">
                 <div class="o_mail_chat_messages">
@@ -50,8 +74,25 @@
         </div>
     </t>
 
-
-
+    <!--
+        List of channel in the sidebar
+        param: channel_slot : the name of the channel slot
+        param: widget : the widget (client action)
+    -->
+    <t t-name="mail.chat.ChatMailThread.channels">
+        <ul t-att-class="'nav nav-sidebar o_mail_chat_channel_slot_' + channel_slot">
+            <t t-foreach="widget.get(channel_slot)" t-as="channel">
+                <li t-att-class="'o_mail_chat_channel_item ' + (channel.message_needaction_counter &gt; 0 ? 'o_mail_chat_channel_unread' : ' ')" t-att-data-channel-id="channel.id">
+                    <a href="#">
+                        <t t-esc="channel.channel_name"/>
+                        <span class="badge pull-right o_mail_chat_needaction" t-att-data-channel-id="channel.id" t-att-style="((channel.message_needaction_counter &gt; 0) ? 'display:block;' : 'display:none;')">
+                            <t t-esc="channel.message_needaction_counter"/>
+                        </span>
+                    </a>
+                </li>
+            </t>
+        </ul>
+    </t>
 
 
 
@@ -72,24 +113,24 @@
             <div class="col-sm-3 col-md-2 sidebar o_mail_chat_im_sidebar">
                 <!-- Static channel list -->
                 <ul class="nav nav-sidebar">
-                    <li class="o_mail_chat_im_channel_item" data-channel-id="channel_inbox">
+                    <li class="o_mail_chat_channel_item" data-channel-id="channel_inbox">
                         <a href="#">Inbox</a>
                     </li>
-                    <li class="o_mail_chat_im_channel_item" data-channel-id="channel_starred">
+                    <li class="o_mail_chat_channel_item" data-channel-id="channel_starred">
                         <a href="#">Starred</a>
                     </li>
                 </ul>
                 <!-- Channel list -->
                 <h4><t t-esc="_t('Channels')"/></h4>
-                <t t-call="mail.chat.im.ChannelList">
+                <t t-call="mail.chat.ChatMailThread.channels">
                     <t t-set="channel_slot" t-value="'channel_channel'"/>
                 </t>
                 <!-- Direct Message list (res.users)-->
                 <h4><t t-esc="_t('Direct Message')"/></h4>
-                <t t-call="mail.chat.im.PartnerList"/>
+                <t t-call="mail.chat.ChatThreadMessage.partners"/>
                 <!-- Private Group list -->
                 <h4><t t-esc="_t('Private Group')"/></h4>
-                <t t-call="mail.chat.im.ChannelList">
+                <t t-call="mail.chat.ChatMailThread.channels">
                     <t t-set="channel_slot" t-value="'channel_private_group'"/>
                 </t>
             </div>
@@ -122,23 +163,8 @@
         </div>
     </t>
 
-    <t t-name="mail.chat.im.ChannelList">
-        <ul t-att-class="'nav nav-sidebar o_mail_chat_im_sidebar_slot_' + channel_slot">
-            <t t-foreach="widget.get(channel_slot)" t-as="channel">
-                <li t-att-class="'o_mail_chat_im_channel_item ' + (channel.message_needaction_counter &gt; 0 ? 'o_mail_chat_im_unread' : ' ')" t-att-data-channel-id="channel.id">
-                    <a href="#">
-                        <t t-esc="channel.channel_name"/>
-                        <span class="badge pull-right o_mail_chat_needaction" t-att-data-channel-id="channel.id" t-att-style="((channel.message_needaction_counter &gt; 0) ? 'display:block;' : 'display:none;')">
-                            <t t-esc="channel.message_needaction_counter"/>
-                        </span>
-                    </a>
-                </li>
-            </t>
-        </ul>
-    </t>
-
-    <t t-name="mail.chat.im.PartnerList">
-        <ul class="nav nav-sidebar o_mail_chat_im_sidebar_slot_partners">
+    <t t-name="mail.chat.ChatThreadMessage.partners">
+        <ul class="nav nav-sidebar o_mail_chat_channel_slot_partners">
             <t t-foreach="widget.get('partners')" t-as="partner">
                 <li class="o_mail_chat_im_partner_item" t-att-data-partner-id="partner.id">
                     <a href="#" t-att-class="'fa ' + (partner.im_status == 'online' ? 'fa-circle' : 'fa-circle-o')">

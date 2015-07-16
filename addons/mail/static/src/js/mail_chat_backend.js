@@ -372,15 +372,227 @@ var PartnerInviteDialog = Dialog.extend({
 var ChatMailTread = Widget.extend(mail_thread.MailThreadMixin, ControlPanelMixin, {
     template: 'mail.chat.ChatMailThread',
     events: {
+        // events from mail thread mixin
 
+        // events specific for ChatMailThread
+        "click .o_mail_chat_channel_item": "on_click_channel",
     },
     init: function (parent, action) {
         this._super.apply(this, arguments);
         mail_thread.MailThreadMixin.init.call(this);
+        // attributes
+        this.action_manager = parent;
+        this.help_message = action.help || '';
+        this.context = action.context;
+        this.action = action;
+        // components : conversation manager and search widget (channel_type + '_search_widget')
+        this.conv_manager = web_client.mail_conversation_manager;
+        this.channel_search_widget = new ChannelAddMoreSearch(this, [['channel_type', '=', 'channel']], {'label': _t('+ Subscribe'), 'can_create': true});
+        this.group_search_widget = new PrivateGroupAddMoreSearch(this, [], {'label': _t('+ New private group'), 'can_create': true});
+        this.partner_search_widget = new PartnerAddMoreSeach(this);
+        // emoji
+        this.emoji_list = this.conv_manager.emoji_list;
+        this.emoji_substitution = this.conv_manager.emoji_substitution;
+        // channel business
+        this.channels = {};
+        this.mapping = {}; // mapping partner_id/channel_id for 'direct message' channel
+        this.set('current_channel_id', false);
+        this.domain_search = [];
+        // channel slots
+        this.set('channel_channel', []);
+        this.set('channel_direct_message', []);
+        this.set('channel_private_group', []);
+        this.set('partners', []);
+        // models
+        this.ChannelModel = new Model('mail.channel', this.context);
+    },
+    willStart: function(){
+        return this.channel_fetch_slot();
     },
     start: function(){
+        var self = this;
         this._super.apply(this, arguments);
         mail_thread.MailThreadMixin.start.call(this);
+
+        // channel business events
+        this.on("change:current_channel_id", this, this.channel_change);
+        this.on("change:channel_channel", this, function(){
+            self.channel_render('channel_channel');
+        });
+        this.on("change:channel_private_group", this, function(){
+            self.channel_render('channel_private_group');
+        });
+        this.on("change:partners", this, this.partner_render);
+
+        // search widget for channel
+        this.channel_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_channel_channel'));
+        this.channel_search_widget.on('item_create', this, function(name){
+            self.channel_create(name, 'public').then(function(channel){
+                self.channel_apply(channel);
+            });
+        });
+        this.channel_search_widget.on('item_clicked', this, function(item){
+            self.channel_join_and_get_info(item.id).then(function(channel){
+                self.channel_apply(channel);
+            });
+        });
+        // search widget for direct message
+        this.partner_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_partners'));
+        this.partner_search_widget.on('item_clicked', this, function(item){
+            self.channel_get([item.id]);
+            self.partner_add(item);
+        });
+        // search widget for private group
+        this.group_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_channel_private_group'));
+        this.group_search_widget.on('item_create', this, function(name){
+            self.channel_create(name, 'private').then(function(channel){
+                self.channel_apply(channel);
+            });
+        });
+    },
+    destroy: function(){
+        internal_bus.trigger('mail_im_view_active', false); // IM View is desactivated
+        this._super.apply(this, arguments);
+    },
+    // events
+    on_click_channel: function(event){
+        event.preventDefault();
+        var channel_id = this.$(event.currentTarget).data('channel-id');
+        this.set('current_channel_id', channel_id);
+    },
+    // channels
+    channel_fetch_slot: function(){
+        var self = this;
+        return this.ChannelModel.call("channel_fetch_slot").then(function(result){
+            self.set('partners', result['partners']);
+            self.mapping = result['mapping'];
+            self._channel_slot(_.omit(result, 'partners', 'mapping'));
+        });
+    },
+    _channel_slot: function(fetch_result){
+        var self = this;
+        var channel_slots = _.keys(fetch_result);
+        _.each(channel_slots, function(slot){
+            // update the channel slot
+            self.set(slot, fetch_result[slot]);
+            // flatten the result : update the complete channel list
+            _.each(fetch_result[slot], function(channel){
+                self.channels[channel.id] = channel;
+            });
+        });
+    },
+    channel_apply: function(channel){
+        this.channel_add(channel);
+        this.set('current_channel_id', channel.id);
+    },
+    channel_add: function(channel){
+        var channel_slot = this.get_channel_slot(channel);
+        var existing = this.get(channel_slot);
+        if(_.contains(_.pluck(existing, 'id'), channel.id)){
+            // update the old channel
+            var filtered_channels = _.filter(this.get(channel_slot), function(item){ return item.id != channel.id; });
+            this.set(channel_slot, filtered_channels.concat([channel]));
+        }else{
+            // simply add the reveiced channel
+            this.set(channel_slot, existing.concat([channel]));
+        }
+        // also update the flatten list
+        this.channels[channel.id] = channel;
+
+        // update the mapping for 'direct message' channel, and the partner list
+        if(channel_slot === 'channel_direct_message'){
+            var partner = channel.direct_partner[0];
+            this.mapping[partner.id] = channel.id;
+            this.partner_add(partner);
+        }
+    },
+    channel_remove: function(channel_id){
+        var channel = this.channels[channel_id];
+        var slot = this.get_channel_slot(channel);
+        this.set(slot, _.filter(this.get(slot), function(c){ return c.id !== channel_id; }));
+        delete this.channels[channel_id];
+    },
+    channel_get: function(partner_ids){
+        var self = this;
+        return this.ChannelModel.call('channel_get', [partner_ids]).then(function(channel){
+            self.channel_apply(channel);
+        });
+    },
+    channel_info: function(channel_id){
+        var self = this;
+        return this.ChannelModel.call('channel_info', [[channel_id]]).then(function(channels){
+            return channels[0];
+        });
+    },
+    channel_unpin: function(uuid){
+        return this.ChannelModel.call('channel_pin', [uuid, false]);
+    },
+    channel_join_and_get_info: function(channel_id){
+        return this.ChannelModel.call('channel_join_and_get_info', [[channel_id]]);
+    },
+    channel_invite: function(partner_ids){
+        return this.ChannelModel.call('channel_invite', [], {"ids" : [this.get('current_channel_id')], 'partner_ids': partner_ids});
+    },
+    channel_create: function(channel_name, channel_type){
+        return this.ChannelModel.call('channel_create', [channel_name, channel_type]);
+    },
+    channel_change: function(){
+        var self = this;
+        var current_channel_id = this.get('current_channel_id');
+        var current_channel = this.channels[current_channel_id];
+        var current_channel_name = current_channel && current_channel.channel_name || _t('Unknown');
+        var button_flags = {
+            $minimize: true,
+            $invite: true,
+            $more: true,
+        };
+        // virtual channel id (for inbox, or starred channel)
+        if(_.isString(current_channel_id)){
+            if(current_channel_id == 'channel_inbox'){
+                current_channel_name = _t('Inbox');
+            }
+            if(current_channel_id == 'channel_starred'){
+                current_channel_name = _t('Starred');
+            }
+            button_flags.$minimize = false;
+            button_flags.$invite = false;
+            button_flags.$more = false;
+        }else{
+            if(current_channel && this.get_channel_slot(current_channel) === 'channel_direct_message'){
+                button_flags.$invite = false;
+                button_flags.$more = false;
+            }
+        }
+        // unbold the current channel TODO JEM do rpc to set last dateseen, then unblod !
+        this.$('.o_mail_chat_channel_item[data-channel-id="'+current_channel_id+'"]').removeClass('o_mail_chat_channel_unread');
+        // TODO JEM this.cp_update([{'title': current_channel_name, 'action': this}], button_flags);
+        console.log('channel change : ', current_channel_id);
+        // fetch the messages (do it after cp_update which update the domain search)
+        //return this.message_fetch(this.get_current_domain(), {'reset': true, 'thread_level': 1});
+    },
+    channel_render: function(channel_slot){
+        this.$('.o_mail_chat_channel_slot_' + channel_slot).replaceWith(QWeb.render("mail.chat.ChatMailThread.channels", {'widget': this, 'channel_slot': channel_slot}));
+    },
+    // partners
+    partner_add: function(partner){
+        console.log("partner_add", partner);
+        var partners = _.filter(this.get('partners'), function(p){ return p.id != partner.id; });
+        this.set('partners', partners.concat([partner]));
+    },
+    partner_render: function(){
+        this.$('.o_mail_chat_channel_slot_partners').replaceWith(QWeb.render("mail.chat.ChatThreadMessage.partners", {'widget': this}));
+    },
+    // utils
+    get_channel_slot: function(channel){
+        if(channel.channel_type === 'channel'){
+            if(channel.public === 'private'){
+                return 'channel_private_group';
+            }
+            return 'channel_channel';
+        }
+        if(channel.channel_type === 'chat'){
+            return 'channel_direct_message';
+        }
     },
 });
 
@@ -388,7 +600,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
     template: "mail.chat.im.InstantMessagingView",
     events: {
         "click .o_mail_redirect": "on_click_redirect",
-        "click .o_mail_chat_im_sidebar .o_mail_chat_im_channel_item": "on_click_channel",
+        "click .o_mail_chat_im_sidebar .o_mail_chat_channel_item": "on_click_channel",
         "click .o_mail_chat_im_partner_item": "on_click_partner",
         "click .o_mail_chat_im_content .o_mail_chat_im_star": "on_message_star",
         "click .o_mail_chat_im_channel_unpin": "on_click_partner_unpin",
@@ -448,7 +660,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
         });
         this.on("change:partners", this, this.partner_render);
         // search widget for channel
-        this.channel_search_widget.insertAfter(this.$('.o_mail_chat_im_sidebar_slot_channel_channel'));
+        this.channel_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_channel_channel'));
         this.channel_search_widget.on('item_create', this, function(name){
             self.channel_create(name, 'public').then(function(channel){
                 self.channel_apply(channel);
@@ -460,13 +672,13 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
             });
         });
         // search widget for direct message
-        this.partner_search_widget.insertAfter(this.$('.o_mail_chat_im_sidebar_slot_partners'));
+        this.partner_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_partners'));
         this.partner_search_widget.on('item_clicked', this, function(item){
             self.channel_get([item.id]);
             self.partner_add(item);
         });
         // search widget for private group
-        this.group_search_widget.insertAfter(this.$('.o_mail_chat_im_sidebar_slot_channel_private_group'));
+        this.group_search_widget.insertAfter(this.$('.o_mail_chat_channel_slot_channel_private_group'));
         this.group_search_widget.on('item_create', this, function(name){
             self.channel_create(name, 'private').then(function(channel){
                 self.channel_apply(channel);
@@ -745,17 +957,13 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
         return this.ChannelModel.call('channel_pin', [uuid, false]);
     },
     channel_join_and_get_info: function(channel_id){
-        return this.ChannelModel.call('channel_join_and_get_info', [[channel_id]]).then(function(channel){
-            return channel;
-        });
+        return this.ChannelModel.call('channel_join_and_get_info', [[channel_id]]);
     },
     channel_invite: function(partner_ids){
         return this.ChannelModel.call('channel_invite', [], {"ids" : [this.get('current_channel_id')], 'partner_ids': partner_ids});
     },
     channel_create: function(channel_name, channel_type){
-        return this.ChannelModel.call('channel_create', [channel_name, channel_type]).then(function(channel){
-            return channel;
-        });
+        return this.ChannelModel.call('channel_create', [channel_name, channel_type]);
     },
     channel_change: function(){
         var self = this;
@@ -786,7 +994,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
         }
         // highlight and unbold the current channel
         this.$('li[data-channel-id]').removeClass('active');
-        this.$('li[data-channel-id="'+current_channel_id+'"]').addClass('active').removeClass('o_mail_chat_im_unread');
+        this.$('li[data-channel-id="'+current_channel_id+'"]').addClass('active').removeClass('o_mail_chat_channel_unread');
         this.cp_update([{'title': current_channel_name, 'action': this}], button_flags);
         // fetch the messages (do it after cp_update which update the domain search)
         return this.message_fetch(this.get_current_domain(), {'reset': true, 'thread_level': 1});
@@ -798,7 +1006,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
     },
     channel_render: function(channel_slot){
         console.log("CHANNEL RENDER", channel_slot);
-        this.$('.o_mail_chat_im_sidebar_slot_' + channel_slot).replaceWith(QWeb.render("mail.chat.im.ChannelList", {'widget': this, 'channel_slot': channel_slot}));
+        this.$('.o_mail_chat_channel_slot_' + channel_slot).replaceWith(QWeb.render("mail.chat.ChatMailThread.channels", {'widget': this, 'channel_slot': channel_slot}));
     },
     // messages
     message_fetch: function(domain, options){
@@ -895,7 +1103,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
         def.then(function(){
             // bold channel having unread messages
             _.each(other_message_channel_ids, function(channel_id){
-               self.$('.o_mail_chat_im_sidebar .o_mail_chat_im_channel_item[data-channel-id="'+channel_id+'"]').addClass('o_mail_chat_im_unread');
+               self.$('.o_mail_chat_im_sidebar .o_mail_chat_channel_item[data-channel-id="'+channel_id+'"]').addClass('o_mail_chat_channel_unread');
             });
         });
         //TODO JEM: if needaction, add it to inbox + increment badge
@@ -915,7 +1123,7 @@ var InstantMessagingView = Widget.extend(ControlPanelMixin, {
         this.set('partners', partners.concat([partner]));
     },
     partner_render: function(){
-        this.$('.o_mail_chat_im_sidebar_slot_partners').replaceWith(QWeb.render("mail.chat.im.PartnerList", {'widget': this}));
+        this.$('.o_mail_chat_channel_slot_partners').replaceWith(QWeb.render("mail.chat.ChatThreadMessage.partners", {'widget': this}));
     },
     // needaction
     needaction_increment: function(channel_ids){
