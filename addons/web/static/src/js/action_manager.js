@@ -61,6 +61,9 @@ var Action = core.Class.extend({
     get_nb_views: function() {
         return 0;
     },
+    appendTo: function(el) {
+        return this.widget.appendTo(el);
+    }
 });
 /**
  * Specialization of Action for client actions that are Widgets
@@ -88,9 +91,16 @@ var WidgetAction = Action.extend({
     /**
      * Destroys the widget
      */
-    destroy: function() { 
+    destroy: function() {
         this.widget.destroy();
+        this.client_action_container.parentNode.removeChild(this.client_action_container);
     },
+    appendTo: function(el) {
+        this.client_action_container = document.createElement('div');
+        this.client_action_container.className = 'oe_client_action';
+        el.appendChild(this.client_action_container);
+        return this.widget.appendTo(el.lastElementChild);
+    }
 });
 /**
  * Specialization of WidgetAction for window actions (i.e. ViewManagers)
@@ -107,6 +117,12 @@ var ViewManagerAction = WidgetAction.extend({
         return this.widget.select_view(view_index).then(function() {
             _super.call(self);
         });
+    },
+    /**
+     * Destroys the widget
+     */
+    destroy: function() { 
+        this.widget.destroy();
     },
     /**
      * @return {Array} array of Objects that will be interpreted to display the breadcrumbs
@@ -127,6 +143,9 @@ var ViewManagerAction = WidgetAction.extend({
     get_nb_views: function() {
         return this.widget.view_stack.length;
     },
+    appendTo: function(el) {
+        return this.widget.appendTo(el);
+    }
 });
 
 var ActionManager = Widget.extend({
@@ -214,7 +233,7 @@ var ActionManager = Widget.extend({
         // render the inner_widget in a fragment, and append it to the
         // document only when it's ready
         var new_widget_fragment = document.createDocumentFragment();
-        return $.when(this.inner_widget.appendTo(new_widget_fragment)).done(function() {
+        return $.when(this.inner_action.appendTo(new_widget_fragment)).done(function() {
             self.$el.append(new_widget_fragment);
             // Hide the old_widget as it will be removed from the DOM when it
             // is destroyed
