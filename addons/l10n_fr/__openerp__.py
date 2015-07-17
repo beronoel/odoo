@@ -47,7 +47,7 @@ configuration of their taxes and fiscal positions manually.
         #'wizard/fr_report_bilan_view.xml',
         #'wizard/fr_report_compute_resultant_view.xml',
     ],
-    'test': ['test/l10n_fr_report.yml'],
+    #'test': ['test/l10n_fr_report.yml'],
     'demo': [],
     'auto_install': False,
     'installable': True,
