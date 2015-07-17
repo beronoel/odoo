@@ -1941,6 +1941,7 @@
             <field name="arch" type="xml">
                 <pivot string="Inventory">
                     <field name="location_id" type="row"/>
+                    <field name="product_id" type="row"/>
                     <field name="qty" type="measure"/>
                 </pivot>
             </field>
