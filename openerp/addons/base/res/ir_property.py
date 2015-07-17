@@ -4,9 +4,8 @@
 from operator import itemgetter
 import time
 
-from openerp import models, api
-from openerp.osv import osv, orm, fields
-from openerp.tools.misc import attrgetter
+from openerp import api, fields, models, _
+from openerp.osv import orm
 from openerp.exceptions import UserError
 
 # -------------------------------------------------------------------------
@@ -26,54 +25,51 @@ TYPE2FIELD = {
     'selection': 'value_text',
 }
 
-class ir_property(osv.osv):
+
+class IrProperty(models.Model):
     _name = 'ir.property'
 
-    _columns = {
-        'name': fields.char('Name', select=1),
+    name = fields.Char(index=True)
 
-        'res_id': fields.char('Resource', help="If not set, acts as a default value for new resources", select=1),
-        'company_id': fields.many2one('res.company', 'Company', select=1),
-        'fields_id': fields.many2one('ir.model.fields', 'Field', ondelete='cascade', required=True, select=1),
+    res_id = fields.Char(string='Resource',
+                         help="If not set, acts as a default value for new resources",
+                         index=True)
+    company_id = fields.Many2one('res.company', string='Company', index=True)
+    fields_id = fields.Many2one('ir.model.fields', string='Field',
+                                ondelete='cascade', required=True, index=True)
 
-        'value_float' : fields.float('Value'),
-        'value_integer' : fields.integer('Value'),
-        'value_text' : fields.text('Value'), # will contain (char, text)
-        'value_binary' : fields.binary('Value'),
-        'value_reference': fields.char('Value'),
-        'value_datetime' : fields.datetime('Value'),
+    value_float = fields.Float(string='Value')
+    value_integer = fields.Integer(string='Value')
+    value_text = fields.Text(string='Value')  # will contain (char, text)
+    value_binary = fields.Binary(string='Value')
+    value_reference = fields.Char(string='Value')
+    value_datetime = fields.Datetime(string='Value')
 
-        'type' : fields.selection([('char', 'Char'),
-                                   ('float', 'Float'),
-                                   ('boolean', 'Boolean'),
-                                   ('integer', 'Integer'),
-                                   ('text', 'Text'),
-                                   ('binary', 'Binary'),
-                                   ('many2one', 'Many2One'),
-                                   ('date', 'Date'),
-                                   ('datetime', 'DateTime'),
-                                   ('selection', 'Selection'),
-                                  ],
-                                  'Type',
-                                  required=True,
-                                  select=1),
-    }
+    type = fields.Selection([('char', 'Char'),
+                             ('float', 'Float'),
+                             ('boolean', 'Boolean'),
+                             ('integer', 'Integer'),
+                             ('text', 'Text'),
+                             ('binary', 'Binary'),
+                             ('many2one', 'Many2One'),
+                             ('date', 'Date'),
+                             ('datetime', 'DateTime'),
+                             ('selection', 'Selection'),
+                             ],
+                            required=True,
+                            default='many2one',
+                            index=True)
 
-    _defaults = {
-        'type': 'many2one',
-    }
-
-    def _update_values(self, cr, uid, ids, values):
+    @api.multi
+    def _update_values(self, values):
         value = values.pop('value', None)
         if not value:
             return values
 
-        prop = None
         type_ = values.get('type')
         if not type_:
-            if ids:
-                prop = self.browse(cr, uid, ids[0])
-                type_ = prop.type
+            if self.ids:
+                type_ = self.type
             else:
                 type_ = self._defaults['type']
 
@@ -87,24 +83,26 @@ class ir_property(osv.osv):
             elif isinstance(value, (int, long)):
                 field_id = values.get('fields_id')
                 if not field_id:
-                    if not prop:
+                    if not self:
                         raise ValueError()
-                    field_id = prop.fields_id
+                    field_id = self.fields_id
                 else:
-                    field_id = self.pool.get('ir.model.fields').browse(cr, uid, field_id)
+                    field_id = self.env['ir.model.fields'].browse(field_id)
 
                 value = '%s,%d' % (field_id.relation, value)
 
         values[field] = value
         return values
 
-    def write(self, cr, uid, ids, values, context=None):
-        return super(ir_property, self).write(cr, uid, ids, self._update_values(cr, uid, ids, values), context=context)
+    @api.multi
+    def write(self, values):
+        return super(IrProperty, self).write(self._update_values(values))
 
-    def create(self, cr, uid, values, context=None):
-        return super(ir_property, self).create(cr, uid, self._update_values(cr, uid, None, values), context=context)
+    @api.model
+    def create(self, values):
+        return super(IrProperty, self).create(self._update_values(values))
 
-    def get_by_record(self, cr, uid, record, context=None):
+    def get_by_record(self, record):
         if record.type in ('char', 'text', 'selection'):
             return record.value_text
         elif record.type == 'float':
@@ -119,38 +117,39 @@ class ir_property(osv.osv):
             if not record.value_reference:
                 return False
             model, resource_id = record.value_reference.split(',')
-            value = self.pool[model].browse(cr, uid, int(resource_id), context=context)
+            value = self.pool[model].browse(int(resource_id))
             return value.exists()
         elif record.type == 'datetime':
             return record.value_datetime
         elif record.type == 'date':
             if not record.value_datetime:
                 return False
-            return time.strftime('%Y-%m-%d', time.strptime(record.value_datetime, '%Y-%m-%d %H:%M:%S'))
+            return time.strftime(
+                '%Y-%m-%d', time.strptime(record.value_datetime, '%Y-%m-%d %H:%M:%S'))
         return False
 
-    def get(self, cr, uid, name, model, res_id=False, context=None):
-        domain = self._get_domain(cr, uid, name, model, context=context)
+    @api.model
+    def get(self, name, model, res_id=False):
+        domain = self._get_domain(name, model)
         if domain is not None:
             domain = [('res_id', '=', res_id)] + domain
             #make the search with company_id asc to make sure that properties specific to a company are given first
-            nid = self.search(cr, uid, domain, limit=1, order='company_id asc', context=context)
-            if not nid: return False
-            record = self.browse(cr, uid, nid[0], context=context)
-            return self.get_by_record(cr, uid, record, context=context)
+            record = self.search(domain, limit=1, order='company_id asc')
+            if not record:
+                return False
+            return self.get_by_record(record)
         return False
 
-    def _get_domain(self, cr, uid, prop_name, model, context=None):
-        context = context or {}
-        cr.execute('select id from ir_model_fields where name=%s and model=%s', (prop_name, model))
-        res = cr.fetchone()
+    def _get_domain(self, prop_name, model):
+        self.env.cr.execute('select id from ir_model_fields where name=%s and model=%s', (
+            prop_name, model))
+        res = self.env.cr.fetchone()
         if not res:
             return None
 
-        cid = context.get('force_company')
+        cid = self.env.context.get('force_company')
         if not cid:
-            company = self.pool.get('res.company')
-            cid = company._company_default_get(cr, uid, model, res[0], context=context)
+            cid = self.env['res.company']._company_default_get(model, res[0])
 
         return [('fields_id', '=', res[0]), ('company_id', 'in', [cid, False])]
 
@@ -207,8 +206,9 @@ class ir_property(osv.osv):
         default_value = clean(self.get(name, model))
 
         # retrieve the properties corresponding to the given record ids
-        self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
-        field_id = self._cr.fetchone()[0]
+        self.env.cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (
+            name, model))
+        field_id = self.env.cr.fetchone()[0]
         company_id = self.env.context.get('force_company') or self.env['res.company']._company_default_get(model, field_id).id
         refs = {('%s,%s' % (model, id)): id for id in values}
         props = self.search([
@@ -285,7 +285,6 @@ class ir_property(osv.osv):
             elif value >= 0 and operator == '<':
                 operator = '>='
                 include_zero = True
-
 
         # retrieve the properties that match the condition
         domain = self._get_domain(name, model)
