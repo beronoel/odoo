@@ -707,23 +707,29 @@ class purchase_order(osv.osv):
         context = context or {}
         for purchase in self.browse(cr, uid, ids, context=context):
             for pick in purchase.picking_ids:
-                for move in pick.move_lines:
-                    if pick.state == 'done':
-                        raise UserError(_('Unable to cancel the purchase order %s.') % (purchase.name) + _('You have already received some goods for it.  '))
+                if pick.state == 'done':
+                    raise UserError(_('Unable to cancel the purchase order %s.') % (purchase.name) + _('You have already received some goods for it.  '))
+            # Check action_cancel
             self.pool.get('stock.picking').action_cancel(cr, uid, [x.id for x in purchase.picking_ids if x.state != 'cancel'], context=context)
-            #Check procurements and set them to False
-            cancel_procurements = []
-            cancel_moves = []
+            # Check procurements not related to stock move yet
             if not context.get('cancel_procurement'):
+                cancel_procurements = []
+                cancel_moves = []
+                exception_procurements = []
                 for line in purchase.order_line:
                     if line.procurement_ids:
-                        cancel_procurements += [x.id for x in line.procurement_ids if x.state!='cancel']
-                        # TODO: Check propagate
-                        cancel_moves += [x.move_dest_id.id for x in line.procurement_ids if x.move_dest_id and x.move_dest_id.state!='cancel']
+                        cancel_procurements += [x.id for x in line.procurement_ids if x.state not in ('cancel', 'exception') and x.rule_id.propagate]
+                        exception_procurements += [x.id for x in line.procurement_ids if x.state not in ('cancel', 'exception') and not x.rule_id.propagate]
+                        cancel_moves += [x.move_dest_id.id for x in line.procurement_ids if x.move_dest_id and x.move_dest_id.state!='cancel' and x.rule_id.propagate]
                 if cancel_moves:
+                    cancel_moves = list(set(cancel_moves))
                     self.pool['stock.move'].action_cancel(cr, uid, cancel_moves, context=context)
                 if cancel_procurements:
+                    cancel_procurements = list(set(cancel_procurements))
                     self.pool['procurement.order'].write(cr, uid, cancel_procurements, {'state': 'cancel'}, context=context)
+                if exception_procurements:
+                    exception_procurements = list(set(exception_procurements))
+                    self.pool['procurement.order'].write(cr, uid, exception_procurements, {'state': 'exception'}, context=context)
 
             for inv in purchase.invoice_ids:
                 if inv and inv.state not in ('cancel', 'draft'):
