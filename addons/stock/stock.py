@@ -2102,20 +2102,21 @@ class stock_move(osv.osv):
         return values
 
     @api.cr_uid_ids_context
-    def _picking_assign(self, cr, uid, move_ids, procurement_group, location_from, location_to, context=None):
+    def _picking_assign(self, cr, uid, move_ids, context=None):
         """Assign a picking on the given move_ids, which is a list of move supposed to share the same procurement_group, location_from and location_to
         (and company). Those attributes are also given as parameters.
         """
+        move = self.browse(cr, uid, move_ids, context=context)[0]
         pick_obj = self.pool.get("stock.picking")
         picks = pick_obj.search(cr, uid, [
-                ('group_id', '=', procurement_group),
-                ('location_id', '=', location_from),
-                ('location_dest_id', '=', location_to),
+                ('group_id', '=', move.group_id.id),
+                ('location_id', '=', move.location_id.id),
+                ('location_dest_id', '=', move.location_dest_id.id),
+                ('picking_type_id', '=', move.picking_type_id.id),
                 ('state', 'in', ['draft', 'confirmed', 'waiting'])], limit=1, context=context)
         if picks:
             pick = picks[0]
         else:
-            move = self.browse(cr, uid, move_ids, context=context)[0]
             values = self._prepare_picking_assign(cr, uid, move, context=context)
             pick = pick_obj.create(cr, uid, values, context=context)
         return self.write(cr, uid, move_ids, {'picking_id': pick}, context=context)
@@ -2181,8 +2182,7 @@ class stock_move(osv.osv):
                 self.write(cr, uid, write_ids, {'state': state})
         #assign picking in batch for all confirmed move that share the same details
         for key, move_ids in to_assign.items():
-            procurement_group, location_from, location_to = key
-            self._picking_assign(cr, uid, move_ids, procurement_group, location_from, location_to, context=context)
+            self._picking_assign(cr, uid, move_ids, context=context)
         moves = self.browse(cr, uid, ids, context=context)
         self._push_apply(cr, uid, moves, context=context)
         return ids
