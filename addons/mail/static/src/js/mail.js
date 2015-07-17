@@ -704,14 +704,12 @@ var MailThread = Attachment.extend ({
             'id': this.context.default_res_id,
             'title': this.record_name,
         };
-
         web_client.action_manager.do_push_state(state);
 
         this.context.params = {
             model: this.context.default_model,
             res_id: this.context.default_res_id,
         };
-
         this.ds_thread.call("message_redirect_action", {context: this.context}).then(function(action){
             self.do_action(action);
         });

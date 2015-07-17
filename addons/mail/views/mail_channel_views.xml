@@ -194,27 +194,17 @@
     <!-- TODO JEM : SLACK test client action-->
 
     <record id="mail_channel_action_client_slack" model="ir.actions.client">
-            <field name="name">Slack View</field>
+            <field name="name">Chat</field>
             <field name="tag">mail.chat.instant_messaging</field>
             <field name="res_model">mail.channel</field>
-            <!--
-            <field name="context">{
-                'default_channel_id': 'channel_inbox',
-                'default_model': 'res.users',
-                'default_res_id': uid,
-            }</field>
-            -->
             <field name="params" eval="&quot;{
-                'view_mailbox': True,
-                'view_inbox': True,
-                'read_action': 'read',
                 'default_active_id': 'channel_inbox'
             }&quot;"/>
             <field name="help" type="html">
                 <p>
                     There is no message in this channel.
                 </p><p>
-                    Your "Inbox" contains your "needaction" also known as the message where you are mentioned, and the message you get when you follow a document as a person.<br/>
+                    Your "Inbox" contains your "needaction" also known as the messages where you are mentioned, and the messages you get when you follow a document as a person.<br/>
                     Your "Starred" contains your favorite messages.
                     <br/><br/>
                     In the "Channels" section, you will find the public and restricted channel.<br/>

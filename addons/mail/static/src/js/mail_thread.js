@@ -43,6 +43,7 @@ var MailComposeMessage = Widget.extend({
     start: function(){
         var self = this;
         this.$input = this.$('.o_mail_compose_message_input');
+        this.$input.focus();
         this.$attachment_button = this.$(".o_mail_compose_message_button_attachment");
         // attachments
         $(window).on(this.fileupload_id, this.on_attachment_loaded);
@@ -55,7 +56,7 @@ var MailComposeMessage = Widget.extend({
                     self.$emoji = $(QWeb.render('mail.ComposeMessage.emoji', {'widget': self}));
                     self.$emoji.find('.o_mail_compose_message_emoji_img').on('click', self, self.on_click_emoji_img);
                 }
-                return self.$emoji
+                return self.$emoji;
             },
             html: true,
             container: '.o_mail_compose_message_emoji',
@@ -83,11 +84,11 @@ var MailComposeMessage = Widget.extend({
             return;
         }
         $input.val("");
-        console.log('mes', mes);
         this.message_post(mes, _.pluck(this.get('attachment_ids'), 'id'));
     },
     // message post
     message_post: function(body, attachment_ids, kwargs){
+        console.log('CTX message_post', this.context);
         var self = this;
         kwargs = kwargs || {};
         var values = _.extend(kwargs, {
@@ -102,6 +103,7 @@ var MailComposeMessage = Widget.extend({
     },
     // attachment business
     on_attachment_change: function(event){
+        console.log('on_attachment_change');
         var $target = $(event.target);
         if ($target.val() !== '') {
             var filename = $target.val().replace(/.*[\\\/]/,'');
@@ -189,6 +191,9 @@ var MailComposeMessage = Widget.extend({
     attachment_render: function(){
         this.$('.o_mail_compose_message_attachment_list').html(QWeb.render('mail.ComposeMessage.attachments', {'widget': this}));
     },
+    focus: function(){
+        this.$input.focus();
+    }
 });
 
 
@@ -204,6 +209,7 @@ var MailThreadMixin = {
         this.set('messages', []);
         this.partner_id = session.partner_id || false;
         this.emoji_substitution = {};
+        this.options = {};
     },
     start: function(){
         this.on("change:messages", this, this.message_render);
@@ -229,6 +235,18 @@ var MailThreadMixin = {
             res_model: res_model,
             views: [[false, 'form']],
             res_id: res_id,
+        });
+    },
+    /**
+     * Toggle a message as 'starred' (or not). Trigger when clicking
+     * on selector '.o_mail_thread_message_star'.
+     */
+    on_message_star: function(event){
+        var $source = this.$(event.currentTarget);
+        var mid = $source.data('message-id');
+        var is_starred = !$source.hasClass('o_mail_message_starred');
+        return this.MessageDatasetSearch.call('set_message_starred', [[mid], is_starred]).then(function(res){
+            $source.toggleClass('o_mail_message_starred');
         });
     },
     // Message functions

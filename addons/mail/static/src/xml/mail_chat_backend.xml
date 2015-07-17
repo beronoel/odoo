@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <!-- Add More / Search Box -->
-    <t t-name="mail.chat.AbstractAddMoreSearch">
-        <div class="o_mail_chat_add_more_search">
-            <div class="o_mail_chat_add_more_text">
-                <span class="btn btn-link"><t t-esc="widget.label"/></span>
-            </div>
-            <div class="o_mail_chat_add_more_search_bar" style="display: none;">
-                <div class="btn-group">
-                    <input type="text" class="o_mail_chat_search_input"/>
-                </div>
-            </div>
-        </div>
-    </t>
-
     <!-- Notification Counter of the Systray Menu -->
     <t t-name="mail.chat.NotificationTopButton">
         <li t-att-title='_t("Notifications")'>
@@ -22,6 +8,16 @@
                 <i class="fa fa-comment"></i>
             </a>
         </li>
+    </t>
+
+    <!-- Add More / Search Box -->
+    <t t-name="mail.chat.AbstractAddMoreSearch">
+        <div class="o_mail_chat_add_more_search">
+            <a href="#" class="o_mail_chat_add_more_text"><t t-esc="widget.label"/></a>
+            <div class="o_mail_chat_add_more_search_bar" style="display: none;">
+                <input type="text" class="o_mail_chat_search_input"/>
+            </div>
+        </div>
     </t>
 
     <!-- PartnerInviteDialog : content of the dialog -->
@@ -37,12 +33,14 @@
     <!--
         ChatMailThread
         Layout of the client action
+        param: widget
     -->
     <t t-name="mail.chat.ChatMailThread">
-        <div class="o_mail_chat">
+        <div class="o_mail_chat o_mail_thread">
+            <!-- Sidebar -->
             <div class="o_mail_chat_sidebar">
                 <!-- Static channel list -->
-                <ul class="nav nav-sidebar">
+                <ul class="nav nav-pills nav-stacked">
                     <li class="o_mail_chat_channel_item" data-channel-id="channel_inbox">
                         <a href="#">Inbox</a>
                     </li>
@@ -51,25 +49,29 @@
                     </li>
                 </ul>
                 <!-- Channel list -->
-                <h4><t t-esc="_t('Channels')"/></h4>
+                <h4 class="o_mail_chat_sidebar_title"><t t-esc="_t('Channels')"/></h4>
                 <t t-call="mail.chat.ChatMailThread.channels">
                     <t t-set="channel_slot" t-value="'channel_channel'"/>
                 </t>
                 <!-- Direct Message list (res.users)-->
-                <h4><t t-esc="_t('Direct Message')"/></h4>
+                <h4 class="o_mail_chat_sidebar_title"><t t-esc="_t('Direct Message')"/></h4>
                 <t t-call="mail.chat.ChatThreadMessage.partners"/>
                 <!-- Private Group list -->
-                <h4><t t-esc="_t('Private Group')"/></h4>
+                <h4 class="o_mail_chat_sidebar_title"><t t-esc="_t('Private Group')"/></h4>
                 <t t-call="mail.chat.ChatMailThread.channels">
                     <t t-set="channel_slot" t-value="'channel_private_group'"/>
                 </t>
             </div>
+            <!-- Content -->
             <div class="o_mail_chat_content">
                 <div class="o_mail_chat_messages">
-
-
+                    <div class="container-fluid o_mail_chat_messages_content">
+                        <t t-call="mail.chat.ChatMailThread.content"/>
+                    </div>
                 </div>
-                <div class="o_mail_chat_composer">answer</div>
+                <div class="o_mail_chat_composer">
+                    <t t-call="mail.ComposeMessage"/>
+                </div>
             </div>
         </div>
     </t>
@@ -80,7 +82,7 @@
         param: widget : the widget (client action)
     -->
     <t t-name="mail.chat.ChatMailThread.channels">
-        <ul t-att-class="'nav nav-sidebar o_mail_chat_channel_slot_' + channel_slot">
+        <ul t-att-class="'nav nav-pills nav-stacked o_mail_chat_channel_slot_' + channel_slot">
             <t t-foreach="widget.get(channel_slot)" t-as="channel">
                 <li t-att-class="'o_mail_chat_channel_item ' + (channel.message_needaction_counter &gt; 0 ? 'o_mail_chat_channel_unread' : ' ')" t-att-data-channel-id="channel.id">
                     <a href="#">
@@ -94,53 +96,41 @@
         </ul>
     </t>
 
-
-
-
-
-
-
-
-
-
-
-
-    <!-- Instant Messaging View (Slack, Inbox, ...) -->
-    <t t-name="mail.chat.im.InstantMessagingView">
-        <div class="o_mail_chat_im_container container-fluid">
-          <div class="row o_mail_chat_im_row">
-            <!-- sidebar : channel list -->
-            <div class="col-sm-3 col-md-2 sidebar o_mail_chat_im_sidebar">
-                <!-- Static channel list -->
-                <ul class="nav nav-sidebar">
-                    <li class="o_mail_chat_channel_item" data-channel-id="channel_inbox">
-                        <a href="#">Inbox</a>
-                    </li>
-                    <li class="o_mail_chat_channel_item" data-channel-id="channel_starred">
-                        <a href="#">Starred</a>
-                    </li>
-                </ul>
-                <!-- Channel list -->
-                <h4><t t-esc="_t('Channels')"/></h4>
-                <t t-call="mail.chat.ChatMailThread.channels">
-                    <t t-set="channel_slot" t-value="'channel_channel'"/>
-                </t>
-                <!-- Direct Message list (res.users)-->
-                <h4><t t-esc="_t('Direct Message')"/></h4>
-                <t t-call="mail.chat.ChatThreadMessage.partners"/>
-                <!-- Private Group list -->
-                <h4><t t-esc="_t('Private Group')"/></h4>
-                <t t-call="mail.chat.ChatMailThread.channels">
-                    <t t-set="channel_slot" t-value="'channel_private_group'"/>
-                </t>
-            </div>
-            <!-- Channel content : message list, ... -->
-            <div class="col-sm-9 col-md-10 o_mail_chat_im_content">
-                <t t-call="mail.chat.im.ConversationContent"/>
-            </div>
-          </div>
-        </div>
+    <!--
+        List of Partners of Direct Message channel
+    -->
+    <t t-name="mail.chat.ChatThreadMessage.partners">
+        <ul class="nav nav-pills nav-stacked o_mail_chat_channel_slot_partners">
+            <t t-foreach="widget.get('partners')" t-as="partner">
+                <li class="o_mail_chat_partner_item" t-att-data-partner-id="partner.id">
+                    <a href="#" t-att-class="'fa ' + (partner.im_status == 'online' ? 'fa-circle' : 'fa-circle-o')">
+                        <t t-esc="partner.name"/>
+                        <span class="fa fa-times pull-right o_mail_chat_channel_unpin" t-att-title="_t('Untoggle')" t-att-data-partner-id="partner.id"/>
+                    </a>
+                </li>
+            </t>
+        </ul>
     </t>
+
+    <!--
+        Channel content (messages) or 'Help Message' of the client action
+    -->
+    <t t-name="mail.chat.ChatMailThread.content">
+        <t t-if="widget.get('messages').length">
+            <t t-call="mail.Thread.messages"/>
+        </t>
+        <t t-if="!widget.get('messages').length">
+            <t t-raw="widget.help_message"/>
+        </t>
+    </t>
+
+
+
+
+
+
+
+    <!-- TODO JEM : treat them -->
 
     <t t-name="mail.chat.im.ControlButtons">
         <button type="button" class="btn btn-default o_mail_chat_im_button_minimize" t-att-title='_t("Minimize the conversation")'>
@@ -163,85 +153,5 @@
         </div>
     </t>
 
-    <t t-name="mail.chat.ChatThreadMessage.partners">
-        <ul class="nav nav-sidebar o_mail_chat_channel_slot_partners">
-            <t t-foreach="widget.get('partners')" t-as="partner">
-                <li class="o_mail_chat_im_partner_item" t-att-data-partner-id="partner.id">
-                    <a href="#" t-att-class="'fa ' + (partner.im_status == 'online' ? 'fa-circle' : 'fa-circle-o')">
-                        <t t-esc="partner.name"/>
-                        <span class="fa fa-times pull-right o_mail_chat_im_channel_unpin" t-att-title="_t('Untoggle')" t-att-data-partner-id="partner.id"/>
-                    </a>
-                </li>
-            </t>
-        </ul>
-    </t>
-
-    <t t-name="mail.chat.im.ConversationContent">
-        <div class="row o_mail_chat_im_content_wrap_conversation">
-            <div class="col-md-12" style="height:inherit;">
-                <div class="row o_mail_chat_im_messages">
-                    <t t-if="widget.get('current_messages').length">
-                        <t t-call="mail.chat.im.Messages"/>
-                        <!--<t t-call="mail.Thread.messages"/>-->
-                    </t>
-                    <t t-if="!widget.get('current_messages').length">
-                        <t t-raw="widget.help_message"/>
-                    </t>
-                </div>
-                <!-- the mail chat compose message is append here -->
-            </div>
-        </div>
-    </t>
-
-    <t t-name="mail.chat.im.PersonalContent">
-        <div class="row o_mail_chat_im_content_wrap_personal">
-            <div class="col-md-12" style="height:inherit;">
-                <t t-if="widget.get('current_messages').length">
-                    <t t-call="mail.chat.im.Messages"/>
-                </t>
-                <t t-if="!widget.get('current_messages').length">
-                    <t t-raw="widget.help_message"/>
-                </t>
-            </div>
-        </div>
-    </t>
-
-
-    <t t-name="mail.chat.im.Messages">
-        <t t-foreach="widget.get('current_messages')" t-as="message">
-           <div t-if="message.message_type != 'expandable'" class="row o_mail_chat_im_message" t-att-data-message-id="message.id">
-                <div class="col-md-1 col-sm-1">
-                    <i t-att-class="'fa fa-star-o fa-lg o_mail_chat_im_star ' + (message.is_favorite ? 'o_mail_starred' : '')"
-                       t-att-data-message-id="message.id"/>
-                </div>
-                <div class="col-md-1 col-sm-1">
-                    <img t-if="message.author_avatar" class="media-object" t-att-src="'data:image/png;base64,' + message.author_avatar" alt="avatar"/>
-                </div>
-                <div class="col-md-7 col-sm-7">
-                    <p class="text-muted">
-                        <t t-if="message.author_id">
-                            <strong><t t-esc="message.author_id[1]"/></strong> -
-                        </t>
-                        <t t-esc="moment(message.date, 'YYYY-MM-DD hh:mm:ss').format('hh:mm')"/>
-                        <t t-if="message.model &amp;&amp; (message.model != 'mail.channel')">
-                            on <a t-att-href="_.str.sprintf('#id=%s&amp;model=%s', message.res_id, message.model)"><t t-esc="message.record_name"/></a>
-                        </t>
-                    </p>
-                    <t t-raw="message.body"/>
-                </div>
-                <div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
-                    <t t-foreach="message.attachment_ids" t-as="attachment">
-                        <div t-attf-class="o_mail_attachment">
-                            <a t-att-href='attachment.url' target="_blank">
-                                 <img t-att-src="'/mail/static/src/img/mimetypes/' + (attachment.file_type_icon || 'unknown') + '.png'"></img>
-                                <div class='o_mail_attachment_name'><t t-raw='attachment.name'/></div>
-                            </a>
-                        </div>
-                    </t>
-                    <hr/>
-                </div>
-            </div>
-        </t>
-    </t>
 
 </templates>

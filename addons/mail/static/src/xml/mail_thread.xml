@@ -86,11 +86,12 @@
         <t t-foreach="widget.get('messages')" t-as="message">
             <div class="row o_mail_thread_message" t-att-data-message-id="message.id">
                 <div class="col-md-1 col-sm-1">
-                    <t t-if="message.author_id">
+                    <t t-if="message.author_avatar">
                         <img t-att-src="'data:image/png;base64,' + message.author_avatar" alt="avatar" class="o_mail_thread_avatar"/>
                     </t>
-                    <t t-if="!message.author_id &amp;&amp; message.email_from">
-                        <img src="/mail/static/src/img/email_icon.png" alt="avatar" class="o_mail_thread_avatar"/>
+                    <t t-if="!message.author_avatar">
+                        <img t-if="message.message_type == 'email' &amp;&amp; (!message.author_id || !message.author_id[0])" src="/mail/static/src/img/email_icon.png" alt="avatar" class="o_mail_thread_avatar"/>
+                        <img  t-if="!(message.message_type == 'email' &amp;&amp; (!message.author_id || !message.author_id[0]))"  t-att-src="'/web/binary/image?model=res.partner&amp;field=image_small&amp;id=' + message.author_id[0]"/>
                     </t>
                 </div>
                 <div class="col-md-10 col-sm-10 o_mail_thread_message_core">

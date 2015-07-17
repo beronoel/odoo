@@ -272,8 +272,8 @@ var DocumentMailThread = form_common.AbstractField.extend(mail_thread.MailThread
     template: 'mail.chatter.DocumentMailThread',
     events: {
         "click .o_mail_redirect": "on_click_redirect",
-        "click .o_mail_chatter_show_more_message": "on_message_show_more",
         "click .o_mail_thread_message_star": "on_message_star",
+        "click .o_mail_chatter_show_more_message": "on_message_show_more",
         // toggle message composer (!! declaration order is important !!)
         "click .o_mail_chatter_button_new_message": "on_open_composer",//"on_toggle_compose_message",
         "click .o_mail_chatter_button_log_note": "on_open_composer",// "on_toggle_compose_message",
@@ -314,19 +314,6 @@ var DocumentMailThread = form_common.AbstractField.extend(mail_thread.MailThread
     start: function(){
         mail_thread.MailThreadMixin.start.call(this);
         return this._super.apply(this, arguments);
-    },
-    /**
-     * Toggle a message as 'starred' (or not). Trigger when clicking
-     * on selector '.o_mail_thread_message_star'.
-     */
-    on_message_star: function(event){
-        var $source = this.$(event.currentTarget);
-        console.log($source);
-        var mid = $source.data('message-id');
-        var is_starred = !$source.hasClass('o_mail_message_starred');
-        return this.MessageDatasetSearch.call('set_message_starred', [[mid], is_starred]).then(function(res){
-            $source.toggleClass('o_mail_message_starred');
-        });
     },
     on_message_show_more: function(event){
         var self = this;
@@ -413,12 +400,11 @@ var DocumentMailThread = form_common.AbstractField.extend(mail_thread.MailThread
     },
     // override from thread mixin
     message_render: function(){
+        console.log('render', this.get('messages'));
         this.$('.o_mail_chatter_messages').html(QWeb.render('mail.Thread.messages', {'widget': this}));
     },
     _message_preprocess: function(messages){
         var messages = mail_thread.MailThreadMixin._message_preprocess.apply(this, arguments);
-
-
         return messages.reverse();
     },
     get_message_domain: function(){
