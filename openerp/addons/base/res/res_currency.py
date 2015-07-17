@@ -5,102 +5,86 @@ import re
 import time
 import math
 
-from openerp import api, fields as fields2
-from openerp import tools
-from openerp.osv import fields, osv
+from openerp import api, fields, models, tools, _
 from openerp.tools import float_round, float_is_zero, float_compare
 
 CURRENCY_DISPLAY_PATTERN = re.compile(r'(\w+)\s*(?:\((.*)\))?')
 
-class res_currency(osv.osv):
 
-    def _get_current_rate(self, cr, uid, ids, name, arg, context=None):
-        if context is None:
-            context = {}
+class ResCurrency(models.Model):
+
+    @api.multi
+    def _get_current_rate(self):
         res = {}
-
-        date = context.get('date') or time.strftime('%Y-%m-%d')
-        company_id = context.get('company_id') or self.pool['res.users']._get_company(cr, uid, context=context)
-        for id in ids:
-            cr.execute("""SELECT rate FROM res_currency_rate 
+        date = self.env.context.get('date') or time.strftime('%Y-%m-%d')
+        company_id = self.env.context.get('company_id') or self.env['res.users']._get_company()
+        for id in self.ids:
+            self.env.cr.execute("""SELECT rate FROM res_currency_rate
                            WHERE currency_id = %s
                              AND name <= %s
                              AND (company_id is null
                                  OR company_id = %s)
                         ORDER BY company_id, name desc LIMIT 1""",
-                       (id, date, company_id))
-            if cr.rowcount:
-                res[id] = cr.fetchone()[0]
+                                (id, date, company_id))
+            if self.env.cr.rowcount:
+                res[id] = self.env.cr.fetchone()[0]
             else:
                 res[id] = 1
         return res
 
-    def _decimal_places(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for id in ids:
-            rounding = self.browse(cr, uid, id, context=context).rounding
-            rounding = (0 < rounding < 1) and rounding or 1
-            res[id] = int(math.ceil(math.log10(1 / rounding)))
-        return res
-
-    def _decimal_places(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for currency in self.browse(cr, uid, ids, context=context):
+    @api.multi
+    def _decimal_places(self):
+        for currency in self:
             if currency.rounding > 0 and currency.rounding < 1:
-                res[currency.id] = int(math.ceil(math.log10(1/currency.rounding)))
+                currency = int(math.ceil(math.log10(1/currency.rounding)))
             else:
-                res[currency.id] = 0
-        return res
-
-    _name = "res.currency"
-    _description = "Currency"
-    _columns = {
-        # Note: 'code' column was removed as of v6.0, the 'name' should now hold the ISO code.
-        'name': fields.char('Currency', size=3, required=True, help="Currency Code (ISO 4217)"),
-        'symbol': fields.char('Symbol', size=4, help="Currency sign, to be used when printing amounts."),
-        'rate': fields.function(_get_current_rate, string='Current Rate', digits=(12,6),
-            help='The rate of the currency to the currency of rate 1.'),
-        'rate_ids': fields.one2many('res.currency.rate', 'currency_id', 'Rates'),
-        'rounding': fields.float('Rounding Factor', digits=(12,6)),
-        'decimal_places': fields.function(_decimal_places, string='Decimal Places', type='integer'),
-        'active': fields.boolean('Active'),
-        'position': fields.selection([('after','After Amount'),('before','Before Amount')], 'Symbol Position', help="Determines where the currency symbol should be placed after or before the amount.")
-    }
-    _defaults = {
-        'active': 1,
-        'position' : 'after',
-        'rounding': 0.01,
-    }
-    _sql_constraints = [
-        ('unique_name', 'unique (name)', 'The currency code must be unique!'),
-    ]
-    _order = "name"
-
-    date = fields2.Date(compute='compute_date')
+                currency = 0
 
     @api.one
     @api.depends('rate_ids.name')
     def compute_date(self):
         self.date = self.rate_ids[:1].name
 
-    def name_search(self, cr, user, name='', args=None, operator='ilike', context=None, limit=100):
+    _name = "res.currency"
+    _description = "Currency"
+    _order = "name"
+
+    # Note: 'code' column was removed as of v6.0, the 'name' should now hold the ISO code.
+    name = fields.Char(string='Currency', required=True, help="Currency Code (ISO 4217)")
+    symbol = fields.Char(help="Currency sign, to be used when printing amounts.")
+    rate = fields.Float(compute='_get_current_rate', string='Current Rate', digits=(12, 6),
+                        help='The rate of the currency to the currency of rate 1.')
+    rate_ids = fields.One2many('res.currency.rate', 'currency_id', string='Rates')
+    rounding = fields.Float(string='Rounding Factor', digits=(12, 6), default=0.01)
+    decimal_places = fields.Integer(compute='_decimal_places')
+    active = fields.Boolean(default=True)
+    position = fields.Selection(
+        [('after', 'After Amount'),
+         ('before', 'Before Amount')],
+        string='Symbol Position', default='after',
+        help="Determines where the currency symbol should be placed after or before the amount.")
+    date = fields.Date(compute='compute_date')
+
+    _sql_constraints = [
+        ('unique_name', 'unique (name)', _('The currency code must be unique!')),
+    ]
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
         if not args:
             args = []
-        results = super(res_currency,self)\
-            .name_search(cr, user, name, args, operator=operator, context=context, limit=limit)
+        results = super(ResCurrency, self).name_search(
+            name, args, operator=operator, limit=limit)
         if not results:
             name_match = CURRENCY_DISPLAY_PATTERN.match(name)
             if name_match:
-                results = super(res_currency,self)\
-                    .name_search(cr, user, name_match.group(1), args, operator=operator, context=context, limit=limit)
+                results = super(ResCurrency, self).name_search(
+                    name_match.group(1), args, operator=operator, limit=limit)
         return results
 
-    def name_get(self, cr, uid, ids, context=None):
-        if not ids:
-            return []
-        if isinstance(ids, (int, long)):
-            ids = [ids]
-        reads = self.read(cr, uid, ids, ['name','symbol'], context=context, load='_classic_write')
+    @api.multi
+    def name_get(self):
+        reads = self.read(['name', 'symbol'], load='_classic_write')
         return [(x['id'], tools.ustr(x['name'])) for x in reads]
 
     def copy(self, cr, uid, id, default=None, context=None):
@@ -193,24 +177,23 @@ class res_currency(osv.osv):
         """
         return float_is_zero(amount, precision_rounding=currency.rounding)
 
-    def _get_conversion_rate(self, cr, uid, from_currency, to_currency, context=None):
-        if context is None:
-            context = {}
-        ctx = context.copy()
-        from_currency = self.browse(cr, uid, from_currency.id, context=ctx)
-        to_currency = self.browse(cr, uid, to_currency.id, context=ctx)
+    @api.model
+    def _get_conversion_rate(self, from_currency, to_currency):
+        from_currency = self.browse(from_currency.id)
+        to_currency = self.browse(to_currency.id)
         return to_currency.rate/from_currency.rate
 
-    def _compute(self, cr, uid, from_currency, to_currency, from_amount, round=True, context=None):
+    @api.model
+    def _compute(self, from_currency, to_currency, from_amount, round=True):
         if (to_currency.id == from_currency.id):
             if round:
-                return self.round(cr, uid, to_currency, from_amount)
+                return self.round(to_currency, from_amount)
             else:
                 return from_amount
         else:
-            rate = self._get_conversion_rate(cr, uid, from_currency, to_currency, context=context)
+            rate = self._get_conversion_rate(from_currency, to_currency)
             if round:
-                return self.round(cr, uid, to_currency, from_amount * rate)
+                return self.round(to_currency, from_amount * rate)
             else:
                 return from_amount * rate
 
@@ -261,30 +244,29 @@ class res_currency(osv.osv):
         function = "if (arguments[1] === false || arguments[1] === undefined) {" + company_currency_format + " }" + function
         return function
 
-class res_currency_rate(osv.osv):
+
+class ResCurrencyRate(models.Model):
     _name = "res.currency.rate"
     _description = "Currency Rate"
-
-    _columns = {
-        'name': fields.datetime('Date', required=True, select=True),
-        'rate': fields.float('Rate', digits=(12, 6), help='The rate of the currency to the currency of rate 1'),
-        'currency_id': fields.many2one('res.currency', 'Currency', readonly=True),
-        'company_id': fields.many2one('res.company', 'Company')
-    }
-    _defaults = {
-        'name': lambda *a: time.strftime('%Y-%m-%d 00:00:00'),
-    }
     _order = "name desc"
 
-    def name_search(self, cr, user, name, args=None, operator='ilike', context=None, limit=80):
+    name = fields.Datetime(string='Date', required=True, index=True,
+                           default=lambda *a: time.strftime('%Y-%m-%d 00:00:00'))
+    rate = fields.Float(
+        digits=(12, 6),
+        help='The rate of the currency to the currency of rate 1')
+    currency_id = fields.Many2one('res.currency', string='Currency', readonly=True)
+    company_id = fields.Many2one('res.company', string='Company')
+
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=80):
         if operator in ['=', '!=']:
             try:
                 date_format = '%Y-%m-%d'
-                if context.get('lang'):
-                    lang_obj = self.pool['res.lang']
-                    lang_ids = lang_obj.search(cr, user, [('code', '=', context['lang'])], context=context)
-                    if lang_ids:
-                        date_format = lang_obj.browse(cr, user, lang_ids[0], context=context).date_format
+                if self.env.context.get('lang'):
+                    langs = self.env['res.lang'].search([('code', '=', self.env.context['lang'])])
+                    if langs:
+                        date_format = langs.date_format
                 name = time.strftime('%Y-%m-%d', time.strptime(name, date_format))
             except ValueError:
                 try:
@@ -293,4 +275,5 @@ class res_currency_rate(osv.osv):
                     return []
                 name = ''
                 operator = 'ilike'
-        return super(res_currency_rate, self).name_search(cr, user, name, args=args, operator=operator, context=context, limit=limit)
+        return super(ResCurrencyRate, self).name_search(name, args=args,
+                                                        operator=operator, limit=limit)

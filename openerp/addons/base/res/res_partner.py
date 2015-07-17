@@ -67,7 +67,7 @@ def _tz_get(self):
 
 class ResPartnerCategory(models.Model):
 
-    def name_get(self):
+    def name_get(self, cr, uid, ids, context=None):
         """ Return the categories' display name, including their direct
             parent by default.
 
@@ -75,12 +75,16 @@ class ResPartnerCategory(models.Model):
             version of the category name (without the direct parent) is used.
             The default is the long version.
         """
+        if not isinstance(ids, list):
+            ids = [ids]
+        if context is None:
+            context = {}
 
-        if self.env.context.get('partner_category_display') == 'short':
-            return super(ResPartnerCategory, self).name_get()
+        if context.get('partner_category_display') == 'short':
+            return super(ResPartnerCategory, self).name_get(cr, uid, ids, context=context)
 
         res = []
-        for category in self:
+        for category in self.browse(cr, uid, ids, context=context):
             names = []
             current = category
             while current:
@@ -100,7 +104,7 @@ class ResPartnerCategory(models.Model):
         return categories.name_get()
 
     @api.multi
-    def _name_get_fnc(self, field_name, arg):
+    def _name_get_fnc(self):
         return dict(self.name_get())
 
     _description = 'Partner Categories'
@@ -169,6 +173,7 @@ class ResPartner(models.Model, format_address):
         return dict((p.id, tools.image_get_resized_images(p.image)) for p in self)
 
     def _set_image(self):
+        print 'self---setimage--->', self
         self.image = tools.image_resize_image_big(self.image)
 
     @api.depends('parent_id', 'is_company')
@@ -299,8 +304,7 @@ class ResPartner(models.Model, format_address):
         return tools.image_resize_image_big(image.encode('base64'))
 
     @api.model
-    def fields_view_get(self, view_id=None, view_type='form',
-                        toolbar=False, submenu=False):
+    def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
         if (not view_id) and (view_type == 'form') and self.env.context and self.env.context.get('force_email', False):
             view_id = self.env.ref('base.view_partner_simple_form').id
         res = super(ResPartner, self).fields_view_get(view_id=view_id, view_type=view_type,
@@ -354,7 +358,7 @@ class ResPartner(models.Model, format_address):
                 self.country_id = self.partner_id['country_id']
 
         else:
-            self.use_parent_address = False
+            result['value'] = {'use_parent_address': False}
         return result
 
     @api.onchange('state_id')
