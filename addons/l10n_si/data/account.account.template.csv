@@ -68,7 +68,6 @@ code,id,user_type_id/id,name,reconcile,chart_template_id/id
 102000,gd_acc_102000,account.data_account_type_current_assets,"IZDANI ČEKI (ODBITNA POSTAVKA)",False,gd_chart
 103000,gd_acc_103000,account.data_account_type_current_assets,"PREJETI ČEKI",False,gd_chart
 104000,gd_acc_104000,account.data_account_type_current_assets,"NETVEGANI TAKOJ UDENARLJIVI DOLŽNIŠKI VREDNOSTNI PAPIRJI",False,gd_chart
-109000,gd_acc_109000,account.data_account_type_current_assets,"DENAR NA POTI",False,gd_chart
 110000,gd_acc_110000,account.data_account_type_current_assets,"DENARNA SREDSTVA NA RAČUNIH, RAZEN DEVIZNIH",False,gd_chart
 111000,gd_acc_111000,account.data_account_type_current_assets,"KRATKOROČNI DEPOZITI OZIROMA DEPOZITI NA ODPOKLIC, RAZEN DEVIZNIH",False,gd_chart
 112000,gd_acc_112000,account.data_account_type_current_assets,"DEVIZNA SREDSTVA NA RAČUNIH",False,gd_chart
@@ -234,6 +233,7 @@ code,id,user_type_id/id,name,reconcile,chart_template_id/id
 481000,gd_acc_481000,account.data_account_type_expenses,"IZDATKI ZA VARSTVO OKOLJA",False,gd_chart
 482000,gd_acc_482000,account.data_account_type_expenses,"NAGRADE DIJAKOM IN ŠTUDENTOM NA DELOVNI PRAKSI SKUPAJ Z DAJATVAMI",False,gd_chart
 483000,gd_acc_483000,account.data_account_type_expenses,"ŠTIPENDIJE DIJAKOM IN ŠTUDENTOM",False,gd_chart
+484000,gd_acc_484000,account.data_account_type_expenses,"Foreigh izguba deviznega",False,gd_chart
 489000,gd_acc_489000,account.data_account_type_expenses,"OSTALI STROŠKI",False,gd_chart
 490000,gd_acc_490000,account.data_account_type_expenses,"PRENOS STROŠKOV V ZALOGE",False,gd_chart
 491000,gd_acc_491000,account.data_account_type_expenses,"PRENOS STROŠKOV NEPOSREDNO V ODHODKE",False,gd_chart
@@ -314,6 +314,7 @@ code,id,user_type_id/id,name,reconcile,chart_template_id/id
 786000,gd_acc_786000,account.data_account_type_revenue,"PREJETE ODŠKODNINE",False,gd_chart
 787000,gd_acc_787000,account.data_account_type_revenue,"PREJETE KAZNI",False,gd_chart
 789000,gd_acc_789000,account.data_account_type_revenue,"OSTALI PRIHODKI",False,gd_chart
+789100,gd_acc_789100,account.data_account_type_revenue,"Foreigh izmenjavo dobiček",False,gd_chart
 800000,gd_acc_800000,account.data_account_type_current_liabilities,"DOBIČEK ALI IZGUBA PRED OBDAVČITVIJO",False,gd_chart
 810000,gd_acc_810000,account.data_account_type_current_liabilities,"DAVEK OD DOHODKA",False,gd_chart
 812000,gd_acc_812000,account.data_account_type_current_liabilities,"DRUGI DAVKI, KI NISO IZKAZANI V DRUGIH POSTAVKAH",False,gd_chart
