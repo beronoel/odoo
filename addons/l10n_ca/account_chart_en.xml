@@ -8,12 +8,14 @@
         <field name="reconcile" eval="True"/>
         <field ref="account.data_account_type_current_assets" name="user_type_id"/>
     </record>
+
     <record id="ca_en_chart_template_en" model="account.chart.template">
         <field name="name">Canada - Chart of Accounts for english-speaking provinces</field>
         <field name="code_digits">6</field>
         <field name="currency_id" ref="base.CAD"/>
         <field name="transfer_account_id" ref="transfer_account_id_01"/>
     </record>
+
     <record id="transfer_account_id_01" model="account.account.template">
         <field name="chart_template_id" ref="ca_en_chart_template_en"/>
     </record>
@@ -200,6 +202,26 @@
         <field name="chart_template_id" ref="ca_en_chart_template_en"/>
     </record>
 
+    <record id="chart218601_en" model="account.account.template">
+        <field name="code">218601</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Employee Benefits Provision - Employees Contribution</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart218602_en" model="account.account.template">
+        <field name="code">218602</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Employee Benefits Provision - Employer Contribution</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart2521_en" model="account.account.template">
+        <field name="code">2521</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Provision for pension plans</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
 
     <record id="chart2181_en" model="account.account.template">
         <field name="code">2181</field>
@@ -266,6 +288,13 @@
 		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
 	</record>
 
+    <record id="chart2542_en" model="account.account.template">
+        <field name="code">2542</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Bonus Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
 	<!-- EQUITY -->
 
 
@@ -300,6 +329,13 @@
 
 	<!-- EXPENSES -->
 
+    <record id="chart254101_en" model="account.account.template">
+        <field name="code">254101</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Vacations Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
 	<record id="chart5111_en" model="account.account.template">
 		<field name="code">5111</field>
 		<field name="user_type_id" ref="account.data_account_type_expenses"/>
@@ -314,6 +350,84 @@
 		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
 	</record>
 
+	<record id="chart254102_en" model="account.account.template">
+        <field name="code">254102</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Compensatory Days Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart254103_en" model="account.account.template">
+        <field name="code">254103</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Sick Leaves Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512303_en" model="account.account.template">
+        <field name="code">512303</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Group Pension Plan</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512101_en" model="account.account.template">
+        <field name="code">512101</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Regular Salaries</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512302_en" model="account.account.template">
+        <field name="code">512302</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Employment Insurance</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512301_en" model="account.account.template">
+        <field name="code">512301</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Canada Pension Plan</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512203_en" model="account.account.template">
+        <field name="code">512203</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Sick Leaves Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+
+    <record id="chart512202_en" model="account.account.template">
+        <field name="code">512202</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Compensatory Days Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512201_en" model="account.account.template">
+        <field name="code">512201</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Vacations Accruded</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512103_en" model="account.account.template">
+        <field name="code">512103</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Retroactive Pay</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
+    <record id="chart512102_en" model="account.account.template">
+        <field name="code">512102</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Bonus</field>
+        <field name="chart_template_id" ref="ca_en_chart_template_en"/>
+    </record>
+
 	<record id="chart5113_en" model="account.account.template">
 		<field name="code">5113</field>
 		<field name="user_type_id" ref="account.data_account_type_expenses"/>
@@ -325,13 +439,6 @@
 		<field name="code">5114</field>
 		<field name="user_type_id" ref="account.data_account_type_expenses"/>
 		<field name="name">International Purchases</field>
-		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
-	</record>
-
-	<record id="chart51201_en" model="account.account.template">
-		<field name="code">51201</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Salaries, wages and commissions</field>
 		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
 	</record>
 
@@ -363,13 +470,6 @@
 		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
 	</record>
 
-	<record id="chart51206_en" model="account.account.template">
-		<field name="code">51206</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Parental Insurance</field>
-		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
-	</record>
-
     <record id="chart512313_en" model="account.account.template">
         <field name="code">512313</field>
 		<field name="user_type_id" ref="account.data_account_type_expenses"/>
@@ -381,20 +481,6 @@
         <field name="code">512314</field>
 		<field name="user_type_id" ref="account.data_account_type_expenses"/>
 		<field name="name">Labour Standards</field>
-		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
-	</record>
-
-	<record id="chart51209_en" model="account.account.template">
-		<field name="code">51209</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Federal Income Tax</field>
-		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
-	</record>
-
-	<record id="chart51210_en" model="account.account.template">
-		<field name="code">51210</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Provincial Income Tax</field>
 		<field name="chart_template_id" ref="ca_en_chart_template_en"/>
 	</record>
 

@@ -8,8 +8,8 @@
         <field name="reconcile" eval="True"/>
         <field ref="account.data_account_type_current_assets" name="user_type_id"/>
     </record>
-	<record id="ca_fr_chart_template_fr" model="account.chart.template">
-		<field name="name">Canada - Plan comptable pour les provinces francophones</field>
+    <record id="ca_fr_chart_template_fr" model="account.chart.template">
+        <field name="name">Canada - Plan comptable pour les provinces francophones</field>
         <field name="code_digits">6</field>
         <field name="currency_id" ref="base.CAD"/>
         <field name="transfer_account_id" ref="transfer_account_id"/>
@@ -18,115 +18,115 @@
         <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
     </record>
 
-	<record id="chart1141_fr" model="account.account.template">
-		<field name="code">1141</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="name">Stock</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart1141_fr" model="account.account.template">
+        <field name="code">1141</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="name">Stock</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart1145_fr" model="account.account.template">
-		<field name="code">1145</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="name">Stock expédié non-facturé</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart1145_fr" model="account.account.template">
+        <field name="code">1145</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="name">Stock expédié non-facturé</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart1151_fr" model="account.account.template">
-		<field name="code">1151</field>
-		<field name="user_type_id" ref="account.data_account_type_receivable"/>
-		<field name="reconcile" eval="True"/>
-		<field name="name">Comptes clients</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart1151_fr" model="account.account.template">
+        <field name="code">1151</field>
+        <field name="user_type_id" ref="account.data_account_type_receivable"/>
+        <field name="reconcile" eval="True"/>
+        <field name="name">Comptes clients</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart1181_fr" model="account.account.template">
-		<field name="code">1181</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TPS à recevoir</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart1181_fr" model="account.account.template">
+        <field name="code">1181</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TPS à recevoir</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart1182_fr" model="account.account.template">
-		<field name="code">1182</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVP/TVQ à recevoir</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart1182_fr" model="account.account.template">
+        <field name="code">1182</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVP/TVQ à recevoir</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart11831_fr" model="account.account.template">
-		<field name="code">11831</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à recevoir - 13%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart11831_fr" model="account.account.template">
+        <field name="code">11831</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à recevoir - 13%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart11832_fr" model="account.account.template">
-		<field name="code">11832</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à recevoir - 14%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart11832_fr" model="account.account.template">
+        <field name="code">11832</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à recevoir - 14%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart11833_fr" model="account.account.template">
-		<field name="code">11833</field>
-		<field name="user_type_id" ref="account.data_account_type_current_assets"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à recevoir - 15%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart11833_fr" model="account.account.template">
+        <field name="code">11833</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à recevoir - 15%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart2111_fr" model="account.account.template">
-		<field name="code">2111</field>
-		<field name="user_type_id" ref="account.data_account_type_payable"/>
-		<field name="reconcile" eval="True"/>
-		<field name="name">Comptes fournisseurs</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart2111_fr" model="account.account.template">
+        <field name="code">2111</field>
+        <field name="user_type_id" ref="account.data_account_type_payable"/>
+        <field name="reconcile" eval="True"/>
+        <field name="name">Comptes fournisseurs</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart2131_fr" model="account.account.template">
-		<field name="code">2131</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TPS à payer</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart2131_fr" model="account.account.template">
+        <field name="code">2131</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TPS à payer</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart2132_fr" model="account.account.template">
-		<field name="code">2132</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVP/TVQ à payer</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart2132_fr" model="account.account.template">
+        <field name="code">2132</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVP/TVQ à payer</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart21331_fr" model="account.account.template">
-		<field name="code">21331</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à payer - 13%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart21331_fr" model="account.account.template">
+        <field name="code">21331</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à payer - 13%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart21332_fr" model="account.account.template">
-		<field name="code">21332</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à payer - 14%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart21332_fr" model="account.account.template">
+        <field name="code">21332</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à payer - 14%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart21333_fr" model="account.account.template">
-		<field name="code">21333</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="reconcile" eval="False"/>
-		<field name="name">TVH à payer - 15%</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart21333_fr" model="account.account.template">
+        <field name="code">21333</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="reconcile" eval="False"/>
+        <field name="name">TVH à payer - 15%</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart214111_fr" model="account.account.template">
         <field name="code">214111</field>
@@ -139,6 +139,20 @@
         <field name="code">214112</field>
         <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
         <field name="name">AE - Contribution de l'employeur</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart214131_fr" model="account.account.template">
+        <field name="code">214131</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">RPC - Contribution des employés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart214132_fr" model="account.account.template">
+        <field name="code">214132</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">RPC - Contribution de l'employeur</field>
         <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
     </record>
 
@@ -205,141 +219,253 @@
         <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
     </record>
 
-	<record id="chart2171_fr" model="account.account.template">
-		<field name="code">2171</field>
-		<field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
-		<field name="name">Stock reçu non facturé</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart2171_fr" model="account.account.template">
+        <field name="code">2171</field>
+        <field name="user_type_id" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Stock reçu non facturé</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<!-- CAPITAUX PROPRES -->
+    <record id="chart2184_fr" model="account.account.template">
+        <field name="code">2184</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Paie Rétroactive à payer</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart411_fr" model="account.account.template">
-		<field name="code">411</field>
-		<field name="user_type_id" ref="account.data_account_type_revenue"/>
-		<field name="name">Ventes</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart218501_fr" model="account.account.template">
+        <field name="code">218501</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Régimes de pension collectifs à payer - Contribution des employés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart412_fr" model="account.account.template">
-		<field name="code">412</field>
-		<field name="user_type_id" ref="account.data_account_type_revenue"/>
-		<field name="name">Ventes avec des provinces harmonisées</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
-	
-	<record id="chart413_fr" model="account.account.template">
-		<field name="code">413</field>
-		<field name="user_type_id" ref="account.data_account_type_revenue"/>
-		<field name="name">Ventes avec des provinces non-harmonisées</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart218502_fr" model="account.account.template">
+        <field name="code">218502</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Régimes de pension collectifs à payer - Contribution de l'employeur</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart414_fr" model="account.account.template">
-		<field name="code">414</field>
-		<field name="user_type_id" ref="account.data_account_type_revenue"/>
-		<field name="name">Ventes à l'étranger</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart218601_fr" model="account.account.template">
+        <field name="code">218601</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Provision pour avantages sociaux - Contribution de l'employé</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<!-- CHARGES -->
-	
+    <record id="chart218602_fr" model="account.account.template">
+        <field name="code">218602</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Provision pour avantages sociaux - Contribution de l'employeur</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart254101_fr" model="account.account.template">
+        <field name="code">254101</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Vacances Accumulées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart254102_fr" model="account.account.template">
+        <field name="code">254102</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Jours Compensatoires Accumulés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart254103_fr" model="account.account.template">
+        <field name="code">254103</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Congés de Maladie Accumulés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart2542_fr" model="account.account.template">
+        <field name="code">2542</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Bonis Accumulés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart2183_fr" model="account.account.template">
+        <field name="code">2183</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Bonis à payer</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart2181_fr" model="account.account.template">
+        <field name="code">2181</field>
+        <field name="user_type" ref="account.data_account_type_current_liabilities"/>
+        <field name="name">Salaires à payer</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <!-- CAPITAUX PROPRES -->
+
+    <record id="chart411_fr" model="account.account.template">
+        <field name="code">411</field>
+        <field name="user_type_id" ref="account.data_account_type_revenue"/>
+        <field name="name">Ventes</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart412_fr" model="account.account.template">
+        <field name="code">412</field>
+        <field name="user_type_id" ref="account.data_account_type_revenue"/>
+        <field name="name">Ventes avec des provinces harmonisées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+    
+    <record id="chart413_fr" model="account.account.template">
+        <field name="code">413</field>
+        <field name="user_type_id" ref="account.data_account_type_revenue"/>
+        <field name="name">Ventes avec des provinces non-harmonisées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart414_fr" model="account.account.template">
+        <field name="code">414</field>
+        <field name="user_type_id" ref="account.data_account_type_revenue"/>
+        <field name="name">Ventes à l'étranger</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <!-- CHARGES -->
+    
     <record id="chart5111_fr" model="account.account.template">
-		<field name="code">5111</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Achats</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="code">5111</field>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Achats</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart5112_fr" model="account.account.template">
-		<field name="code">5112</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Achats dans des provinces harmonisées</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
-	
-	<record id="chart5113_fr" model="account.account.template">
-		<field name="code">5113</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Achats dans des provinces non-harmonisées</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart5112_fr" model="account.account.template">
+        <field name="code">5112</field>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Achats dans des provinces harmonisées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+    
+    <record id="chart5113_fr" model="account.account.template">
+        <field name="code">5113</field>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Achats dans des provinces non-harmonisées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart5114_fr" model="account.account.template">
-		<field name="code">5114</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Achats à l'étranger</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart5114_fr" model="account.account.template">
+        <field name="code">5114</field>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Achats à l'étranger</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart51201_fr" model="account.account.template">
-		<field name="code">51201</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Salaires</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart512101_fr" model="account.account.template">
+        <field name="code">512101</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Salaires Réguliers</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart51202_fr" model="account.account.template">
-		<field name="code">51202</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Vacances</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart512102_fr" model="account.account.template">
+        <field name="code">512102</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Bonis</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart51203_fr" model="account.account.template">
-		<field name="code">51203</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Assurance Emploi</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart512103_fr" model="account.account.template">
+        <field name="code">512103</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Paies Rétroactives</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
-	<record id="chart51204_fr" model="account.account.template">
-		<field name="code">51204</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Fonds des services de santé</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+    <record id="chart512201_fr" model="account.account.template">
+        <field name="code">512201</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Vacances Accumulées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart512202_fr" model="account.account.template">
+        <field name="code">512202</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Jours Compensatoires Accumulées</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart512203_fr" model="account.account.template">
+        <field name="code">512203</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Congés de Maladie Accumulés</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart512301_fr" model="account.account.template">
+        <field name="code">512301</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Régime de Pensions du Canada</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+     <record id="chart512302_fr" model="account.account.template">
+        <field name="code">512302</field>
+        <field name="user_type" ref="account.data_account_type_expenses"/>
+        <field name="name">Assurance Emploi</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
+
+    <record id="chart51201_fr" model="account.account.template">
+        <field name="code">51201</field>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Salaires</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart512304_fr" model="account.account.template">
         <field name="code">512304</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Rentes</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Rentes</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
     <record id="chart512310_fr" model="account.account.template">
         <field name="code">512310</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Assurance parentale</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Assurance parentale</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart512311_fr" model="account.account.template">
         <field name="code">512311</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Santé et sécurité au travail</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Santé et sécurité au travail</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart512312_fr" model="account.account.template">
         <field name="code">512312</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Normes du travail</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Normes du travail</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart512313_fr" model="account.account.template">
         <field name="code">512313</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Impôt fédéral</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Impôt fédéral</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     <record id="chart512314_fr" model="account.account.template">
         <field name="code">512314</field>
-		<field name="user_type_id" ref="account.data_account_type_expenses"/>
-		<field name="name">Impôt provincial</field>
-		<field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
-	</record>
+        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+        <field name="name">Impôt provincial</field>
+        <field name="chart_template_id" ref="ca_fr_chart_template_fr"/>
+    </record>
 
     </data>
 </odoo>
