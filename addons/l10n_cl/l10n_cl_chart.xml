@@ -33,7 +33,6 @@
         <field name="code">112.001</field>
         <field name="reconcile" eval="False"/>
         <field ref="account.data_account_type_current_assets" name="user_type_id"/>
-        <field name="currency_id" ref="base.USD"/>
         <field name="chart_template_id" ref="cl_chart_template"/>
     </record>
 
