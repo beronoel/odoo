@@ -27,5 +27,5 @@ This is the latest UK OpenERP localisation necessary to run OpenERP accounting f
         'data/account_chart_template.yml',
     ],
     'demo' : ['demo/demo.xml'],
-    'installable': True,
+    'installable': False,
 }
