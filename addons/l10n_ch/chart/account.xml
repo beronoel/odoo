@@ -5,7 +5,7 @@
          <!-- Account Tags -->
 
         <record id="transfer_account_id" model="account.account.template">
-            <field name="code">8901</field>
+            <field name="code">101</field>
             <field name="name">De transfert de compte</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field eval="True" name="reconcile"/>
@@ -14,6 +14,7 @@
             <field name="name">Plan comptable 2015</field>
             <field name="code_digits">6</field>
             <field name="bank_account_code_prefix">1020</field>
+            <field name="cash_account_code_prefix">1000</field>
             <field name="currency_id" ref="base.CHF"/>
             <field name="transfer_account_id" ref="transfer_account_id"/>
         </record>
@@ -21,13 +22,6 @@
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
         <!-- Accounts Templates -->
-        <record id="ch_coa_1000" model="account.account.template">
-            <field name="code">1000</field>
-            <field name="name">Caisse</field>
-            <field name="user_type_id" ref="account.data_account_type_current_assets"/>
-            <field eval="False" name="reconcile"/>
-            <field name="chart_template_id" ref="l10nch_chart_template"/>
-        </record>
         <record id="ch_coa_1060" model="account.account.template">
             <field name="code">1060</field>
             <field name="name">Titres</field>
@@ -875,16 +869,16 @@
             <field eval="False" name="reconcile"/>
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
-            <record id="gain8902" model="account.account.template">
-            <field name="code">8902</field>
-            <field name="name">gain</field>
+            <record id="ch_coa_6710" model="account.account.template">
+            <field name="code">6710</field>
+            <field name="name">Perte de change</field>
             <field name="user_type_id" ref="account.data_account_type_other_income"/>
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
 
-        <record id="loss8903" model="account.account.template">
-            <field name="code">8903</field>
-            <field name="name">loss</field>
+        <record id="ch_coa_8110" model="account.account.template">
+            <field name="code">8110</field>
+            <field name="name">Gain de change</field>
             <field name="user_type_id" ref="account.data_account_type_expenses"/>
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
@@ -896,8 +890,8 @@
             <field name="property_account_income_categ_id" ref="ch_coa_3200"/>
             <field name="property_account_expense_id" ref="ch_coa_4200"/>
             <field name="property_account_income_id" ref="ch_coa_3200"/>
-            <field name="income_currency_exchange_account_id" ref="gain8902"/>
-            <field name="expense_currency_exchange_account_id" ref="loss8903"/>
+            <field name="income_currency_exchange_account_id" ref="ch_coa_6710"/>
+            <field name="expense_currency_exchange_account_id" ref="ch_coa_8110"/>
         </record>
     </data>
 </odoo>
