@@ -26,5 +26,5 @@ Romanian accounting chart and localization.
               'fiscal_position_template.xml',
               'account_chart_template.yml',
               ],
-    "installable": True,
+    "installable": False,
 }

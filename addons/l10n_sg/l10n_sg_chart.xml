@@ -10,8 +10,8 @@
 
         <record id="sg_chart_template" model="account.chart.template">
             <field name="name">Singapore Chart of Accounts - Standard</field>
-            <field name="bank_account_code_prefix">666</field>
-            <field name="cash_account_code_prefix">555</field>
+            <field name="cash_account_code_prefix">100001</field>
+            <field name="bank_account_code_prefix">100002</field>
             <field name="code_digits">6</field>
             <field name="currency_id" ref="base.SGD" />
             <field name="transfer_account_id" ref="transfer_account_id"/>
@@ -19,22 +19,6 @@
 
         <record id="transfer_account_id" model="account.account.template">
             <field name="chart_template_id" ref="sg_chart_template"/>
-        </record>
-
-        <record model="account.account.template" id="account_account_689">
-            <field name="name">Cash on hand</field>
-            <field name="code">100001</field>
-            <field name="user_type_id" ref="account.data_account_type_liquidity" />
-            <field name="chart_template_id" ref="sg_chart_template"/>
-            <field name="reconcile" eval="False" />
-        </record>
-
-        <record model="account.account.template" id="account_account_690">
-            <field name="name">Current</field>
-            <field name="code">100002</field>
-            <field name="user_type_id" ref="account.data_account_type_liquidity" />
-            <field name="chart_template_id" ref="sg_chart_template"/>
-            <field name="reconcile" eval="False" />
         </record>
 
         <record model="account.account.template" id="account_account_691">
@@ -1197,28 +1181,13 @@
             <field name="reconcile" eval="False" />
         </record>
 
-        <record id="gain81_01" model="account.account.template">
-            <field name="code">81</field>
-            <field name="name">compte de Guany</field>
-            <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="chart_template_id" ref="sg_chart_template"/>
-        </record>
-
-        <record id="loss81_01" model="account.account.template">
-            <field name="code">82</field>
-            <field name="name">compte de Pèrdues</field>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
-            <field name="chart_template_id" ref="sg_chart_template"/>
-        </record>
-
-
     <record id="sg_chart_template" model="account.chart.template">
         <field name="property_account_receivable_id" ref="account_account_735" />
         <field name="property_account_payable_id" ref="account_account_777" />
         <field name="property_account_expense_categ_id" ref="account_account_819" />
         <field name="property_account_income_categ_id" ref="account_account_803" />
-        <field name="income_currency_exchange_account_id" ref="gain81_01"/>
-        <field name="expense_currency_exchange_account_id" ref="loss81_01"/>
+        <field name="income_currency_exchange_account_id" ref="account_account_853"/>
+        <field name="expense_currency_exchange_account_id" ref="account_account_853"/>
     </record>
 
 </odoo>
