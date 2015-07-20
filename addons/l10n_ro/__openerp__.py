@@ -29,5 +29,5 @@ Romanian accounting chart and localization.
               'res.country.state.csv',
               'res.bank.csv',
               ],
-    "installable": True,
+    "installable": False,
 }
