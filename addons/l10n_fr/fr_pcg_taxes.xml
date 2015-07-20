@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="pcg_4091" model="account.account.template">
-      <field name="name">Fournisseurs - Avances et acomptes versés sur commandes</field>
-      <field name="code">4091</field>
-      <field name="user_type_id" ref="account.data_account_type_current_assets" />
+    <record id="pcg_471" model="account.account.template">
+      <field name="name">De transfert de compte</field>
+      <field name="code">471</field>
+      <field name="user_type_id" ref="account.data_account_type_current_assets"/>
       <field name="reconcile" eval="True"/>
     </record>
 
@@ -14,10 +14,11 @@
         <field name="currency_id" ref="base.EUR"/>
         <field name="code_digits" eval="6"/>
         <field name="bank_account_code_prefix">512</field>
-        <field name="transfer_account_id" ref="pcg_4091"/>
+        <field name="cash_account_code_prefix">53</field>
+        <field name="transfer_account_id" ref="pcg_471"/>
     </record>
 
-    <record id="pcg_4091" model="account.account.template">
+    <record id="pcg_471" model="account.account.template">
       <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
     </record>
 

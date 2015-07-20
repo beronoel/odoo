@@ -2614,16 +2614,8 @@
       <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
     </record>
 
-    <record id="pcg_471" model="account.account.template">
-      <field name="name">Comptes d'attente 1</field>
-      <field name="code">471</field>
-      <field name="user_type_id" ref="account.data_account_type_receivable"/>
-      <field name="reconcile" eval="True"/>
-      <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
-    </record>
-
     <record id="pcg_472" model="account.account.template">
-      <field name="name">Comptes d'attente 2</field>
+      <field name="name">Comptes d'attente 1</field>
       <field name="code">472</field>
       <field name="user_type_id" ref="account.data_account_type_receivable"/>
       <field name="reconcile" eval="True"/>
@@ -2631,7 +2623,7 @@
     </record>
 
     <record id="pcg_473" model="account.account.template">
-      <field name="name">Comptes d'attente 3</field>
+      <field name="name">Comptes d'attente 2</field>
       <field name="code">473</field>
       <field name="user_type_id" ref="account.data_account_type_receivable"/>
       <field name="reconcile" eval="True"/>
@@ -2639,7 +2631,7 @@
     </record>
 
     <record id="pcg_474" model="account.account.template">
-      <field name="name">Comptes d'attente 4</field>
+      <field name="name">Comptes d'attente 3</field>
       <field name="code">474</field>
       <field name="user_type_id" ref="account.data_account_type_receivable"/>
       <field name="reconcile" eval="True"/>
@@ -2647,8 +2639,16 @@
     </record>
 
     <record id="pcg_475" model="account.account.template">
-      <field name="name">Comptes d'attente 5</field>
+      <field name="name">Comptes d'attente 4</field>
       <field name="code">475</field>
+      <field name="user_type_id" ref="account.data_account_type_receivable"/>
+      <field name="reconcile" eval="True"/>
+      <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
+    </record>
+
+    <record id="pcg_476" model="account.account.template">
+      <field name="name">Comptes d'attente 5</field>
+      <field name="code">476</field>
       <field name="user_type_id" ref="account.data_account_type_receivable"/>
       <field name="reconcile" eval="True"/>
       <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
@@ -4816,7 +4816,7 @@
     <record id="pcg_766" model="account.account.template">
       <field name="name">Gains de change</field>
       <field name="code">766</field>
-      <field name="user_type_id" ref="account.data_account_type_revenue"/>
+      <field name="user_type_id" ref="account.data_account_type_other_income"/>
       <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
     </record>
 
@@ -5087,27 +5087,13 @@
       <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
     </record>
 
-    <record id="pcg_798" model="account.account.template">
-      <field name="name">Gain compte</field>
-      <field name="code">798</field>
-      <field name="user_type_id" ref="account.data_account_type_other_income"/>
-      <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
-    </record>
-
-    <record id="pcg_799" model="account.account.template">
-      <field name="name">Compte de résultat</field>
-      <field name="code">799</field>
-      <field name="user_type_id" ref="account.data_account_type_expenses"/>
-      <field name="chart_template_id" ref="l10n_fr_pcg_chart_template"/>
-    </record>
-
     <record id="l10n_fr_pcg_chart_template" model="account.chart.template">
       <field name="property_account_receivable_id" ref="fr_pcg_recv"/>
       <field name="property_account_payable_id" ref="fr_pcg_pay"/>
       <field name="property_account_expense_categ_id" ref="pcg_6071"/>
       <field name="property_account_income_categ_id" ref="pcg_7071"/>
-      <field name="income_currency_exchange_account_id" ref="pcg_798"/>
-      <field name="expense_currency_exchange_account_id" ref="pcg_799"/>
+      <field name="income_currency_exchange_account_id" ref="pcg_766"/>
+      <field name="expense_currency_exchange_account_id" ref="pcg_666"/>
       <field name="currency_id" ref="base.EUR"/>
     </record>
 </odoo>
