@@ -8,28 +8,26 @@
         <field name="name">Cuentas No Clasificadas</field>
     </record>
 
-    <record id="114_001" model="account.account.template">
-        <field name="name">Activo Circulante.../ BCO. CTA CTE CLP</field>
-        <field name="code">114.001</field>
+    <record id="117" model="account.account.template">
+        <field name="name">Cuenta de Transferencia</field>
+        <field name="code">117</field>
         <field name="reconcile" eval="True"/>
         <field ref="account.data_account_type_current_assets" name="user_type_id"/>
     </record>
 
     <record id="cl_chart_template" model="account.chart.template">
       <field name="name">Chile - Plan de Cuentas</field>
+      <field name="bank_account_code_prefix">114</field>
+      <field name="cash_account_code_prefix">111_001</field>
       <field name="code_digits">6</field>
       <field name="currency_id" ref="base.CLP"/>
-      <field name="transfer_account_id" ref="114_001"/>
-    </record>   
+      <field name="transfer_account_id" ref="117"/>
+    </record>
 
-    <!-- Account Templates -->
-    <record id="111_001" model="account.account.template">
-        <field name="name">Activo Circulante - Caja / efectivo CLP</field>
-        <field name="code">111.001</field><field name="reconcile" eval="False"/>
-        <field ref="account.data_account_type_current_assets" name="user_type_id"/>
+    <record id="117" model="account.account.template">
         <field name="chart_template_id" ref="cl_chart_template"/>
     </record>
-    
+    <!-- Account Templates -->
     <record id="112_001" model="account.account.template">
         <field name="name">Activo Circulante - Caja / efectivo USD</field>
         <field name="code">112.001</field>
@@ -48,6 +46,10 @@
     </record>
 
     <record id="114_001" model="account.account.template">
+        <field name="name">Activo Circulante.../ BCO. CTA CTE CLP</field>
+        <field name="code">114.001</field>
+        <field name="reconcile" eval="True"/>
+        <field ref="account.data_account_type_current_assets" name="user_type_id"/>
         <field name="chart_template_id" ref="cl_chart_template"/>
     </record>
 
@@ -928,17 +930,10 @@
         <field name="chart_template_id" ref="cl_chart_template"/>
     </record>
 
-    <record id="gain724" model="account.account.template">
-        <field name="code">724</field>
-        <field name="name">ganancia</field>
-        <field name="user_type_id" ref="account.data_account_type_other_income"/>
-        <field name="chart_template_id" ref="cl_chart_template"/>
-    </record>
-
-    <record id="loss725" model="account.account.template">
-        <field name="code">725</field>
-        <field name="name">pérdida</field>
-        <field name="user_type_id" ref="account.data_account_type_expenses"/>
+    <record id="112" model="account.account.template">
+        <field name="name">Activo Circulante - Moneda Extranjera</field>
+        <field name="code">112</field>
+        <field name="user_type_id" ref="account.data_account_type_current_assets"/>
         <field name="chart_template_id" ref="cl_chart_template"/>
     </record>
 
@@ -947,8 +942,8 @@
         <field name="property_account_payable_id" ref="211"/>
         <field name="property_account_expense_categ_id" ref="61_01"/>
         <field name="property_account_income_categ_id" ref="411_01"/>
-        <field name="income_currency_exchange_account_id" ref="gain724"/>
-        <field name="expense_currency_exchange_account_id" ref="loss725"/>
-    </record>   
+        <field name="income_currency_exchange_account_id" ref="112"/>
+        <field name="expense_currency_exchange_account_id" ref="112"/>
+    </record>
 
 </odoo>
