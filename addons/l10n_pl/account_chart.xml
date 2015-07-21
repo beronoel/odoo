@@ -26,6 +26,7 @@
             <field name="code_digits">6</field>
             <field name="currency_id" ref="base.PLN"/>
             <field name="bank_account_code_prefix">Z1-000-000</field>
+            <field name="cash_account_code_prefix">Z1-000-000</field>
             <field name="transfer_account_id" ref="chart11090000"/>
         </record>
 
@@ -1766,7 +1767,7 @@
         <record id="chart75060000" model="account.account.template">
                 <field name="code">75-060-000</field>
                 <field name="reconcile" eval="False"/>
-                <field name="user_type_id" ref="account.data_account_type_revenue"/>
+                <field name="user_type_id" ref="account.data_account_type_other_income"/>
                 <field name="chart_template_id" ref="pl_chart_template"/>
                 <field name="name">Dodatnie różnice kursu walut</field>
         </record>
@@ -2155,8 +2156,8 @@
       <field name="property_account_payable_id" ref="chart21000000"/>
       <field name="property_account_expense_categ_id" ref="chart30020000"/>
       <field name="property_account_income_categ_id" ref="chart73010000"/>
-      <field name="income_currency_exchange_account_id" ref="chart77000000"/>
-      <field name="expense_currency_exchange_account_id" ref="chart77100000"/>
+      <field name="income_currency_exchange_account_id" ref="chart75060000"/>
+      <field name="expense_currency_exchange_account_id" ref="pl_a_pay"/>
     </record>
         
 </data>
