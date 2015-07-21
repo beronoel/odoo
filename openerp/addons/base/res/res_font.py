@@ -35,6 +35,7 @@ BUILTIN_ALTERNATIVES = [
     ('Courier', 'bolditalic', ["FreeMonoBoldOblique", "DejaVuSansMono-BoldOblique"]),
 ]
 
+
 class ResFont(models.Model):
     _name = "res.font"
     _description = 'Fonts available'
