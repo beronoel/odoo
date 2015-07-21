@@ -515,7 +515,7 @@
     Testing for Many2Many field with category vendor and active=False
 -
     !python {model: res.partner }: |
-        vals = {'category_id': [(6, 0, [ref("base.res_partner_category_10")])],
+        vals = {'category_id': [(6, 0, [ref("base.res_partner_category_1")])],
                 'name': 'OpenERP Test',
                 'active': False,
                 'child_ids': [(0, 0, {'name': 'address of OpenERP Test', 'country_id': ref("base.be")})]
