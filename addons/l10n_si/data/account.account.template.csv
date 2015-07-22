@@ -393,5 +393,3 @@ code,id,user_type_id/id,name,reconcile,chart_template_id/id
 997000,gd_acc_997000,account.data_account_type_current_liabilities,"OBVEZNOSTI IZ BLAGA, PREJETEGA V KOMISIJSKO IN KONSIGNACIJSKO PRODAJO",False,gd_chart
 998000,gd_acc_998000,account.data_account_type_current_liabilities,"NOMINALNA VREDNOST VREDNOTNIC, IZDANIH ZA OBRAČUNAVANJE ZNOTRAJ PRAVNE OSEBE",False,gd_chart
 999000,gd_acc_999000,account.data_account_type_current_liabilities,"DRUGI PASIVNI ZUNAJBILANČNI KONTI",False,gd_chart
-
-100200,gd_acc_100200,account.data_account_type_expenses,"Loss Account",False,gd_chart
