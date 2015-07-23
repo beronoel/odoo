@@ -361,25 +361,6 @@ class sale_order_line(osv.osv):
 class stock_move(osv.osv):
     _inherit = 'stock.move'
 
-    def _create_invoice_line_from_vals(self, cr, uid, move, invoice_line_vals, context=None):
-        invoice_line_id = super(stock_move, self)._create_invoice_line_from_vals(cr, uid, move, invoice_line_vals, context=context)
-        if context.get('inv_type') in ('out_invoice', 'out_refund') and move.procurement_id and move.procurement_id.sale_line_id:
-            sale_line = move.procurement_id.sale_line_id
-            self.pool.get('sale.order.line').write(cr, uid, [sale_line.id], {
-                'invoice_lines': [(4, invoice_line_id)]
-            }, context=context)
-            self.pool.get('sale.order').write(cr, uid, [sale_line.order_id.id], {
-                'invoice_ids': [(4, invoice_line_vals['invoice_id'])],
-            })
-            sale_line_obj = self.pool.get('sale.order.line')
-            invoice_line_obj = self.pool.get('account.invoice.line')
-            sale_line_ids = sale_line_obj.search(cr, uid, [('order_id', '=', move.procurement_id.sale_line_id.order_id.id), ('invoiced', '=', False), '|', ('product_id', '=', False), ('product_id.type', '=', 'service')], context=context)
-            if sale_line_ids:
-                created_lines = sale_line_obj.invoice_line_create(cr, uid, sale_line_ids, context=context)
-                invoice_line_obj.write(cr, uid, created_lines, {'invoice_id': invoice_line_vals['invoice_id']}, context=context)
-
-        return invoice_line_id
-
     def _get_master_data(self, cr, uid, move, company, context=None):
         if context.get('inv_type') in ('out_invoice', 'out_refund') and move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.order_policy == 'picking':
             sale_order = move.procurement_id.sale_line_id.order_id

@@ -82,9 +82,6 @@ class stock_move(osv.osv):
                 currency = partner.property_product_pricelist.currency_id.id
         return partner, uid, currency
 
-    def _create_invoice_line_from_vals(self, cr, uid, move, invoice_line_vals, context=None):
-        return self.pool.get('account.invoice.line').create(cr, uid, invoice_line_vals, context=context)
-
     def _get_price_unit_invoice(self, cr, uid, move_line, type, context=None):
         """ Gets price unit for invoice
         @param move_line: Stock move lines
