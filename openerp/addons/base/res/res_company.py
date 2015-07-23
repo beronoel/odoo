@@ -5,7 +5,6 @@ import os
 import re
 from openerp import api, fields, models, tools, _
 from openerp.osv import osv
-from openerp.tools.safe_eval import safe_eval as eval
 from openerp.tools import image_resize_image
 
 
@@ -169,6 +168,61 @@ class ResCompany(models.Model):
     def act_discover_fonts(self):
         return self.env['res.font'].font_scan()
 
+    @api.onchange('custom_footer', 'phone', 'fax', 'email', 'website', 'vat',
+                  'company_registry', 'bank_ids')
+    def onchange_footer(self):
+        if self.custom_footer:
+            return {}
+
+        # first line (notice that missing elements are filtered out before the join)
+        res = ' | '.join(filter(bool, [
+            self.phone and '%s: %s' % (_('Phone'), self.phone),
+            self.fax and '%s: %s' % (_('Fax'), self.fax),
+            self.email and '%s: %s' % (_('Email'), self.email),
+            self.website and '%s: %s' % (_('Website'), self.website),
+            self.vat and '%s: %s' % (_('TIN'), self.vat),
+            self.company_registry and '%s: %s' % (_('Reg'), self.company_registry),
+        ]))
+        # second line: bank accounts
+        account_data = self.resolve_2many_commands('bank_ids', self.bank_ids)
+        account_names = self.env['res.partner.bank']._prepare_name_get(account_data)
+        if account_names:
+            title = _('Bank Accounts') if len(account_names) > 1 else _('Bank Account')
+            res += '\n%s: %s' % (title, ', '.join(name for id, name in account_names))
+        self.rml_footer = res
+        self.rml_footer_readonly = res
+
+    @api.onchange('state_id')
+    def onchange_state(self):
+        if self.state_id:
+            self.country_id = self.state_id.country_id.id
+
+    @api.onchange('font', 'rml_header', 'rml_header2', 'rml_header3')
+    def onchange_font_name(self):
+        """ To change default header style of all <para> and drawstring. """
+
+        def _change_header(header, font):
+            """ Replace default fontname use in header and setfont tag """
+
+            default_para = re.sub('fontName.?=.?".*"', 'fontName="%s"' % font, header)
+            return re.sub('(<setFont.?name.?=.?)(".*?")(.)', '\g<1>"%s"\g<3>' % font, default_para)
+
+        if not self.font:
+            return True
+        self.rml_header = _change_header(self.rml_header, self.font.name)
+        self.rml_header2 = _change_header(self.rml_header2, self.font.name)
+        self.rml_header3 = _change_header(self.rml_header3, self.font.name)
+
+    @api.onchange('country_id')
+    def onchange_country(self):
+        res = {'domain': {'state_id': []}}
+        currency_id = self._get_euro()
+        if self.country_id:
+            currency_id = self.country_id.currency_id.id
+            res['domain'] = {'state_id': [('country_id', '=', self.country_id.id)]}
+        self.currency_id = currency_id
+        return res
+
     name = fields.Char(related='partner_id.name', string='Company Name',
                        required=True, store=True)
     parent_id = fields.Many2one('res.company', string='Parent Company', index=True)
@@ -227,61 +281,6 @@ class ResCompany(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique (name)', _('The company name must be unique !'))
     ]
-
-    @api.onchange('custom_footer', 'phone', 'fax', 'email', 'website', 'vat',
-                  'company_registry', 'bank_ids')
-    def onchange_footer(self):
-        if self.custom_footer:
-            return {}
-
-        # first line (notice that missing elements are filtered out before the join)
-        res = ' | '.join(filter(bool, [
-            self.phone and '%s: %s' % (_('Phone'), self.phone),
-            self.fax and '%s: %s' % (_('Fax'), self.fax),
-            self.email and '%s: %s' % (_('Email'), self.email),
-            self.website and '%s: %s' % (_('Website'), self.website),
-            self.vat and '%s: %s' % (_('TIN'), self.vat),
-            self.company_registry and '%s: %s' % (_('Reg'), self.company_registry),
-        ]))
-        # second line: bank accounts
-        account_data = self.resolve_2many_commands('bank_ids', self.bank_ids)
-        account_names = self.env['res.partner.bank']._prepare_name_get(account_data)
-        if account_names:
-            title = _('Bank Accounts') if len(account_names) > 1 else _('Bank Account')
-            res += '\n%s: %s' % (title, ', '.join(name for id, name in account_names))
-        self.rml_footer = res
-        self.rml_footer_readonly = res
-
-    @api.onchange('state_id')
-    def onchange_state(self):
-        if self.state_id:
-            self.country_id = self.state_id.country_id.id
-
-    @api.onchange('font', 'rml_header', 'rml_header2', 'rml_header3')
-    def onchange_font_name(self):
-        """ To change default header style of all <para> and drawstring. """
-
-        def _change_header(header, font):
-            """ Replace default fontname use in header and setfont tag """
-
-            default_para = re.sub('fontName.?=.?".*"', 'fontName="%s"' % font, header)
-            return re.sub('(<setFont.?name.?=.?)(".*?")(.)', '\g<1>"%s"\g<3>' % font, default_para)
-
-        if not self.font:
-            return True
-        self.rml_header = _change_header(self.rml_header, self.font.name)
-        self.rml_header2 = _change_header(self.rml_header2, self.font.name)
-        self.rml_header3 = _change_header(self.rml_header3, self.font.name)
-
-    @api.onchange('country_id')
-    def onchange_country(self):
-        res = {'domain': {'state_id': []}}
-        currency_id = self._get_euro()
-        if self.country_id:
-            currency_id = self.country_id.currency_id.id
-            res['domain'] = {'state_id': [('country_id', '=', self.country_id.id)]}
-        self.currency_id = currency_id
-        return res
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
