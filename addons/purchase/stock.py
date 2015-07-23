@@ -106,7 +106,7 @@ class stock_move(osv.osv):
         if purchase_line:
             res['invoice_line_tax_id'] = [(6, 0, [x.id for x in purchase_line.taxes_id])]
             res['price_unit'] = purchase_line.price_unit
-            res['account_analytic_id'] = move.purchase_line_id.account_analytic_id.id
+            res['account_analytic_id'] = purchase_line.account_analytic_id.id
             res['purchase_line_ids'] = [(4, purchase_line.id)]
         return res
 
