@@ -96,9 +96,9 @@ class stock_move(osv.osv):
                 return partner, uid, currency
         return super(stock_move, self)._get_master_data(cr, uid, move, company, context=context)
 
-
     def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type, context=None):
         res = super(stock_move, self)._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)
+        purchase_line = False
         if inv_type == 'in_invoice' and move.purchase_line_id:
             purchase_line = move.purchase_line_id
         elif inv_type == 'in_refund' and move.origin_returned_move_id.purchase_line_id:
