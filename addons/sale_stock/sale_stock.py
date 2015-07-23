@@ -362,7 +362,7 @@ class stock_move(osv.osv):
     _inherit = 'stock.move'
 
     def _get_master_data(self, cr, uid, move, company, context=None):
-        if context.get('inv_type') in ('out_invoice', 'out_refund') and move.procurement_id and move.procurement_id.sale_line_id and move.procurement_id.sale_line_id.order_id.order_policy == 'picking':
+        if context.get('inv_type') in ('out_invoice', 'out_refund') and (move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id):
             sale_order = move.procurement_id.sale_line_id.order_id
             return sale_order.partner_invoice_id, sale_order.user_id.id, sale_order.pricelist_id.currency_id.id
         elif move.picking_id.sale_id and context.get('inv_type') in ('out_invoice', 'out_refund'):
@@ -373,8 +373,8 @@ class stock_move(osv.osv):
 
     def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type, context=None):
         res = super(stock_move, self)._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)
-        if inv_type in ('out_invoice', 'out_refund') and move.procurement_id and move.procurement_id.sale_line_id:
-            sale_line = move.procurement_id.sale_line_id
+        if inv_type in ('out_invoice', 'out_refund') and (move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id):
+            sale_line = move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id
             res['invoice_line_tax_ids'] = [(6, 0, [x.id for x in sale_line.tax_id])]
             res['account_analytic_id'] = sale_line.order_id.project_id and sale_line.order_id.project_id.id or False
             res['discount'] = sale_line.discount
@@ -448,7 +448,7 @@ class stock_picking(osv.osv):
     def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, moves, context=None):
         inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
         if inv_type in ('out_invoice', 'out_refund'):
-            sales = [x.picking_id.sale_id for x in moves if x.picking_id.sale_id]
+            sales = [x.picking_id.sale_id or x.origin_returned_move_id.picking_id.sale_id for x in moves if x.picking_id.sale_id or x.origin_returned_move_id.picking_id.sale_id]
             if sales:
                 sale = sales[0]
                 inv_vals.update({
@@ -463,10 +463,9 @@ class stock_picking(osv.osv):
 
     def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
         res = super(stock_picking, self).get_service_line_vals(cr, uid, moves, partner, inv_type, context=context)
-        invoice_line_obj = self.pool.get('account.invoice.line')
-        if inv_type in ('out_invoice', 'out_refund'):
+        if inv_type == 'out_invoice':
             sale_line_obj = self.pool.get('sale.order.line')
-            orders = list(set([x.procurement_id.sale_line_id.order_id.id for x in moves if x.procurement_id.sale_line_id.order_id.id]))
+            orders = list(set([x.procurement_id.sale_line_id.order_id.id for x in moves if x.procurement_id.sale_line_id]))
             sale_line_ids = sale_line_obj.search(cr, uid, [('order_id', 'in', orders), ('invoiced', '=', False), '|', ('product_id', '=', False),
                                                            ('product_id.type', '=', 'service')], context=context)
             if sale_line_ids:
