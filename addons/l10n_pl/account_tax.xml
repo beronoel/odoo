@@ -440,7 +440,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">sale</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_VLP-1_sale')])]"/>
                 </record>
 
@@ -453,7 +453,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_VLP-1_purchase')])]"/>
                 </record>
 
@@ -466,7 +466,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart76140000"/>
                         <field name="account_id" ref="chart76140000"/>
-                        <field name="type_tax_use">sale</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_VLP-2_sale')])]"/>
                 </record>
 
@@ -479,7 +479,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart76140000"/>
                         <field name="account_id" ref="chart76140000"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_VLP-2_purchase')])]"/>
                 </record>
 
@@ -528,7 +528,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_ZST1')])]"/>
                 </record>
 
@@ -541,7 +541,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22030400"/>
                         <field name="account_id" ref="chart22030400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_ZST2')])]"/>
                 </record>
 
@@ -578,7 +578,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_UNT1')])]"/>
                 </record>
 
@@ -591,7 +591,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22030400"/>
                         <field name="account_id" ref="chart22030400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_UNT2')])]"/>
                 </record>
 
@@ -625,7 +625,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_UNU1')])]"/>
                 </record>
 
@@ -638,7 +638,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22030400"/>
                         <field name="account_id" ref="chart22030400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_UNU2')])]"/>
                 </record>
 
@@ -676,7 +676,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_IMT1')])]"/>
                 </record>
 
@@ -689,7 +689,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22030400"/>
                         <field name="account_id" ref="chart22030400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_IMT2')])]"/>
                 </record>
 
@@ -723,7 +723,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22020400"/>
                         <field name="account_id" ref="chart22020400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_IMU1')])]"/>
                 </record>
 
@@ -736,7 +736,7 @@
                         <field name="amount_type">percent</field>
                         <field name="refund_account_id" ref="chart22030400"/>
                         <field name="account_id" ref="chart22030400"/>
-                        <field name="type_tax_use">purchase</field>
+                        <field name="type_tax_use">none</field>
                         <field name="tag_ids" eval="[(6,0,[ref('l10n_pl.tax_IMU2')])]"/>
                 </record>
 
