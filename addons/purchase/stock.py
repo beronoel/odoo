@@ -75,7 +75,7 @@ class stock_move(osv.osv):
         elif inv_type == 'in_refund' and move.origin_returned_move_id.purchase_line_id:
             purchase_line = move.origin_returned_move_id.purchase_line_id
         if purchase_line:
-            res['invoice_line_tax_id'] = [(6, 0, [x.id for x in purchase_line.taxes_id])]
+            res['invoice_line_tax_ids'] = [(6, 0, [x.id for x in purchase_line.taxes_id])]
             res['price_unit'] = purchase_line.price_unit
             res['account_analytic_id'] = purchase_line.account_analytic_id.id
             res['purchase_line_ids'] = [(4, purchase_line.id)]
@@ -94,7 +94,7 @@ class stock_move(osv.osv):
                         mov = self.browse(cr, uid, mov_id[0], context=context)
                         fp = mov.purchase_line_id.order_id.fiscal_position
                         res = self.pool.get("account.invoice.line").product_id_change(cr, uid, [], move.product_id.id, None, partner_id=move.picking_id.partner_id.id, fposition_id=(fp and fp.id), type='in_invoice', context=context)
-                        extra_move_tax[0, move.product_id] = [(6, 0, res['value']['invoice_line_tax_id'])]
+                        extra_move_tax[0, move.product_id] = [(6, 0, res['value']['invoice_line_tax_ids'])]
         return (is_extra_move, extra_move_tax)
 
 
