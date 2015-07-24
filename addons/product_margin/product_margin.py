@@ -27,6 +27,24 @@ from openerp.osv import fields, osv
 class product_product(osv.osv):
     _inherit = "product.product"
 
+    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=True):
+        res = super(product_product, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
+        if context is None:
+            context = {}
+        if 'turnover' in fields:
+            # Calculate products
+            for re in res:
+                if re.get('__domain'):
+                    products = self.search(cr, uid, re['__domain'], context=context)
+                    res_val = self._product_margin(cr, uid, products, [], '', context=context)
+                    for key in res_val.keys():
+                        for l in res_val[key].keys():
+                            if re.get(l):
+                                re[l] += res_val[key][l]
+                            else:
+                                re[l] = res_val[key][l]
+        return res
+
     def _product_margin(self, cr, uid, ids, field_names, arg, context=None):
         res = {}
         if context is None:
