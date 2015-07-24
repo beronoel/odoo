@@ -297,13 +297,13 @@ class ResCompany(models.Model):
             name=name, args=args, operator=operator, limit=limit)
 
     @api.returns('self')
-    def _company_default_get(self, object=False, field=False):
+    def _company_default_get(self, cr, uid, object=False, field=False, context=None):
         """
         Returns the default company (the user's company)
         The 'object' and 'field' arguments are ignored but left here for
         backward compatibility and potential override.
         """
-        return self.env['res.users']._get_company()
+        return self.pool['res.users']._get_company(cr, uid, context=context)
 
     @tools.ormcache('uid', 'company')
     def _get_company_children(self, company=None):
@@ -353,5 +353,6 @@ class ResCompany(models.Model):
         return super(ResCompany, self).write(values)
 
     _constraints = [
-        (osv.osv._check_recursion, 'Error! You can not create recursive companies.', ['parent_id'])
+        (osv.osv._check_recursion, _(
+            'Error! You can not create recursive companies.'), ['parent_id'])
     ]

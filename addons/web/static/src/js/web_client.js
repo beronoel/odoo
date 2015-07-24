@@ -221,7 +221,7 @@ var WebClient = Widget.extend({
         ev.preventDefault();
         self.alive(new Model("res.users").get_func("read")(session.uid, ["company_id"])).then(function(res) {
             self.rpc("/web/action/load", { action_id: "base.action_res_company_form" }).done(function(result) {
-                result.res_id = res.company_id[0];
+                result.res_id = res[0].company_id[0];
                 result.target = "new";
                 result.views = [[false, 'form']];
                 result.flags = {

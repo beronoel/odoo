@@ -38,11 +38,11 @@ var SystrayMenu = Widget.extend({
                 return;
             var func = new Model("res.users").get_func("read");
             return self.alive(func(session.uid, ["name", "company_id"])).then(function(res) {
-                var topbar_name = res.name;
+                var topbar_name = res[0].name;
                 if(session.debug)
                     topbar_name = _.str.sprintf("%s (%s)", topbar_name, session.db);
-                if(res.company_id[0] > 1)
-                    topbar_name = _.str.sprintf("%s (%s)", topbar_name, res.company_id[1]);
+                if(res[0].company_id[0] > 1)
+                    topbar_name = _.str.sprintf("%s (%s)", topbar_name, res[0].company_id[1]);
                 self.$el.find('.oe_topbar_name').text(topbar_name);
                 if (!session.debug) {
                     topbar_name = _.str.sprintf("%s (%s)", topbar_name, session.db);

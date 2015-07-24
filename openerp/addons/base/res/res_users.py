@@ -10,7 +10,6 @@ from lxml.builder import E
 
 import openerp
 from openerp import api, fields, models, SUPERUSER_ID, _
-# from openerp import SUPERUSER_ID, models
 from openerp import tools
 import openerp.exceptions
 from openerp.osv import expression
@@ -32,18 +31,15 @@ class ResGroups(models.Model):
     _rec_name = 'full_name'
     _order = 'name'
 
-    @api.multi
     def _get_full_name(self):
-        res = {}
-        for record in self:
-            if record.category_id:
-                res[record.id] = '%s / %s' % (record.category_id.name, record.name)
+        for group in self:
+            if group.category_id:
+                group.name = '%s / %s' % (group.category_id.name, group.name)
             else:
-                res[record.id] = record.name
-        return res
+                group.name = group.name
 
-    @api.multi
     def _search_group(self, args):
+        print '---_search_group----', self, args
         operand = args[0][2]
         operator = args[0][1]
         lst = True
@@ -88,7 +84,7 @@ class ResGroups(models.Model):
                                    string='Views')
     comment = fields.Text(translate=True)
     category_id = fields.Many2one('ir.module.category', string='Application', index=True)
-    full_name = fields.Char(compute='_get_full_name', string='Group Name', search=_search_group)
+    full_name = fields.Char(compute='_get_full_name', string='Group Name', search='_search_group')
     share = fields.Boolean(
         string='Share Group',
         help="Group created to set access rights for sharing data with some users.")
@@ -141,6 +137,7 @@ class ResUsers(models.Model):
     _description = 'Users'
 
     def _set_new_password(self, value, args):
+        print '_set_new_password---', self, value, args
         if value is False:
             # Do not update the password if no value is provided, ignore silently.
             # For example web client submits False values for all empty fields.
@@ -152,11 +149,10 @@ class ResUsers(models.Model):
             raise UserError(_('Please use the change password wizard (in User Preferences or User menu) to change your own password.'))
         self.write({'password': value})
 
-    @api.multi
     def _get_password(self):
+        print '----_get_password-->', self
         return dict.fromkeys(self.ids, '')
 
-    @api.multi
     def _is_share(self):
         for user in self:
             self.id = not user.has_group_wrapper('base.group_user')
@@ -171,10 +167,24 @@ class ResUsers(models.Model):
             result.update(user.id for user in group.users)
         return list(result)
 
+    @api.v8
     def _get_company(self, uid2=False):
         if not uid2:
             uid2 = self.env.user
         return uid2.company_id
+
+    @api.v7
+    def _get_company(self, cr, uid, context=None, uid2=False):
+        if not uid2:
+            uid2 = uid
+        # Use read() to compute default company, and pass load=_classic_write to
+        # avoid useless name_get() calls. This will avoid prefetching fields
+        # while computing default values for new db columns, as the
+        # db backend may not be fully initialized yet.
+        user_data = self.pool['res.users'].read(cr, uid, uid2, ['company_id'],
+                                                context=context, load='_classic_write')[0]
+        comp_id = user_data['company_id']
+        return comp_id or False
 
     def _get_companies(self):
         company = self._get_company()
@@ -197,29 +207,6 @@ class ResUsers(models.Model):
     def on_change_login(self):
         if self.login and tools.single_email_re.match(self.login):
             self.email = self.login
-
-    @api.onchange('state_id')
-    def onchange_state(self):
-        partners = [user.partner_id for user in self]
-        return partners.onchange_state(self.state_id)
-
-    @api.onchange('is_company')
-    def onchange_type(self):
-        """ Wrapper on the user.partner onchange_type, because some calls to the
-            partner form view applied to the user may trigger the
-            partner.onchange_type method, but applied to the user object.
-        """
-        partners = [user.partner_id for user in self]
-        return partners.onchange_type(self.is_company)
-
-    @api.onchange('use_parent_address', 'parent_id')
-    def onchange_address(self):
-        """ Wrapper on the user.partner onchange_address, because some calls to the
-            partner form view applied to the user may trigger the
-            partner.onchange_type method, but applied to the user object.
-        """
-        partners = [user.partner_id for user in self]
-        return partners.onchange_address(self.use_parent_address, self.parent_id)
 
     @api.depends('company_id', 'company_ids')
     def _check_company(self):
@@ -261,7 +248,7 @@ class ResUsers(models.Model):
                                    default=_get_companies,
                                    string='Companies')
     share = fields.Boolean(
-        compute='_is_share', string='Share User', type='boolean',
+        compute='_is_share', string='Share User',
         help="External user with limited access, created only for the purpose of sharing data.")
 
     # overridden inherited fields to bypass access rights, in case you have
@@ -353,7 +340,8 @@ class ResUsers(models.Model):
     @api.multi
     def unlink(self):
         if 1 in self.ids:
-            raise UserError(_('You can not remove the admin user as it is used internally for resources created by Odoo (updates, module installation, ...)'))
+            raise UserError(
+                _('You can not remove the admin user as it is used internally for resources created by Odoo (updates, module installation, ...)'))
         db = self.env.cr.dbname
         if db in self._uid_cache:
             for id in self.ids:
@@ -364,7 +352,7 @@ class ResUsers(models.Model):
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         if not args:
-            args=[]
+            args = []
         users = []
         if name and operator in ['=', 'ilike']:
             users = self.search([('login', '=', name)] + args, limit=limit)
@@ -382,8 +370,9 @@ class ResUsers(models.Model):
             default['login'] = _("%s (copy)") % user2copy['login']
         return super(ResUsers, self).copy(default)
 
-    @tools.ormcache()
-    def context_get(self):
+    @tools.ormcache('uid')
+    def context_get(self, cr, uid, context=None):
+        user = self.browse(cr, SUPERUSER_ID, uid, context)
         result = {}
         for k in self._fields:
             if k.startswith('context_'):
@@ -393,7 +382,7 @@ class ResUsers(models.Model):
             else:
                 context_key = False
             if context_key:
-                res = getattr(self.env.user, k) or False
+                res = getattr(user, k) or False
                 if isinstance(res, models.BaseModel):
                     res = res.id
                 result[context_key] = res or False
@@ -411,9 +400,9 @@ class ResUsers(models.Model):
         else:
             raise openerp.exceptions.AccessDenied()
 
-    def check_credentials(self, uid, password):
+    def check_credentials(self, cr, uid, password):
         """ Override this method to plug additional authentication methods"""
-        res = self.sudo().search([('id', '=', uid), ('password', '=', password)])
+        res = self.search(cr, SUPERUSER_ID, [('id', '=', uid), ('password', '=', password)])
         if not res:
             raise openerp.exceptions.AccessDenied()
 
@@ -421,18 +410,19 @@ class ResUsers(models.Model):
         if not password:
             return False
         user_id = False
+        cr = self.pool.cursor()
         try:
             # autocommit: our single update request will be performed atomically.
             # (In this way, there is no opportunity to have two transactions
             # interleaving their cr.execute()..cr.commit() calls and have one
             # of them rolled back due to a concurrent access.)
-            self.env.cr.autocommit(True)
+            cr.autocommit(True)
             # check if user exists
-            res = self.sudo().search([('login', '=', login)])
+            res = self.search(cr, SUPERUSER_ID, [('login', '=', login)])
             if res:
                 user_id = res[0]
                 # check credentials
-                self.check_credentials(user_id, password)
+                self.check_credentials(cr, user_id, password)
                 # We effectively unconditionally write the res_users line.
                 # Even w/ autocommit there's a chance the user row will be locked,
                 # in which case we can't delay the login just for the purpose of
@@ -444,18 +434,17 @@ class ResUsers(models.Model):
                 # as a SQL error, if anyone cares.
                 try:
                     # NO KEY introduced in PostgreSQL 9.3 http://www.postgresql.org/docs/9.3/static/release-9-3.html#AEN115299
-                    update_clause = 'NO KEY UPDATE' if self.env.cr._cnx.server_version >= 90300 else 'UPDATE'
-                    self.env.cr.execute("SELECT id FROM ResUsers WHERE id=%%s FOR %s NOWAIT" % update_clause, (user_id,), log_exceptions=False)
-                    self.env.cr.execute("UPDATE ResUsers SET login_date = now() AT TIME ZONE 'UTC' WHERE id=%s", (user_id,))
-                    self.invalidate_cache(['login_date'], [user_id])
+                    update_clause = 'NO KEY UPDATE' if cr._cnx.server_version >= 90300 else 'UPDATE'
+                    cr.execute("SELECT id FROM ResUsers WHERE id=%%s FOR %s NOWAIT" % update_clause, (user_id,), log_exceptions=False)
+                    cr.execute("UPDATE ResUsers SET login_date = now() AT TIME ZONE 'UTC' WHERE id=%s", (user_id,))
+                    self.invalidate_cache(cr, user_id, ['login_date'], [user_id])
                 except Exception:
-                    _logger.debug(
-                        "Failed to update last_login for db:%s login:%s", db, login, exc_info=True)
+                    _logger.debug("Failed to update last_login for db:%s login:%s", db, login, exc_info=True)
         except openerp.exceptions.AccessDenied:
             _logger.info("Login failed for db:%s login:%s", db, login)
             user_id = False
         finally:
-            self.env.cr.close()
+            cr.close()
 
         return user_id
 
@@ -471,14 +460,14 @@ class ResUsers(models.Model):
                relevant environment attributes
         """
         uid = self._login(db, login, password)
-        if uid == SUPERUSER_ID:
+        if uid == openerp.SUPERUSER_ID:
             # Successfully logged in as admin!
             # Attempt to guess the web base url...
             if user_agent_env and user_agent_env.get('base_location'):
-                cr = self.env.cursor()
+                cr = self.pool.cursor()
                 try:
                     base = user_agent_env['base_location']
-                    ICP = self.env['ir.config_parameter']
+                    ICP = self.pool['ir.config_parameter']
                     if not ICP.get_param(cr, uid, 'web.base.url.freeze'):
                         ICP.set_param(cr, uid, 'web.base.url', base)
                     cr.commit()
@@ -496,7 +485,7 @@ class ResUsers(models.Model):
             raise openerp.exceptions.AccessDenied()
         if self._uid_cache.get(db, {}).get(uid) == passwd:
             return
-        cr = self.env.cursor()
+        cr = self.pool.cursor()
         try:
             self.check_credentials(cr, uid, passwd)
             if self._uid_cache.has_key(db):
@@ -995,7 +984,6 @@ class ChangePasswordWizard(models.TransientModel):
     def _default_user_ids(self):
         user_model = self.env['res.users']
         user_ids = self.env.context.get('active_model') == 'res.users' and self.env.context.get('active_ids') or []
-        print '--user_ids-->', user_ids
         return [
             (0, 0, {'user_id': user.id, 'user_login': user.login})
             for user in user_model.browse(user_ids)
@@ -1006,10 +994,9 @@ class ChangePasswordWizard(models.TransientModel):
 
     @api.multi
     def change_password_button(self):
-        # wizard = self.browse()[0]
         need_reload = any(self.env.user.id == user.user_id.id for user in self.user_ids)
-
         line_ids = [user.id for user in self.user_ids]
+        print '-line_ids------', line_ids
         self.env['change.password.user'].change_password_button(line_ids)
 
         if need_reload:
@@ -1034,8 +1021,9 @@ class ChangePasswordUser(models.TransientModel):
     user_login = fields.Char(readonly=True)
     new_passwd = fields.Char(string='New Password', default='')
 
-    def change_password_button(self):
-        for line in self:
+    def change_password_button(self, line_ids):
+        change_user_pwd = self.browse(line_ids)
+        for line in change_user_pwd:
             line.user_id.write({'password': line.new_passwd})
         # don't keep temporary passwords in the database longer than necessary
-        self.write({'new_passwd': False})
+        change_user_pwd.browse(line_ids).write({'new_passwd': False})

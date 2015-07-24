@@ -67,7 +67,8 @@ def _tz_get(self):
 
 class ResPartnerCategory(models.Model):
 
-    def name_get(self, cr, uid, ids, context=None):
+    @api.multi
+    def name_get(self):
         """ Return the categories' display name, including their direct
             parent by default.
 
@@ -75,16 +76,11 @@ class ResPartnerCategory(models.Model):
             version of the category name (without the direct parent) is used.
             The default is the long version.
         """
-        if not isinstance(ids, list):
-            ids = [ids]
-        if context is None:
-            context = {}
-
-        if context.get('partner_category_display') == 'short':
-            return super(ResPartnerCategory, self).name_get(cr, uid, ids, context=context)
+        if self.env.context.get('partner_category_display') == 'short':
+            return super(ResPartnerCategory, self).name_get()
 
         res = []
-        for category in self.browse(cr, uid, ids, context=context):
+        for category in self:
             names = []
             current = category
             while current:
@@ -104,7 +100,7 @@ class ResPartnerCategory(models.Model):
         return categories.name_get()
 
     @api.multi
-    def _name_get_fnc(self):
+    def _name_get_fnc(self, field_name, arg):
         return dict(self.name_get())
 
     _description = 'Partner Categories'
@@ -124,7 +120,7 @@ class ResPartnerCategory(models.Model):
 
     _constraints = [
         (osv.osv._check_recursion,
-         'Error ! You can not create recursive categories.', ['parent_id'])
+         _('Error ! You can not create recursive categories.'), ['parent_id'])
     ]
 
     _parent_store = True
@@ -155,11 +151,11 @@ class ResPartner(models.Model, format_address):
     _description = 'Partner'
     _name = "res.partner"
 
-    @api.multi
     def _address_display(self):
         res = {}
         for partner in self:
             res[partner.id] = self._display_address(partner)
+        print '-----address_display---', self, res
         return res
 
     @api.multi
@@ -168,13 +164,16 @@ class ResPartner(models.Model, format_address):
             (p.id, datetime.datetime.now(pytz.timezone(p.tz or 'GMT')).strftime('%z'))
             for p in self)
 
+    @api.multi
     @api.depends('image')
     def _get_image(self):
+        print '------get_image-----', self
         return dict((p.id, tools.image_get_resized_images(p.image)) for p in self)
 
-    def _set_image(self):
-        print 'self---setimage--->', self
-        self.image = tools.image_resize_image_big(self.image)
+    @api.one
+    def _set_image(self, name, value, args):
+        print '----set-image---->', self, name, value, args
+        return self.write({'image': tools.image_resize_image_big(value)})
 
     @api.depends('parent_id', 'is_company')
     def _commercial_partner_compute(self):
@@ -195,12 +194,14 @@ class ResPartner(models.Model, format_address):
         context.pop('show_email', None)
         return dict(self.name_get())
 
+    @api.model
     def _default_category(self):
         category_id = self.env.context.get('category_id', False)
         return [category_id] if category_id else False
 
+    @api.model
     def _default_company(self):
-        return self.env.user.company_id
+        return self.env['res.company']._company_default_get('res.partner')
 
     _order = "display_name"
 
@@ -301,6 +302,7 @@ class ResPartner(models.Model, format_address):
         if not is_company:
             image = tools.image_colorize(image)
 
+        print '------image---->', image
         return tools.image_resize_image_big(image.encode('base64'))
 
     @api.model
@@ -315,7 +317,7 @@ class ResPartner(models.Model, format_address):
 
     _constraints = [
         (osv.osv._check_recursion,
-         'You cannot create recursive Partner hierarchies.', ['parent_id']),
+         _('You cannot create recursive Partner hierarchies.'), ['parent_id']),
     ]
 
     @api.one
@@ -334,12 +336,12 @@ class ResPartner(models.Model, format_address):
             domain = {'title': [('domain', '=', 'contact')]}
         return {'domain': domain}
 
-    @api.multi
     @api.onchange('use_parent_address', 'parent_id')
+    def onchange_address_wrapper(self):
+        self.onchange_address(self.use_parent_address, self.parent_id)
+
+    @api.multi
     def onchange_address(self, use_parent_address, parent_id):
-        def value_or_id(val):
-            """ return val or val.id if val is a browse record """
-            return val if isinstance(val, (bool, int, long, float, basestring)) else val.id
         result = {}
         if parent_id:
             if self.ids:
@@ -350,12 +352,12 @@ class ResPartner(models.Model, format_address):
                                                       'company then a new contact should be created under that new '
                                                       'company. You can use the "Discard" button to abandon this change.')}
             if use_parent_address and self.parent_id:
-                self.street = self.partner_id['street']
-                self.street2 = self.partner_id['street2']
-                self.zip = self.partner_id['zip']
-                self.city = self.partner_id['city']
-                self.state_id = self.partner_id['state_id']
-                self.country_id = self.partner_id['country_id']
+                self.street = self.parent_id['street']
+                self.street2 = self.parent_id['street2']
+                self.zip = self.parent_id['zip']
+                self.city = self.parent_id['city']
+                self.state_id = self.parent_id['state_id']
+                self.country_id = self.parent_id['country_id']
 
         else:
             result['value'] = {'use_parent_address': False}
@@ -364,10 +366,8 @@ class ResPartner(models.Model, format_address):
     @api.onchange('state_id')
     def onchange_state(self):
         if self.state_id:
-            state = self.env['res.country.state'].browse(self.state_id)
-            self.country_id = state.country_id.id
+            self.country_id = self.state_id.country_id.id
 
-    @api.model
     def _update_fields_values(self, partner, fields):
         """ Returns dict of write() values for synchronizing ``fields`` """
         values = {}
@@ -383,7 +383,6 @@ class ResPartner(models.Model, format_address):
                 values[fname] = partner[fname]
         return values
 
-    @api.multi
     def _address_fields(self):
         """ Returns the list of address fields that are synced from the parent
         when the `use_parent_address` flag is set. """
@@ -396,7 +395,6 @@ class ResPartner(models.Model, format_address):
         if addr_vals:
             return super(ResPartner, self).write(addr_vals)
 
-    @api.multi
     def _commercial_fields(self):
         """ Returns the list of fields that are managed by the commercial entity
         to which a partner belongs. These fields are meant to be hidden on
@@ -405,7 +403,6 @@ class ResPartner(models.Model, format_address):
         extended by inheriting classes. """
         return ['vat', 'credit_limit']
 
-    @api.multi
     def _commercial_sync_from_company(self):
         """ Handle sync of commercial fields when a new parent commercial entity is set,
         as if they were related fields """
@@ -420,7 +417,6 @@ class ResPartner(models.Model, format_address):
             sync_vals = self._update_fields_values(commercial_partner, commercial_fields)
             self.write(sync_vals)
 
-    @api.multi
     def _commercial_sync_to_children(self):
         """ Handle sync of commercial fields to descendants """
         commercial_fields = self._commercial_fields()
@@ -438,7 +434,6 @@ class ResPartner(models.Model, format_address):
         for child in sync_children:
             child.write(sync_vals)
 
-    @api.model
     def _fields_sync(self, partner, update_values):
         """ Sync commercial fields and address fields from company and to children after create/update,
         just as if those were all modeled as fields.related to the parent """
@@ -468,7 +463,6 @@ class ResPartner(models.Model, format_address):
                                              ('use_parent_address', '=', True)])
                 update_ids.update_address(update_values)
 
-    @api.multi
     def _handle_first_contact_creation(self, partner):
         """ On creation of first contact for a company (or root) that has no address, assume contact address
         was meant to be company address """
@@ -579,6 +573,7 @@ class ResPartner(models.Model, format_address):
             name, email = text, ''
         return name, email
 
+    @api.model
     def name_create(self, name):
         """ Override of orm's name_create method for partners. The purpose is
             to handle some basic formats to create partners using the
@@ -649,6 +644,7 @@ class ResPartner(models.Model, format_address):
                 where_clause_params.append(limit)
             self.env.cr.execute(query, where_clause_params)
             ids = map(lambda x: x[0], self.env.cr.fetchall())
+            print '-----name_search---->', ids
 
             if ids:
                 return self.name_get()
@@ -657,7 +653,7 @@ class ResPartner(models.Model, format_address):
         return super(ResPartner, self).name_search(name, args, operator=operator,
                                                    limit=limit)
 
-    @api.multi
+    @api.model
     def find_or_create(self, email):
         """ Find a partner with the given ``email`` or use :py:method:`~.name_create`
             to create one
@@ -677,7 +673,6 @@ class ResPartner(models.Model, format_address):
         for partner in self:
             if partner.email:
                 tools.email_send(email_from, [partner.email], subject, body, on_error)
-        return True
 
     @api.multi
     def email_send(self, email_from, subject, body, on_error=''):
@@ -690,7 +685,6 @@ class ResPartner(models.Model, format_address):
                 'args': repr([self.ids[:16], email_from, subject, body, on_error])
             })
             self.ids = self.ids[16:]
-        return True
 
     @api.multi
     def address_get(self, adr_pref=None):
