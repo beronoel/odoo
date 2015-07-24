@@ -361,15 +361,15 @@ class sale_order_line(osv.osv):
 class stock_move(osv.osv):
     _inherit = 'stock.move'
 
-    def _get_master_data(self, cr, uid, move, company, context=None):
-        if context.get('inv_type') in ('out_invoice', 'out_refund') and (move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id):
+    def _get_master_data(self, cr, uid, move, inv_type, context=None):
+        if inv_type in ('out_invoice', 'out_refund') and (move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id):
             sale_order = move.procurement_id.sale_line_id.order_id
             return sale_order.partner_invoice_id, sale_order.user_id.id, sale_order.pricelist_id.currency_id.id
-        elif move.picking_id.sale_id and context.get('inv_type') in ('out_invoice', 'out_refund'):
+        elif move.picking_id.sale_id and inv_type in ('out_invoice', 'out_refund'):
             # In case of extra move, it is better to use the same data as the original moves
             sale_order = move.picking_id.sale_id
             return sale_order.partner_invoice_id, sale_order.user_id.id, sale_order.pricelist_id.currency_id.id
-        return super(stock_move, self)._get_master_data(cr, uid, move, company, context=context)
+        return super(stock_move, self)._get_master_data(cr, uid, move, inv_type, context=context)
 
     def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type, context=None):
         res = super(stock_move, self)._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)

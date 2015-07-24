@@ -72,14 +72,12 @@ class stock_move(osv.osv):
         'invoice_state': lambda *args, **argv: 'none'
     }
 
-    def _get_master_data(self, cr, uid, move, company, context=None):
+    def _get_master_data(self, cr, uid, move, inv_type, context=None):
         ''' returns a tuple (browse_record(res.partner), ID(res.users), ID(res.currency)'''
-        currency = company.currency_id.id
+        currency = move.company_id.currency_id.id
         partner = move.picking_id and move.picking_id.partner_id
-        if partner:
-            code = self.get_code_from_locs(cr, uid, move, context=context)
-            if partner.property_product_pricelist and code == 'outgoing':
-                currency = partner.property_product_pricelist.currency_id.id
+        if partner and partner.property_product_pricelist and inv_type in ('out_invoice', 'out_refund'):
+            currency = partner.property_product_pricelist.currency_id.id
         return partner, uid, currency
 
     def _get_price_unit_invoice(self, cr, uid, move_line, type, context=None):
@@ -298,7 +296,7 @@ class stock_picking(osv.osv):
         for move in moves:
             company = move.company_id
             origin = move.picking_id.name
-            partner, _user_id, currency_id = move_obj._get_master_data(cr, uid, move, company, context=context)
+            partner, _user_id, currency_id = move_obj._get_master_data(cr, uid, move, inv_type, context=context)
             # Force user_id to be current user, to avoid creating multiple invoices when lines
             # have been sold by different salesmen
             _user_id = uid

@@ -46,14 +46,14 @@ class stock_move(osv.osv):
             default['purchase_line_id'] = False
         return super(stock_move, self).copy(cr, uid, id, default, context)
 
-    def _get_master_data(self, cr, uid, move, company, context=None):
-        if context.get('inv_type') == 'in_invoice' and move.purchase_line_id:
+    def _get_master_data(self, cr, uid, move, inv_type, context=None):
+        if inv_type == 'in_invoice' and move.purchase_line_id:
             purchase_order = move.purchase_line_id.order_id
             return purchase_order.partner_id, purchase_order.create_uid.id, purchase_order.currency_id.id
-        if context.get('inv_type') == 'in_refund' and move.origin_returned_move_id.purchase_line_id:
+        if inv_type == 'in_refund' and move.origin_returned_move_id.purchase_line_id:
             purchase_order = move.origin_returned_move_id.purchase_line_id.order_id
             return purchase_order.partner_id, purchase_order.create_uid.id, purchase_order.currency_id.id
-        elif context.get('inv_type') in ('in_invoice', 'in_refund') and move.picking_id:
+        elif inv_type in ('in_invoice', 'in_refund') and move.picking_id:
             # In case of an extra move, it is better to use the data from the original moves
             for purchase_move in move.picking_id.move_lines:
                 if purchase_move.purchase_line_id:
@@ -65,7 +65,7 @@ class stock_move(osv.osv):
             if partner and partner.property_product_pricelist_purchase and code == 'incoming':
                 currency = partner.property_product_pricelist_purchase.currency_id.id
                 return partner, uid, currency
-        return super(stock_move, self)._get_master_data(cr, uid, move, company, context=context)
+        return super(stock_move, self)._get_master_data(cr, uid, move, inv_type, context=context)
 
     def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type, context=None):
         res = super(stock_move, self)._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)
