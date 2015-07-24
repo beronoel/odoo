@@ -31,18 +31,30 @@ class product_product(osv.osv):
         res = super(product_product, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
         if context is None:
             context = {}
-        if 'turnover' in fields:
-            # Calculate products
+        fields_list = ['turnover', 'sale_avg_price', 'sale_purchase_price', 'sale_num_invoiced', 'purchase_num_invoiced',
+                       'sales_gap', 'purchase_gap', 'total_cost', 'sale_expected', 'normal_cost', 'total_margin',
+                       'expected_margin', 'total_margin_rate', 'expected_margin_rate']
+        if any(x in fields for x in fields_list):
+            # Calculate first for every product in which line it needs to be applied
+            re_ind = 0
+            prod_re = {}
+            tot_products = []
             for re in res:
                 if re.get('__domain'):
                     products = self.search(cr, uid, re['__domain'], context=context)
-                    res_val = self._product_margin(cr, uid, products, [], '', context=context)
-                    for key in res_val.keys():
-                        for l in res_val[key].keys():
-                            if re.get(l):
-                                re[l] += res_val[key][l]
-                            else:
-                                re[l] = res_val[key][l]
+                    tot_products += products
+                    for prod in products:
+                        prod_re[prod] = re_ind
+                re_ind += 1
+
+            res_val = self._product_margin(cr, uid, tot_products, [x for x in fields if fields in fields_list], '', context=context)
+            for key in res_val.keys():
+                for l in res_val[key].keys():
+                    re = res[prod_re[key]]
+                    if re.get(l):
+                        re[l] += res_val[key][l]
+                    else:
+                        re[l] = res_val[key][l]
         return res
 
     def _product_margin(self, cr, uid, ids, field_names, arg, context=None):
