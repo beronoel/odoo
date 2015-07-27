@@ -443,8 +443,8 @@ class stock_quant(osv.osv):
         if context.get('force_company'): 
             domain += [('company_id', '=', context.get('force_company'))]
         else:
-            domain += [('company_id', '=', ops and ops.company_id.id or move.company_id.id)]
-        removal_strategy = self.pool.get('stock.location').get_removal_strategy(cr, uid, qty, move, ops=False, context=context)
+            domain += [('company_id', '=', move.company_id.id)]
+        removal_strategy = self.pool.get('stock.location').get_removal_strategy(cr, uid, qty, move, ops=ops, context=context)
         product = move.product_id
         domain += [('product_id', '=', move.product_id.id)]
 
