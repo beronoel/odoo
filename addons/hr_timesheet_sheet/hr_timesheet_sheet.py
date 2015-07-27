@@ -256,6 +256,22 @@ class hr_timesheet_sheet(osv.osv):
     # OpenChatter methods and notifications
     # ------------------------------------------------
 
+    def mail_wkf_done(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state == 'confirm':
+            return self.signal_workflow(cr, uid, [res_id], 'done')
+
+    def mail_wkf_cancel(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state == 'confirm':
+            return self.signal_workflow(cr, uid, [res_id], 'cancel')
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(hr_timesheet_sheet, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        sheet = self.browse(cr, uid, ids[0], context=context)
+        if sheet.state == 'confirm':
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, sheet.id, 'mail_wkf_done'), 'title': 'Approve'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, sheet.id, 'mail_wkf_cancel'), 'title': 'Refuse'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, sheet.id, 'mail_wkf_done'), 'title': 'Approve'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, sheet.id, 'mail_wkf_cancel'), 'title': 'Refuse'}]
+        return res
+
     def _track_subtype(self, cr, uid, ids, init_values, context=None):
         record = self.browse(cr, uid, ids[0], context=context)
         if 'state' in init_values and record.state == 'confirm':

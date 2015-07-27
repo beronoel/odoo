@@ -166,6 +166,23 @@ class crm_claim(osv.osv):
         defaults.update(custom_values)
         return super(crm_claim, self).message_new(cr, uid, msg, custom_values=defaults, context=context)
 
+    def claim_settled(self, cr, uid, res_id, context=None):
+        stage_settled = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'crm_claim.stage_claim2')
+        if stage_settled:
+            return self.write(cr, uid, res_id, {'stage_id': stage_settled}, context=context)
+
+    def claim_rejected(self, cr, uid, res_id, context=None):
+        stage_rejected = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'crm_claim.stage_claim3')
+        if stage_rejected:
+            return self.write(cr, uid, res_id, {'stage_id': stage_rejected}, context=context)
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(crm_claim, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        claim = self.browse(cr, uid, ids[0], context=context)
+        res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+        res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+        return res
+
 class res_partner(osv.osv):
     _inherit = 'res.partner'
     def _claim_count(self, cr, uid, ids, field_name, arg, context=None):

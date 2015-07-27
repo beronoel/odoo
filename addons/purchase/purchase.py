@@ -1021,6 +1021,18 @@ class purchase_order(osv.osv):
                 self.pool['purchase.order.line'].write(cr, uid, is_invoiced, {'invoiced': True})
             workflow.trg_write(uid, 'purchase.order', po.id, cr)
 
+    def mail_wkf_confirm(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state in ['draft', 'bid']:
+            return self.signal_workflow(cr, uid, [res_id], 'purchase_confirm')
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(purchase_order, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        po = self.browse(cr, uid, ids[0], context=context)
+        if po.state in ['draft', 'bid']:
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, po.id, 'mail_wkf_confirm'), 'title': 'Confirm Order'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, po.id, 'mail_wkf_confirm'), 'title': 'Confirm Order'}]
+        return res
+
 
 class purchase_order_line(osv.osv):
     def _amount_line(self, cr, uid, ids, prop, arg, context=None):

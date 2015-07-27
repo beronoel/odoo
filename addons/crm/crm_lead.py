@@ -356,6 +356,12 @@ class crm_lead(format_address, osv.osv):
     # Backward compatibility
     case_mark_won = action_set_won
 
+    def assign_user(self, cr, uid, res_id, context=None):
+        """ Assigen logged in user to leads.
+        """
+        if not self.browse(cr, uid, res_id, context=context).user_id:
+            return self.write(cr, uid, res_id, {'user_id': uid}, context=context)
+
     def log_next_activity_1(self, cr, uid, ids, context=None):
         return self.log_next_activity_done(cr, uid, ids, next_activity_name='activity_1_id', context=context)
 
@@ -1011,8 +1017,8 @@ Update your business card, phone book, social media,... Send an email right now 
         res = super(crm_lead, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
         lead = self.browse(cr, uid, ids[0], context=context)
         if not lead.user_id:
-            res['follow']['actions'] = [{'url': '#', 'title': 'I take it'}]
-            res['unfollow']['actions'] = [{'url': '#', 'title': 'I take it'}]
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'assign_user'), 'title': 'I take it'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'assign_user'), 'title': 'I take it'}]
         elif lead.type == 'lead':
             res['follow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
             res['unfollow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]

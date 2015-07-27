@@ -477,6 +477,29 @@ class hr_holidays(osv.osv):
         ids_to_set_false = list(set(ids) - set(ids_to_set_true))
         return self.write(cr, uid, ids_to_set_true, {'payslip_status': True}, context=context) and self.write(cr, uid, ids_to_set_false, {'payslip_status': False}, context=context)
 
+    def mail_wkf_validate(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state == 'confirm':
+            return self.signal_workflow(cr, uid, [res_id], 'validate')
+
+    def mail_wkf_refuse(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state in ['confirm', 'validate', 'validate1']:
+            return self.signal_workflow(cr, uid, [res_id], 'refuse')
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(hr_holidays, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        holiday = self.browse(cr, uid, ids[0], context=context)
+        follow_actions = []
+        unfollow_actions = []
+        if holiday.state == 'confirm':
+            follow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, holiday.id, 'mail_wkf_validate'), 'title': 'Approve'})
+            unfollow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, holiday.id, 'mail_wkf_validate'), 'title': 'Approve'})
+        if holiday.state in ['confirm', 'validate', 'validate1']:
+            follow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, holiday.id, 'mail_wkf_refuse'), 'title': 'Refuse'})
+            unfollow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, holiday.id, 'mail_wkf_refuse'), 'title': 'Refuse'})
+        res['follow']['actions'] = follow_actions
+        res['unfollow']['actions'] = unfollow_actions
+        return res
+
     def _track_subtype(self, cr, uid, ids, init_values, context=None):
         record = self.browse(cr, uid, ids[0], context=context)
         if 'state' in init_values and record.state == 'validate':

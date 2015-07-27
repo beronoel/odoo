@@ -369,6 +369,28 @@ class hr_expense_expense(osv.osv):
         }
         return result
 
+    def mail_wkf_validate(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state == 'confirm':
+            return self.signal_workflow(cr, uid, [res_id], 'validate')
+
+    def mail_wkf_refuse(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state in ['confirm', 'accepted']:
+            return self.signal_workflow(cr, uid, [res_id], 'refuse')
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(hr_expense_expense, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        expense = self.browse(cr, uid, ids[0], context=context)
+        follow_actions = []
+        unfollow_actions = []
+        if expense.state == 'confirm':
+            follow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, expense.id, 'mail_wkf_validate'), 'title': 'Approve'})
+            unfollow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, expense.id, 'mail_wkf_validate'), 'title': 'Approve'})
+        if expense.state in ['confirm', 'accepted']:
+            follow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, expense.id, 'mail_wkf_refuse'), 'title': 'Refuse'})
+            unfollow_actions.append({'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, expense.id, 'mail_wkf_refuse'), 'title': 'Refuse'})
+        res['follow']['actions'] = follow_actions
+        res['unfollow']['actions'] = unfollow_actions
+        return res
 
 class product_template(osv.osv):
     _inherit = "product.template"

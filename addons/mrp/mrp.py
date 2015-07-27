@@ -1317,6 +1317,17 @@ class mrp_production(osv.osv):
                 workflow.trg_validate(uid, 'mrp.production', order.id, 'moves_ready', cr)
         return True
 
+    def mail_wkf_confirm(self, cr, uid, res_id, context=None):
+        if self.browse(cr, uid, res_id, context=context).state == 'draft':
+            return self.signal_workflow(cr, uid, [res_id], 'button_confirm')
+
+    def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
+        res = super(mrp_production, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        production = self.browse(cr, uid, ids[0], context=context)
+        if production.state == 'draft':
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'mail_wkf_confirm'), 'title': 'Confirm Production'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'mail_wkf_confirm'), 'title': 'Confirm Production'}]
+        return res
 
 class mrp_production_workcenter_line(osv.osv):
     _name = 'mrp.production.workcenter.line'
