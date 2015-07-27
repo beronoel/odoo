@@ -424,6 +424,7 @@ class stock_quant(osv.osv):
             it tries to find the remaining quantity by looping on the preferred_domain_list (tries with the second item and so on).
             Make sure the quants aren't found twice => all the domains of preferred_domain_list should be orthogonal
         '''
+        context = context or {}
         domain = domain or [('qty', '>', 0.0)]
         quants = [(None, qty)]
         if ops:
