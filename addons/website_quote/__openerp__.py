@@ -14,7 +14,8 @@ OpenERP Sale Quote Roller
     'data': [
         'views/quotation_report.xml',
         'views/website_quotation.xml',
-        'views/website_quotation_backend.xml',
+        'views/sale_order_views.xml',
+        'views/sale_quote_template_views.xml',
         'views/report_saleorder.xml',
         'views/report_quotation.xml',
         'data/website_quotation_data.xml',
