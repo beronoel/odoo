@@ -36,6 +36,11 @@ class StockInvoiceOnshipping(models.TransientModel):
 
         return False
 
+    need_two_invoices = fields.Boolean('Need two invoices', default=_default_need_two_invoices)
+    second_journal_id = fields.Many2one('account.journal', 'Destination Journal (Customer Invoice)',
+                                        default=_default_second_journal_id)
+    wizard_title = fields.Char('Wizard Title', compute='_compute_wizard_title', readonly=True)
+
     @api.depends('invoice_type', 'need_two_invoices')
     def _compute_wizard_title(self):
         if self.need_two_invoices:
@@ -62,9 +67,9 @@ class StockInvoiceOnshipping(models.TransientModel):
             pick = self.env['stock.picking'].browse(pick_ids)
 
             # Supplier invoice
-            pick_context_in = pick.with_context(partner_to_invoice_id=pick.partner_id.id, date_inv=self.invoice_date)
+            pick_context_in = pick.with_context(date_inv=self.invoice_date)
             first_invoice_ids = pick_context_in.action_invoice_create(
-                journal_id=self.journal_id.id, group=self.group, type='in_invoice', move_invoiced=False)
+                journal_id=self.journal_id.id, group=self.group, type='in_invoice', invoiced=False)
             # Customer invoice
             pick_context_out = pick.with_context(date_inv=self.invoice_date)
             second_invoice_ids = pick_context_out.action_invoice_create(
@@ -73,8 +78,3 @@ class StockInvoiceOnshipping(models.TransientModel):
             return first_invoice_ids + second_invoice_ids
         else:
             return super(StockInvoiceOnshipping, self).create_invoice()
-
-    need_two_invoices = fields.Boolean('Need two invoices', default=_default_need_two_invoices)
-    second_journal_id = fields.Many2one('account.journal', 'Destination Journal (Customer Invoice)',
-                                        default=_default_second_journal_id)
-    wizard_title = fields.Char('Wizard Title', compute='_compute_wizard_title', readonly=True)

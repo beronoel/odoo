@@ -215,11 +215,12 @@ class stock_picking(osv.osv):
         """
         return picking.partner_id and picking.partner_id.id
         
-    def action_invoice_create(self, cr, uid, ids, journal_id, group=False, type='out_invoice', context=None):
+    def action_invoice_create(self, cr, uid, ids, journal_id, group=False, type='out_invoice', invoiced=True, context=None):
         """ Creates invoice based on the invoice state selected for picking.
         @param journal_id: Id of journal
         @param group: Whether to create a group invoice or not
         @param type: Type invoice to be created
+        @param invoiced: Whether the invoice needs to be set as invoiced (in handy for multiple invoices from one move)
         @return: Ids of created invoices for the pickings
         """
         context = context or {}
@@ -241,9 +242,10 @@ class stock_picking(osv.osv):
                         todo[key].append(move)
         invoices = []
         for moves in todo.values():
-            invoices += self._invoice_create_line(cr, uid, moves, journal_id, type, context=context)
+            invoices += self._invoice_create_line(cr, uid, moves, journal_id, type, invoiced=invoiced, context=context)
         
         #For anglo-saxon accounting
+        #TODO: This belongs somewhere in the _invoice_create_line, not here
         if anglo_saxon_accounting:
             if type in ('in_invoice', 'in_refund'):
                 for inv in self.pool.get('account.invoice').browse(cr, uid, invoices, context=context):
@@ -285,7 +287,7 @@ class stock_picking(osv.osv):
     def get_service_line_vals(self, cr, uid, moves, partner, inv_type, context=None):
         return []
 
-    def _invoice_create_line(self, cr, uid, moves, journal_id, inv_type='out_invoice', context=None):
+    def _invoice_create_line(self, cr, uid, moves, journal_id, inv_type='out_invoice', invoiced=True, context=None):
         invoice_obj = self.pool.get('account.invoice')
         move_obj = self.pool.get('stock.move')
         invoices = {}
@@ -331,7 +333,8 @@ class stock_picking(osv.osv):
             invoice_vals['invoice_line_ids'] = invoice_line_vals
             invoice_vals['invoice_line_ids'] += self.get_service_line_vals(cr, uid, moves_key, partner, inv_type, context=context)
             invoice_id = invoice_obj.create(cr, uid, invoice_vals, context=context)
-            move_obj.write(cr, uid, [x.id for x in moves_key], {'invoice_state': 'invoiced'}, context=context)
+            if invoiced:
+                move_obj.write(cr, uid, [x.id for x in moves_key], {'invoice_state': 'invoiced'}, context=context)
             inv_moves[invoice_id] = moves_key
         return inv_moves
 

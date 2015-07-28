@@ -122,7 +122,6 @@ class stock_invoice_onshipping(osv.osv_memory):
         context['date_inv'] = data.invoice_date
         acc_journal = self.pool.get("account.journal")
         inv_type = data.invoice_type
-        context['inv_type'] = inv_type
 
         active_ids = context.get('active_ids', [])
         res = picking_pool.action_invoice_create(cr, uid, active_ids,
