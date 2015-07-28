@@ -1,113 +1,72 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp import api
-from openerp.osv import osv, fields
-import uuid
-import time
 import datetime
+import logging
+import uuid
+
+from openerp import api, fields, models
 
 import openerp.addons.decimal_precision as dp
-from openerp import SUPERUSER_ID
-from openerp.tools.translate import _
 
+_logger = logging.getLogger(__name__)
 
-class sale_order_line(osv.osv):
+class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
     _description = "Sales Order Line"
-    _columns = {
-        'website_description': fields.html('Line Description'),
-        'option_line_id': fields.one2many('sale.order.option', 'line_id', 'Optional Products Lines'),
-    }
 
-    def _inject_quote_description(self, cr, uid, values, context=None):
-        values = dict(values or {})
-        if not values.get('website_description') and values.get('product_id'):
-            product = self.pool['product.product'].browse(cr, uid, values['product_id'], context=context)
-            values['website_description'] = product.quote_description or product.website_description
-        return values
+    website_description = fields.Html(string='Line Description', compute='_compute_website_description', store=True)
+    option_line_id = fields.One2many('sale.order.option', 'line_id', string='Optional Product Lines')
 
-    def create(self, cr, uid, values, context=None):
-        values = self._inject_quote_description(cr, uid, values, context)
-        ret = super(sale_order_line, self).create(cr, uid, values, context=context)
-        # hack because create don t make the job for a related field
-        if values.get('website_description'):
-            self.write(cr, uid, ret, {'website_description': values['website_description']}, context=context)
-        return ret
-
-    def write(self, cr, uid, ids, values, context=None):
-        values = self._inject_quote_description(cr, uid, values, context)
-        return super(sale_order_line, self).write(cr, uid, ids, values, context=context)
+    @api.one
+    def _compute_website_description(self):
+        if self.product_id:
+            self.website_description = self.product_id.quote_description or self.product_id.website_description
 
 
-class sale_order(osv.osv):
+class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    def _get_total(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for order in self.browse(cr, uid, ids, context=context):
-            total = 0.0
-            for line in order.order_line:
-                total += (line.product_uom_qty * line.price_unit)
-            res[order.id] = total
-        return res
-
-    _columns = {
-        'access_token': fields.char('Security Token', required=True, copy=False),
-        'template_id': fields.many2one('sale.quote.template', 'Quotation Template', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}),
-        'website_description': fields.html('Description'),
-        'options' : fields.one2many('sale.order.option', 'order_id', 'Optional Products Lines', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=True),
-        'amount_undiscounted': fields.function(_get_total, string='Amount Before Discount', type="float", digits=0),
-        'quote_viewed': fields.boolean('Quotation Viewed'),
-        'require_payment': fields.boolean('Immediate Payment', help="Require immediate payment by the customer when validating the order from the website quote"),
-    }
-
-    def _get_template_id(self, cr, uid, context=None):
+    def _default_template_id(self):
         try:
-            template_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'website_quote', 'website_quote_template_default')[1]
+            quote_template = self.env.ref('website_quote.website_quote_template_default')
         except ValueError:
-            template_id = False
-        return template_id
+            quote_template = self.template_id
+        return quote_template
 
-    _defaults = {
-        'access_token': lambda self, cr, uid, ctx={}: str(uuid.uuid4()),
-        'template_id' : _get_template_id,
-    }
+    access_token = fields.Char(string='Security Token', required=True, copy=False, default=lambda self: str(uuid.uuid4()))
+    template_id = fields.Many2one('sale.quote.template', string='Quotation Template', default=_default_template_id, readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]})
+    website_description = fields.Html(string='Description')
+    options = fields.One2many('sale.order.option', 'order_id', string='Optional Product Lines', readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, copy=True)
+    amount_undiscounted = fields.Float(compute="_compute_amount_undiscounted", string='Amount Before Discount', digits_compute=dp.get_precision('Account'))
+    quote_viewed = fields.Boolean(string='Quotation Viewed')
+    require_payment = fields.Boolean(string='Immediate Payment', help="Require immediate payment by the customer when validating the order from the website quote")
 
-    def open_quotation(self, cr, uid, quote_id, context=None):
-        quote = self.browse(cr, uid, quote_id[0], context=context)
-        self.write(cr, uid, quote_id[0], {'quote_viewed': True}, context=context)
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'url': '/quote/%s/%s' % (quote.id, quote.access_token)
-        }
+    @api.multi
+    def _compute_amount_undiscounted(self):
+        for order in self:
+            total = sum(line.product_uom_qty * line.price_unit for line in order.order_line)
+            self.amount_undiscounted = total
 
-    def onchange_template_id(self, cr, uid, ids, template_id, partner=False, fiscal_position_id=False, pricelist_id=False, context=None):
-        if not template_id:
+    @api.onchange('template_id')
+    def onchange_template_id(self):
+        if not self.template_id:
             return True
+        SaleOrderLine = self.env['sale.order.line']
+        pricelist = self.env['product.pricelist'].browse(self.pricelist_id)
 
-        if partner:
-            context = dict(context or {})
-            context['lang'] = self.pool['res.partner'].browse(cr, uid, partner, context).lang
-
-        pricelist_obj = self.pool['product.pricelist']
+        context = dict(self.env.context)
+        if self.partner_id:
+            context.update({'lang': self.partner_id.lang})
 
         lines = [(5,)]
-        quote_template = self.pool.get('sale.quote.template').browse(cr, uid, template_id, context=context)
+        quote_template = self.template_id.with_context(context)
         for line in quote_template.quote_line:
-            res = self.pool.get('sale.order.line').product_id_change(cr, uid, False,
-                False, line.product_id.id, line.product_uom_qty, line.product_uom_id.id, line.product_uom_qty,
-                line.product_uom_id.id, line.name, partner, False, True, time.strftime('%Y-%m-%d'),
-                False, fiscal_position_id, True, context)
-            data = res.get('value', {})
-            if pricelist_id:
-                uom_context = context.copy()
-                uom_context['uom'] = line.product_uom_id.id
-                price = pricelist_obj.price_get(cr, uid, [pricelist_id], line.product_id.id, 1, context=uom_context)[pricelist_id]
-            else:
-                price = line.price_unit
-
+            result = SaleOrderLine.with_context(context).product_id_change(False, line.product_id.id, line.product_uom_qty, line.product_uom_id.id, line.product_uom_qty,
+                line.product_uom_id.id, line.name, self.partner_id.id, False, True, fields.Date.today(),
+                False, self.fiscal_position_id, True)
+            data = result.get('value', {})
+            price = pricelist.price_get(line.product_id.id, 1).get('pricelist_id') or line.price_unit
             if 'tax_id' in data:
                 data['tax_id'] = [(6, 0, data['tax_id'])]
             data.update({
@@ -123,10 +82,7 @@ class sale_order(osv.osv):
             lines.append((0, 0, data))
         options = []
         for option in quote_template.options:
-            if pricelist_id:
-                price = pricelist_obj.price_get(cr, uid, [pricelist_id], option.product_id.id, 1, context=context)[pricelist_id]
-            else:
-                price = option.price_unit
+            price = pricelist.price_get(option.product_id.id, 1).get('pricelist_id') or option.price_unit
             options.append((0, 0, {
                 'product_id': option.product_id.id,
                 'name': option.name,
@@ -138,124 +94,91 @@ class sale_order(osv.osv):
             }))
         date = False
         if quote_template.number_of_days > 0:
-            date = (datetime.datetime.now() + datetime.timedelta(quote_template.number_of_days)).strftime("%Y-%m-%d")
-        data = {
-            'order_line': lines,
-            'website_description': quote_template.website_description,
-            'note': quote_template.note,
-            'options': options,
-            'validity_date': date,
-            'require_payment': quote_template.require_payment
-        }
-        return {'value': data}
+            date = fields.Date.to_string(datetime.datetime.now() + datetime.timedelta(quote_template.number_of_days))
 
-    def recommended_products(self, cr, uid, ids, context=None):
-        order_line = self.browse(cr, uid, ids[0], context=context).order_line
-        product_pool = self.pool.get('product.product')
-        products = []
-        for line in order_line:
-            products += line.product_id.product_tmpl_id.recommended_products(context=context)
-        return products
+        self.order_line = lines
+        self.website_description = quote_template.website_description
+        self.note = quote_template.note
+        self.options = options
+        self.validity_date = date
+        self.require_payment = quote_template.require_payment
 
-    def get_access_action(self, cr, uid, id, context=None):
-        """ Override method that generated the link to access the document. Instead
-        of the classic form view, redirect to the online quote if exists. """
-        quote = self.browse(cr, uid, id, context=context)
-        if not quote.template_id:
-            return super(sale_order, self).get_access_action(cr, uid, id, context=context)
+    @api.multi
+    def action_open_quotation(self):
+        self.ensure_one()
+        self.quote_viewed = True
         return {
             'type': 'ir.actions.act_url',
-            'url': '/quote/%s' % id,
             'target': 'self',
-            'res_id': id,
+            'url': '/quote/%s/%s' % (self.id, self.access_token)
         }
 
-    def action_quotation_send(self, cr, uid, ids, context=None):
-        action = super(sale_order, self).action_quotation_send(cr, uid, ids, context=context)
-        ir_model_data = self.pool.get('ir.model.data')
-        quote_template_id = self.read(cr, uid, ids, ['template_id'], context=context)[0]['template_id']
-        if quote_template_id:
-            try:
-                template_id = ir_model_data.get_object_reference(cr, uid, 'website_quote', 'email_template_edi_sale')[1]
-            except ValueError:
-                pass
-            else:
+    @api.multi
+    def get_access_action(self):
+        """ Override method that generated the link to access the document. Instead
+        of the classic form view, redirect to the online quote if exists. """
+        self.ensure_one()
+        if not self.template_id:
+            return super(SaleOrder, self).get_access_action()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': '/quote/%s' % self.id,
+            'target': 'self',
+            'res_id': self.id,
+        }
+
+    @api.multi
+    def action_quotation_send(self):
+        self.ensure_one()
+        action = super(SaleOrder, self).action_quotation_send()
+        if self.template_id:
+            template = self.env.ref('website_quote.email_template_edi_sale')
+            if template:
                 action['context'].update({
-                    'default_template_id': template_id,
+                    'default_template_id': template.id,
                     'default_use_template': True
                 })
-
+            else:
+                _logger.warning("No template found for Quotation")
         return action
 
-    def _confirm_online_quote(self, cr, uid, order_id, tx, context=None):
-        """ Payment callback: validate the order and write tx details in chatter """
-        order = self.browse(cr, uid, order_id, context=context)
 
-        # create draft invoice if transaction is ok
-        if tx and tx.state == 'done':
-            if order.state in ['draft', 'sent']:
-                self.signal_workflow(cr, SUPERUSER_ID, [order.id], 'manual_invoice', context=context)
-            message = _('Order payed by %s. Transaction: %s. Amount: %s.') % (tx.partner_id.name, tx.acquirer_reference, tx.amount)
-            self.message_post(cr, uid, order_id, body=message, type='comment', subtype='mt_comment', context=context)
-            return True
-        return False
-
-class sale_order_option(osv.osv):
+class SaleOrderOption(models.Model):
     _name = "sale.order.option"
     _description = "Sale Options"
-    _columns = {
-        'order_id': fields.many2one('sale.order', 'Sale Order Reference', ondelete='cascade', select=True),
-        'line_id': fields.many2one('sale.order.line', on_delete="set null"),
-        'name': fields.text('Description', required=True),
-        'product_id': fields.many2one('product.product', 'Product', domain=[('sale_ok', '=', True)]),
-        'website_description': fields.html('Line Description'),
-        'price_unit': fields.float('Unit Price', required=True, digits_compute= dp.get_precision('Product Price')),
-        'discount': fields.float('Discount (%)', digits_compute= dp.get_precision('Discount')),
-        'uom_id': fields.many2one('product.uom', 'Unit of Measure ', required=True),
-        'quantity': fields.float('Quantity', required=True,
-            digits_compute= dp.get_precision('Product UoS')),
-    }
 
-    _defaults = {
-        'quantity': 1,
-    }
-
-    # TODO master: to remove, replaced by onchange of the new api
-    def on_change_product_id(self, cr, uid, ids, product, uom_id=None, context=None):
-        vals, domain = {}, []
-        if not product:
-            return vals
-        product_obj = self.pool.get('product.product').browse(cr, uid, product, context=context)
-        name = product_obj.name
-        if product_obj.description_sale:
-            name += '\n'+product_obj.description_sale
-        vals.update({
-            'price_unit': product_obj.list_price,
-            'website_description': product_obj and (product_obj.quote_description or product_obj.website_description),
-            'name': name,
-            'uom_id': uom_id or product_obj.uom_id.id,
-        })
-        uom_obj = self.pool.get('product.uom')
-        if vals['uom_id'] != product_obj.uom_id.id:
-            selected_uom = uom_obj.browse(cr, uid, vals['uom_id'], context=context)
-            new_price = uom_obj._compute_price(cr, uid, product_obj.uom_id.id, vals['price_unit'], vals['uom_id'])
-            vals['price_unit'] = new_price
-        if not uom_id:
-            domain = {'uom_id': [('category_id', '=', product_obj.uom_id.category_id.id)]}
-        return {'value': vals, 'domain': domain}
-
-    def product_uom_change(self, cr, uid, ids, product, uom_id, context=None):
-        context = context or {}
-        if not uom_id:
-            return {'value': {'price_unit': 0.0, 'uom_id': False}}
-        return self.on_change_product_id(cr, uid, ids, product, uom_id=uom_id, context=context)
+    order_id = fields.Many2one('sale.order', string='Sale Order Reference', ondelete='cascade', index=True)
+    line_id = fields.Many2one('sale.order.line', string='Sale Order Line', on_delete="set null")
+    name = fields.Text(string='Description', required=True)
+    product_id = fields.Many2one('product.product', string='Product', domain=[('sale_ok', '=', True)])
+    website_description = fields.Html(string='Line Description')
+    price_unit = fields.Float(string='Unit Price', required=True, digits_compute=dp.get_precision('Product Price'))
+    discount = fields.Float(digits_compute=dp.get_precision('Discount'))
+    uom_id = fields.Many2one('product.uom', string='Unit of Measure', required=True)
+    quantity = fields.Float(required=True, digits_compute=dp.get_precision('Product UoS'), default=1)
 
     @api.onchange('product_id')
-    def _onchange_product_id(self):
-        product = self.product_id.with_context(lang=self.order_id.partner_id.lang)
-        self.price_unit = product.list_price
-        self.website_description = product.quote_description or product.website_description
-        self.name = product.name
-        if product.description_sale:
-            self.name += '\n' + product.description_sale
-        self.uom_id = product.product_tmpl_id.uom_id
+    def on_change_product_id(self):
+        domain = {}
+        if not self.product_id:
+            return {}
+
+        product_uom = self.uom_id
+        name = self.product_id.name
+        if self.product_id.description_sale:
+            name += '\n'+self.product_id.description_sale
+        self.price_unit = self.product_id.list_price
+        self.website_description = self.product_id.quote_description or self.product_id.website_description
+        self.name = name
+        self.uom_id = self.uom_id or self.product_id.product_tmpl_id.uom_id.id
+
+        if self.uom_id != self.product_id.uom_id.id:
+            self.price_unit = self.env['product.uom']._compute_price(self.product_id.uom_id.id, self.price_unit, self.uom_id.id)
+        if not product_uom:
+            domain = {'uom_id': [('category_id', '=', self.product_id.uom_id.category_id.id)]}
+        return {'domain': domain}
+
+    @api.onchange('uom_id')
+    def on_change_uom_id(self):
+        if self.uom_id:
+            self.on_change_product_id()

@@ -1,5 +1,4 @@
-<openerp>
-    <data>
+<odoo>
         <!-- After installation of the module, open the quotations menu -->
         <record id="open_quotation_menu" model="ir.actions.client">
         	<field name="name">Open Quotations</field>
@@ -161,7 +160,6 @@
                 </section>
             </field>
         </record>
-    </data>
 
     <!-- Mail template is done in a NOUPDATE block
          so users can freely customize/delete them -->
@@ -258,4 +256,4 @@
             ]]></field>
         </record>
     </data>
-</openerp>
+</odoo>
