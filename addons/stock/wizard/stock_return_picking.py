@@ -76,7 +76,7 @@ class stock_return_picking(osv.osv_memory):
             if 'move_dest_exists' in fields:
                 res.update({'move_dest_exists': chained_move_exist})
             if 'parent_location_id' in fields and pick.location_id.usage == 'internal':
-                res.update({'parent_location_id':pick.picking_type_id.warehouse_id and pick.picking_type_id.warehouse_id.view_location_id.id or False})
+                res.update({'parent_location_id':pick.picking_type_id.warehouse_id and pick.picking_type_id.warehouse_id.view_location_id.id or pick.location_id.location_id.id})
             if 'original_location_id' in fields:
                 res.update({'original_location_id': pick.location_id.id})
             if 'location_id' in fields:
