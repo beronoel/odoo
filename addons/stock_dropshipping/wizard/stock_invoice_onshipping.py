@@ -33,7 +33,6 @@ class StockInvoiceOnshipping(models.TransientModel):
             po = pick.move_lines[0].purchase_line_id.order_id
             if so.order_policy == 'picking' and po.invoice_method == 'picking':
                 return True
-
         return False
 
     need_two_invoices = fields.Boolean('Need two invoices', default=_default_need_two_invoices)
@@ -44,20 +43,11 @@ class StockInvoiceOnshipping(models.TransientModel):
     @api.depends('invoice_type', 'need_two_invoices')
     def _compute_wizard_title(self):
         if self.need_two_invoices:
-            self.wizard_title = _("Create Supplier Bill and Customer Invoice")
+            self.wizard_title = _("Create Vendor Bill and Customer Invoice")
         else:
             selection = dict(self.fields_get()['invoice_type']['selection'])
             invoice_type = self._get_invoice_type()
             self.wizard_title = selection[invoice_type]
-
-    @api.multi
-    def open_invoice(self):
-        action_data = super(StockInvoiceOnshipping, self).open_invoice()
-        if self.need_two_invoices:
-            # Do not show the two invoices, because a form view would be wrong
-            return True
-        else:
-            return action_data
 
     @api.multi
     def create_invoice(self):

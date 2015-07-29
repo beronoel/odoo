@@ -100,7 +100,6 @@ class stock_invoice_onshipping(osv.osv_memory):
 
         action_model = False
         action = {}
-        
         inv_type = self.browse(cr, uid, ids[0], context=context).invoice_type
         data_pool = self.pool.get('ir.model.data')
         if inv_type in ["out_invoice", "out_refund"]:

@@ -365,7 +365,7 @@ class stock_move(osv.osv):
         if inv_type in ('out_invoice', 'out_refund') and (move.procurement_id.sale_line_id or move.origin_returned_move_id.procurement_id.sale_line_id):
             sale_order = move.procurement_id.sale_line_id.order_id or move.origin_returned_move_id.procurement_id.sale_line_id.order_id
             return sale_order.partner_invoice_id, sale_order.user_id.id, sale_order.pricelist_id.currency_id.id
-        elif move.picking_id.sale_id or move.origin_returned_move_id.picking_id.sale_id and inv_type in ('out_invoice', 'out_refund'):
+        elif inv_type in ('out_invoice', 'out_refund') and (move.picking_id.sale_id or move.origin_returned_move_id.picking_id.sale_id):
             # In case of extra move, it is better to use the same data as the original moves
             sale_order = move.picking_id.sale_id or move.origin_returned_move_id.picking_id.sale_id
             return sale_order.partner_invoice_id, sale_order.user_id.id, sale_order.pricelist_id.currency_id.id
