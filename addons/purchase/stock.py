@@ -163,7 +163,7 @@ class stock_picking(osv.osv):
         inv_vals = super(stock_picking, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, moves, context=context)
         purchases = []
         for move in moves:
-            if move.purchase_line_id or move.origin_returned_move_id.purchase_line_id:
+            if inv_type in ('in_invoice', 'in_refund') and (move.purchase_line_id or move.origin_returned_move_id.purchase_line_id):
                 purchase = move.purchase_line_id.order_id or move.origin_returned_move_id.purchase_line_id.order_id
                 inv_vals.update({
                     'fiscal_position_id': purchase.fiscal_position_id.id,
