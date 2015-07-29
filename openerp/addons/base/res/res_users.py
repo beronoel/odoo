@@ -38,6 +38,7 @@ class ResGroups(models.Model):
             else:
                 group.name = group.name
 
+    @api.multi
     def _search_group(self, args):
         print '---_search_group----', self, args
         operand = args[0][2]
@@ -84,7 +85,7 @@ class ResGroups(models.Model):
                                    string='Views')
     comment = fields.Text(translate=True)
     category_id = fields.Many2one('ir.module.category', string='Application', index=True)
-    full_name = fields.Char(compute='_get_full_name', string='Group Name', search='_search_group')
+    full_name = fields.Char(compute='_get_full_name', string='Group Name', search=_search_group)
     share = fields.Boolean(
         string='Share Group',
         help="Group created to set access rights for sharing data with some users.")
@@ -248,7 +249,7 @@ class ResUsers(models.Model):
                                    default=_get_companies,
                                    string='Companies')
     share = fields.Boolean(
-        compute='_is_share', string='Share User',
+        compute='_is_share', string='Share User', store=True,
         help="External user with limited access, created only for the purpose of sharing data.")
 
     # overridden inherited fields to bypass access rights, in case you have
