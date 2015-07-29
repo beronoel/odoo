@@ -204,8 +204,11 @@ class stock_location_route(osv.osv):
         'product_categ_selectable': fields.boolean('Applicable on Product Category'),
         'warehouse_selectable': fields.boolean('Applicable on Warehouse'),
         'supplied_wh_id': fields.many2one('stock.warehouse', 'Supplied Warehouse'),
-        'supplier_wh_id': fields.many2one('stock.warehouse', 'Vendor Warehouse'),
+        'supplier_wh_id': fields.many2one('stock.warehouse', 'Supplying Warehouse'),
         'company_id': fields.many2one('res.company', 'Company', select=1, help='Let this field empty if this route is shared between all companies'),
+        'product_ids': fields.many2many('product.template', 'stock_route_product', 'route_id', 'product_id', 'Products'),
+        'categ_ids': fields.many2many('product.category', 'stock_location_route_categ', 'route_id', 'categ_id', 'Product Categories'),
+        'warehouse_ids': fields.many2many('stock.warehouse', 'stock_route_warehouse', 'route_id', 'warehouse_id', 'Warehouses'),
     }
 
     _defaults = {
@@ -233,6 +236,17 @@ class stock_location_route(osv.osv):
             if pull_ids:
                 self.pool.get('procurement.rule').write(cr, uid, pull_ids, {'active': vals['active']}, context=context)
         return res
+
+    def view_product_ids(self, cr, uid, ids, context=None):
+        return {
+
+        }
+
+    def view_categ_ids(self, cr, uid, ids, context=None):
+        return {
+
+        }
+
 
 #----------------------------------------------------------
 # Quants
