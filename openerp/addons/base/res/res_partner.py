@@ -99,8 +99,7 @@ class ResPartnerCategory(models.Model):
         categories = self.search(args, limit=limit)
         return categories.name_get()
 
-    @api.multi
-    def _name_get_fnc(self, field_name, arg):
+    def _name_get_fnc(self):
         return dict(self.name_get())
 
     _description = 'Partner Categories'
@@ -374,7 +373,8 @@ class ResPartner(models.Model, format_address):
         for fname in fields:
             field = self._fields[fname]
             if field.type == 'one2many':
-                raise AssertionError('One2Many fields cannot be synchronized as part of `commercial_fields` or `address fields`')
+                raise AssertionError(_(
+                    'One2Many fields cannot be synchronized as part of `commercial_fields` or `address fields`'))
             if field.type == 'many2one':
                 values[fname] = partner[fname].id if partner[fname] else False
             elif field.type == 'many2many':
@@ -388,7 +388,6 @@ class ResPartner(models.Model, format_address):
         when the `use_parent_address` flag is set. """
         return list(ADDRESS_FIELDS)
 
-    @api.multi
     def update_address(self, vals):
         address_fields = self._address_fields()
         addr_vals = dict((key, vals[key]) for key in address_fields if key in vals)
@@ -459,9 +458,9 @@ class ResPartner(models.Model, format_address):
             # 2b. Address fields: sync if address changed
             address_fields = self._address_fields()
             if any(field in update_values for field in address_fields):
-                update_ids = partner.search([('parent_id', '=', partner.id),
-                                             ('use_parent_address', '=', True)])
-                update_ids.update_address(update_values)
+                update = partner.search([('parent_id', '=', partner.id),
+                                         ('use_parent_address', '=', True)])
+                update.update_address(update_values)
 
     def _handle_first_contact_creation(self, partner):
         """ On creation of first contact for a company (or root) that has no address, assume contact address
@@ -562,6 +561,7 @@ class ResPartner(models.Model, format_address):
         return res
 
     def _parse_partner_name(self, text):
+        print '=====partner_partner_name-===>', self, text
         """ Supported syntax:
             - 'Raoul <raoul@grosbedon.fr>': will find name and email address
             - otherwise: default, everything is set as the name """
@@ -575,6 +575,7 @@ class ResPartner(models.Model, format_address):
 
     @api.model
     def name_create(self, name):
+        print '-----name_create----', self, name
         """ Override of orm's name_create method for partners. The purpose is
             to handle some basic formats to create partners using the
             name_create.
@@ -604,6 +605,7 @@ class ResPartner(models.Model, format_address):
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
+        print '-----name_search---', self, name, args
         if not args:
             args = []
         if name and operator in ('=', 'ilike', '=ilike', 'like', '=like'):
