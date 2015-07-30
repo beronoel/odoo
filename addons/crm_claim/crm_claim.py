@@ -179,13 +179,8 @@ class crm_claim(osv.osv):
     def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
         res = super(crm_claim, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
         claim = self.browse(cr, uid, ids[0], context=context)
-        # WIP : check access rights before appending actions to mail header.
-        # try :
-        #     self.check_access_rights(cr, uid, 'read')
-        #     self.check_access_rights(cr, uid, 'write')
-        # except:
-        #     res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
-        #     res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+        res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+        res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
         return res
 
 class res_partner(osv.osv):

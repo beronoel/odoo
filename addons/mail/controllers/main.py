@@ -5,7 +5,9 @@ import psycopg2
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
+from openerp.exceptions import AccessError
 from openerp.http import request
+from openerp.tools import plaintext2html
 from openerp.addons.web.controllers.main import content_disposition
 import mimetypes
 
@@ -91,10 +93,18 @@ class MailController(http.Controller):
 
     @http.route('/mail/unfollow', type='http', auth='user')
     def message_unsubscribe(self,  model, res_id):
-        request.env[model].browse(res_id).message_unsubscribe_users()
+        document = request.env[model].browse(int(res_id))
+        document.message_unsubscribe_users()
+        vals = {'user': request.env.user.name, 'document': document.name_get()[0][1]}
+        return request.render('mail.mail_unsubscribe', vals)
 
     @http.route('/mail/execute', type='http', auth='user')
     def message_execute(self, model, res_id, action, **kwargs):
-        if hasattr(request.env[model], action):
-            getattr(request.env[model].browse(int(res_id)), action)()
-        return request.render('mail.mail_actions', {})
+        vals = {}
+        vals['base_url'] = request.env['ir.config_parameter'].get_param('web.base.url')
+        try :
+            if hasattr(request.env[model], action):
+                getattr(request.env[model].browse(int(res_id)), action)()
+        except AccessError as e:
+            vals['error'] = plaintext2html(e.name)
+        return request.render('mail.mail_actions', vals)
