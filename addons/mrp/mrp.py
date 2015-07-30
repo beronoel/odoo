@@ -1321,12 +1321,28 @@ class mrp_production(osv.osv):
         if self.browse(cr, uid, res_id, context=context).state == 'draft':
             return self.signal_workflow(cr, uid, [res_id], 'button_confirm')
 
+    def trigger_produce_action(self, cr, uid, res_id, context=None):
+        prod = self.browse(cr, uid, res_id, context=context)
+        prod_mode = 'consume_produce'
+        done = 0.0
+        if prod.state == 'ready':
+            for move in prod.move_created_ids2:
+                if move.product_id == prod.product_id:
+                    if not move.scrapped:
+                        done += move.product_uom_qty
+            product_qty = prod.product_qty - done
+            self.action_produce(cr, uid, res_id, product_qty, prod_mode)
+        return self
+
     def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
         res = super(mrp_production, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
         production = self.browse(cr, uid, ids[0], context=context)
         if production.state == 'draft':
             res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'mail_wkf_confirm'), 'title': 'Confirm Production'}]
             res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'mail_wkf_confirm'), 'title': 'Confirm Production'}]
+        if production.state == 'ready':
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'trigger_produce_action'), 'title': 'Produce'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, production.id, 'trigger_produce_action'), 'title': 'Produce'}]
         return res
 
 class mrp_production_workcenter_line(osv.osv):
