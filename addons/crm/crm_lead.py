@@ -362,6 +362,12 @@ class crm_lead(format_address, osv.osv):
         if not self.browse(cr, uid, res_id, context=context).user_id:
             return self.write(cr, uid, res_id, {'user_id': uid}, context=context)
 
+    def trigger_convert_oppurtunity(self, cr, uid, res_id, context=None):
+        partner_id = self.browse(cr, uid, res_id, context=context).partner_id.id
+        self.convert_opportunity(cr, uid, res_id, partner_id)
+        return self
+
+
     def log_next_activity_1(self, cr, uid, ids, context=None):
         return self.log_next_activity_done(cr, uid, ids, next_activity_name='activity_1_id', context=context)
 
@@ -1020,8 +1026,8 @@ Update your business card, phone book, social media,... Send an email right now 
             res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'assign_user'), 'title': 'I take it'}]
             res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'assign_user'), 'title': 'I take it'}]
         elif lead.type == 'lead':
-            res['follow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
-            res['unfollow']['actions'] = [{'url': '#', 'title': 'Convert to opportunity'}]
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'trigger_convert_oppurtunity'), 'title': 'Convert to opportunity'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'trigger_convert_oppurtunity'), 'title': 'Convert to opportunity'}]
         else:
             if lead.probability < 100:
                 res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_won'), 'title': 'Won'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, lead.id, 'case_mark_lost'), 'title': 'Lost'}]
