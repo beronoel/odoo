@@ -143,6 +143,13 @@ class MailMail(models.Model):
         self.ensure_one()
         body = self.body_html or ''
 
+        # While inviting user, Access link won't be there. so adding it for now.
+        if self.env.context.get('add_access_link'):
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            url = self.env['mail.thread']._get_access_link(False, False, self.model, self.res_id, partner)
+            url_full = urljoin(base_url, url)
+            accees_link = '<a href="%s"> Click here to access the document.</a>' % (url_full)
+            body = tools.append_content_to_html(body, accees_link, plaintext=False, container_tag='div')
         # generate access links for notifications or emails linked to a specific document with auto threading
         # link = None
         # if self.notification or (self.model and self.res_id and not self.no_auto_thread):

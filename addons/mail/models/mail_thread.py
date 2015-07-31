@@ -556,7 +556,7 @@ class MailThread(models.AbstractModel):
             'action': 'mail.action_mail_redirect',
         }
         if partner and partner.user_ids:
-            fragment['login'] = partner.user_ids[0].login,
+            fragment['login'] = partner.user_ids[0].login
         if notification:
             fragment['message_id'] = message_id
         elif model and res_id:

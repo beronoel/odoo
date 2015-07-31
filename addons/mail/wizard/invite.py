@@ -52,7 +52,7 @@ class Invite(models.TransientModel):
                 # wizard.message = tools.append_content_to_html(wizard.message, signature_company, plaintext=False, container_tag='div')
 
                 # send mail to new followers
-                self.env['mail.mail'].create({
+                self.env['mail.mail'].with_context(add_access_link=True).create({
                     'model': wizard.res_model,
                     'res_id': wizard.res_id,
                     'record_name': document.name_get()[0][1],
