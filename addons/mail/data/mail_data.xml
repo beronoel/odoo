@@ -82,6 +82,13 @@
             <field name="model_id" ref="mail.model_mail_message"/>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
+<div itemscope itemtype="http://schema.org/EmailMessage">
+    <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
+        <link itemprop="target" href="${ctx['button_access']['url']}"/>
+        <link itemprop="url" href="${ctx['button_access']['url']}"/>
+        <meta itemprop="name" content="View ${ctx['model_name']}"/>
+    </div>
+</div>
 <div class="container snippet_row bg-color" style="width: 700px;padding:20px 10px;background:#fff;" data-snippet-theme="basic_theme">
     <div class="container" style="width: 675px;">
                 % if ctx.get('button_access'):
@@ -112,7 +119,7 @@
                 </a>
                 % endif
                 <strong>using</strong>
-                <a href="www.odoo.com" style="text-decoration:none;color:#a24689;"><strong>Odoo</strong></a>
+                <a href="https://www.odoo.com" style="text-decoration:none;color:#a24689;"><strong>Odoo</strong></a>
                 % endif
             </span>
     </div>

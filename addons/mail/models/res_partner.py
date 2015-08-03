@@ -59,6 +59,7 @@ class Partner(models.Model):
             website_url = 'http://%s' % user.company_id.website if not user.company_id.website.lower().startswith(('http:', 'https:')) else user.company_id.website
         else:
             website_url = False
+        model_name = self.env['ir.model'].search([('model', '=', self.env[message_sudo.model]._name)]).name_get()[0][1]
         company_name = user.company_id.name
 
         # compute email references
@@ -75,6 +76,8 @@ class Partner(models.Model):
             'signature': signature,
             'website_url': website_url,
             'company_name': company_name,
+            'model_name': model_name,
+            'no_sanitize': True,
         }
 
         # classify recipients: actions / no action

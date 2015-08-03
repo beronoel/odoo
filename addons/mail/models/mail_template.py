@@ -466,7 +466,7 @@ class MailTemplate(models.Model):
                     if signature:
                         values['body_html'] = tools.append_content_to_html(values['body_html'], signature, plaintext=False)
                 if values.get('body_html'):
-                    values['body'] = tools.html_sanitize(values['body_html'])
+                    values['body'] = values['body_html'] if self.env.context.get('no_sanitize') else tools.html_sanitize(values['body_html'])
                 # technical settings
                 values.update(
                     mail_server_id=template.mail_server_id.id or False,
