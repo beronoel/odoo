@@ -106,11 +106,21 @@ class stock_invoice_onshipping(osv.osv_memory):
             action_id = data_pool.xmlid_to_res_id(cr, uid, 'account.action_invoice_tree1')
         elif inv_type in ["in_invoice", "in_refund"]:
             action_id = data_pool.xmlid_to_res_id(cr, uid, 'account.action_invoice_tree2')
-
         if action_id:
             action_pool = self.pool['ir.actions.act_window']
             action = action_pool.read(cr, uid, action_id, context=context)
-            action['domain'] = "[('id','in', ["+','.join(map(str,invoice_ids))+"])]"
+
+            if len(invoice_ids) == 1:
+                #action['view_type'] = 'form'
+                action['res_id'] = invoice_ids[0]
+                #action['res_model'] = 'account.invoice'
+                #action['view_mode'] = 'form,tree,calendar,graph'
+
+                tree = action['views'][0]
+                action['views'][0] = action['views'][1]
+                action['views'][1] = tree
+            else:
+                action['domain'] = "[('id','in', ["+','.join(map(str,invoice_ids))+"])]"
             return action
         return True
 

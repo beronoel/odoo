@@ -65,6 +65,6 @@ class StockInvoiceOnshipping(models.TransientModel):
             second_invoice_ids = pick_context_out.action_invoice_create(
                 journal_id=self.second_journal_id.id, group=self.group, type='out_invoice')
 
-            return first_invoice_ids + second_invoice_ids
+            return second_invoice_ids #first_invoice_ids +
         else:
             return super(StockInvoiceOnshipping, self).create_invoice()
