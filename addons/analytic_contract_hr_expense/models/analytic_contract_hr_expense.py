@@ -1,52 +1,39 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-from openerp.osv import fields, osv
-from openerp.tools.translate import _
 
-from openerp.addons.decimal_precision import decimal_precision as dp
+from openerp import api, fields, models, _
 
-class account_analytic_account(osv.osv):
+
+class AccountAnalyticAccount(models.Model):
     _name = "account.analytic.account"
     _inherit = "account.analytic.account"
 
-    def _get_total_estimation(self, account):
-        tot_est = super(account_analytic_account, self)._get_total_estimation(account)
-        if account.charge_expenses:
-            tot_est += account.est_expenses
-        return tot_est
+    charge_expenses = fields.Boolean(string="Charge Expenses")
+    expense_invoiced = fields.Float(string="Expenses invoiced", compute='_expense_invoiced_calc')
+    expense_to_invoice = fields.Float(string="Expenses to invoice", compute='_expense_to_invoice_calc')
+    remaining_expense = fields.Float(string="Remaining Expenses", compute='_remaining_expnse_calc')
+    est_expenses = fields.Float(string="Estimation of Expenses to Invoice")
+    ca_invoiced = fields.Float(string='Invoiced Amount', compute='_ca_invoiced_calc',
+        help="Total customer invoiced amount for this account.")
 
-    def _get_total_invoiced(self, account):
-        total_invoiced = super(account_analytic_account, self)._get_total_invoiced(account)
-        if account.charge_expenses:
-            total_invoiced += account.expense_invoiced
-        return total_invoiced
+    @api.multi
+    def _expense_invoiced_calc(self):
+        for account in self:
+            account.expense_invoiced = 0.0
+            Lines = self.env['account.analytic.line']
+            lines = Lines.search([('account_id', '=', account.id), ('invoice_id', '!=', False), ('to_invoice', '!=', False), ('journal_id.type', '=', 'purchase')])
+            #Put invoices in separate array in order not to calculate them double
+            invoices = []
+            for line in lines:
+                if line.invoice_id not in invoices:
+                    invoices.append(line.invoice_id)
+            for invoice in invoices:
+                account.expense_invoiced += invoice.amount_untaxed
 
-    def _get_total_remaining(self, account):
-        total_remaining = super(account_analytic_account, self)._get_total_remaining(account)
-        if account.charge_expenses:
-            total_remaining += account.remaining_expense
-        return total_remaining
-
-    def _get_total_toinvoice(self, account):
-        total_toinvoice = super(account_analytic_account, self)._get_total_toinvoice(account)
-        if account.charge_expenses:
-            total_toinvoice += account.expense_to_invoice
-        return total_toinvoice
-
-    def _remaining_expnse_calc(self, cr, uid, ids, name, arg, context=None):
-        res = {}
-        for account in self.browse(cr, uid, ids, context=context):
-            if account.est_expenses != 0:
-                res[account.id] = max(account.est_expenses - account.expense_invoiced, account.expense_to_invoice)
-            else:
-                res[account.id]=0.0
-        return res
-
-    def _expense_to_invoice_calc(self, cr, uid, ids, name, arg, context=None):
-        res = {}
+    @api.multi
+    def _expense_to_invoice_calc(self):
         #We don't want consolidation for each of these fields because those complex computation is resource-greedy.
-        for account in self.pool.get('account.analytic.account').browse(cr, uid, ids, context=context):
-            cr.execute("""
+        for account in self:
+            self.env.cr.execute("""
                 SELECT product_id, sum(amount), user_id, to_invoice, sum(unit_amount), product_uom_id, line.name
                 FROM account_analytic_line line
                     LEFT JOIN account_analytic_journal journal ON (journal.id = line.journal_id)
@@ -56,72 +43,53 @@ class account_analytic_account(osv.osv):
                     AND to_invoice IS NOT NULL
                 GROUP BY product_id, user_id, to_invoice, product_uom_id, line.name""", (account.id,))
 
-            res[account.id] = 0.0
-            for product_id, total_amount, user_id, factor_id, qty, uom, line_name in cr.fetchall():
+            account.expense_to_invoice = 0.0
+            for product_id, total_amount, user_id, factor_id, qty, uom, line_name in self.env.cr.fetchall():
                 #the amount to reinvoice is the real cost. We don't use the pricelist
                 total_amount = -total_amount
-                factor = self.pool.get('hr_timesheet_invoice.factor').browse(cr, uid, factor_id, context=context)
-                res[account.id] += total_amount * (100 - factor.factor or 0.0) / 100.0
-        return res
+                factor = self.env['hr_timesheet_invoice.factor'].browse(factor_id)
+                account.expense_to_invoice += total_amount * \
+                    (100 - factor.factor or 0.0) / 100.0
 
-    def _expense_invoiced_calc(self, cr, uid, ids, name, arg, context=None):
-        lines_obj = self.pool.get('account.analytic.line')
-        res = {}
-        for account in self.browse(cr, uid, ids, context=context):
-            res[account.id] = 0.0
-            line_ids = lines_obj.search(cr, uid, [('account_id','=', account.id), ('invoice_id','!=',False), ('to_invoice','!=', False), ('journal_id.type', '=', 'purchase')], context=context)
-            #Put invoices in separate array in order not to calculate them double
-            invoices = []
-            for line in lines_obj.browse(cr, uid, line_ids, context=context):
-                if line.invoice_id not in invoices:
-                    invoices.append(line.invoice_id)
-            for invoice in invoices:
-                res[account.id] += invoice.amount_untaxed
-        return res
+    @api.depends('est_expenses','expense_invoiced','expense_to_invoice')
+    def _remaining_expnse_calc(self):
+        for account in self:
+            if account.est_expenses != 0:
+                account.remaining_expense = max(account.est_expenses - account.expense_invoiced, account.expense_to_invoice)
+            else:
+                account.remaining_expense = 0.0
 
-    def _ca_invoiced_calc(self, cr, uid, ids, name, arg, context=None):
-        result = super(account_analytic_account, self)._ca_invoiced_calc(cr, uid, ids, name, arg, context=context)
-        for acc in self.browse(cr, uid, result.keys(), context=context):
-            result[acc.id] = result[acc.id] - (acc.expense_invoiced or 0.0)
-        return result
+    @api.depends('expense_invoiced')
+    def _ca_invoiced_calc(self, name=None, arg=None):
+        result = super(AccountAnalyticAccount, self)._ca_invoiced_calc(name, arg)
+        for account in self:
+            account.ca_invoiced -= account.expense_invoiced
 
-    _columns = {
-        'charge_expenses' : fields.boolean('Charge Expenses'),
-        'expense_invoiced' : fields.function(_expense_invoiced_calc, string="Expenses invoiced", type="float"),
-        'expense_to_invoice' : fields.function(_expense_to_invoice_calc, string="Expenses to invoice", type='float'),
-        'remaining_expense' : fields.function(_remaining_expnse_calc, string="Remaining Expenses", type="float"), 
-        'est_expenses': fields.float('Estimation of Expenses to Invoice'),
-        'ca_invoiced': fields.function(_ca_invoiced_calc, type='float', string='Invoiced Amount',
-            help="Total customer invoiced amount for this account.",
-            digits=0),
-    }
-
-    def on_change_template(self, cr, uid, ids, template_id, date_start=False, context=None):
-        res = super(account_analytic_account, self).on_change_template(cr, uid, ids, template_id, date_start=date_start, context=context)
+    @api.multi
+    def on_change_template(self, template_id, date_start=False):
+        res = super(AccountAnalyticAccount, self).on_change_template(template_id, date_start=date_start)
         if template_id and 'value' in res:
-            template = self.browse(cr, uid, template_id, context=context)
+            template = self.browse(template_id)
             res['value']['charge_expenses'] = template.charge_expenses
             res['value']['est_expenses'] = template.est_expenses
         return res
 
-    def open_hr_expense(self, cr, uid, ids, context=None):
-        mod_obj = self.pool['ir.model.data']
-        act_obj = self.pool['ir.actions.act_window']
+    @api.multi
+    def open_hr_expense(self):
+        self.ensure_one()
+        result = self.env.ref('hr_expense.expense_all').read()[0]
 
-        dummy, act_window_id = mod_obj.get_object_reference(cr, uid, 'hr_expense', 'expense_all')
-        result = act_obj.read(cr, uid, [act_window_id], context=context)[0]
-
-        line_ids = self.pool['hr.expense.line'].search(cr, uid, [('analytic_account', 'in', ids)], context=context)
-        result['domain'] = [('line_ids', 'in', line_ids)]
-        names = [account.name for account in self.browse(cr, uid, ids, context=context)]
-        result['name'] = _('Expenses of %s') % ','.join(names)
-        result['context'] = {'analytic_account': ids[0]}
+        lines = self.env['hr.expense.line'].search([('analytic_account', 'in', self.ids)])
+        result['domain'] = [('line_ids', 'in', lines.ids)]
+        result['name'] = _('Expenses of %s') % self.name
+        result['context'] = {'analytic_account': self.ids[0]}
         result['view_type'] = 'form'
         return result
 
-    def hr_to_invoice_expense(self, cr, uid, ids, context=None):
-        domain = [('invoice_id','=',False),('to_invoice','!=',False), ('journal_id.type', '=', 'purchase'), ('account_id', 'in', ids)]
-        names = [record.name for record in self.browse(cr, uid, ids, context=context)]
+    @api.multi
+    def hr_to_invoice_expense(self):
+        domain = [('invoice_id', '=', False), ('to_invoice', '!=', False), ('journal_id.type', '=', 'purchase'), ('account_id', 'in', self.ids)]
+        names = [record.name for record in self]
         name = _('Expenses to Invoice of %s') % ','.join(names)
         return {
             'type': 'ir.actions.act_window',
@@ -131,3 +99,28 @@ class account_analytic_account(osv.osv):
             'domain' : domain,
             'res_model': 'account.analytic.line',
         }
+
+    def _get_total_estimation(self, account):
+        tot_est = super(AccountAnalyticAccount, self)._get_total_estimation(account)
+        if account.charge_expenses:
+            tot_est += account.est_expenses
+        return tot_est
+
+
+    def _get_total_invoiced(self, account):
+        total_invoiced = super(AccountAnalyticAccount, self)._get_total_invoiced(account)
+        if account.charge_expenses:
+            total_invoiced += account.expense_invoiced
+        return total_invoiced
+
+    def _get_total_remaining(self, account):
+        total_remaining = super(AccountAnalyticAccount, self)._get_total_remaining(account)
+        if account.charge_expenses:
+            total_remaining += account.remaining_expense
+        return total_remaining
+
+    def _get_total_toinvoice(self, account):
+        total_toinvoice = super(AccountAnalyticAccount, self)._get_total_toinvoice(account)
+        if account.charge_expenses:
+            total_toinvoice += account.expense_to_invoice
+        return total_toinvoice
