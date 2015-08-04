@@ -443,20 +443,31 @@
             <field name="model">stock.location.path</field>
             <field name="arch" type="xml">
                 <form string="Location Paths">
-                    <group col="4">
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
                         <group>
-                            <field name="name"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Locations">
                             <field name="location_from_id"/>
                             <field name="location_dest_id"/>
                         </group>
-                        <group>
-                            <field name="company_id" groups="base.group_multi_company" />
-                            <field name="picking_type_id"/>
+                        <group string="Details">
                             <field name="auto"/>
+                            <field name="picking_type_id" attrs="{'invisible': [('auto', '=', 'transparent')]}"/>
+                            <field name="company_id" groups="base.group_multi_company" />
                             <label for="delay" string="Delay"/>
-                        <div>
-                            <field name="delay" class="oe_inline"/>days
-                        </div>
+                            <div>
+                                <field name="delay" class="oe_inline"/>days
+                            </div>
                         </group>
                     </group>
                 </form>
@@ -1910,8 +1921,8 @@
                         </group>
                         <group string="Creates">
                             <field name="location_src_id" attrs="{'required': [('action', '=', 'move')], 'invisible':[('action', '!=', 'move')]}"  domain="[('usage','!=','view')]"/>
-                            <field name="picking_type_id" attrs="{'required': [('action', '!=', 'manufacture')]}"/>
                             <field name="procure_method" groups="stock.group_adv_location" attrs="{'invisible': [('action', '!=', 'move')]}"/>
+                            <field name="picking_type_id" attrs="{'required': [('action', '!=', 'manufacture')]}"/>
                             <field name="partner_address_id" groups="stock.group_adv_location" context="{'show_address': 1}" options="{'always_reload': 1}" attrs="{'invisible': [('action', '!=', 'move')]}"/>
                             <label for="delay" string="Delay"  groups="stock.group_adv_location" attrs="{'invisible': [('action', '!=', 'move')]}"/>
                             <div groups="stock.group_adv_location" attrs="{'invisible': [('action', '!=', 'move')]}">
@@ -2226,12 +2237,12 @@
                             <label for="product_categ_selectable" string="Product Categories"/>
                             <div>
                                 <field name="product_categ_selectable" class="oe_inline"/>
-                                <button name="view_categ_ids" type="object" string="⇒" class="oe_link"/>
+                                <button name="view_categ_ids" type="object" string="⇒ View" class="oe_link"/>
                             </div>
                             <label for="product_selectable" string="Products"/>
                             <div>
                                 <field name="product_selectable" class="oe_inline"/>
-                                <button name="view_product_ids" type="object" string="⇒" class="oe_link"/>
+                                <button name="view_product_ids" type="object" string="⇒ View" class="oe_link"/>
                             </div>
                         </group>
                         <group>
