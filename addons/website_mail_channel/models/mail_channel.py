@@ -8,9 +8,10 @@ from openerp.addons.website.models.website import slug
 class MailGroup(osv.Model):
     _inherit = 'mail.channel'
 
-    def message_get_email_values(self, cr, uid, id, notif_mail=None, context=None):
-        res = super(MailGroup, self).message_get_email_values(cr, uid, id, notif_mail=notif_mail, context=context)
-        group = self.browse(cr, uid, id, context=context)
+    def message_get_email_values(self, cr, uid, ids, notif_mail=None, context=None):
+        assert len(ids) == 1, 'Values are always returned for single mail'
+        res = super(MailGroup, self).message_get_email_values(cr, uid, ids, notif_mail=notif_mail, context=context)
+        group = self.browse(cr, uid, ids, context=context)
         base_url = self.pool['ir.config_parameter'].get_param(cr, uid, 'web.base.url')
         headers = {}
         if res.get('headers'):

@@ -68,6 +68,11 @@
             <field name="name">Discussions</field>
             <field name="sequence" eval="0"/>
         </record>
+        <record id="mt_all_replies" model="mail.message.subtype">
+            <field name="name">All Replies</field>
+            <field name="res_model">mail.channel</field>
+            <field name="default" eval="False"/>
+        </record>
         <record id="mt_note" model="mail.message.subtype">
             <field name="name">Note</field>
             <field name="default" eval="False"/>

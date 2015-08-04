@@ -16,21 +16,24 @@ class MailMail(osv.Model):
         mail = self.browse(cr, uid, ids[0], context=context)
 
         if mail.model == 'mail.channel' and mail.res_id:
+            mail_follower = self.pool['mail.followers']
+            mail_follower_id = mail_follower.search(cr, uid, [('partner_id', '=', partner and partner.id or False), ('res_id', '=', mail.res_id), ('res_model', '=', 'mail.channel')], limit=1, context=context)
+            followed_subtype_ids = mail_follower.browse(cr, uid, mail_follower_id, context=context).subtype_ids.ids
             # no super() call on purpose, no private links that could be quoted!
             channel = self.pool['mail.channel'].browse(cr, uid, mail.res_id, context=context)
             base_url = self.pool['ir.config_parameter'].get_param(cr, uid, 'web.base.url')
             vals = {
-                'maillist': _('Mailing-List'),
-                'post_to': _('Post to'),
+                'web_link': _('Web View'),
                 'unsub': _('Unsubscribe'),
-                'mailto': 'mailto:%s@%s' % (channel.alias_name, channel.alias_domain),
                 'group_url': '%s/groups/%s' % (base_url, slug(channel)),
                 'unsub_url': '%s/groups?unsubscribe' % (base_url,),
+                'receive': _('Receive'),
+                'recieve_urls': '%s | %s' % (_('One mail per thread'), _('All mails'))
             }
             footer = """_______________________________________________
-                        %(maillist)s: %(group_url)s
-                        %(post_to)s: %(mailto)s
-                        %(unsub)s: %(unsub_url)s
+                        %(web_link)s : %(group_url)s
+                        %(unsub)s : %(unsub_url)s
+                        %(receive)s : %(recieve_urls)s
                     """ % vals
             body = tools.append_content_to_html(mail.body, footer, container_tag='div')
             return body

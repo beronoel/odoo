@@ -4,7 +4,7 @@ import psycopg2
 
 import openerp
 from openerp import SUPERUSER_ID
-from openerp import http
+from openerp import http, _
 from openerp.exceptions import AccessError
 from openerp.http import request
 from openerp.tools import plaintext2html
@@ -72,9 +72,11 @@ class MailController(http.Controller):
         ])
 
         # find current model subtypes, add them to a dictionary
+        # For mail.channle model, we want to display 'Discussion' subtype as 'Discussion Initated'
+        mt_discussion_id = request.env.ref('mail.mt_comment', raise_if_not_found=False).id
         subtypes = request.env['mail.message.subtype'].search(['&', ('hidden', '=', False), '|', ('res_model', '=', res_model), ('res_model', '=', False)])
         subtypes_list = [{
-            'name': subtype.name,
+            'name': _("Discussion Initiated") if res_model == "mail.channel" and subtype.id == mt_discussion_id else subtype.name,
             'res_model': subtype.res_model,
             'sequence': subtype.sequence,
             'default': subtype.default,
