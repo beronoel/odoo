@@ -200,12 +200,13 @@ class stock_location_route(osv.osv):
         'pull_ids': fields.one2many('procurement.rule', 'route_id', 'Procurement Rules', copy=True),
         'active': fields.boolean('Active', help="If the active field is set to False, it will allow you to hide the route without removing it."),
         'push_ids': fields.one2many('stock.location.path', 'route_id', 'Push Rules', copy=True),
-        'product_selectable': fields.boolean('Applicable on Product'),
-        'product_categ_selectable': fields.boolean('Applicable on Product Category'),
-        'warehouse_selectable': fields.boolean('Applicable on Warehouse'),
+        'product_selectable': fields.boolean('Applicable on Product', help="When checked, the route will be selectable in the Procurements tab of the Product form.  It will take priority over the Warehouse route. "),
+        'product_categ_selectable': fields.boolean('Applicable on Product Category', help="When checked, the route will be selectable on the Product Category.  It will take priority over the Warehouse route. "),
+        'warehouse_selectable': fields.boolean('Applicable on Warehouse', help="When a warehouse is selected for this route, this route should be seen as the default route when products pass through this warehouse.  This behaviour can be overridden by the routes on the Product/Product Categories or by the Preferred Routes on the Procurement"),
         'supplied_wh_id': fields.many2one('stock.warehouse', 'Supplied Warehouse'),
         'supplier_wh_id': fields.many2one('stock.warehouse', 'Supplying Warehouse'),
-        'company_id': fields.many2one('res.company', 'Company', select=1, help='Let this field empty if this route is shared between all companies'),
+        'company_id': fields.many2one('res.company', 'Company', select=1, help='Leave this field empty if this route is shared between all companies'),
+        #Reverse many2many fields:
         'product_ids': fields.many2many('product.template', 'stock_route_product', 'route_id', 'product_id', 'Products'),
         'categ_ids': fields.many2many('product.category', 'stock_location_route_categ', 'route_id', 'categ_id', 'Product Categories'),
         'warehouse_ids': fields.many2many('stock.warehouse', 'stock_route_warehouse', 'route_id', 'warehouse_id', 'Warehouses'),
@@ -238,13 +239,29 @@ class stock_location_route(osv.osv):
         return res
 
     def view_product_ids(self, cr, uid, ids, context=None):
+        product_ids = []
+        for route in self.browse(cr, uid, ids, context=context):
+            product_ids += [x.id for x in route.product_ids]
         return {
-
+            'name': _('Products'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.template',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', product_ids)],
         }
 
     def view_categ_ids(self, cr, uid, ids, context=None):
+        categ_ids = []
+        for route in self.browse(cr, uid, ids, context=context):
+            categ_ids += [x.id for x in route.categ_ids]
         return {
-
+            'name': _('Product Categories'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'product.category',
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', categ_ids)],
         }
 
 
