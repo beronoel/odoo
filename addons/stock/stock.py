@@ -974,6 +974,11 @@ class stock_picking(models.Model):
             for r in picking.move_lines:
                 if r.state == 'draft':
                     todo.append(r.id)
+            if picking.partner_id and picking.location_dest_id.usage == 'transit':
+                whs = self.pool['stock.warehouse'].search(cr, uid, [('partner_id', '=', picking.partner_id.id)], context=context)
+                if whs:
+                    self.pool['stock.move'].write(cr, uid, [x.id for x in picking.move_lines if x.state == 'draft'],
+                                                    {'warehouse_id': whs[0]}, context=context)
         if len(todo):
             self.pool.get('stock.move').action_confirm(cr, uid, todo, context=context)
 
@@ -1960,6 +1965,8 @@ class stock_move(osv.osv):
             #   to receive goods without triggering the push rules again (which would duplicate chained operations)
             if not move.move_dest_id:
                 domain = [('location_from_id', '=', move.location_dest_id.id)]
+                if move.warehouse_id:
+                    domain += ['|', ('warehouse_id', '=', move.warehouse_id.id), ('warehouse_id', '=', False)]
                 #priority goes to the route defined on the product and product category
                 route_ids = [x.id for x in move.product_id.route_ids + move.product_id.categ_id.total_route_ids]
                 rules = push_obj.search(cr, uid, domain + [('route_id', 'in', route_ids)], order='route_sequence, sequence', context=context)
