@@ -2,9 +2,9 @@
 <odoo>
 <template id="mail_actions" name="Invitation View">
     <t t-call="mail.mail_actions_layout">
-        <div class="well col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 text-center">
+        <div class="jumbotron text-center">
             <t t-if="not error">
-                <strong>Action is perfomed successfully!</strong>
+                <h1><small>Action is perfomed successfully!</small></h1>
                 <p>Thank you.</p>
             </t>
             <t t-if="error">
@@ -19,8 +19,22 @@
 </template>
 <template id="mail_unsubscribe" name="Unsubscribe View">
     <t t-call="mail.mail_actions_layout">
-        <div class="well col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 text-center">
-            <p>Hello <strong><span t-esc="user"/></strong>, you have successfully unsubscribed <span t-if="document" t-esc="document"/>.</p>
+        <div class="container mt8">
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <t t-if="not error">
+                        <h1 class="page-header text-center">Mailing Subscriptions</h1>
+
+                        <div class="alert alert-success text-center">
+                            <p>You have successfully unsubscribed.</p>
+                        </div>
+                    </t>
+                    <t t-if="error">
+                        <span t-raw="error"/>
+                        <p>Kindly contact your system administrator. Thank you! </p>
+                    </t>
+                </div>
+            </div>
         </div>
     </t>
 </template>
