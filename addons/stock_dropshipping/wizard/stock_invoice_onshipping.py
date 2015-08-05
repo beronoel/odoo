@@ -39,6 +39,7 @@ class StockInvoiceOnshipping(models.TransientModel):
     second_journal_id = fields.Many2one('account.journal', 'Destination Journal (Customer Invoice)',
                                         default=_default_second_journal_id)
     wizard_title = fields.Char('Wizard Title', compute='_compute_wizard_title', readonly=True)
+    warning_message = fields.Char('Warning message')
 
     @api.depends('invoice_type', 'need_two_invoices')
     def _compute_wizard_title(self):
