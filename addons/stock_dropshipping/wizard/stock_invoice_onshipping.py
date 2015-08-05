@@ -39,7 +39,7 @@ class StockInvoiceOnshipping(models.TransientModel):
     second_journal_id = fields.Many2one('account.journal', 'Destination Journal (Customer Invoice)',
                                         default=_default_second_journal_id)
     wizard_title = fields.Char('Wizard Title', compute='_compute_wizard_title', readonly=True)
-    warning_message = fields.Char('Warning message')
+    warning_message = fields.Char('Warning message', default='')
 
     @api.depends('invoice_type', 'need_two_invoices')
     def _compute_wizard_title(self):
@@ -49,6 +49,26 @@ class StockInvoiceOnshipping(models.TransientModel):
             selection = dict(self.fields_get()['invoice_type']['selection'])
             invoice_type = self._get_invoice_type()
             self.wizard_title = selection[invoice_type]
+
+    @api.multi
+    def open_invoice(self):
+        if self.need_two_invoices:
+            if self.warning_message:
+                return True
+            else:
+                invoice_ids = self.create_invoice()
+                import pdb; pdb.set_trace()
+                self.warning_message = 'I created two different invoices'
+
+                return {
+                    'type': 'ir.actions.act_window',
+                    'res_model': 'stock.invoice.onshipping',
+                    'view_mode': 'form',
+                    'res_id': self.ids[0],
+                    'target': 'new',
+                    }
+        else:
+            action_data = super(StockInvoiceOnshipping, self).open_invoice()
 
     @api.multi
     def create_invoice(self):
@@ -66,6 +86,6 @@ class StockInvoiceOnshipping(models.TransientModel):
             second_invoice_ids = pick_context_out.action_invoice_create(
                 journal_id=self.second_journal_id.id, group=self.group, type='out_invoice')
 
-            return second_invoice_ids #first_invoice_ids +
+            return second_invoice_ids + first_invoice_ids
         else:
             return super(StockInvoiceOnshipping, self).create_invoice()
