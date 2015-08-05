@@ -3,36 +3,41 @@
 <template id="mail_actions" name="Invitation View">
     <t t-call="mail.mail_actions_layout">
         <div class="jumbotron text-center">
-            <t t-if="not error">
+            <t t-if="not access_error">
                 <h1><small>Action is perfomed successfully!</small></h1>
-                <p>Thank you.</p>
             </t>
-            <t t-if="error">
-                <span t-raw="error"/>
-                <p>Kindly contact your system administrator. Thank you! </p>
+            <t t-if="access_error">
+                <span t-raw="access_error"/>
+                <p>Kindly contact your system administrator. </p>
             </t>
+            <p>Thank you.</p>
             <p>
                 <a t-att-href="base_url" class="btn btn-primary">Go to Home</a>
             </p>
         </div>
     </t>
 </template>
-<template id="mail_unsubscribe" name="Unsubscribe View">
+<template id="mail_subscriptionchange" name="Unsubscribe View">
     <t t-call="mail.mail_actions_layout">
         <div class="container mt8">
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
-                    <t t-if="not error">
-                        <h1 class="page-header text-center">Mailing Subscriptions</h1>
-
-                        <div class="alert alert-success text-center">
-                            <p>You have successfully unsubscribed.</p>
-                        </div>
-                    </t>
-                    <t t-if="error">
-                        <span t-raw="error"/>
-                        <p>Kindly contact your system administrator. Thank you! </p>
-                    </t>
+                    <h1 class="page-header text-center">Mailing Subscriptions</h1>
+                    <div t-attf-class="alert #{msg and 'alert-success' or 'alert-danger'} text-center">
+                        <p>Hello <span t-esc="user"/>,
+                            <t t-if="msg">
+                                <span t-raw="msg"/>
+                            </t>
+                            <t t-if="error_message">
+                                Sorry, your current subscription could not be altered due to following Error : <br/><strong t-raw="error_message"/>
+                                <p>Kindly contact your system administrator. </p>
+                            </t>
+                        </p>
+                        <p>Thank you.</p>
+                        <p>
+                            <a t-att-href="base_url" class="btn btn-link">Go to Home</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

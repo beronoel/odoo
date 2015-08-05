@@ -90,23 +90,29 @@ class MailController(http.Controller):
         return subtypes_list
 
     @http.route('/mail/follow', type='http', auth='user')
-    def message_subscribe(self,  model, res_id):
-        request.env[model].browse(res_id).message_subscribe_users()
+    def message_subscribe(self, model, res_id):
+        document = request.env[model].browse(int(res_id))
+        document.message_subscribe_users()
+        message = '%s <br/>%s.' % (_('You have successfully subscribed the following document : '), document.name_get()[0][1])
+        vals = {'user': request.env.user.name, 'msg': message}
+        return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/unfollow', type='http', auth='user')
-    def message_unsubscribe(self,  model, res_id):
+    def message_unsubscribe(self, model, res_id):
         document = request.env[model].browse(int(res_id))
         document.message_unsubscribe_users()
-        vals = {'user': request.env.user.name, 'document': document.name_get()[0][1]}
-        return request.render('mail.mail_unsubscribe', vals)
+        message = '%s <br/>%s.' % (_('You have successfully unsubscribed the following document : '), document.name_get()[0][1])
+        vals = {'user': request.env.user.name, 'msg': message}
+        return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/execute', type='http', auth='user')
     def message_execute(self, model, res_id, action, **kwargs):
         vals = {}
         vals['base_url'] = request.env['ir.config_parameter'].get_param('web.base.url')
-        try :
+        try:
             if hasattr(request.env[model], action):
                 getattr(request.env[model].browse(int(res_id)), action)()
+            vals['success_msg'] = _('Action is perfomed successfully!')
         except AccessError as e:
-            vals['error'] = plaintext2html(e.name)
+            vals['access_error'] = plaintext2html(e.name)
         return request.render('mail.mail_actions', vals)
