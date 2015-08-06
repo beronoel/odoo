@@ -29,8 +29,8 @@ class StockInvoiceOnshipping(models.TransientModel):
     def _default_need_two_invoices(self):
         if 'active_id' in self.env.context:
             pick = self.env['stock.picking'].browse(self.env.context['active_id'])
-            so = pick.sale_id
-            po = pick.move_lines[0].purchase_line_id.order_id
+            so = pick.sale_id or pick.move_lines[0].origin_returned_move_id.picking_id.sale_id
+            po = pick.move_lines[0].purchase_line_id.order_id or pick.move_lines[0].origin_returned_move_id.purchase_line_id.order_id
             if so.order_policy == 'picking' and po.invoice_method == 'picking':
                 return True
         return False
@@ -57,9 +57,7 @@ class StockInvoiceOnshipping(models.TransientModel):
                 return True
             else:
                 invoice_ids = self.create_invoice()
-                import pdb; pdb.set_trace()
-                self.warning_message = 'I created two different invoices'
-
+                self.warning_message = str(len(invoice_ids)) + _(' invoices of different types were generated for this picking. ')
                 return {
                     'type': 'ir.actions.act_window',
                     'res_model': 'stock.invoice.onshipping',
