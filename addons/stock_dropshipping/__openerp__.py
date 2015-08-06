@@ -11,7 +11,7 @@ Manage drop shipping orders
 ===========================
 
 This module adds a pre-configured Drop Shipping picking type
-as well as a procurement route that allow configuring Drop
+as well as a procurement route that allows configuring Drop
 Shipping products and orders.
 
 When drop shipping is used the goods are directly transferred

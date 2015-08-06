@@ -245,7 +245,6 @@ class stock_picking(osv.osv):
             invoices += self._invoice_create_line(cr, uid, moves, journal_id, type, invoiced=invoiced, context=context)
         
         #For anglo-saxon accounting
-        #TODO: This belongs somewhere in the _invoice_create_line, not here
         if anglo_saxon_accounting:
             if type in ('in_invoice', 'in_refund'):
                 for inv in self.pool.get('account.invoice').browse(cr, uid, invoices, context=context):

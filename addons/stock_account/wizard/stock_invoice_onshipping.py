@@ -111,11 +111,7 @@ class stock_invoice_onshipping(osv.osv_memory):
             action = action_pool.read(cr, uid, action_id, context=context)
 
             if len(invoice_ids) == 1:
-                #action['view_type'] = 'form'
                 action['res_id'] = invoice_ids[0]
-                #action['res_model'] = 'account.invoice'
-                #action['view_mode'] = 'form,tree,calendar,graph'
-
                 tree = action['views'][0]
                 action['views'][0] = action['views'][1]
                 action['views'][1] = tree
@@ -129,7 +125,6 @@ class stock_invoice_onshipping(osv.osv_memory):
         picking_pool = self.pool.get('stock.picking')
         data = self.browse(cr, uid, ids[0], context=context)
         context['date_inv'] = data.invoice_date
-        acc_journal = self.pool.get("account.journal")
         inv_type = data.invoice_type
 
         active_ids = context.get('active_ids', [])
