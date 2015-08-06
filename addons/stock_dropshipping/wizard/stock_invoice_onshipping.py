@@ -19,8 +19,11 @@ class StockInvoiceOnshipping(models.TransientModel):
                 return 'in_invoice'
             else:
                 return 'out_invoice'
-        else:
-            return super(StockInvoiceOnshipping, self)._get_invoice_type()
+        elif src_usage == 'customer' and dest_usage == 'supplier':
+            if pick.move_lines and pick.move_lines[0].origin_returned_move_id.purchase_line_id.order_id.invoice_method == 'picking':
+                return 'in_refund'
+            else:
+                return super(StockInvoiceOnshipping, self)._get_invoice_type()
 
     def _default_second_journal_id(self):
         res = self.env['account.journal'].search([('type', '=', 'sale')])
