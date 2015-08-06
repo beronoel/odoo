@@ -32,7 +32,6 @@ customer invoice and supplier bill from the picking.
     'data': [
         'data/stock_dropshipping.xml',
         'wizard/stock_invoice_onshipping_view.xml',
-        'security/group.xml'
     ],
     'test': [
         '../account/test/account_minimal_test.xml',
