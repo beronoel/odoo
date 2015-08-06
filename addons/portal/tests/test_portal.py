@@ -69,16 +69,12 @@ class test_portal(TestMail):
     def test_mail_notification_url_partner_portal(self):
         # Mail data
         mail = self.env['mail.mail'].create({'state': 'exception'})
-        # Test: link for nobody -> None
-        url = mail._get_partner_access_link()
-        self.assertEqual(url, None,
-                         'notification email: mails not send to a specific partner should not have any URL')
         # Test: link for partner -> signup URL
-        url = mail._get_partner_access_link(partner=self.partner_1)
+        url = self.env['mail.thread']._get_access_link(False, False, mail.model, mail.res_id, self.partner_1)
         self.assertIn(self.partner_1.signup_token, url,
                       'notification email: mails send to a not-user partner should contain the signup token')
         # Test: link for user -> signin
-        url = mail._get_partner_access_link(partner=self.user_employee.partner_id)
+        url = self.env['mail.thread']._get_access_link(False, False, mail.model, mail.res_id, self.user_employee.partner_id)
         self.assertIn('action=mail.action_mail_redirect', url,
                       'notification email: link should contain the redirect action')
         self.assertIn('login=%s' % self.user_employee.login, url,

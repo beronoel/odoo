@@ -24,21 +24,9 @@ class TestMailFeatures(TestMail):
             'login': 'b4r+_#_R3wl$$', 'alias_name': 'b4r+_#_R3wl$$'})
         self.assertEqual(user_barty.alias_name, 'b4r+_-_r3wl-', 'Disallowed chars should be replaced by hyphens')
 
-    def test_mail_notification_url_no_partner(self):
-        mail = self.env['mail.mail'].create({'state': 'exception'})
-        url = mail._get_partner_access_link()
-        self.assertEqual(url, None)
-
-    def test_mail_notification_url_partner(self):
-        mail = self.env['mail.mail'].create({'state': 'exception'})
-        url = mail._get_partner_access_link(self.partner_1)
-        self.assertEqual(url, None)
-
     def test_mail_notification_url_user_signin(self):
-        base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         mail = self.env['mail.mail'].create({'state': 'exception'})
-        url = mail._get_partner_access_link(self.user_employee.partner_id)
-        self.assertIn(base_url, url)
+        url = self.env['mail.thread']._get_access_link(False, False, mail.model, mail.res_id, self.user_employee.partner_id)
         self.assertIn('db=%s' % self.env.cr.dbname, url,
                       'notification email: link should contain database name')
         self.assertIn('action=mail.action_mail_redirect', url,
@@ -47,10 +35,8 @@ class TestMailFeatures(TestMail):
                       'notification email: link should contain the user login')
 
     def test_mail_notification_url_user_document(self):
-        base_url = self.env['ir.config_parameter'].get_param('web.base.url')
         mail = self.env['mail.mail'].create({'state': 'exception', 'model': 'mail.channel', 'res_id': self.group_pigs.id})
-        url = mail._get_partner_access_link(self.user_employee.partner_id)
-        self.assertIn(base_url, url)
+        url = self.env['mail.thread']._get_access_link(False, False, mail.model, mail.res_id, self.user_employee.partner_id)
         self.assertIn('db=%s' % self.env.cr.dbname, url,
                       'notification email: link should contain database name')
         self.assertIn('action=mail.action_mail_redirect', url,
