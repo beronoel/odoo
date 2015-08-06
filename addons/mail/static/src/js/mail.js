@@ -1234,6 +1234,10 @@ var ComposeMessage = Attachment.extend ({
             values['subtype'] = 'mail.mt_comment';
         }
 
+        if (this.parent_thread.ds_thread._model.name == 'mail.channel' && this.parent_thread.parent_id) {
+            values['subtype'] = 'mail.mt_all_replies';
+        }
+
         this.parent_thread.ds_thread._model.call('message_post', [this.context.default_res_id], values).done(function (message_id) {
             var thread = self.parent_thread;
 
