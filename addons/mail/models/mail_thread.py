@@ -564,9 +564,6 @@ class MailThread(models.AbstractModel):
 
         return "/web?%s#%s" % (urlencode(query), urlencode(fragment))
 
-    def _get_actions(self, partner_users):
-        pass
-
     def _get_recipient_structure(self):
         return {
             'button_access': None,
@@ -608,8 +605,6 @@ class MailThread(models.AbstractModel):
         partners = recipients.sudo().filtered(lambda partner: not partner.user_ids and not hasattr(partner, '_get_signup_url_for_action'))
         signups = recipients.sudo().filtered(lambda partner: not partner.user_ids and hasattr(partner, '_get_signup_url_for_action'))
         partner_users = recipients - (partners | signups)
-        # actions = self._get_actions(partner_users)
-        # partner_actions = partner_users.filtered(lambda partner: partner.id in (actions and actions.keys() or []))
         partner_actions = self.env['res.partner']
         partner_others = partner_users - partner_actions
         followers = self.env['mail.followers'].sudo().search([

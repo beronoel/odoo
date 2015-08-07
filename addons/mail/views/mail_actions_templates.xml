@@ -8,7 +8,7 @@
             </t>
             <t t-if="access_error">
                 <span t-raw="access_error"/>
-                <p>Kindly contact your system administrator. </p>
+                <p>Please contact your system administrator. </p>
             </t>
             <p>Thank you.</p>
             <p>
@@ -29,8 +29,8 @@
                                 <span t-raw="msg"/>
                             </t>
                             <t t-if="error_message">
-                                Sorry, your current subscription could not be altered due to following Error : <br/><strong t-raw="error_message"/>
-                                <p>Kindly contact your system administrator. </p>
+                                Sorry, your current subscription could not be changed due to following Error : <br/><strong t-raw="error_message"/>
+                                <p>Please contact your system administrator. </p>
                             </t>
                         </p>
                         <p>Thank you.</p>

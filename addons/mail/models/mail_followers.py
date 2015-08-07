@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import threading
-
-from openerp import _, api, fields, models
-from openerp import tools
-
+from openerp import api, fields, models
 
 class Followers(models.Model):
     """ mail_followers holds the data related to the follow mechanism inside

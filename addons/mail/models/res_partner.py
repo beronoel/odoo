@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import threading
+
 from openerp import _, api, fields, models
 
 
@@ -41,6 +43,7 @@ class Partner(models.Model):
         UPDATE ME """
         # rebrowse as sudo to avoid access rigths on author, user, ... -> portal / public goes through this method
         message_sudo = message.sudo()
+        chunks = []
 
         # compute signature
         signature = False
@@ -59,7 +62,7 @@ class Partner(models.Model):
             website_url = 'http://%s' % user.company_id.website if not user.company_id.website.lower().startswith(('http:', 'https:')) else user.company_id.website
         else:
             website_url = False
-        model_name = self.env['ir.model'].search([('model', '=', self.env[message_sudo.model]._name)]).name_get()[0][1]
+        model_name = self.env['ir.model'].search([('model', '=', self.env[message_sudo.model]._name)]).name_get()[0][1]if message_sudo.model else False
         company_name = user.company_id.name
 
         # compute email references
@@ -76,7 +79,7 @@ class Partner(models.Model):
             'signature': signature,
             'website_url': website_url,
             'company_name': company_name,
-            'model_name': model_name,
+            'model_name': model_name or _('Document'),
             'no_sanitize': True,
         }
 
@@ -121,9 +124,9 @@ class Partner(models.Model):
         # #   2. do not send emails immediately if the registry is not loaded,
         # #      to prevent sending email during a simple update of the database
         # #      using the command-line.
-        # if force_send and len(chunks) < 2 and \
-        #        (not self.pool._init or
-        #         getattr(threading.currentThread(), 'testing', False)):
-        #     emails.send()
+        if force_send and len(chunks) < 2 and \
+            (not self.pool._init or
+                getattr(threading.currentThread(), 'testing', False)):
+            emails.send()
 
         return True
