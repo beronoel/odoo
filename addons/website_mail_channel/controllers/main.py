@@ -156,15 +156,14 @@ class MailGroup(http.Controller):
 
     @http.route("/changesubscription/<model('mail.channel'):channel>", type='http', auth='user', website=True)
     def change_subscription(self, channel, **post):
-        vals = {}
-        vals['user'] = request.env.user.name
-        vals['base_url'] = request.env['ir.config_parameter'].get_param('web.base.url')
+        vals = {'user': request.env.user.name, 'base_url': request.env['ir.config_parameter'].get_param('web.base.url'), 'doc_name': channel.name_get()[0][1], 'mail_channel': True}
         try:
             user_ids = [int(user_id) for user_id in post.get('users').split(',')] if post.get('users') else False
             subtype_ids = [int(subtype_id) for subtype_id in post.get('subtypes').split(',')] if post.get('subtypes') else False
-            channel.message_subscribe_users(user_ids=user_ids, subtype_ids=subtype_ids)
-            message = '%s <br/>%s.' % (_('You have successfully changed your subscription for following mailing group : '), channel.name_get()[0][1])
-            vals['msg'] = message
+            if subtype_ids and user_ids:
+                channel.message_subscribe_users(user_ids=user_ids, subtype_ids=subtype_ids)
+            else:
+                raise ValueError
         except ValueError:
             vals['error_message'] = _('Invalid/Wrong URL')
         return request.website.render('mail.mail_subscriptionchange', vals)

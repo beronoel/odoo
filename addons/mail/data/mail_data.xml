@@ -110,8 +110,8 @@
                 % if ctx.get('actions'):
                 % for action in ctx['actions']:
                 <a href="${action['url']}" style="text-decoration:none; color:#a24689;">${action['title']}</a>
-                %if len(ctx['actions']) > 1:
-                |
+                %if len(ctx['actions']) > 1 and loop.index < len(ctx['actions']):
+                    |
                 % endif
                 % endfor
                 % else:

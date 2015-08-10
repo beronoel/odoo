@@ -23,14 +23,15 @@
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <h1 class="page-header text-center">Mailing Subscriptions</h1>
-                    <div t-attf-class="alert #{msg and 'alert-success' or 'alert-danger'} text-center">
+                    <div t-attf-class="alert #{ not error_message and 'alert-success' or 'alert-danger'} text-center">
                         <p>Hello <span t-esc="user"/>,
-                            <t t-if="msg">
-                                <span t-raw="msg"/>
+                            <t t-if="mail_subscribe">
+                                You have successfully subscribed the following document : <br/>
+                                <strong t-esc="doc_name"/>
                             </t>
-                            <t t-if="error_message">
-                                Sorry, your current subscription could not be changed due to following Error : <br/><strong t-raw="error_message"/>
-                                <p>Please contact your system administrator. </p>
+                            <t t-if="mail_unsubscribe">
+                                You have successfully unsubscribed the following document : <br/>
+                                <strong t-esc="doc_name"/>
                             </t>
                         </p>
                         <p>Thank you.</p>

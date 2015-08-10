@@ -93,16 +93,16 @@ class MailController(http.Controller):
     def message_subscribe(self, model, res_id):
         document = request.env[model].browse(int(res_id))
         document.message_subscribe_users()
-        message = '%s <br/>%s.' % (_('You have successfully subscribed the following document : '), document.name_get()[0][1])
-        vals = {'user': request.env.user.name, 'msg': message}
+        base_url = request.env['ir.config_parameter'].get_param('web.base.url')
+        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_subscribe': True, 'doc_name': document.name_get()[0][1]}
         return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/unfollow', type='http', auth='user')
     def message_unsubscribe(self, model, res_id):
         document = request.env[model].browse(int(res_id))
         document.message_unsubscribe_users()
-        message = '%s <br/>%s.' % (_('You have successfully unsubscribed the following document : '), document.name_get()[0][1])
-        vals = {'user': request.env.user.name, 'msg': message}
+        base_url = request.env['ir.config_parameter'].get_param('web.base.url')
+        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_unsubscribe': True, 'doc_name': document.name_get()[0][1]}
         return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/execute', type='http', auth='user')

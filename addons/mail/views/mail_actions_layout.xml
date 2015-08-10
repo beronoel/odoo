@@ -6,7 +6,6 @@
                 <meta charset="utf-8" />
                 <meta name="viewport" content="initial-scale=1"/>
                 <title><t t-esc="title or 'Odoo Mail Action'"/></title>
-                <!-- <link rel="stylesheet" href="/calendar/static/src/css/calendar.css"/> -->
                 <link rel='stylesheet' href='/web/static/lib/bootstrap/css/bootstrap.css'/>
                 <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
             </head>
