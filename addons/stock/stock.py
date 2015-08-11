@@ -877,13 +877,24 @@ class stock_picking(models.Model):
             packop_ids = [op.id for op in picking.pack_operation_ids]
             self.pool.get('stock.pack.operation').write(cr, uid, packop_ids, {'owner_id': picking.owner_id.id}, context=context)
 
-    def onchange_picking_type(self, cr, uid, ids, picking_type_id):
+    def onchange_picking_type(self, cr, uid, ids, picking_type_id, partner_id):
         res = {}
         if picking_type_id:
             picking_type = self.pool['stock.picking.type'].browse(cr, uid, picking_type_id)
-            res['value'] = {'location_id': picking_type.default_location_src_id.id,
-                            'location_dest_id': picking_type.default_location_dest_id.id,
-                         }
+            if not picking_type.default_location_src_id and partner_id:
+                partner = self.pool['res.partner'].browse(cr, uid, partner_id)
+                location_id = partner.property_stock_supplier.id
+            else:
+                location_id = picking_type.default_location_src_id.id
+
+            if not picking_type.default_location_dest_id and partner_id:
+                partner = self.pool['res.partner'].browse(cr, uid, partner_id)
+                location_dest_id = partner.property_stock_customer.id
+            else:
+                location_dest_id = picking_type.default_location_dest_id.id
+
+            res['value'] = {'location_id': location_id,
+                            'location_dest_id': location_dest_id,}
         return res
 
     def _default_location_destination(self):
@@ -3711,6 +3722,16 @@ class stock_warehouse(osv.osv):
         #create routes and push/procurement rules
         new_objects_dict = self.create_routes(cr, uid, new_id, warehouse, context=context)
         self.write(cr, uid, warehouse.id, new_objects_dict, context=context)
+
+        # If partner assigned
+        if vals.get('partner_id'):
+            comp_obj = self.pool['res.company']
+            if vals.get('company_id'):
+                transit_loc = comp_obj.browse(cr, uid, vals.get('company_id'), context=context).internal_transit_location_id.id
+            else:
+                transit_loc = comp_obj.browse(cr, uid, comp_obj._company_default_get(cr, uid, 'stock.warehouse', context=context)).internal_transit_location_id.id
+            self.pool['res.partner'].write(cr, uid, [vals['partner_id']], {'property_stock_customer': transit_loc,
+                                                                            'property_stock_supplier': transit_loc}, context=context)
         return new_id
 
     def _format_rulename(self, cr, uid, obj, from_loc, dest_loc, context=None):
@@ -3873,6 +3894,15 @@ class stock_warehouse(osv.osv):
                 for inter_wh_route_id in to_assign_route_ids:
                     self.write(cr, uid, [warehouse.id], {'route_ids': [(4, inter_wh_route_id)]})
 
+        # If another partner assigned
+        if vals.get('partner_id'):
+            if not vals.get('company_id'):
+                company = self.browse(cr, uid, ids[0], context=context).company_id
+            else:
+                company = self.pool['res.company'].browse(cr, uid, vals['company_id'])
+            transit_loc = company.internal_transit_location_id.id
+            self.pool['res.partner'].write(cr, uid, [vals['partner_id']], {'property_stock_customer': transit_loc,
+                                                                            'property_stock_supplier': transit_loc}, context=context)
         return super(stock_warehouse, self).write(cr, uid, ids, vals=vals, context=context)
 
     def get_all_routes_for_wh(self, cr, uid, warehouse, context=None):
