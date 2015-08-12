@@ -675,25 +675,25 @@ class stock_quant(osv.osv):
         product = move.product_id
         res = []
         offset = 0
+        lot_qty = {}
+        if ops:
+            for packlot in ops.pack_lot_ids:
+                lot_qty[packlot.lot_id.id] = packlot.qty
+        else:
+            if move.restrict_lot_id:
+                lot_qty[move.restrict_lot_id.id] = quantity
         while float_compare(quantity, 0, precision_rounding=product.uom_id.rounding) > 0:
             quants = self.search(cr, uid, domain, order=orderby, limit=10, offset=offset, context=context)
             # Need to check lots here
-            lot_qty = {}
-            if ops:
-                for packlot in ops.pack_lot_ids:
-                    lot_qty[packlot.lot_id.id] = packlot.qty
-            else:
-                if move.restrict_lot_id:
-                    lot_qty[move.restrict_lot_id.id] = quantity
             if not quants:
                 res.append((None, quantity))
                 break
             for quant in self.browse(cr, uid, quants, context=context):
                 rounding = product.uom_id.rounding
                 if float_compare(quantity, abs(quant.qty), precision_rounding=rounding) >= 0:
-
-                    res += [(quant, abs(quant.qty))]
-                    quantity -= abs(quant.qty)
+                    if not lot_qty or float_compare(lot_qty.get(quant.lot_id.id), abs(quant.qty), precision_rounding=rounding) >= 0:
+                        res += [(quant, abs(quant.qty))]
+                        quantity -= abs(quant.qty)
                 elif float_compare(quantity, 0.0, precision_rounding=rounding) != 0:
                     res += [(quant, quantity)]
                     quantity = 0
