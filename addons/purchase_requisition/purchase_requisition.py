@@ -402,7 +402,9 @@ class procurement_order(osv.osv):
         requisition_obj = self.pool.get('purchase.requisition')
         warehouse_obj = self.pool.get('stock.warehouse')
         req_ids = []
+        res = {}
         for procurement in self.browse(cr, uid, ids, context=context):
+            res[procurement.id] = False
             if procurement.product_id.purchase_requisition:
                 warehouse_id = warehouse_obj.search(cr, uid, [('company_id', '=', procurement.company_id.id)], context=context)
                 requisition_id = requisition_obj.create(cr, uid, {
@@ -416,14 +418,16 @@ class procurement_order(osv.osv):
                         'product_id': procurement.product_id.id,
                         'product_uom_id': procurement.product_uom.id,
                         'product_qty': procurement.product_qty
-
                     })],
                 })
                 self.message_post(cr, uid, [procurement.id], body=_("Purchase Requisition created"), context=context)
                 self.write(cr, uid, [procurement.id], {'requisition_id': requisition_id}, context=context)
                 req_ids += [procurement.id]
+                res[procurement.id] = True
         set_others = set(ids) - set(req_ids)
-        return super(procurement_order, self).make_po(cr, uid, list(set_others), context=context)
+        if set_others:
+            res.update(super(procurement_order, self).make_po(cr, uid, list(set_others), context=context))
+        return res
 
     def _check(self, cr, uid, procurement, context=None):
         if procurement.rule_id and procurement.rule_id.action == 'buy' and procurement.product_id.purchase_requisition:
