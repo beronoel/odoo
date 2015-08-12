@@ -429,7 +429,10 @@ class stock_quant(osv.osv):
         domain = domain or [('qty', '>', 0.0)]
         quants = [(None, qty)]
         if ops:
-            restrict_lot_id = ops.lot_id.id
+            if ops.pack_lot_ids:
+                restrict_lot_ids = [x.id for x in ops.pack_lot_ids]
+            else:
+                restrict_lot_ids = False
             location = ops.location_id
             domain += [('owner_id', '=', ops.owner_id.id)]
             if ops.package_id and not ops.product_id:
@@ -438,7 +441,7 @@ class stock_quant(osv.osv):
                 domain += [('package_id', '=', ops.package_id.id)]
             domain += [('location_id', '=', ops.location_id.id)]
         else:
-            restrict_lot_id = move.restrict_lot_id.id
+            restrict_lot_ids = [move.restrict_lot_id.id]
             location = move.location_id
             domain += [('owner_id', '=', move.restrict_partner_id.id)]
             domain += [('location_id', 'child_of', move.location_id.id)]
@@ -454,14 +457,14 @@ class stock_quant(osv.osv):
         if location.usage in ['inventory', 'production', 'supplier']:
             return quants
         res_qty = qty
-        if restrict_lot_id:
+        if restrict_lot_ids:
             if not preferred_domain_list:
-                preferred_domain_list = [[('lot_id', '=', restrict_lot_id)], [('lot_id', '=', False)]]
+                preferred_domain_list = [[('lot_id', 'in', restrict_lot_ids)], [('lot_id', '=', False)]]
             else:
                 lot_list = []
                 no_lot_list = []
                 for pref_domain in preferred_domain_list:
-                    pref_lot_domain = pref_domain + [('lot_id', '=', restrict_lot_id)]
+                    pref_lot_domain = pref_domain + [('lot_id', 'in', restrict_lot_ids)]
                     pref_no_lot_domain = pref_domain + [('lot_id', '=', False)]
                     lot_list.append(pref_lot_domain)
                     no_lot_list.append(pref_no_lot_domain)
@@ -674,12 +677,21 @@ class stock_quant(osv.osv):
         offset = 0
         while float_compare(quantity, 0, precision_rounding=product.uom_id.rounding) > 0:
             quants = self.search(cr, uid, domain, order=orderby, limit=10, offset=offset, context=context)
+            # Need to check lots here
+            lot_qty = {}
+            if ops:
+                for packlot in ops.pack_lot_ids:
+                    lot_qty[packlot.lot_id.id] = packlot.qty
+            else:
+                if move.restrict_lot_id:
+                    lot_qty[move.restrict_lot_id.id] = quantity
             if not quants:
                 res.append((None, quantity))
                 break
             for quant in self.browse(cr, uid, quants, context=context):
                 rounding = product.uom_id.rounding
                 if float_compare(quantity, abs(quant.qty), precision_rounding=rounding) >= 0:
+
                     res += [(quant, abs(quant.qty))]
                     quantity -= abs(quant.qty)
                 elif float_compare(quantity, 0.0, precision_rounding=rounding) != 0:
@@ -4157,7 +4169,7 @@ class stock_pack_operation(osv.osv):
         'qty_done': fields.float('Processed', digits_compute=dp.get_precision('Product Unit of Measure')),
         'processed_boolean': fields.function(_get_bool, fnct_inv=_set_processed_qty, type='boolean', string='Processed'),
         'package_id': fields.many2one('stock.quant.package', 'Source Package'),  # 2
-        'pack_lot_ids': fields.one2many('stock.pack.operation.lot', 'operation_id', 'Lines of lots'),
+        'pack_lot_ids': fields.one2many('stock.pack.operation.lot', 'operation_id', 'Lines of Lots'),
         'result_package_id': fields.many2one('stock.quant.package', 'Destination Package', help="If set, the operations are packed into this package", required=False, ondelete='cascade'),
         'date': fields.datetime('Date', required=True),
         'owner_id': fields.many2one('res.partner', 'Owner', help="Owner of the quants"),
