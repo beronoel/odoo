@@ -94,25 +94,46 @@ class MailController(http.Controller):
         document = request.env[model].browse(int(res_id))
         document.message_subscribe_users()
         base_url = request.env['ir.config_parameter'].get_param('web.base.url')
-        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_subscribe': True, 'doc_name': document.name_get()[0][1]}
+        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_subscription': 'follow', 'doc_name': document.name_get()[0][1]}
         return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/unfollow', type='http', auth='user')
-    def message_unsubscribe(self, model, res_id):
+    def message_unsubscribe(self, model, res_id, partner_id, token):
         document = request.env[model].browse(int(res_id))
-        document.message_unsubscribe_users()
         base_url = request.env['ir.config_parameter'].get_param('web.base.url')
-        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_unsubscribe': True, 'doc_name': document.name_get()[0][1]}
+        vals = {'user': request.env.user.name, 'base_url': base_url, 'mail_subscription': 'unfollow', 'doc_name': document.name_get()[0][1]}
+        if request.env.user.partner_id.id != int(partner_id):
+            vals['not_allowed'] = True
+            return request.render('mail.mail_subscriptionchange', vals)
+        mail_action = request.env['mail.followers.action'].sudo().search([('res_id', '=', int(res_id)), ('res_model', '=', model), ('token', '=', token)])
+        if mail_action and request.env.user.partner_id in document.message_follower_ids:
+            document.message_unsubscribe_users()
+            vals['status'] = 'done'
+        if not mail_action:
+            vals['status'] = 'wrong_url'
+        else:
+            vals['status'] = 'not_subscribed'
         return request.render('mail.mail_subscriptionchange', vals)
 
     @http.route('/mail/execute', type='http', auth='user')
-    def message_execute(self, model, res_id, action, **kwargs):
+    def message_execute(self, model, res_id, partner_id, token, action, **kwargs):
         vals = {}
         vals['base_url'] = request.env['ir.config_parameter'].get_param('web.base.url')
+        if request.env.user.partner_id.id != int(partner_id):
+            vals['not_allowed'] = True
+            return request.render('mail.mail_actions', vals)
         try:
             if hasattr(request.env[model], action):
-                getattr(request.env[model].browse(int(res_id)), action)()
-            vals['success_msg'] = _('Action is perfomed successfully!')
+                mail_action = request.env['mail.followers.action'].sudo().search([('res_id', '=', int(res_id)), ('res_model', '=', model), ('token', '=', token)])
+                if mail_action:
+                    vals['status'] = 'done'
+                    getattr(request.env[model].browse(int(res_id)), action)()
+                else:
+                    vals['status'] = 'wrong_url'
+            else:
+                vals['status'] = 'wrong_url'
         except AccessError as e:
             vals['access_error'] = plaintext2html(e.name)
+        except KeyError:
+            vals['status'] = 'wrong_url'
         return request.render('mail.mail_actions', vals)

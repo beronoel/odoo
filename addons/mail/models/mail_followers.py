@@ -2,6 +2,8 @@
 
 from openerp import api, fields, models
 
+import uuid
+
 class Followers(models.Model):
     """ mail_followers holds the data related to the follow mechanism inside
     Odoo. Partners can choose to follow documents (records) of any kind
@@ -133,3 +135,24 @@ class Notification(models.Model):
             return True
 
         return new_notif_ids._notify_email(message, force_send, user_signature)  # tde check this one too
+
+
+class FollowersMailAction(models.Model):
+    """ FollowersMailAction holds the data related to Authentication for
+    follow mechanism inside Odoo.
+    """
+    _name = 'mail.followers.action'
+    _description = 'Followers Authentication'
+
+    res_model = fields.Char(
+        string='Related Document Model', required=True, help='Model of the followed resource')
+    res_id = fields.Integer(
+        string='Related Document ID', required=True, help='Id of the followed resource')
+    partner_id = fields.Many2one('res.partner', string='Contact', ondelete='cascade', required=True)
+    token = fields.Char(required=True, help='Unique token for each chatter message', default=uuid.uuid4().__str__())
+    # state = fields.Selection([('cancelled', 'Cancelled'), ('draft', 'Draft'), ('closed', 'Closed')],
+    #                          'Status', required=True, readonly=True, copy=False, default="draft",
+    #                          help='* The \'Draft\' status is set by default. \
+    #                 \n* The \'Cancelled\' status is set user unfollows the document. \
+    #                 \n* The \'Closed\' status is set when the action is perfomed successfully.')
+    # [DJA] Right now I don't feel need of the state field on this model.

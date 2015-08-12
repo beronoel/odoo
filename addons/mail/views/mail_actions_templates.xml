@@ -2,10 +2,10 @@
 <odoo>
 <template id="mail_actions" name="Invitation View">
     <t t-call="mail.mail_actions_layout">
-        <div class="jumbotron text-center">
-            <t t-if="not access_error">
-                <h1><small>Action is perfomed successfully!</small></h1>
-            </t>
+        <div t-attf-class="jumbotron #{ status == 'done' and 'alert-success' or 'alert-danger'} text-center">
+            <h1 t-if="status == 'done'"><small>Action is perfomed successfully!</small></h1>
+            <h3 t-if="not_allowed">You are not allowed to perform this action as this mail was not intended for you.</h3>
+            <h3 t-if="status == 'wrong_url'">Invalid/Wrong URL. Please click the link from mail again to perform action.</h3>
             <t t-if="access_error">
                 <span t-raw="access_error"/>
                 <p>Please contact your system administrator. </p>
@@ -23,14 +23,17 @@
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">
                     <h1 class="page-header text-center">Mailing Subscriptions</h1>
-                    <div t-attf-class="alert #{ not error_message and 'alert-success' or 'alert-danger'} text-center">
+                    <div t-attf-class="alert #{ status == 'done' and 'alert-success' or 'alert-danger'} text-center">
                         <p>Hello <span t-esc="user"/>,
-                            <t t-if="mail_subscribe">
+                            <t t-if="mail_subscription == 'follow'">
                                 You have successfully subscribed the following document : <br/>
                                 <strong t-esc="doc_name"/>
                             </t>
-                            <t t-if="mail_unsubscribe">
-                                You have successfully unsubscribed the following document : <br/>
+                            <t t-if="mail_subscription == 'unfollow'">
+                                <span t-if="not_allowed">You are not allowed to unsubscribe following document as this mail was not intended for you </span>
+                                <span t-if="status == 'done'">You have successfully unsubscribed following document </span>
+                                <span t-if="status == 'wrong_url'">Invalid/Wrong URL. Please click the link from mail again to unsubscribe from following document</span>
+                                <span t-if="status == 'not_subscribed'">You are already unsubscribed from following document</span>: <br/>
                                 <strong t-esc="doc_name"/>
                             </t>
                         </p>

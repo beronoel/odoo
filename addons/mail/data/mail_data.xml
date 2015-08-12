@@ -101,10 +101,10 @@
                 % endif
 
                 % if ctx.get('button_follow'):
-                <a href="${ctx['button_follow']['url']}" style="-webkit-user-select: none; color: #333; background-color: #fff; padding: 5px 10px; margin-bottom: 0; font-size: 12px; line-height: 1.5; text-decoration: none; display: inline-block; vertical-align: middle; font-weight: normal; text-align: center; cursor: pointer; white-space: nowrap; background-image: none; border: 1px solid #a24689; border-radius: 3px;" class="o_default_snippet_text">${ctx['button_follow']['title']}</a>
+                    <a href="${ctx['button_follow']['url']}" style="-webkit-user-select: none; color: #333; background-color: #fff; padding: 5px 10px; margin-bottom: 0; font-size: 12px; line-height: 1.5; text-decoration: none; display: inline-block; vertical-align: middle; font-weight: normal; text-align: center; cursor: pointer; white-space: nowrap; background-image: none; border: 1px solid #a24689; border-radius: 3px;" class="o_default_snippet_text">${ctx['button_follow']['title']}</a>
                 
                 % elif ctx.get('button_unfollow'):
-                <a href="${ctx['button_unfollow']['url']}" style="-webkit-user-select: none; color: #333; background-color: #fff; padding: 5px 10px; margin-bottom: 0; font-size: 12px; line-height: 1.5; text-decoration: none; display: inline-block; vertical-align: middle; font-weight: normal; text-align: center; cursor: pointer; white-space: nowrap; background-image: none; border: 1px solid #a24689; border-radius: 3px;" class="o_default_snippet_text">${ctx['button_unfollow']['title']}</a>
+                    <a href="${ctx['button_unfollow']['url']}" style="-webkit-user-select: none; color: #333; background-color: #fff; padding: 5px 10px; margin-bottom: 0; font-size: 12px; line-height: 1.5; text-decoration: none; display: inline-block; vertical-align: middle; font-weight: normal; text-align: center; cursor: pointer; white-space: nowrap; background-image: none; border: 1px solid #a24689; border-radius: 3px;" class="o_default_snippet_text">${ctx['button_unfollow']['title']}</a>
                 % endif
         <span style="padding-top:5px; color: #777; float: right !important; font-size: 14px;">
                 % if ctx.get('actions'):

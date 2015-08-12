@@ -178,9 +178,15 @@ class crm_claim(osv.osv):
 
     def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
         res = super(crm_claim, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
+        if not partner_users:
+            return res
         claim = self.browse(cr, uid, ids[0], context=context)
-        res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
-        res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+        # Check for the minimal required group for peforming an action
+        can_perform_action = self.pool['res.users'].has_group(cr, partner_users.user_ids[0].id, 'base.group_sale_salesman')
+        mail_action = res['unfollow']['mail_action']
+        if can_perform_action and mail_action:
+            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, claim.id, 'claim_rejected'), 'title': 'Rejected'}]
+            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&partner_id=%d&token=%s&action=%s' % (self._name, claim.id, partner_users.id, mail_action.token, 'claim_settled'), 'title': 'Settled'}, {'url': '/mail/execute?model=%s&res_id=%s&partner_id=%d&token=%s&action=%s' % (self._name, claim.id, partner_users.id, mail_action.token, 'claim_rejected'), 'title': 'Rejected'}]
         return res
 
 class res_partner(osv.osv):

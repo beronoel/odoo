@@ -570,13 +570,20 @@ class MailThread(models.AbstractModel):
             'button_follow': False,
             'button_unfollow': False,
             'actions': list(),
-            'recipients': None
+            'recipients': None,
+            'mail_action': False
         }
 
     @api.multi
     def _message_classify_recipients_better(self, message, partners, signups, partner_users, followers, notfollowers):
         structure = self._get_recipient_structure()
         access_link = self._get_access_link(True, message.id, message.model, message.res_id)
+        mail_action = False
+        MailFollowersAction = self.env['mail.followers.action']
+        if partner_users:
+            mail_action = MailFollowersAction.search([('res_id', '=', message.res_id), ('res_model', '=', message.model), ('partner_id', '=', partner_users.id)])
+            if not mail_action:
+                mail_action = MailFollowersAction.create({'res_id': message.res_id, 'res_model': message.model, 'partner_id': partner_users.id})
         # urlencode({'db': self._cr.dbname}
         result = {
             'partner': dict(structure, **{'recipients': partners}),
@@ -586,8 +593,9 @@ class MailThread(models.AbstractModel):
                 'recipients': notfollowers}),
             'unfollow': dict(structure, **{
                 'button_access': {'url': access_link, 'title': _('View')},
-                'button_unfollow': {'url': '/mail/unfollow?%s' % urlencode({'model': message.model, 'res_id': message.res_id}), 'title': _('Unfollow')},
-                'recipients': followers}),
+                'button_unfollow': {'url': '/mail/unfollow?%s' % urlencode({'model': message.model, 'res_id': message.res_id, 'partner_id': partner_users.id, 'token': mail_action.token}), 'title': _('Unfollow')} if mail_action else False,
+                'recipients': followers,
+                'mail_action': mail_action}),
         }
         for partner in signups:
             new_key = 'signup_%d' % partner.id

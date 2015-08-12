@@ -36,7 +36,7 @@ class Partner(models.Model):
     def message_get_default_recipients(self):
         return dict((res_id, {'partner_ids': [res_id], 'email_to': False, 'email_cc': False}) for res_id in self.ids)
 
-    @api.multi
+    @api.one
     def message_send_notification_email(self, message, force_send=False, user_signature=True):
         """ Method to send email linked to notified messages.
 
