@@ -25,41 +25,63 @@ class stock_lot_split(models.TransientModel):
     @api.multi
     def process(self):
         self.ensure_one()
-        if not self.line_ids:
-            raise UserError (_('Please provide at least one line'))
-        # Split pack operations
-        firstline = True
-        totals_other = 0.0
+        # lot_pack = {}
+        # for pack_lot in self.pack_id.pack_lot_ids:
+        #     lot_pack[pack_lot.lot_id.id] = pack_lot
+        #
+        # # We assume there is one line for every lot for the moment (needs a group by or whatever)
+        # for line in self.line_ids:
+        #     if lot_pack.get(line.lot_id.id):
+        #         lot_pack[line.lot_id.id].product_qty =
+        #     else:
+
+        self.pack_id.pack_lot_ids.unlink()
         for line in self.line_ids:
-            if not line.lot_name and not line.lot_id:
-                raise UserError(_('Please provide a lot/serial number for every line'))
-            # In case of only creating lots, we will have the text in lot_name, otherwise the lot_id
-            if line.lot_name:
-                if self.pack_id.lot_id and line.lot_name == self.pack_id.lot_id.name:
-                    lot = self.pack_id.lot_id
-                else:
-                    lot = self.env['stock.production.lot'].create({'name': line.lot_name, 'product_id': self.pack_id.product_id.id})
-            else:
-                lot = line.lot_id
-            if firstline:
-                self.pack_id.write({'lot_id': lot.id,
-                                   'qty_done': line.product_qty})
-                firstline = False
-            else:
-                pack_new = self.pack_id.copy()
-                pack_new.write({'lot_id': lot.id,
-                                'qty_done': line.product_qty,
-                                'product_qty': line.product_qty})
-                totals_other += line.product_qty
-        old_qty = self.pack_id.product_qty
-        if old_qty - totals_other > 0:
-            self.pack_id.product_qty = self.pack_id.product_qty - totals_other
-        else:
-            self.pack_id.product_qty = 0.0
-
-        return True
+            self.env['stock.pack.operation.lot'].create({'operation_id': self.pack_id.id,
+                                                         'qty': line.product_qty,
+                                                         'lot_id': line.lot_id.id})
 
 
+
+
+#     @api.multi
+#     def process(self):
+#         self.ensure_one()
+#         if not self.line_ids:
+#             raise UserError (_('Please provide at least one line'))
+#         # Split pack operations
+#         firstline = True
+#         totals_other = 0.0
+#         for line in self.line_ids:
+#             if not line.lot_name and not line.lot_id:
+#                 raise UserError(_('Please provide a lot/serial number for every line'))
+#             # In case of only creating lots, we will have the text in lot_name, otherwise the lot_id
+#             if line.lot_name:
+#                 if self.pack_id.lot_id and line.lot_name == self.pack_id.lot_id.name:
+#                     lot = self.pack_id.lot_id
+#                 else:
+#                     lot = self.env['stock.production.lot'].create({'name': line.lot_name, 'product_id': self.pack_id.product_id.id})
+#             else:
+#                 lot = line.lot_id
+#             if firstline:
+#                 self.pack_id.write({'lot_id': lot.id,
+#                                    'qty_done': line.product_qty})
+#                 firstline = False
+#             else:
+#                 pack_new = self.pack_id.copy()
+#                 pack_new.write({'lot_id': lot.id,
+#                                 'qty_done': line.product_qty,
+#                                 'product_qty': line.product_qty})
+#                 totals_other += line.product_qty
+#         old_qty = self.pack_id.product_qty
+#         if old_qty - totals_other > 0:
+#             self.pack_id.product_qty = self.pack_id.product_qty - totals_other
+#         else:
+#             self.pack_id.product_qty = 0.0
+#
+#         return True
+#
+#
 class stock_lot_split_line(models.TransientModel):
     _name = 'stock.lot.split.line'
     _description = 'Lot split line'

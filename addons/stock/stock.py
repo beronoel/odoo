@@ -4157,7 +4157,7 @@ class stock_pack_operation(osv.osv):
         'qty_done': fields.float('Processed', digits_compute=dp.get_precision('Product Unit of Measure')),
         'processed_boolean': fields.function(_get_bool, fnct_inv=_set_processed_qty, type='boolean', string='Processed'),
         'package_id': fields.many2one('stock.quant.package', 'Source Package'),  # 2
-        'lot_id': fields.many2one('stock.production.lot', 'Lot/Serial Number'),
+        'pack_lot_ids': fields.one2many('stock.pack.operation.lot', 'operation_id', 'Lines of lots'),
         'result_package_id': fields.many2one('stock.quant.package', 'Destination Package', help="If set, the operations are packed into this package", required=False, ondelete='cascade'),
         'date': fields.datetime('Date', required=True),
         'owner_id': fields.many2one('res.partner', 'Owner', help="Owner of the quants"),
@@ -4217,6 +4217,8 @@ class stock_pack_operation(osv.osv):
                     raise UserError(_('You should provide a different Lot for each piece'))
 
     def split_lot(self, cr, uid, ids, context=None):
+        context = context or {}
+        ctx=context.copy()
         assert len(ids) > 0
         data_obj = self.pool['ir.model.data']
         pack = self.browse(cr, uid, ids[0], context=context)
@@ -4225,15 +4227,20 @@ class stock_pack_operation(osv.osv):
         view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_lot_split')
         only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
         line_ids = []
-        if pack.qty_done > 0 and pack.lot_id:
-            if pack.product_id.tracking == 'serial':
-                product_qty = 1.0
-            else:
-                product_qty = pack.qty_done
-            line_ids = [(0, 0, {'lot_id': pack.lot_id.id,
-                                'lot_name': pack.lot_id.name if only_create else '',
-                                'product_qty': product_qty,
-                                })]
+        # if pack.qty_done > 0 and pack.lot_id:
+        #     if pack.product_id.tracking == 'serial':
+        #         product_qty = 1.0
+        #     else:
+        #         product_qty = pack.qty_done
+        #     line_ids = [(0, 0, {'lot_id': pack.lot_id.id,
+        #                         'lot_name': pack.lot_id.name if only_create else '',
+        #                         'product_qty': product_qty,
+        #                         })]
+        for packlot in pack.pack_lot_ids:
+            line_ids += [(0, 0, {'lot_id': packlot.lot_id.id,
+                                 'product_qty': packlot.qty,
+                                 'lot_name': packlot.lot_id.name if only_create else '',})]
+
         values = {
             'pack_id': pack.id,
             'product_id': pack.product_id.id,
@@ -4254,9 +4261,20 @@ class stock_pack_operation(osv.osv):
              'view_id': view,
              'target': 'new',
              'res_id': wiz_id,
-             'context': {'serial': serial,
-                         'only_create': only_create},
+             'context': ctx.update({'serial': serial,
+                         'only_create': only_create}),
          }
+
+
+class stock_pack_operation_lot(osv.osv):
+    _name = "stock.pack.operation.lot"
+    _description = "Specifies lot for pack operations that need it"
+
+    _columns = {
+        'operation_id': fields.many2one('stock.pack.operation'),
+        'qty': fields.float('Quantity'),
+        'lot_id': fields.many2one('stock.production.lot'),
+    }
 
 
 class stock_move_operation_link(osv.osv):
