@@ -357,7 +357,7 @@ class procurement_order(osv.osv):
         return res
 
     def _check(self, cr, uid, procurement, context=None):
-        ''' Implement the procurement checking for rules of type 'move'. The procurement will be satisfied only if all related
+        ''' Implement the procFurement checking for rules of type 'move'. The procurement will be satisfied only if all related
             moves are done/cancel and if the requested quantity is moved.
         '''
         if procurement.rule_id and procurement.rule_id.action == 'move':
