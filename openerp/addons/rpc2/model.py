@@ -17,9 +17,12 @@ def dispatch(registry, uid, model, method, *args):
     # comes straight from xmlrpclib.loads, so should only be list or dict
     if type(subject) is list:
         ids = subject
-    if type(subject) is dict:
+    elif type(subject) is dict:
         ids = subject.get('records') or []
         context = subject.get('context') or {}
+    elif subject:
+        # other truthy subjects are errors
+        raise ValueError("Unknown RPC subject %s, expected falsy value, list or dict" % subject)
 
     # optional args, kwargs
     if type(args) is dict:
