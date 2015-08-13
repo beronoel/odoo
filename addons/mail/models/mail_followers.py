@@ -147,6 +147,7 @@ class FollowersMailAction(models.Model):
     """
     _name = 'mail.followers.action'
     _description = 'Followers Authentication'
+    _log_access = False
 
     res_model = fields.Char(
         string='Related Document Model', required=True, help='Model of the followed resource')
