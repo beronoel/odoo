@@ -138,8 +138,12 @@ class Notification(models.Model):
 
 
 class FollowersMailAction(models.Model):
-    """ FollowersMailAction holds the data related to Authentication for
-    follow mechanism inside Odoo.
+    """
+    FollowersMailAction holds the data related to Authentication for
+    unfollow mechanism and performing actions directly from mail action
+    buttons inside Odoo. Record will be created per partner per document
+    while posting in chatter only for those partners who has related user
+    (and so login credentials) and follows particular document.
     """
     _name = 'mail.followers.action'
     _description = 'Followers Authentication'
@@ -149,7 +153,7 @@ class FollowersMailAction(models.Model):
     res_id = fields.Integer(
         string='Related Document ID', required=True, help='Id of the followed resource')
     partner_id = fields.Many2one('res.partner', string='Contact', ondelete='cascade', required=True)
-    token = fields.Char(required=True, help='Unique token for each chatter message', default=uuid.uuid4().__str__())
+    token = fields.Char(required=True, help='Unique token', default=uuid.uuid4().__str__())
     # state = fields.Selection([('cancelled', 'Cancelled'), ('draft', 'Draft'), ('closed', 'Closed')],
     #                          'Status', required=True, readonly=True, copy=False, default="draft",
     #                          help='* The \'Draft\' status is set by default. \
