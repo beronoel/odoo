@@ -40,6 +40,8 @@ class stock_lot_split(models.TransientModel):
             self.env['stock.pack.operation.lot'].create({'operation_id': self.pack_id.id,
                                                          'qty': line.product_qty,
                                                          'lot_id': line.lot_id.id})
+        self.pack_id.qty_done = self.qty_done
+
 
 
 

@@ -441,7 +441,10 @@ class stock_quant(osv.osv):
                 domain += [('package_id', '=', ops.package_id.id)]
             domain += [('location_id', '=', ops.location_id.id)]
         else:
-            restrict_lot_ids = [move.restrict_lot_id.id]
+            if move.restrict_lot_id:
+                restrict_lot_ids = [move.restrict_lot_id.id]
+            else:
+                restrict_lot_ids = False
             location = move.location_id
             domain += [('owner_id', '=', move.restrict_partner_id.id)]
             domain += [('location_id', 'child_of', move.location_id.id)]
@@ -676,12 +679,10 @@ class stock_quant(osv.osv):
         res = []
         offset = 0
         lot_qty = {}
-        if ops:
+        if ops: #In order to check all lots at once on a pack operation
             for packlot in ops.pack_lot_ids:
-                lot_qty[packlot.lot_id.id] = packlot.qty
-        else:
-            if move.restrict_lot_id:
-                lot_qty[move.restrict_lot_id.id] = quantity
+                lot_qty[packlot.lot_id.id] = packlot.qty #TODO: UoM can be a different one than the default UoM + rounding issues
+
         while float_compare(quantity, 0, precision_rounding=product.uom_id.rounding) > 0:
             quants = self.search(cr, uid, domain, order=orderby, limit=10, offset=offset, context=context)
             # Need to check lots here
@@ -690,10 +691,17 @@ class stock_quant(osv.osv):
                 break
             for quant in self.browse(cr, uid, quants, context=context):
                 rounding = product.uom_id.rounding
-                if float_compare(quantity, abs(quant.qty), precision_rounding=rounding) >= 0:
-                    if not lot_qty or float_compare(lot_qty.get(quant.lot_id.id), abs(quant.qty), precision_rounding=rounding) >= 0:
-                        res += [(quant, abs(quant.qty))]
-                        quantity -= abs(quant.qty)
+                qty = quant.qty
+                if lot_qty and quant.lot_id.id:
+                    if lot_qty.get(quant.lot_id.id):
+                        qty = min(lot_qty[quant.lot_id.id], quant.qty)
+                        lot_qty[quant.lot_id.id] -= qty
+                    else:
+                        continue
+
+                if float_compare(quantity, abs(qty), precision_rounding=rounding) >= 0:
+                    res += [(quant, abs(qty))]
+                    quantity -= abs(qty)
                 elif float_compare(quantity, 0.0, precision_rounding=rounding) != 0:
                     res += [(quant, quantity)]
                     quantity = 0
@@ -1194,9 +1202,10 @@ class stock_picking(models.Model):
             for quant in pack_quants:
                 del quants_suggested_locations[quant]
 
-        # Go through all remaining reserved quants and group by product, package, lot, owner, source location and dest location
+        # Go through all remaining reserved quants and group by product, package, owner, source location and dest location
+        # No lot for the moment as it will be put in a special object
         for quant, dest_location_id in quants_suggested_locations.items():
-            key = (quant.product_id.id, quant.package_id.id, quant.lot_id.id, quant.owner_id.id, quant.location_id.id, dest_location_id)
+            key = (quant.product_id.id, quant.package_id.id, quant.owner_id.id, quant.location_id.id, dest_location_id)
             if qtys_grouped.get(key):
                 qtys_grouped[key] += quant.qty
             else:
@@ -1207,7 +1216,7 @@ class stock_picking(models.Model):
             if qty <= 0:
                 continue
             suggested_location_id = _picking_putaway_apply(product)
-            key = (product.id, False, False, picking.owner_id.id, picking.location_id.id, suggested_location_id)
+            key = (product.id, False, picking.owner_id.id, picking.location_id.id, suggested_location_id)
             if qtys_grouped.get(key):
                 qtys_grouped[key] += qty
             else:
@@ -1228,10 +1237,10 @@ class stock_picking(models.Model):
                 'product_qty': qty_uom,
                 'product_id': key[0],
                 'package_id': key[1],
-                'lot_id': key[2],
-                'owner_id': key[3],
-                'location_id': key[4],
-                'location_dest_id': key[5],
+                #'lot_id': key[2],
+                'owner_id': key[2],
+                'location_id': key[3],
+                'location_dest_id': key[4],
                 'product_uom_id': uom_id,
             }
             if key[0] in prevals:
@@ -1348,13 +1357,16 @@ class stock_picking(models.Model):
         need_rereserve = False
         #sort the operations in order to give higher priority to those with a package, then a serial number
         operations = picking.pack_operation_ids
-        operations = sorted(operations, key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.lot_id and -1 or 0))
+        operations = sorted(operations, key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.pack_lot_ids and -1 or 0))
         #delete existing operations to start again from scratch
         links = link_obj.search(cr, uid, [('operation_id', 'in', [x.id for x in operations])], context=context)
         if links:
             link_obj.unlink(cr, uid, links, context=context)
         #1) first, try to create links when quants can be identified without any doubt
         for ops in operations:
+            lot_qty = {}
+            for packlot in ops.pack_lot_ids:
+                lot_qty[packlot.lot_id.id] = packlot.qty
             #for each operation, create the links with the stock move by seeking on the matching reserved quants,
             #and deffer the operation if there is some ambiguity on the move to select
             if ops.package_id and not ops.product_id and (not done_qtys or ops.qty_done):
@@ -1387,12 +1399,20 @@ class stock_picking(models.Model):
                             flag = quant.package_id and bool(package_obj.search(cr, uid, [('id', 'child_of', [ops.package_id.id])], context=context)) or False
                         else:
                             flag = not quant.package_id.id
-                        flag = flag and ((ops.lot_id and ops.lot_id.id == quant.lot_id.id) or not ops.lot_id)
+                        #flag = flag and ((ops.lot_id and ops.lot_id.id == quant.lot_id.id) or not ops.lot_id)
                         flag = flag and (ops.owner_id.id == quant.owner_id.id)
                         if flag:
-                            max_qty_on_link = min(quant.qty, qty_to_assign)
-                            qty_on_link = _create_link_for_quant(ops.id, quant, max_qty_on_link)
-                            qty_to_assign -= qty_on_link
+                            if not lot_qty:
+                                max_qty_on_link = min(quant.qty, qty_to_assign)
+                                qty_on_link = _create_link_for_quant(ops.id, quant, max_qty_on_link)
+                                qty_to_assign -= qty_on_link
+                            else:
+                                if lot_qty.get(quant.lot_id.id): #if there is still some qty left
+                                    max_qty_on_link = min(quant.qty, qty_to_assign, lot_qty[quant.lot_id.id])
+                                    qty_on_link = _create_link_for_quant(ops.id, quant, max_qty_on_link)
+                                    qty_to_assign -= qty_on_link
+                                    lot_qty[quant.lot_id.id] -= qty_on_link
+
                 qty_assign_cmp = float_compare(qty_to_assign, 0, precision_rounding=ops.product_id.uom_id.rounding)
                 if qty_assign_cmp > 0:
                     #qty reserved is less than qty put in operations. We need to create a link but it's deferred after we processed
@@ -2429,6 +2449,26 @@ class stock_move(osv.osv):
             if vals:
                 self.write(cr, uid, [move.id], vals, context=context)
 
+    def _distribute_quants_by_lot(self, cr, uid, ids, ops, quants, context=None):
+        none_total = sum([x[1] for x in quants if not x[0]])
+        false_quants = [x for x in quants if x[0] and not x[0].lot_id.id]
+        with_lot_quants = [x for x in quants if x[0] and x[0].lot_id.id]
+        lot_quants_dict = {}
+        for pack_lot in ops.pack_lot_ids:
+            lot_quants_dict[pack_lot.lot_id.id] = [x for x in with_lot_quants if x[0].lot_id.id == pack_lot.lot_id.id]
+            remaining = pack_lot.qty - sum(x[1] for x in lot_quants_dict[pack_lot.lot_id.id])
+            if false_quants:
+                while remaining > 0 and false_quants:
+                    if false_quants[0][1] > remaining_qty:
+                        remaining_qty = 0
+                        false_quants[0][1] -= remaining_qty
+                    else:
+                        add_quant = false_quants.pop(0)
+                        lot_quants_dict[pack_lot.lot_id.id] += [add_quant]
+            if remaining:
+                lot_quants_dict[pack_lot.lot_id.id].append([None, remaining])
+        return lot_quants_dict
+
     def action_done(self, cr, uid, ids, context=None):
         """ Process completely the moves given as ids and if all moves are done, it will finish the picking.
         """
@@ -2450,7 +2490,7 @@ class stock_move(osv.osv):
 
         #Sort operations according to entire packages first, then package + lot, package only, lot only
         operations = list(operations)
-        operations.sort(key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.lot_id and -1 or 0))
+        operations.sort(key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.pack_lot_ids and -1 or 0))
 
         for ops in operations:
             if ops.picking_id:
@@ -2458,7 +2498,7 @@ class stock_move(osv.osv):
             main_domain = [('qty', '>', 0)]
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
-                self.check_tracking(cr, uid, move, not ops.product_id and ops.package_id.id or ops.lot_id.id, context=context)
+                self.check_tracking(cr, uid, move, not ops.product_id and ops.package_id.id or True, context=context) # TODO: or ops.pack_lot_ids and change the function
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
@@ -2475,7 +2515,17 @@ class stock_move(osv.osv):
                     quant_dest_package_id = False
                     ctx = context.copy()
                     ctx['entire_pack'] = True
-                quant_obj.quants_move(cr, uid, quants, move, ops.location_dest_id, location_from=ops.location_id, lot_id=ops.lot_id.id, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id, dest_package_id=quant_dest_package_id, context=ctx)
+
+                if not ops.pack_lot_ids:
+                    quant_obj.quants_move(cr, uid, quants, move, ops.location_dest_id, location_from=ops.location_id,
+                                          lot_id=False, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
+                                          dest_package_id=quant_dest_package_id, context=ctx)
+                else:
+                    lot_quants = self._distribute_quants_by_lot(cr, uid, ids, ops, quants, context=context)
+                    for lot in lot_quants.keys():
+                        quant_obj.quants_move(cr, uid, lot_quants[lot], move, ops.location_dest_id, location_from=ops.location_id,
+                                                    lot_id=lot, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
+                                                    dest_package_id=quant_dest_package_id, context=ctx)
 
                 # Handle pack in pack
                 if not ops.product_id and ops.package_id and ops.result_package_id.id != ops.package_id.parent_id.id:
