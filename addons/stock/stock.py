@@ -430,7 +430,7 @@ class stock_quant(osv.osv):
         quants = [(None, qty)]
         if ops:
             if ops.pack_lot_ids:
-                restrict_lot_ids = [x.id for x in ops.pack_lot_ids]
+                restrict_lot_ids = [x.lot_id.id for x in ops.pack_lot_ids]
             else:
                 restrict_lot_ids = False
             location = ops.location_id
@@ -4289,15 +4289,6 @@ class stock_pack_operation(osv.osv):
         view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_lot_split')
         only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
         line_ids = []
-        # if pack.qty_done > 0 and pack.lot_id:
-        #     if pack.product_id.tracking == 'serial':
-        #         product_qty = 1.0
-        #     else:
-        #         product_qty = pack.qty_done
-        #     line_ids = [(0, 0, {'lot_id': pack.lot_id.id,
-        #                         'lot_name': pack.lot_id.name if only_create else '',
-        #                         'product_qty': product_qty,
-        #                         })]
         for packlot in pack.pack_lot_ids:
             line_ids += [(0, 0, {'lot_id': packlot.lot_id.id,
                                  'product_qty': packlot.qty,
@@ -4313,6 +4304,8 @@ class stock_pack_operation(osv.osv):
             'line_ids': line_ids,
         }
         wiz_id = self.pool['stock.lot.split'].create(cr, uid, values, context=context)
+        ctx.update({'serial': serial,
+                         'only_create': only_create})
         return {
              'name': _('Split Lot'),
              'type': 'ir.actions.act_window',
@@ -4323,9 +4316,8 @@ class stock_pack_operation(osv.osv):
              'view_id': view,
              'target': 'new',
              'res_id': wiz_id,
-             'context': ctx.update({'serial': serial,
-                         'only_create': only_create}),
-         }
+             'context': ctx,
+        }
 
 
 class stock_pack_operation_lot(osv.osv):

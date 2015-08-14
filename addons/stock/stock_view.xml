@@ -747,7 +747,7 @@
                                     <field name="to_loc" groups="stock.group_locations,stock.group_tracking_lot"/>
                                     <field name="result_package_id" groups="stock.group_tracking_lot" context="{'location_id': location_dest_id}" invisible="1"/>
                                     <field name="state" invisible="1"/>
-                                    <field name="qty_done"/>
+                                    <field name="qty_done" attrs="{'readonly': [('lots_visible', '=', True)]}"/>
                                     <field name="product_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}"/>
                                     <button name="%(stock.pack_details)d" string="Modify" type="action" icon="STOCK_EXECUTE"
                                             states="confirmed,assigned,waiting,partially_available"/>
