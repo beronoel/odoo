@@ -126,8 +126,8 @@ class MailController(http.Controller):
             if hasattr(request.env[model], action):
                 mail_action = request.env['mail.followers.action'].sudo().search([('res_id', '=', int(res_id)), ('res_model', '=', model), ('token', '=', token)])
                 if mail_action:
-                    vals['status'] = 'done'
                     getattr(request.env[model].browse(int(res_id)), action)()
+                    vals['status'] = 'done'
                 else:
                     vals['status'] = 'wrong_url'
             else:

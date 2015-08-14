@@ -305,10 +305,22 @@ class sale_order(osv.osv):
 
     def _message_classify_recipients_better(self, cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=None):
         res = super(sale_order, self)._message_classify_recipients_better(cr, uid, ids, message, partners, signups, partner_users, followers, notfollowers, context=context)
-        order = self.browse(cr, uid, ids[0], context=context)
-        if order.state in ['draft', 'sent']:
-            res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, order.id, 'action_button_confirm'), 'title': 'Confirm Sale'}]
-            res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, order.id, 'action_button_confirm'), 'title': 'Confirm Sale'}]
+        if not partner_users:
+            return res
+        # Check if user receiving mail is allowed to perform the operation or not
+        can_perform_action = False
+        if self.pool['res.users'].has_group(cr, partner_users.user_ids[0].id, 'base.group_sale_salesman'):
+            try:
+                self.check_access_rule(cr, partner_users.user_ids[0].id, ids, 'write', context=context)
+                can_perform_action = True
+            except:
+                pass
+        mail_action = res['unfollow']['mail_action']
+        if can_perform_action and mail_action:
+            order = self.browse(cr, uid, ids[0], context=context)
+            if order.state in ['draft', 'sent']:
+                res['follow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&action=%s' % (self._name, order.id, 'action_button_confirm'), 'title': 'Confirm Sale'}]
+                res['unfollow']['actions'] = [{'url': '/mail/execute?model=%s&res_id=%s&partner_id=%d&token=%s&action=%s' % (self._name, order.id, partner_users.id, mail_action.token, 'action_button_confirm'), 'title': 'Confirm Sale'}]
         return res
 
     # FIXME: deprecated method, overriders should be using _prepare_invoice() instead.
