@@ -1203,11 +1203,11 @@ class stock_picking(models.Model):
             for quant in pack_quants:
                 del quants_suggested_locations[quant]
         # Go through all remaining reserved quants and group by product, package, owner, source location and dest location
-        # No lot for the moment as it will be put in a special object
-        tracking = False
-        if quant.product_id.tracking != 'none':
-            tracking = True
+        # Lots will go into pack operation lot object
         for quant, dest_location_id in quants_suggested_locations.items():
+            tracking = False
+            if quant.product_id.tracking != 'none':
+                tracking = True
             key = (quant.product_id.id, quant.package_id.id, quant.owner_id.id, quant.location_id.id, dest_location_id)
             if qtys_grouped.get(key):
                 qtys_grouped[key] += quant.qty
@@ -1569,6 +1569,16 @@ class stock_picking(models.Model):
                 return True
         return False
 
+    def create_lots_for_picking(self, cr, uid, ids, context=None):
+        lot_obj = self.pool['stock.production.lot']
+        opslot_obj = self.pool['stock.pack.operation.lot']
+        for picking in self.browse(cr, uid, ids, context=context):
+            for ops in picking.pack_operation_ids:
+                for opslot in ops.pack_lot_ids:
+                    if not opslot.lot_id:
+                        lot_id = lot_obj.create(cr, uid, {'name': opslot.lot_name, 'product_id': ops.product_id.id}, context=context)
+                        opslot_obj.write(cr, uid, [opslot.id], {'lot_id':lot_id}, context=context)
+
     def do_transfer(self, cr, uid, ids, context=None):
         """
             If no pack operation, we do simple action_done of the picking
@@ -1578,6 +1588,7 @@ class stock_picking(models.Model):
             context = {}
 
         stock_move_obj = self.pool.get('stock.move')
+        self.create_lots_for_picking(cr, uid, ids, context=context)
         for picking in self.browse(cr, uid, ids, context=context):
             if not picking.pack_operation_ids:
                 self.action_done(cr, uid, [picking.id], context=context)
@@ -4240,6 +4251,8 @@ class stock_pack_operation(osv.osv):
         'remaining_qty': fields.function(_get_remaining_qty, type='float', digits = 0, string="Remaining Qty", help="Remaining quantity in default UoM according to moves matched with this operation. "),
         'location_id': fields.many2one('stock.location', 'Source Location', required=True),
         'location_dest_id': fields.many2one('stock.location', 'Destination Location', required=True),
+        'picking_source_location_id': fields.related('picking_id', 'location_id', type='many2one', relation='stock.location'),
+        'picking_destination_location_id': fields.related('picking_id', 'location_dest_id', type='many2one', relation='stock.location'),
         'from_loc': fields.function(_compute_location_description, type='char', string='From', multi='loc', readonly=True),
         'to_loc': fields.function(_compute_location_description, type='char', string='To', multi='loc', readonly=True),
         'fresh_record': fields.boolean('Newly created pack operation'),
@@ -4288,6 +4301,9 @@ class stock_pack_operation(osv.osv):
                 if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0:
                     raise UserError(_('You should provide a different Lot for each piece'))
 
+    def save(self, cr, uid, ids, context=None):
+        return {'type': 'ir.actions.act_window_close'}
+
     def split_lot(self, cr, uid, ids, context=None):
         context = context or {}
         ctx=context.copy()
@@ -4296,24 +4312,8 @@ class stock_pack_operation(osv.osv):
         pack = self.browse(cr, uid, ids[0], context=context)
         picking_type = pack.picking_id.picking_type_id
         serial = (pack.product_id.tracking == 'serial')
-        view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_lot_split')
+        view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
         only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
-        line_ids = []
-        for packlot in pack.pack_lot_ids:
-            line_ids += [(0, 0, {'lot_id': packlot.lot_id.id,
-                                 'product_qty': packlot.qty,
-                                 'lot_name': packlot.lot_id.name if only_create else '',})]
-
-        values = {
-            'pack_id': pack.id,
-            'product_id': pack.product_id.id,
-            'product_uom_id': pack.product_uom_id.id,
-            'product_qty': pack.product_qty,
-            'qty_done': pack.qty_done,
-            'only_create': only_create,
-            'line_ids': line_ids,
-        }
-        wiz_id = self.pool['stock.lot.split'].create(cr, uid, values, context=context)
         ctx.update({'serial': serial,
                          'only_create': only_create})
         return {
@@ -4321,12 +4321,29 @@ class stock_pack_operation(osv.osv):
              'type': 'ir.actions.act_window',
              'view_type': 'form',
              'view_mode': 'form',
-             'res_model': 'stock.lot.split',
+             'res_model': 'stock.pack.operation',
              'views': [(view, 'form')],
              'view_id': view,
              'target': 'new',
-             'res_id': wiz_id,
+             'res_id': pack.id,
              'context': ctx,
+        }
+
+    def show_details(self, cr, uid, ids, context=None):
+        data_obj = self.pool['ir.model.data']
+        view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_details_form')
+        pack = self.browse(cr, uid, ids[0], context=context)
+        return {
+             'name': _('Operation Details'),
+             'type': 'ir.actions.act_window',
+             'view_type': 'form',
+             'view_mode': 'form',
+             'res_model': 'stock.pack.operation',
+             'views': [(view, 'form')],
+             'view_id': view,
+             'target': 'new',
+             'res_id': pack.id,
+             'context': context,
         }
 
 
@@ -4338,6 +4355,7 @@ class stock_pack_operation_lot(osv.osv):
         'operation_id': fields.many2one('stock.pack.operation'),
         'qty': fields.float('Quantity'),
         'lot_id': fields.many2one('stock.production.lot'),
+        'lot_name': fields.char('Lot Name'),
         'qty_todo': fields.float('Quantity'),
     }
 

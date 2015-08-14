@@ -42,14 +42,5 @@
         </field>
     </record>
 
-    <record id="pack_details" model="ir.actions.act_window">
-        <field name="name">Pack Details</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">stock.pack.details</field>
-        <field name="view_id" ref="view_pack_details"/>
-        <field name="view_type">form</field>
-        <field name="view_mode">form</field>
-        <field name="target">new</field>
-        <field name="context">{}</field>
-    </record>
+
 </odoo>
