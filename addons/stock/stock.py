@@ -1175,6 +1175,7 @@ class stock_picking(models.Model):
         quant_obj = self.pool.get("stock.quant")
         vals = []
         qtys_grouped = {}
+        lots_grouped = {}
         #for each quant of the picking, find the suggested location
         quants_suggested_locations = {}
         product_putaway_strats = {}
@@ -1201,15 +1202,20 @@ class stock_picking(models.Model):
             #remove the quants inside the package so that they are excluded from the rest of the computation
             for quant in pack_quants:
                 del quants_suggested_locations[quant]
-
         # Go through all remaining reserved quants and group by product, package, owner, source location and dest location
         # No lot for the moment as it will be put in a special object
+        tracking = False
+        if quant.product_id.tracking != 'none':
+            tracking = True
         for quant, dest_location_id in quants_suggested_locations.items():
             key = (quant.product_id.id, quant.package_id.id, quant.owner_id.id, quant.location_id.id, dest_location_id)
             if qtys_grouped.get(key):
                 qtys_grouped[key] += quant.qty
             else:
                 qtys_grouped[key] = quant.qty
+            if tracking and quant.lot_id:
+                lots_grouped.set_default(key, []).set_default(quant.lot_id.id, 0.0)
+                lots_grouped[key][quant.lot_id.id] += quant.qty
 
         # Do the same for the forced quantities (in cases of force_assign or incomming shipment for example)
         for product, qty in forced_qties.items():
@@ -1232,16 +1238,20 @@ class stock_picking(models.Model):
             if product_uom.get(key[0]):
                 uom_id = product_uom[key[0]].id
                 qty_uom = uom_obj._compute_qty(cr, uid, product.uom_id.id, qty, uom_id)
+            pack_lot_ids = []
+            if lots_grouped.get(key):
+                for lot in lots_grouped[key].keys():
+                    pack_lot_ids += [(0, 0, {'lot_id': lot, 'qty': 0.0, 'qty_todo': lots_grouped[key][lot]})]
             val_dict = {
                 'picking_id': picking.id,
                 'product_qty': qty_uom,
                 'product_id': key[0],
                 'package_id': key[1],
-                #'lot_id': key[2],
                 'owner_id': key[2],
                 'location_id': key[3],
                 'location_dest_id': key[4],
                 'product_uom_id': uom_id,
+                'pack_lot_ids': pack_lot_ids,
             }
             if key[0] in prevals:
                 prevals[key[0]].append(val_dict)
@@ -4328,6 +4338,7 @@ class stock_pack_operation_lot(osv.osv):
         'operation_id': fields.many2one('stock.pack.operation'),
         'qty': fields.float('Quantity'),
         'lot_id': fields.many2one('stock.production.lot'),
+        'qty_todo': fields.float('Quantity'),
     }
 
 

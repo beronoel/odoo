@@ -92,3 +92,4 @@ class stock_lot_split_line(models.TransientModel):
     lot_id = fields.Many2one('stock.production.lot', string="Lot/Serial Number")
     lot_name = fields.Char('Name')
     product_qty = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), default=1.0)
+    qty_todo = fields.Float('Quantity', digits=dp.get_precision('Product Unit of Measure'), default=0.0)
