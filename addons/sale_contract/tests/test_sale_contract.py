@@ -38,6 +38,7 @@ class TestContract(TestContractCommon):
         self.contract.write({'recurring_invoice_line_ids': [(0, 0, {'product_id': self.product.id, 'name': 'TestRecurringLine', 'price_unit': 31415.9, 'uom_id': self.product_tmpl.uom_id.id})]})
         invoice_id = self.contract._recurring_create_invoice()
         invoice = self.env['account.invoice'].browse(invoice_id)
+        invoice.invoice_line_ids.invoice_line_tax_ids = False  # tax with price_included create noice
         self.assertEqual(invoice.amount_untaxed, 31415.9, 'sale_contract: recurring invoice generation problem')
 
     def test_renewal(self):
