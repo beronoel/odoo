@@ -850,6 +850,7 @@
                                     <field name="result_package_id" groups="stock.group_tracking_lot" context="{'location_id': location_dest_id}" invisible="1"/>
                                     <field name="state" invisible="1"/>
                                     <field name="qty_done" invisible="1"/>
+                                    <field name="lots_visible" invisible="1"/>
                                     <field name="processed_boolean"/>
                                     <button name="%(stock.pack_details)d" string="Modify" type="action" icon="fa-gear"
                                             states="confirmed,assigned,waiting,partially_available" groups="base.group_no_one"/>

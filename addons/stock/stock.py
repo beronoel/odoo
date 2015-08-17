@@ -878,7 +878,8 @@ class stock_picking(models.Model):
             picking_type = self.pool['stock.picking.type'].browse(cr, uid, picking_type_id)
             res['value'] = {'location_id': picking_type.default_location_src_id.id,
                             'location_dest_id': picking_type.default_location_dest_id.id,
-                            'lots_visible': picking_type.use_create_lots or picking_type.use_existing_lots,}
+                            #'lots_visible': picking_type.use_create_lots or picking_type.use_existing_lots, TODO: Important for pack operations or not?
+                         }
         return res
 
     def _default_location_destination(self):
