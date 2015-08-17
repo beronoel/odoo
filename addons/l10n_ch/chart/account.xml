@@ -6,13 +6,13 @@
 
         <record id="transfer_account_id" model="account.account.template">
             <field name="code">101</field>
-            <field name="name">De transfert de compte</field>
+            <field name="name">Transferts internes</field>
             <field name="user_type_id" ref="account.data_account_type_current_assets"/>
             <field eval="True" name="reconcile"/>
         </record>
         <record id="l10nch_chart_template" model="account.chart.template">
             <field name="name">Plan comptable 2015</field>
-            <field name="code_digits">6</field>
+            <field name="code_digits">1</field>
             <field name="bank_account_code_prefix">1020</field>
             <field name="cash_account_code_prefix">1000</field>
             <field name="currency_id" ref="base.CHF"/>
@@ -869,19 +869,6 @@
             <field eval="False" name="reconcile"/>
             <field name="chart_template_id" ref="l10nch_chart_template"/>
         </record>
-            <record id="ch_coa_6710" model="account.account.template">
-            <field name="code">6710</field>
-            <field name="name">Perte de change</field>
-            <field name="user_type_id" ref="account.data_account_type_other_income"/>
-            <field name="chart_template_id" ref="l10nch_chart_template"/>
-        </record>
-
-        <record id="ch_coa_8110" model="account.account.template">
-            <field name="code">8110</field>
-            <field name="name">Gain de change</field>
-            <field name="user_type_id" ref="account.data_account_type_expenses"/>
-            <field name="chart_template_id" ref="l10nch_chart_template"/>
-        </record>
         <!-- Chart Template -->
         <record id="l10nch_chart_template" model="account.chart.template">
             <field name="property_account_receivable_id" ref="ch_coa_1100"/>
@@ -890,8 +877,8 @@
             <field name="property_account_income_categ_id" ref="ch_coa_3200"/>
             <field name="property_account_expense_id" ref="ch_coa_4200"/>
             <field name="property_account_income_id" ref="ch_coa_3200"/>
-            <field name="income_currency_exchange_account_id" ref="ch_coa_6710"/>
-            <field name="expense_currency_exchange_account_id" ref="ch_coa_8110"/>
+            <field name="income_currency_exchange_account_id" ref="ch_coa_6950"/>
+            <field name="expense_currency_exchange_account_id" ref="ch_coa_6900"/>
         </record>
     </data>
 </odoo>
