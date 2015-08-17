@@ -2310,12 +2310,12 @@ class stock_move(osv.osv):
         self.check_recompute_pack_op(cr, uid, ids, context=context)
         return res
 
-    def check_tracking(self, cr, uid, move, lot_id, context=None):
+    def check_tracking(self, cr, uid, move, ops, context=None):
         """ Checks if serial number is assigned to stock move or not and raise an error if it had to.
         """
         if move.picking_id and (move.picking_id.picking_type_id.use_existing_lots or move.picking_id.picking_type_id.use_create_lots) and \
             move.product_id.tracking != 'none':
-            if not lot_id:
+            if not (move.restrict_lot_id or (ops and ops.pack_lot_ids)): #If no lots specified
                 raise UserError(_('You need to provide a Lot/Serial Number for product %s') % move.product_id.name)
 
     def check_recompute_pack_op(self, cr, uid, ids, context=None):
@@ -2519,7 +2519,7 @@ class stock_move(osv.osv):
             main_domain = [('qty', '>', 0)]
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
-                self.check_tracking(cr, uid, move, not ops.product_id and ops.package_id.id or True, context=context) # TODO: or ops.pack_lot_ids and change the function
+                self.check_tracking(cr, uid, move, ops, context=context)
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
@@ -2564,7 +2564,7 @@ class stock_move(osv.osv):
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
                 preferred_domain_list = [preferred_domain] + [fallback_domain] + [fallback_domain2]
-                self.check_tracking(cr, uid, move, move.restrict_lot_id.id, context=context)
+                self.check_tracking(cr, uid, move, False, context=context)
                 qty = move_qty[move.id]
                 quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, domain=main_domain, preferred_domain_list=preferred_domain_list, context=context)
                 quant_obj.quants_move(cr, uid, quants, move, move.location_dest_id, lot_id=move.restrict_lot_id.id, owner_id=move.restrict_partner_id.id, context=context)
@@ -4240,7 +4240,7 @@ class stock_pack_operation(osv.osv):
         'qty_done': fields.float('Processed', digits_compute=dp.get_precision('Product Unit of Measure')),
         'processed_boolean': fields.function(_get_bool, fnct_inv=_set_processed_qty, type='boolean', string='Processed'),
         'package_id': fields.many2one('stock.quant.package', 'Source Package'),  # 2
-        'pack_lot_ids': fields.one2many('stock.pack.operation.lot', 'operation_id', 'Lines of Lots'),
+        'pack_lot_ids': fields.one2many('stock.pack.operation.lot', 'operation_id', 'Lots Used'),
         'result_package_id': fields.many2one('stock.quant.package', 'Destination Package', help="If set, the operations are packed into this package", required=False, ondelete='cascade'),
         'date': fields.datetime('Date', required=True),
         'owner_id': fields.many2one('res.partner', 'Owner', help="Owner of the quants"),
@@ -4296,7 +4296,7 @@ class stock_pack_operation(osv.osv):
         for ops in operations:
             if ops.picking_id and (ops.picking_id.picking_type_id.use_existing_lots or ops.picking_id.picking_type_id.use_create_lots) and \
                 ops.product_id and ops.product_id.tracking != 'none':
-                if not ops.lot_id:
+                if not ops.pack_lot_ids:
                     raise UserError(_('You need to provide a Lot/Serial Number for product %s') % ops.product_id.name)
                 if ops.product_id.tracking == 'serial' and ops.qty_done != 1.0:
                     raise UserError(_('You should provide a different Lot for each piece'))
