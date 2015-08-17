@@ -1214,7 +1214,7 @@ class stock_picking(models.Model):
             else:
                 qtys_grouped[key] = quant.qty
             if tracking and quant.lot_id:
-                lots_grouped.set_default(key, []).set_default(quant.lot_id.id, 0.0)
+                lots_grouped.setdefault(key, {}).setdefault(quant.lot_id.id, 0.0)
                 lots_grouped[key][quant.lot_id.id] += quant.qty
 
         # Do the same for the forced quantities (in cases of force_assign or incomming shipment for example)
