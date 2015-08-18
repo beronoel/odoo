@@ -2543,6 +2543,7 @@ class stock_move(osv.osv):
                                           lot_id=False, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
                                           dest_package_id=quant_dest_package_id, context=ctx)
                 else:
+                    import pdb; pdb.set_trace()
                     lot_quants = self._distribute_quants_by_lot(cr, uid, ids, ops, quants, context=context)
                     for lot in lot_quants.keys():
                         quant_obj.quants_move(cr, uid, lot_quants[lot], move, ops.location_dest_id, location_from=ops.location_id,
@@ -4350,7 +4351,7 @@ class stock_pack_operation(osv.osv):
 
 class stock_pack_operation_lot(osv.osv):
     _name = "stock.pack.operation.lot"
-    _description = "Specifies lot for pack operations that need it"
+    _description = "Specifies lot/serial number for pack operations that need it"
 
     _columns = {
         'operation_id': fields.many2one('stock.pack.operation'),
@@ -4359,6 +4360,8 @@ class stock_pack_operation_lot(osv.osv):
         'lot_name': fields.char('Lot Name'),
         'qty_todo': fields.float('Quantity'),
     }
+
+    
 
 
 class stock_move_operation_link(osv.osv):
