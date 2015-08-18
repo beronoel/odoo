@@ -2481,9 +2481,9 @@ class stock_move(osv.osv):
             remaining = pack_lot.qty - sum(x[1] for x in lot_quants_dict[pack_lot.lot_id.id])
             if false_quants:
                 while remaining > 0 and false_quants:
-                    if false_quants[0][1] > remaining_qty:
-                        remaining_qty = 0
-                        false_quants[0][1] -= remaining_qty
+                    if false_quants[0][1] > remaining:
+                        remaining = 0
+                        false_quants[0][1] -= remaining
                     else:
                         add_quant = false_quants.pop(0)
                         lot_quants_dict[pack_lot.lot_id.id] += [add_quant]
@@ -4730,4 +4730,7 @@ class StockPackOperation(models.Model):
 
     @api.onchange('pack_lot_ids')
     def _onchange_packlots(self):
-        self.qty_done = sum([x.qty for x in self.pack_lot_ids])
+        if self.product_id.tracking == 'serial':
+            self.qty_done = sum([x.processed and 1.0 or 0.0 for x in self.pack_lot_ids])
+        else:
+            self.qty_done = sum([x.qty for x in self.pack_lot_ids])
