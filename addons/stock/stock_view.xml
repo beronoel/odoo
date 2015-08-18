@@ -755,7 +755,7 @@
                                        domain="[('product_id','=', parent.product_id)]"
                                        context="{'product_id': parent.product_id}"/>
                                 <field name="qty" invisible="context.get('serial')"/>
-                                <field name="qty_todo" invisible="context.get('serial')"/>
+                                <field name="qty_todo" invisible="context.get('serial') or context.get('only_create')" readonly="1" string="To Do"/>
                             </tree>
                         </field>
                     </group>
