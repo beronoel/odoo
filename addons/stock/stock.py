@@ -2543,7 +2543,6 @@ class stock_move(osv.osv):
                                           lot_id=False, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
                                           dest_package_id=quant_dest_package_id, context=ctx)
                 else:
-                    import pdb; pdb.set_trace()
                     lot_quants = self._distribute_quants_by_lot(cr, uid, ids, ops, quants, context=context)
                     for lot in lot_quants.keys():
                         quant_obj.quants_move(cr, uid, lot_quants[lot], move, ops.location_dest_id, location_from=ops.location_id,
@@ -4304,6 +4303,10 @@ class stock_pack_operation(osv.osv):
                     raise UserError(_('You should provide a different Lot for each piece'))
 
     def save(self, cr, uid, ids, context=None):
+        for pack in self.browse(cr, uid, ids, context=context):
+            if pack.product_id.tracking != 'none':
+                qty_done = sum([x.qty for x in pack.pack_lot_ids])
+                self.pool['stock.pack.operation'].write(cr, uid, [pack.id], {'qty_done': qty_done}, context=context)
         return {'type': 'ir.actions.act_window_close'}
 
     def split_lot(self, cr, uid, ids, context=None):
@@ -4353,15 +4356,27 @@ class stock_pack_operation_lot(osv.osv):
     _name = "stock.pack.operation.lot"
     _description = "Specifies lot/serial number for pack operations that need it"
 
+
+    def _get_processed(self, cr, uid, ids, field_name, arg, context=None):
+        res = {}
+        for packlot in self.browse(cr, uid, ids, context=context):
+            res[packlot.id] = (packlot.qty > 0.0)
+        return res
+
+    def _set_qty(self, cr, uid, id, field_name, field_value, arg, context=None):
+        oplot = self.browse(cr, uid, id, context=context)
+        if field_value and oplot.qty == 0:
+            self.write(cr, uid, [id], {'qty': 1.0}, context=context)
+        return True
+
     _columns = {
         'operation_id': fields.many2one('stock.pack.operation'),
         'qty': fields.float('Quantity'),
-        'lot_id': fields.many2one('stock.production.lot'),
+        'lot_id': fields.many2one('stock.production.lot', 'Lot/Serial Number'),
         'lot_name': fields.char('Lot Name'),
         'qty_todo': fields.float('Quantity'),
+        'processed': fields.function(_get_processed, fnct_inv=_set_qty, type='boolean', string=''),
     }
-
-    
 
 
 class stock_move_operation_link(osv.osv):
@@ -4708,3 +4723,11 @@ class barcode_rule(models.Model):
             ('package','Package')
         ])
         return list(types)
+
+
+class StockPackOperation(models.Model):
+    _inherit = 'stock.pack.operation'
+
+    @api.onchange('pack_lot_ids')
+    def _onchange_packlots(self):
+        self.qty_done = sum([x.qty for x in self.pack_lot_ids])
