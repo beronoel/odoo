@@ -337,7 +337,7 @@ class TestStockFlow(TestStockCommon):
             'location_id': self.supplier_location,
             'location_dest_id': self.stock_location,
             'picking_id': back_order_in.id,
-            'lot_id': lot4_productC.id})
+            'pack_lot_ids': [(0, 0, {'lot_id': lot4_productC.id, 'qty': 1.0})]})
         self.StockPackObj.create({
             'product_id': self.productC.id,
             'product_qty': 2,
@@ -345,7 +345,7 @@ class TestStockFlow(TestStockCommon):
             'location_id': self.supplier_location,
             'location_dest_id': self.stock_location,
             'picking_id': back_order_in.id,
-            'lot_id': lot5_productC.id})
+            'pack_lot_ids': [(0, 0, {'lot_id': lot5_productC.id, 'qty': 2.0})]})
         self.StockPackObj.create({
             'product_id': self.productC.id,
             'product_qty': 2,
@@ -353,7 +353,7 @@ class TestStockFlow(TestStockCommon):
             'location_id': self.supplier_location,
             'location_dest_id': self.stock_location,
             'picking_id': back_order_in.id,
-            'lot_id': lot6_productC.id})
+            'pack_lot_ids': [(0, 0, {'lot_id': lot6_productC.id, 'qty': 2.0})]})
         self.StockPackObj.create({
             'product_id': self.productA.id,
             'product_qty': 10,
