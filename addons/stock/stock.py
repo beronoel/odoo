@@ -2376,7 +2376,7 @@ class stock_move(osv.osv):
                     operations.add(link.operation_id)
         # Check all ops and sort them: we want to process first the packages, then operations with lot then the rest
         operations = list(operations)
-        operations.sort(key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.lot_id and -1 or 0))
+        operations.sort(key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.pack_lot_ids and -1 or 0))
         for ops in operations:
             #first try to find quants based on specific domains given by linked operations
             for record in ops.linked_move_operation_ids:
