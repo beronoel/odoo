@@ -693,7 +693,7 @@ class stock_quant(osv.osv):
                 rounding = product.uom_id.rounding
                 qty = quant.qty
                 if lot_qty and quant.lot_id.id:
-                    if lot_qty.get(quant.lot_id.id):
+                    if lot_qty.get(quant.lot_id.id) and float_compare(lot_qty[quant.lot_id.id], 0, precision_rounding=rounding) > 0:
                         qty = min(lot_qty[quant.lot_id.id], quant.qty)
                         lot_qty[quant.lot_id.id] -= qty
                     else:
