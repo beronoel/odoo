@@ -4378,6 +4378,10 @@ class stock_pack_operation_lot(osv.osv):
         'processed': fields.function(_get_processed, fnct_inv=_set_qty, type='boolean', string=''),
     }
 
+    _defaults = {
+        'processed': True,
+        'qty': lambda cr, uid, ids, c: c.get('serial') and 1.0 or 0.0,
+    }
 
 class stock_move_operation_link(osv.osv):
     """

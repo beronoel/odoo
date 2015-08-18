@@ -749,7 +749,7 @@
                     <group>
                         <field name="pack_lot_ids" nolabel="1">
                             <tree editable="bottom">
-                                <field name="processed" invisible="context.get('only_create') or not context.get('serial')" string=""/>
+                                <field name="processed"  string="" invisible="context.get('only_create') or not context.get('serial')"/>
                                 <field name="lot_name" invisible="not context.get('only_create', False)"/>
                                 <field name="lot_id" invisible="context.get('only_create', False)"
                                        domain="[('product_id','=', parent.product_id)]"
