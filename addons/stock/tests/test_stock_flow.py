@@ -329,7 +329,10 @@ class TestStockFlow(TestStockCommon):
             'location_dest_id': self.stock_location,
             'picking_id': back_order_in.id,
             'pack_lot_ids': [(0, 0, {'lot_id': lot1_productD.id, 'qty': 4.0})],})
-        self.StockPackObj.search([('product_id', '=', self.productC.id), ('picking_id', '=', back_order_in.id)], limit=1).write({'product_qty': 1, 'lot_id': lot3_productC.id})
+        packCs = self.StockPackObj.search([('product_id', '=', self.productC.id), ('picking_id', '=', back_order_in.id)], limit=1)
+        packCs.write({'product_qty': 1,
+                      'pack_lot_ids': [(0, 0, {'lot_id': lot3_productC.id, 'qty': 1.0})]
+                      })
         self.StockPackObj.create({
             'product_id': self.productC.id,
             'product_qty': 1,

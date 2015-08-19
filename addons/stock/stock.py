@@ -388,7 +388,6 @@ class stock_quant(osv.osv):
         self._check_location(cr, uid, location_to, context=context)
         for quant, qty in quants:
             if not quant:
-                #If quant is None, we will create a quant to move (and potentially a negative counterpart too)
                 quant = self._quant_create(cr, uid, qty, move, lot_id=lot_id, owner_id=owner_id, src_package_id=src_package_id, dest_package_id=dest_package_id, force_location_from=location_from, force_location_to=location_to, context=context)
             else:
                 self._quant_split(cr, uid, quant, qty, context=context)
@@ -2471,10 +2470,14 @@ class stock_move(osv.osv):
             if vals:
                 self.write(cr, uid, [move.id], vals, context=context)
 
-    def _distribute_quants_by_lot(self, cr, uid, ids, ops, quants, context=None):
-        none_total = sum([x[1] for x in quants if not x[0]])
-        false_quants = [x for x in quants if x[0] and not x[0].lot_id.id]
-        with_lot_quants = [x for x in quants if x[0] and x[0].lot_id.id]
+    def _distribute_quants_by_lot(self, cr, uid, ops, lot_move_quants, context=None):
+        #Transform lot_move_quants in tuple thing
+        total_quants = []
+        for move in lot_move_quants.keys():
+            total_quants += [x + (move,) for x in lot_move_quants[move]]
+        none_quants = [x for x in total_quants if not x[0]]
+        false_quants = [x for x in total_quants if x[0] and not x[0].lot_id.id]
+        with_lot_quants = [x for x in total_quants if x[0] and x[0].lot_id.id]
         lot_quants_dict = {}
         for pack_lot in ops.pack_lot_ids:
             lot_quants_dict[pack_lot.lot_id.id] = [x for x in with_lot_quants if x[0].lot_id.id == pack_lot.lot_id.id]
@@ -2484,12 +2487,25 @@ class stock_move(osv.osv):
                     if false_quants[0][1] > remaining:
                         remaining = 0
                         false_quants[0][1] -= remaining
+                        lot_quants_dict[pack_lot.lot_id.id] += [(false_quants[0][0], remaining, false_quants[0][2])]
                     else:
                         add_quant = false_quants.pop(0)
                         lot_quants_dict[pack_lot.lot_id.id] += [add_quant]
-            if remaining:
-                lot_quants_dict[pack_lot.lot_id.id].append([None, remaining])
-        return lot_quants_dict
+            if none_quants:
+                while remaining > 0 and none_quants:
+                    if none_quants[0][1] > remaining:
+                        remaining = 0
+                        none_quants[0][1] -= remaining
+                        lot_quants_dict[pack_lot.lot_id.id] += [(none_quants[0][0], remaining, none_quants[0][2])]
+                    else:
+                        add_quant = none_quants.pop(0)
+                        lot_quants_dict[pack_lot.lot_id.id] += [add_quant]
+        move_lot_dict = {}
+        for lot in lot_quants_dict:
+            for quant_tuple in lot_quants_dict[lot]:
+                move_lot_dict.setdefault(quant_tuple[2], {}).setdefault(lot, [])
+                move_lot_dict[quant_tuple[2]][lot] += [(quant_tuple[0], quant_tuple[1])]
+        return move_lot_dict
 
     def action_done(self, cr, uid, ids, context=None):
         """ Process completely the moves given as ids and if all moves are done, it will finish the picking.
@@ -2516,11 +2532,22 @@ class stock_move(osv.osv):
 
         for ops in operations:
             if ops.picking_id:
-                pickings.add(ops.picking_id.id)
+                pickings.add(ops.picking_id.id) #not better with moves?
             main_domain = [('qty', '>', 0)]
+            lot_move_quants = {}
+            self.check_tracking(cr, uid, move, ops, context=context)
+            if ops.product_id:
+                #If a product is given, the result is always put immediately in the result package (if it is False, they are without package)
+                quant_dest_package_id  = ops.result_package_id.id
+                ctx = context
+            else:
+                # When a pack is moved entirely, the quants should not be written anything for the destination package
+                quant_dest_package_id = False
+                ctx = context.copy()
+                ctx['entire_pack'] = True #Should be in params
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
-                self.check_tracking(cr, uid, move, ops, context=context)
+
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
@@ -2528,33 +2555,30 @@ class stock_move(osv.osv):
                 dom = main_domain
                 quants = quant_obj.quants_get_preferred_domain(cr, uid, record.qty, move, ops=ops, domain=dom,
                                                                preferred_domain_list=preferred_domain_list, context=context)
-                if ops.product_id:
-                    #If a product is given, the result is always put immediately in the result package (if it is False, they are without package)
-                    quant_dest_package_id  = ops.result_package_id.id
-                    ctx = context
-                else:
-                    # When a pack is moved entirely, the quants should not be written anything for the destination package
-                    quant_dest_package_id = False
-                    ctx = context.copy()
-                    ctx['entire_pack'] = True
 
                 if not ops.pack_lot_ids:
                     quant_obj.quants_move(cr, uid, quants, move, ops.location_dest_id, location_from=ops.location_id,
                                           lot_id=False, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
                                           dest_package_id=quant_dest_package_id, context=ctx)
                 else:
-                    lot_quants = self._distribute_quants_by_lot(cr, uid, ids, ops, quants, context=context)
-                    for lot in lot_quants.keys():
-                        quant_obj.quants_move(cr, uid, lot_quants[lot], move, ops.location_dest_id, location_from=ops.location_id,
-                                                    lot_id=lot, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
-                                                    dest_package_id=quant_dest_package_id, context=ctx)
+                    lot_move_quants[move.id] = quants
 
-                # Handle pack in pack
-                if not ops.product_id and ops.package_id and ops.result_package_id.id != ops.package_id.parent_id.id:
-                    self.pool.get('stock.quant.package').write(cr, SUPERUSER_ID, [ops.package_id.id], {'parent_id': ops.result_package_id.id}, context=context)
                 if not move_qty.get(move.id):
                     raise UserError(_("The roundings of your Unit of Measures %s on the move vs. %s on the product don't allow to do these operations or you are not transferring the picking at once. ") % (move.product_uom.name, move.product_id.uom_id.name))
                 move_qty[move.id] -= record.qty
+
+            #Handle lots separately
+            if ops.pack_lot_ids:
+                move_lot_dict = self._distribute_quants_by_lot(cr, uid, ops, lot_move_quants, context=context)
+                for move_id in move_lot_dict:
+                    move = self.browse(cr, uid, move_id, context=context)
+                    for lot in move_lot_dict[move_id]:
+                        quant_obj.quants_move(cr, uid, move_lot_dict[move_id][lot], move, ops.location_dest_id, location_from=ops.location_id,
+                                                    lot_id=lot, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
+                                                    dest_package_id=quant_dest_package_id, context=ctx)
+            # Handle pack in pack
+            if not ops.product_id and ops.package_id and ops.result_package_id.id != ops.package_id.parent_id.id:
+                self.pool.get('stock.quant.package').write(cr, SUPERUSER_ID, [ops.package_id.id], {'parent_id': ops.result_package_id.id}, context=context)
         #Check for remaining qtys and unreserve/check move_dest_id in
         move_dest_ids = set()
         for move in self.browse(cr, uid, ids, context=context):
