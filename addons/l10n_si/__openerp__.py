@@ -22,5 +22,5 @@
         "data/account.fiscal.position.tax.template.csv",
         "data/account_chart_template.yml",
     ],
-    "installable": True,
+    "installable": False,
 }
