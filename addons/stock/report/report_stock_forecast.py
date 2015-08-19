@@ -57,7 +57,7 @@ class report_stock_forecast(models.Model):
             GROUP BY date, sq.product_id
             UNION ALL
             SELECT
-            MIN(100000 + sm.id) as id,
+            MIN(-sm.id) as id,
             sm.product_id,
             date_trunc('week', to_date(to_char(sm.date_expected, 'YYYY/MM/DD'), 'YYYY/MM/DD')) AS date,
             SUM(sm.product_qty) AS product_qty
@@ -75,7 +75,7 @@ class report_stock_forecast(models.Model):
             GROUP BY sm.date_expected,sm.product_id
             UNION ALL
             SELECT
-                MIN(100000 + sm.id) as id,
+                MIN(-sm.id) as id,
                 sm.product_id,
                 date_trunc('week', to_date(to_char(sm.date_expected, 'YYYY/MM/DD'), 'YYYY/MM/DD')) AS date,
                 SUM(-(sm.product_qty)) AS product_qty
