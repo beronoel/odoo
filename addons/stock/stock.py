@@ -4253,6 +4253,8 @@ class stock_pack_operation(osv.osv):
         op = self.browse(cr, uid, id, context=context)
         if field_value and op.qty_done == 0:
             self.write(cr, uid, [id], {'qty_done': 1.0}, context=context)
+        if not field_value and op.qty_done != 0:
+            self.write(cr, uid, [id], {'qty_done': 0.0}, context=context)
         return True
 
     def _compute_lots_visible(self, cr, uid, ids, field_name, arg, context=None):
@@ -4410,6 +4412,8 @@ class stock_pack_operation_lot(osv.osv):
         oplot = self.browse(cr, uid, id, context=context)
         if field_value and oplot.qty == 0:
             self.write(cr, uid, [id], {'qty': 1.0}, context=context)
+        if not field_value and oplot.qty != 0:
+            self.write(cr, uid, [id], {'qty': 0.0}, context=context)
         return True
 
     _columns = {

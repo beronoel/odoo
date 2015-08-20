@@ -133,7 +133,7 @@
     pack_obj = self.pool.get("stock.quant.package")
     lot_ids = self.pool.get("stock.production.lot").search(cr, uid, [('product_id', '=', ref('product_neg')), ('name','=','Lot neg')])
     pack_ids = pack_obj.search(cr, uid, [('name', '=', 'Palneg 2')])
-    ops_obj.write(cr, uid, [pick.pack_operation_ids[0].id], {'pack_lot_ids': {'lot_id': lot_ids[0], qty: 20.0}, 'result_package_id': pack_ids[0]})
+    ops_obj.write(cr, uid, [pick.pack_operation_ids[0].id], {'pack_lot_ids': {'lot_id': lot_ids[0], 'qty': 20.0}, 'result_package_id': pack_ids[0]})
     self.do_transfer(cr, uid, [ref("delivery_reconcile")])
 - 
   Check the negative quant was reconciled and the 20 pieces of lot neg at customers have the incoming shipments in the history_ids
