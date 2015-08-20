@@ -1224,7 +1224,7 @@ class stock_picking(models.Model):
             pack_lot_ids = []
             if lots_grouped.get(key):
                 for lot in lots_grouped[key].keys():
-                    pack_lot_ids += [(0, 0, {'lot_id': lot, 'qty': 0.0, 'qty_todo': lots_grouped[key][lot]})]
+                    pack_lot_ids += [(0, 0, {'lot_id': lot, 'qty': 0.0, 'qty_todo': lots_grouped[key][lot], 'processed': False})]
             val_dict = {
                 'picking_id': picking.id,
                 'product_qty': qty_uom,
@@ -2518,6 +2518,7 @@ class stock_move(osv.osv):
         context = context or {}
         picking_obj = self.pool.get("stock.picking")
         quant_obj = self.pool.get("stock.quant")
+        uom_obj = self.pool.get("product.uom")
         todo = [move.id for move in self.browse(cr, uid, ids, context=context) if move.state == "draft"]
         if todo:
             ids = self.action_confirm(cr, uid, todo, context=context)
@@ -2551,7 +2552,7 @@ class stock_move(osv.osv):
                 ctx['entire_pack'] = True #Should be in params
             lot_qty = {}
             for pack_lot in ops.pack_lot_ids:
-                lot_qty[pack_lot.lot_id.id] = pack_lot.qty
+                lot_qty[pack_lot.lot_id.id] = uom_obj._compute_qty(cr, uid, ops.product_uom_id.id, pack_lot.qty, ops.product_id.uom_id.id)
             quants_taken = []
             false_quants = []
             lot_move_qty = {}
