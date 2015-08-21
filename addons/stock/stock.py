@@ -4276,7 +4276,7 @@ class stock_pack_operation(osv.osv):
             pick = pack.picking_id
             product_requires = (pack.product_id.tracking != 'none')
             if pick.picking_type_id:
-                res[pack.id] = pick.picking_type_id.use_existing_lots or pick.picking_type_id.use_create_lots and product_requires
+                res[pack.id] = (pick.picking_type_id.use_existing_lots or pick.picking_type_id.use_create_lots) and product_requires
             else:
                 res[pack.id] = product_requires
         return res
@@ -4378,7 +4378,7 @@ class stock_pack_operation(osv.osv):
         view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
         only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
         ctx.update({'serial': serial,
-                         'only_create': only_create})
+                    'only_create': only_create})
         return {
              'name': _('Split Lot'),
              'type': 'ir.actions.act_window',
@@ -4442,6 +4442,33 @@ class stock_pack_operation_lot(osv.osv):
         'processed': True,
         'qty': lambda cr, uid, ids, c: c.get('serial') and 1.0 or 0.0,
     }
+
+    def do_plus(self, cr, uid, ids, context=None):
+        #return {'type': 'ir.actions.act_window_close'}
+        for packlot in self.browse(cr, uid, ids, context=context):
+            if packlot.qty_todo > 0.0:
+                self.write(cr, uid, [packlot.id], {'qty': packlot.qty_todo}, context=context)
+        pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
+        return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
+        # view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
+        # return {
+        #      'name': _('Split Lot'),
+        #      'type': 'ir.actions.act_window',
+        #      'view_type': 'form',
+        #      'view_mode': 'form',
+        #      'res_model': 'stock.pack.operation',
+        #      'views': [(view, 'form')],
+        #      'view_id': view,
+        #      'target': 'new',
+        #      'res_id': pack,
+        #      'context': context,
+        # }
+
+    def do_minus(self, cr, uid, ids, context=None):
+        for packlot in self.browse(cr, uid, ids, context=context):
+            self.write(cr, uid, [packlot.id], {'qty': 0.0}, context=context)
+        return {}
+
 
 class stock_move_operation_link(osv.osv):
     """
