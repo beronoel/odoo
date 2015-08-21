@@ -2322,6 +2322,7 @@ class stock_move(osv.osv):
         """
         context = context or {}
         quant_obj = self.pool.get("stock.quant")
+        uom_obj = self.pool['product.uom']
         to_assign_moves = []
         main_domain = {}
         todo_moves = []
@@ -2370,8 +2371,20 @@ class stock_move(osv.osv):
                         if qty:
                             quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, domain=domain, preferred_domain_list=[], context=context)
                             quant_obj.quants_reserve(cr, uid, quants, move, record, context=context)
-                else:
-                    pass #TODO: need to find something that takes into account the lots -> just go through the pack_lot_ids and get_preferred_domain by pack_lot
+            else:
+                lot_qty = {}
+                for pack_lot in ops.pack_lot_ids:
+                    lot_qty[pack_lot.lot_id.id] = uom_obj._compute_qty(cr, uid, ops.product_uom_id.id, pack_lot.qty, ops.product_id.uom_id.id)
+                for record in ops.linked_move_operation_ids:
+                    move_qty = record.qty
+                    domain = main_domain[move.id]
+                    for lot in lot_qty:
+                        if lot_qty[lot] > 0 and move_qty > 0:
+                            qty = min(lot_qty[lot], move_qty)
+                            quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, lot_id=lot, domain=domain, preferred_domain_list=[], context=context)
+                            quants_to_reserve = [x for x in quants if x[0] and x[0].lot_id]
+                            quant_obj.quants_reserve(cr, uid, quants_to_reserve, move, record, context=context)
+
         for move in todo_moves:
             if move.linked_move_operation_ids:
                 continue
