@@ -804,7 +804,7 @@ class Field(object):
         record.ensure_one()
 
         try:
-            return record._cache[self]
+            return record._cache[self.name]
         except KeyError:
             pass
 
@@ -831,7 +831,7 @@ class Field(object):
             spec = self.modified_draft(record)
 
             # set value in cache, inverse field, and mark record as dirty
-            record._cache[self] = value
+            record._cache[self.name] = value
             if env.in_onchange:
                 for invf in record._field_inverses[self]:
                     invf._update(value, record)
@@ -845,7 +845,7 @@ class Field(object):
         else:
             # simply write to the database, and update cache
             record.write({self.name: self.convert_to_write(value)})
-            record._cache[self] = value
+            record._cache[self.name] = value
 
     ############################################################################
     #
@@ -858,7 +858,7 @@ class Field(object):
         computed = records._field_computed[self]
         for field in computed:
             for record in records:
-                record._cache[field] = field.null(records.env)
+                record._cache[field.name] = field.null(records.env)
             records.env.computed[field].update(records._ids)
         if isinstance(self.compute, basestring):
             getattr(records, self.compute)()
@@ -878,7 +878,7 @@ class Field(object):
                     try:
                         self._compute_value(record)
                     except Exception as exc:
-                        record._cache.set_failed(exc, self)
+                        record._cache.set_failed(exc, self.name)
 
     def get_value(self, record):
         """ Determine the value of ``self`` for ``record``. """
@@ -903,7 +903,7 @@ class Field(object):
                             except MissingError as exc:
                                 target._cache.set_failed(exc)
                     # the result is saved to database by BaseModel.recompute()
-                    return record._cache[self]
+                    return record._cache[self.name]
 
             # read the field from database
             record._prefetch_field(self)
@@ -919,15 +919,15 @@ class Field(object):
 
         else:
             # this is a non-stored non-computed field
-            record._cache[self] = self.null(env)
+            record._cache[self.name] = self.null(env)
 
-        return record._cache[self]
+        return record._cache[self.name]
 
     def get_draft_value(self, record):
         """ Return the value of ``self`` for the given draft ``record``. """
         if self.compute:
             self._compute_value(record)
-            return record._cache[self]
+            return record._cache[self.name]
         else:
             return self.null(record.env)
 
@@ -1053,7 +1053,7 @@ class Integer(Field):
     def _update(self, records, value):
         # special case, when an integer field is used as inverse for a one2many
         for record in records:
-            record._cache[self] = value.id or 0
+            record._cache[self.name] = value.id or 0
 
     def convert_to_export(self, value, env):
         if value or value == 0:
@@ -1655,7 +1655,7 @@ class Many2one(_Relational):
     def _update(self, records, value):
         """ Update the cached value of ``self`` for ``records`` with ``value``. """
         for record in records:
-            record._cache[self] = value
+            record._cache[self.name] = value
 
     def convert_to_cache(self, value, record, validate=True):
         if isinstance(value, (NoneType, int, long)):
@@ -1704,16 +1704,16 @@ class _RelationalMulti(_Relational):
     def _update(self, records, value):
         """ Update the cached value of ``self`` for ``records`` with ``value``. """
         for record in records:
-            if self in record._cache:
-                record._cache[self] = record[self.name] | value
+            if self.name in record._cache:
+                record._cache[self.name] = record[self.name] | value
             else:
-                record._cache.set_special(self, self._update_getter(record, value))
+                record._cache.set_special(self.name, self._update_getter(record, value))
 
     def _update_getter(self, record, value):
         def getter():
             # read the current field's value, and update it in cache only
-            del record._cache[self]
-            result = record._cache[self] = record[self.name] | value
+            del record._cache[self.name]
+            result = record._cache[self.name] = record[self.name] | value
             return result
         return getter
 
