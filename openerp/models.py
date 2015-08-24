@@ -3893,7 +3893,7 @@ class BaseModel(object):
             for record in self:
                 record._cache.update(record._convert_to_cache(new_vals, update=True))
             for key in new_vals:
-                self._fields[key].determine_inverse(self)
+                self._fields[key].set_inverse(self)
 
         return True
 
@@ -4205,7 +4205,7 @@ class BaseModel(object):
         # put the values of pure new-style fields into cache, and inverse them
         record._cache.update(record._convert_to_cache(new_vals))
         for key in new_vals:
-            self._fields[key].determine_inverse(record)
+            self._fields[key].set_inverse(record)
 
         return record
 

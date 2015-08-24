@@ -900,7 +900,7 @@ class expression(object):
                             context=context)
                         operator = 'in'
                     recs = model.browse(cr, uid, [], context=context)
-                    domain = field.determine_domain(recs, operator, right)
+                    domain = field.search_domain(recs, operator, right)
 
                 if not domain:
                     leaf.leaf = TRUE_LEAF

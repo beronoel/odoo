@@ -829,13 +829,10 @@ class Field(object):
         # cache miss, retrieve value
         if record.id:
             # normal record -> read or compute value for this field
-            self.determine_value(record)
+            return self.get_value(record)
         else:
             # draft record -> compute the value or let it be null
-            self.determine_draft_value(record)
-
-        # the result should be in cache now
-        return record._cache[self]
+            return self.get_draft_value(record)
 
     def __set__(self, record, value):
         """ set the value of field ``self`` on ``record`` """
@@ -901,7 +898,7 @@ class Field(object):
                     except Exception as exc:
                         record._cache.set_failed(exc, self)
 
-    def determine_value(self, record):
+    def get_value(self, record):
         """ Determine the value of ``self`` for ``record``. """
         env = record.env
 
@@ -924,7 +921,7 @@ class Field(object):
                             except MissingError as exc:
                                 target._cache.set_failed(exc)
                     # the result is saved to database by BaseModel.recompute()
-                    return
+                    return record._cache[self]
 
             # read the field from database
             record._prefetch_field(self)
@@ -942,21 +939,24 @@ class Field(object):
             # this is a non-stored non-computed field
             record._cache[self] = self.null(env)
 
-    def determine_draft_value(self, record):
-        """ Determine the value of ``self`` for the given draft ``record``. """
+        return record._cache[self]
+
+    def get_draft_value(self, record):
+        """ Return the value of ``self`` for the given draft ``record``. """
         if self.compute:
             self._compute_value(record)
+            return record._cache[self]
         else:
-            record._cache[self] = SpecialValue(self.null(record.env))
+            return self.null(record.env)
 
-    def determine_inverse(self, records):
+    def set_inverse(self, records):
         """ Given the value of ``self`` on ``records``, inverse the computation. """
         if isinstance(self.inverse, basestring):
             getattr(records, self.inverse)()
         else:
             self.inverse(records)
 
-    def determine_domain(self, records, operator, value):
+    def search_domain(self, records, operator, value):
         """ Return a domain representing a condition on ``self``. """
         if isinstance(self.search, basestring):
             return getattr(records, self.search)(operator, value)
