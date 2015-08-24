@@ -95,8 +95,22 @@
                                 </td>
                                 <t t-if="has_serial_number">
                                     <td t-if="pack_operation.pack_lot_ids">
-                                        <!-- TODO: Split in different lines-->
-                                        <span t-field="pack_operation.pack_lot_ids"/>
+                                        <table class="table table-condensed" t-if="pack_operation.pack_lot_ids">
+                                            <thead>
+                                                <tr><th>Lot</th><th>Qty</th></tr>
+                                            </thead>
+                                            <tr t-foreach="pack_operation.pack_lot_ids" t-as="packlot">
+                                                <td>
+                                                    <span t-field="packlot.lot_id"/>
+                                                    <t t-if="not packlot.lot_id">
+                                                        <span t-field="packlot.lot_name"/>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <span t-field="packlot.qty"/> <t t-if="o.picking_type_id.use_existing_lots and o.state!='done'"> / <span t-field="packlot.qty_todo"/></t>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                     <td t-if="not pack_operation.pack_lot_ids"/>
                                 </t>
@@ -107,8 +121,6 @@
                                     <span t-field="pack_operation.location_id"/>
                                     <span t-if="pack_operation.package_id">:</span>
                                     <span t-field="pack_operation.package_id"/>
-                                    <span t-if="pack_operation.pack_lot_ids">:</span>
-                                    <span t-field="pack_operation.pack_lot_ids"/>
                                 </td>
                                 <td class="text-right">
                                     <span t-field="pack_operation.product_qty"/>
