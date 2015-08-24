@@ -2361,8 +2361,8 @@ class stock_move(osv.osv):
         operations = list(operations)
         operations.sort(key=lambda x: ((x.package_id and not x.product_id) and -4 or 0) + (x.package_id and -2 or 0) + (x.pack_lot_ids and -1 or 0))
         for ops in operations:
-            #first try to find quants based on specific domains given by linked operations
-            if not ops.pack_lot_ids:
+            #first try to find quants based on specific domains given by linked operations for the case where we want to rereserve according to existing pack operations
+            if not (ops.product_id and ops.pack_lot_ids):
                 for record in ops.linked_move_operation_ids:
                     move = record.move_id
                     if move.id in main_domain:
@@ -2373,13 +2373,14 @@ class stock_move(osv.osv):
                             quant_obj.quants_reserve(cr, uid, quants, move, record, context=context)
             else:
                 lot_qty = {}
+                rounding = ops.product_id.uom_id.rounding
                 for pack_lot in ops.pack_lot_ids:
                     lot_qty[pack_lot.lot_id.id] = uom_obj._compute_qty(cr, uid, ops.product_uom_id.id, pack_lot.qty, ops.product_id.uom_id.id)
                 for record in ops.linked_move_operation_ids:
                     move_qty = record.qty
                     domain = main_domain[move.id]
                     for lot in lot_qty:
-                        if lot_qty[lot] > 0 and move_qty > 0:
+                        if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                             qty = min(lot_qty[lot], move_qty)
                             quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, lot_id=lot, domain=domain, preferred_domain_list=[], context=context)
                             quants_to_reserve = [x for x in quants if x[0] and x[0].lot_id]
@@ -2476,25 +2477,26 @@ class stock_move(osv.osv):
         fallback_domain = [('reservation_id', '=', False)]
         fallback_domain2 = ['&', ('reservation_id', 'not in', [x for x in lot_move_qty.keys()]), ('reservation_id', '!=', False)]
         preferred_domain_list = [fallback_domain] + [fallback_domain2]
-        # Do all quants that need
+        rounding = ops.product_id.uom_id.rounding
+        # Iterate for every move through the different lots taken
+        # Take the reserved quants with the correct lot first
+        # Afterwards take the not reserved quants (or reserved on another move) with the correct lot
+        # If nothing found, take first the quants reserved with False lots before taking others
         for move in lot_move_qty:
-            move_quants_dict[move] = {} #x for x in quants_taken if x[0].reservation_id.id == move
+            move_quants_dict[move] = {}
             move_rec = self.pool['stock.move'].browse(cr, uid, move, context=context)
             #Needs to be divided by lot still
             for quant in quants_taken:
                 move_quants_dict[move].setdefault(quant[0].lot_id.id, [])
                 move_quants_dict[move][quant[0].lot_id.id] += [quant]
             false_quants_move = [x for x in false_quants if x[0].reservation_id.id == move]
-
             for lot in lot_qty:
                 move_quants_dict[move].setdefault(lot, [])
-                #if lot_move_qty[move] <= 0 and not move_quants_dict[move].get(lot):
-                #    continue
-                if lot_move_qty > 0 and lot_qty[lot] > 0:
+                if float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0 and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0:
                     # Search if we can find quants with that lot
                     quants = quant_obj.quants_get_preferred_domain(cr, uid, lot_move_qty[move], move_rec, ops=ops, lot_id=lot, domain=domain,
                                                         preferred_domain_list=preferred_domain_list, context=context)
-                    while quants and lot_qty[lot] > 0 and lot_move_qty[move] > 0:
+                    while quants and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0:
                         quant = quants.pop(0)
                         if quant[0] and quant[0].lot_id:
                             qty = min (lot_qty[lot], lot_move_qty[move], quant[1])
@@ -2502,7 +2504,8 @@ class stock_move(osv.osv):
                             lot_qty[lot] -= qty
                             lot_move_qty[move] -= qty
                         else:
-                            while false_quants_move and lot_qty[lot] > 0 and lot_move_qty[move] > 0: #Take first reserved False quants if no quants with lot
+                            #Take reserved False quants first if no quants with lot anymore
+                            while false_quants_move and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0:
                                 qty_min = min(lot_qty[lot], lot_move_qty[move])
                                 if false_quants_move[0][1] > qty_min:
                                     false_quants_move[0][1] -= qty_min
@@ -2514,7 +2517,7 @@ class stock_move(osv.osv):
                                     false_quants_move.pop(0)
                                 lot_qty[lot] -= qty
                                 lot_move_qty[move] -= qty
-                            if lot_qty[lot] > 0 and lot_move_qty[move] > 0:
+                            if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0,precision_rounding=rounding) > 0:
                                 qty = min (lot_qty[lot], lot_move_qty[move], quant[1])
                                 move_quants_dict[move][lot] += [(quant[0], qty)]
                                 lot_qty[lot] -= qty
@@ -2586,11 +2589,12 @@ class stock_move(osv.osv):
                 else:
                     # Check what you can do with reserved quants already
                     qty_on_link = record.qty
+                    rounding = ops.product_id.uom_id.rounding
                     for reserved_quant in move.reserved_quant_ids:
                         if not reserved_quant.lot_id:
                             false_quants += [reserved_quant]
-                        elif lot_qty.get(reserved_quant.lot_id.id, 0) > 0:
-                            if lot_qty[reserved_quant.lot_id.id] >= reserved_quant.qty:
+                        elif float_compare(lot_qty.get(reserved_quant.lot_id.id, 0), 0, precision_rounding=rounding) > 0:
+                            if float_compare(lot_qty[reserved_quant.lot_id.id], reserved_quant.qty, precision_rounding=rounding) >= 0:
                                 lot_qty[reserved_quant.lot_id.id] -= reserved_quant.qty
                                 quants_taken += [(reserved_quant, reserved_quant.qty)]
                                 qty_on_link -= reserved_quant.qty
