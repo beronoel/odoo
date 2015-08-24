@@ -688,8 +688,9 @@
                 <form>
                     <group>
                         <group string="Products">
-                            <field name="picking_source_location_id" invisible="True"/>
-                            <field name="picking_destination_location_id" invisible="True"/>
+                            <field name="lots_visible" invisible="1"/>
+                            <field name="picking_source_location_id" invisible="1"/>
+                            <field name="picking_destination_location_id" invisible="1"/>
                             <field name="product_id" attrs="{'required': [('package_id', '=', False)]}"/>
                         </group>
                         <group string="From">
@@ -697,11 +698,11 @@
                             <field name="package_id" attrs="{'required': [('product_id', '=', False)]}" groups="stock.group_tracking_lot" context="{'location_id': location_id}"/>
                         </group>
                     </group>
-                    <group>
+                    <group name="qty_to">
                         <group string="Quantities">
                             <label for="qty_done"/>
                             <span class="oe_inline">
-                                <field name="qty_done" nolabel="1"/>
+                                <field name="qty_done" nolabel="1" attrs="{'readonly': [('lots_visible','=',True)]}"/>
                                 /
                                 <field name="product_qty"/>
                                 <field name="product_uom_id" options="{&quot;no_open&quot;: True}" groups="product.group_uom"/>
@@ -709,14 +710,25 @@
                             <!--<button name="split_quantities" class="oe_link" string="Split" type="object"/>-->
                         </group>
                         <group string="To">
-                            <field name="location_dest_id" domain="[('id', 'child_of', picking_destination_location_id)]"/>
+                            <field name="location_dest_id" domain="[('id', 'child_of', picking_destination_location_id)]" groups="stock.group_locations"/>
                             <field name="result_package_id" groups="stock.group_tracking_lot" context="{'location_id': location_dest_id}"/>
                         </group>
                     </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_pack_operation_details_form_save" model="ir.ui.view">
+            <field name="name">stock.pack.operation.details.form.save</field>
+            <field name="model">stock.pack.operation</field>
+            <field name="inherit_id" ref="stock.view_pack_operation_details_form"/>
+            <field eval="15" name="priority"/>
+            <field name="arch" type="xml">
+                <group name="qty_to" position="after">
                     <footer>
                         <button name="save" type="object" string="Save" class="oe_highlight"/>
                     </footer>
-                </form>
+                </group>
             </field>
         </record>
 
@@ -724,7 +736,7 @@
             <field name="name">Pack Details</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.pack.operation</field>
-            <field name="view_id" ref="view_pack_operation_details_form"/>
+            <field name="view_id" ref="view_pack_operation_details_form_save"/>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
@@ -768,6 +780,8 @@
                 </form>
             </field>
         </record>
+
+
 
         <record id="view_picking_form" model="ir.ui.view">
             <field name="name">stock.picking.form</field>
