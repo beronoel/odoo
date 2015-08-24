@@ -878,7 +878,8 @@ class Field(object):
         # initialize the fields to their corresponding null value in cache
         computed = records._field_computed[self]
         for field in computed:
-            records._cache[field] = field.null(records.env)
+            for record in records:
+                record._cache[field] = field.null(records.env)
             records.env.computed[field].update(records._ids)
         if isinstance(self.compute, basestring):
             getattr(records, self.compute)()
@@ -1069,7 +1070,8 @@ class Integer(Field):
 
     def _update(self, records, value):
         # special case, when an integer field is used as inverse for a one2many
-        records._cache[self] = value.id or 0
+        for record in records:
+            record._cache[self] = value.id or 0
 
     def convert_to_export(self, value, env):
         if value or value == 0:
@@ -1670,7 +1672,8 @@ class Many2one(_Relational):
 
     def _update(self, records, value):
         """ Update the cached value of ``self`` for ``records`` with ``value``. """
-        records._cache[self] = value
+        for record in records:
+            record._cache[self] = value
 
     def convert_to_cache(self, value, record, validate=True):
         if isinstance(value, (NoneType, int, long)):
