@@ -755,9 +755,9 @@
                                 <field name="lot_id" invisible="context.get('only_create', False)"
                                        domain="[('product_id','=', parent.product_id)]"
                                        context="{'product_id': parent.product_id}"/>
-                                <button name="do_minus" type="object" icon="fa-minus-square" attrs="{'invisible': [('qty', '=', 0.0)]}"/>
-                                <field name="qty" invisible="context.get('serial')"/>
-                                <button name="do_plus" type="object" icon="fa-plus-square" attrs="{'invisible': [('qty', '!=', 0.0)]}"/>
+                                <button name="do_minus" type="object" icon="fa-minus-square" attrs="{'invisible': [('qty', '=', 0.0)]}" invisible="context.get('serial') and context.get('only_create')"/>
+                                <field name="qty" invisible="context.get('serial') and context.get('only_create')"/>
+                                <button name="do_plus" type="object" icon="fa-plus-square" attrs="{'invisible': [('qty', '!=', 0.0)]}" invisible="context.get('serial') and context.get('only_create')"/>
                                 <field name="qty_todo" invisible="context.get('serial') or context.get('only_create')" readonly="1" string="To Do"/>
                             </tree>
                         </field>

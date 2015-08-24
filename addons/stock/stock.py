@@ -4446,8 +4446,8 @@ class stock_pack_operation_lot(osv.osv):
     def do_plus(self, cr, uid, ids, context=None):
         #return {'type': 'ir.actions.act_window_close'}
         for packlot in self.browse(cr, uid, ids, context=context):
-            if packlot.qty_todo > 0.0:
-                self.write(cr, uid, [packlot.id], {'qty': packlot.qty_todo}, context=context)
+            #if packlot.qty_todo > 0.0:
+            self.write(cr, uid, [packlot.id], {'qty': 1.0}, context=context)
         pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
         return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
         # view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
@@ -4467,7 +4467,8 @@ class stock_pack_operation_lot(osv.osv):
     def do_minus(self, cr, uid, ids, context=None):
         for packlot in self.browse(cr, uid, ids, context=context):
             self.write(cr, uid, [packlot.id], {'qty': 0.0}, context=context)
-        return {}
+        pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
+        return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
 
 
 class stock_move_operation_link(osv.osv):
