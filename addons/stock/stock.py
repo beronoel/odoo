@@ -1502,6 +1502,13 @@ class stock_picking(models.Model):
             to_delete = []
             # In draft or with no pack operations edited yet, ask if we can just do everything
             if pick.state == 'draft' or all([x.qty_done == 0.0 for x in pick.pack_operation_ids]):
+                # If no lots when needed, raise error
+                picking_type = pick.picking_type_id
+                if (picking_type.use_create_lots or picking_type.use_existing_lots):
+                    for pack in pick.pack_operation_ids:
+                        if pack.product_id and pack.product_id.tracking != 'none':
+                            raise UserError(_('Some products require lots, so you need to specify those first!'))
+
                 view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_immediate_transfer')
                 wiz_id = self.pool['stock.immediate.transfer'].create(cr, uid, {'pick_id': pick.id}, context=context)
                 return {
@@ -1555,12 +1562,16 @@ class stock_picking(models.Model):
     def create_lots_for_picking(self, cr, uid, ids, context=None):
         lot_obj = self.pool['stock.production.lot']
         opslot_obj = self.pool['stock.pack.operation.lot']
+        to_unlink = []
         for picking in self.browse(cr, uid, ids, context=context):
             for ops in picking.pack_operation_ids:
                 for opslot in ops.pack_lot_ids:
                     if not opslot.lot_id:
                         lot_id = lot_obj.create(cr, uid, {'name': opslot.lot_name, 'product_id': ops.product_id.id}, context=context)
                         opslot_obj.write(cr, uid, [opslot.id], {'lot_id':lot_id}, context=context)
+                #Unlink pack operations where qty = 0
+                to_unlink += [x.id for x in ops.pack_lot_ids if x.qty == 0.0]
+        opslot_obj.unlink(cr, uid, to_unlink, context=context)
 
     def do_transfer(self, cr, uid, ids, context=None):
         """
@@ -2556,7 +2567,6 @@ class stock_move(osv.osv):
             if ops.picking_id:
                 pickings.add(ops.picking_id.id) #not better with moves?
             main_domain = [('qty', '>', 0)]
-            self.check_tracking(cr, uid, move, ops, context=context)
             if ops.product_id:
                 #If a product is given, the result is always put immediately in the result package (if it is False, they are without package)
                 quant_dest_package_id  = ops.result_package_id.id
@@ -2574,6 +2584,7 @@ class stock_move(osv.osv):
             lot_move_qty = {}
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
+                self.check_tracking(cr, uid, move, ops, context=context)
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
@@ -4381,8 +4392,11 @@ class stock_pack_operation(osv.osv):
         serial = (pack.product_id.tracking == 'serial')
         view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
         only_create = picking_type.use_create_lots and not picking_type.use_existing_lots
+        show_reserved = any([x for x in pack.pack_lot_ids if x.qty_todo > 0.0])
+
         ctx.update({'serial': serial,
-                    'only_create': only_create})
+                    'only_create': only_create,
+                    'show_reserved': show_reserved})
         return {
              'name': _('Split Lot'),
              'type': 'ir.actions.act_window',
@@ -4418,20 +4432,11 @@ class stock_pack_operation_lot(osv.osv):
     _name = "stock.pack.operation.lot"
     _description = "Specifies lot/serial number for pack operations that need it"
 
-
     def _get_processed(self, cr, uid, ids, field_name, arg, context=None):
         res = {}
         for packlot in self.browse(cr, uid, ids, context=context):
             res[packlot.id] = (packlot.qty > 0.0)
         return res
-
-    def _set_qty(self, cr, uid, id, field_name, field_value, arg, context=None):
-        oplot = self.browse(cr, uid, id, context=context)
-        if field_value and oplot.qty == 0:
-            self.write(cr, uid, [id], {'qty': 1.0}, context=context)
-        if not field_value and oplot.qty != 0:
-            self.write(cr, uid, [id], {'qty': 0.0}, context=context)
-        return True
 
     _columns = {
         'operation_id': fields.many2one('stock.pack.operation'),
@@ -4439,38 +4444,40 @@ class stock_pack_operation_lot(osv.osv):
         'lot_id': fields.many2one('stock.production.lot', 'Lot/Serial Number'),
         'lot_name': fields.char('Lot Name'),
         'qty_todo': fields.float('Quantity'),
-        'processed': fields.function(_get_processed, fnct_inv=_set_qty, type='boolean', string=''),
+        'processed': fields.function(_get_processed,  type='boolean', store={'stock.pack.operation.lot': (lambda self, cr, uid, ids ,c={}:ids, ['qty'], 10)}),
     }
 
     _defaults = {
-        'processed': True,
-        'qty': lambda cr, uid, ids, c: c.get('serial') and 1.0 or 0.0,
+        'qty': lambda cr, uid, ids, c: 1.0,
     }
+
+    def _check_lot(self, cr, uid, ids, context=None):
+        for packlot in self.browse(cr, uid, ids, context=context):
+            if not packlot.lot_name and not packlot.lot_id:
+                return False
+        return True
+
+    _constraints = [
+        (_check_lot,
+            'Lot is required',
+            ['lot_id', 'lot_name']),
+    ]
+
+    _sql_constraints = [
+        ('qty', 'CHECK(qty >= 0.0)','Quantity must be greater than or equal to 0.0!'),
+        ('uniq_lot_id', 'unique(operation_id, lot_id)', 'You have already mentioned this lot in another line'),
+        ('uniq_lot_name', 'unique(operation_id, lot_name)', 'You have already mentioned this lot name in another line')]
 
     def do_plus(self, cr, uid, ids, context=None):
         #return {'type': 'ir.actions.act_window_close'}
         for packlot in self.browse(cr, uid, ids, context=context):
-            #if packlot.qty_todo > 0.0:
-            self.write(cr, uid, [packlot.id], {'qty': 1.0}, context=context)
+            self.write(cr, uid, [packlot.id], {'qty': packlot.qty + 1}, context=context)
         pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
         return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
-        # view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_pack_operation_lot_form')
-        # return {
-        #      'name': _('Split Lot'),
-        #      'type': 'ir.actions.act_window',
-        #      'view_type': 'form',
-        #      'view_mode': 'form',
-        #      'res_model': 'stock.pack.operation',
-        #      'views': [(view, 'form')],
-        #      'view_id': view,
-        #      'target': 'new',
-        #      'res_id': pack,
-        #      'context': context,
-        # }
 
     def do_minus(self, cr, uid, ids, context=None):
         for packlot in self.browse(cr, uid, ids, context=context):
-            self.write(cr, uid, [packlot.id], {'qty': 0.0}, context=context)
+            self.write(cr, uid, [packlot.id], {'qty': packlot.qty - 1}, context=context)
         pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
         return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
 

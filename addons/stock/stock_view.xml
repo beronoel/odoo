@@ -750,15 +750,15 @@
                     <group>
                         <field name="pack_lot_ids" nolabel="1" attrs="{'readonly': [('state', '=', 'done')]}">
                             <tree editable="bottom" decoration-success="qty_todo==qty">
-                                <!--<field name="processed"  string="" invisible="context.get('only_create') or not context.get('serial')"/>-->
                                 <field name="lot_name" invisible="not context.get('only_create', False)"/>
                                 <field name="lot_id" invisible="context.get('only_create', False)"
                                        domain="[('product_id','=', parent.product_id)]"
                                        context="{'product_id': parent.product_id}"/>
-                                <button name="do_minus" type="object" icon="fa-minus-square" attrs="{'invisible': [('qty', '=', 0.0)]}" invisible="context.get('serial') and context.get('only_create')"/>
                                 <field name="qty" invisible="context.get('serial') and context.get('only_create')"/>
-                                <button name="do_plus" type="object" icon="fa-plus-square" attrs="{'invisible': [('qty', '!=', 0.0)]}" invisible="context.get('serial') and context.get('only_create')"/>
-                                <field name="qty_todo" invisible="context.get('serial') or context.get('only_create')" readonly="1" string="To Do"/>
+                                <button name="do_minus" type="object" icon="fa-minus-square" attrs="{'invisible': [('qty', '&lt;=', 0.99)]}" invisible="not context.get('show_reserved')"/>
+                                <button name="do_plus" type="object" icon="fa-plus-square" invisible="not context.get('show_reserved')"/>
+                                <field name="qty_todo" invisible="not context.get('show_reserved') or context.get('serial')" readonly="1" string="To Do"/>
+                                <field name="processed" invisible="1"/>
                             </tree>
                         </field>
                     </group>
