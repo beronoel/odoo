@@ -5593,7 +5593,10 @@ class BaseModel(object):
         for name in name_seq.split('.'):
             field = recs._fields[name]
             null = field.null(self.env)
-            recs = recs.mapped(lambda rec: rec._cache.get(field, null))
+            if recs:
+                recs = recs.mapped(lambda rec: rec._cache.get(field, null))
+            else:
+                recs = null
         return recs
 
     def filtered(self, func):
