@@ -831,11 +831,10 @@ class Field(object):
             spec = self.modified_draft(record)
 
             # set value in cache, inverse field, and mark record as dirty
-            record._cache[self.name] = value
+            record._cache.set_value(self.name, value, dirty=env.in_onchange)
             if env.in_onchange:
                 for invf in record._field_inverses[self]:
                     invf._update(value, record)
-                record._set_dirty(self.name)
 
             # determine more dependent fields, and invalidate them
             if self.relational:
@@ -1765,8 +1764,8 @@ class _RelationalMulti(_Relational):
                 values = dict(record._cache)
                 values = record._convert_to_write(values)
                 result.append((0, 0, values))
-            elif record._is_dirty():
-                values = {k: record._cache[k] for k in record._get_dirty()}
+            elif record._cache.dirty:
+                values = {k: record._cache[k] for k in record._cache.dirty}
                 values = record._convert_to_write(values)
                 result.append((1, record.id, values))
             else:

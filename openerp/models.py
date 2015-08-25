@@ -5661,26 +5661,6 @@ class BaseModel(object):
         return record
 
     #
-    # Dirty flags, to mark record fields modified (in draft mode)
-    #
-
-    def _is_dirty(self):
-        """ Return whether any record in ``self`` is dirty. """
-        dirty = self.env.dirty
-        return any(record in dirty for record in self)
-
-    def _get_dirty(self):
-        """ Return the list of field names for which ``self`` is dirty. """
-        dirty = self.env.dirty
-        return list(dirty.get(self, ()))
-
-    def _set_dirty(self, field_name):
-        """ Mark the records in ``self`` as dirty for the given ``field_name``. """
-        dirty = self.env.dirty
-        for record in self:
-            dirty[record].add(field_name)
-
-    #
     # "Dunder" methods
     #
 
@@ -6128,7 +6108,8 @@ class BaseModel(object):
                     field = self._fields[name]
                     newval = record[name]
                     if newval != oldval or (
-                        field.type in ('one2many', 'many2many') and newval._is_dirty()
+                        field.type in ('one2many', 'many2many') and
+                        any(rec._cache.dirty for rec in newval)
                     ):
                         todo.append(name)
                         dirty.add(name)
@@ -6199,6 +6180,17 @@ class RecordCache(MutableMapping):
         dummy = SpecialValue(None)
         value = self._record.env.cache[field].get(self._record.id, dummy)
         return default if isinstance(value, SpecialValue) else value
+
+    def set_value(self, name, value, dirty=False):
+        """ Set the value of a field, and possibly mark it as dirty. """
+        self[name] = value
+        if dirty:
+            self.dirty.add(name)
+
+    @property
+    def dirty(self):
+        """ Return the dirty fields for the record, as a set of names. """
+        return self._record.env._dirty[self._record]
 
     def set_special(self, name, getter):
         """ Set the given ``getter`` as the cached value of field ``name``. """
