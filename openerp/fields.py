@@ -1975,6 +1975,6 @@ class Id(Field):
 
 # imported here to avoid dependency cycle issues
 from openerp import SUPERUSER_ID
-from .exceptions import Warning, AccessError, MissingError
-from .models import check_pg_name, BaseModel, MAGIC_COLUMNS
+from .exceptions import AccessError, MissingError
+from .models import check_pg_name, BaseModel
 from .osv import fields

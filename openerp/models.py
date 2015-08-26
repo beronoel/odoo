@@ -31,7 +31,7 @@ import pickle
 import pytz
 import re
 import time
-from collections import defaultdict, MutableMapping
+from collections import defaultdict
 from inspect import getmembers, currentframe
 from operator import itemgetter
 
@@ -5801,7 +5801,7 @@ class BaseModel(object):
     @lazy_property
     def _cache(self):
         """ Return the cache of ``self``, mapping field names to values. """
-        return RecordCache(self)
+        return self.env.get_cache(self)
 
     @api.model
     def _in_cache_without(self, field):
@@ -6125,88 +6125,6 @@ class BaseModel(object):
         }
 
         return result
-
-
-class RecordCache(MutableMapping):
-    """ Access the cache with a mapping from field names to values. """
-    def __init__(self, record):
-        assert len(record) == 1, "Unexpected RecordCache(%s)" % record
-        self._record = record
-
-    def __contains__(self, name):
-        """ Return whether the record has a cached value for field ``name``. """
-        field = self._record._fields[name]
-        return self._record.id in self._record.env.cache[field]
-
-    def __getitem__(self, name):
-        """ Return the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        value = self._record.env.cache[field][self._record.id]
-        return value.get() if isinstance(value, SpecialValue) else value
-
-    def __setitem__(self, name, value):
-        """ Assign the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        self._record.env.cache[field][self._record.id] = value
-
-    def __delitem__(self, name):
-        """ Remove the cached value of field ``name`` for the record. """
-        field = self._record._fields[name]
-        del self._record.env.cache[field][self._record.id]
-
-    def __iter__(self):
-        """ Iterate over the field names with a cached value. """
-        cache, id = self._record.env.cache, self._record.id
-        for name, field in self._record._fields.iteritems():
-            if name != 'id' and id in cache[field]:
-                yield name
-
-    def __len__(self):
-        """ Return the number of fields with a cached value. """
-        return sum(1 for name in self)
-
-    def has_value(self, name):
-        """ Return whether the record has a regular value for field ``name`` in cache. """
-        field = self._record._fields[name]
-        dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
-        return not isinstance(value, SpecialValue)
-
-    def get_value(self, name, default=None):
-        """ Return the cached, regular value of field ``name``, or ``default``. """
-        field = self._record._fields[name]
-        dummy = SpecialValue(None)
-        value = self._record.env.cache[field].get(self._record.id, dummy)
-        return default if isinstance(value, SpecialValue) else value
-
-    def set_value(self, name, value, dirty=False):
-        """ Set the value of a field, and possibly mark it as dirty. """
-        self[name] = value
-        if dirty:
-            self.dirty.add(name)
-
-    @property
-    def dirty(self):
-        """ Return the dirty fields for the record, as a set of names. """
-        return self._record.env._dirty[self._record]
-
-    def set_special(self, name, getter):
-        """ Set the given ``getter`` as the cached value of field ``name``. """
-        field = self._record._fields[name]
-        self._record.env.cache[field][self._record.id] = SpecialValue(getter)
-
-    def set_failed(self, exception, name=None):
-        """ Mark the given field (or all fields) with the given exception. """
-        def getter():
-            raise exception
-        for name in ([name] if name else self._record._fields):
-            self.set_special(name, getter)
-
-
-class SpecialValue(object):
-    """ Encapsulate a function that returns a field's value in cache. """
-    def __init__(self, getter):
-        self.get = getter
 
 
 AbstractModel = BaseModel
