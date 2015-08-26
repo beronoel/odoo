@@ -1003,11 +1003,10 @@ class Field(object):
             if path == 'id':
                 target = records - computed
             elif path and env.in_onchange:
-                target = (target.browse(env.cache[field]) - computed).filtered(
-                    lambda rec: rec._mapped_cache(path) & records
-                )
+                target = env.with_field(field) - computed
+                target = target.filtered(lambda rec: rec._mapped_cache(path) & records)
             else:
-                target = target.browse(env.cache[field]) - computed
+                target = env.with_field(field) - computed
 
             if target:
                 spec.append((field, target._ids))
@@ -1677,9 +1676,9 @@ class Many2one(_Relational):
             # access rights, and not the value's access rights.
             try:
                 value_sudo = value.sudo()
-                # performance trick: make sure that all records of the same
-                # model as value in value.env will be prefetched in value_sudo.env
-                value_sudo.env.prefetch[value._name].update(value.env.prefetch[value._name])
+                # performance trick: make sure that all records with the same
+                # model in value.env will be prefetched in value_sudo.env
+                value_sudo.env.prefetch(value.env.with_model(value))
                 return value_sudo.name_get()[0]
             except MissingError:
                 # Should not happen, unless the foreign key is missing.

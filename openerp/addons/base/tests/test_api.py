@@ -330,23 +330,23 @@ class TestAPI(common.TransactionCase):
 
         # all the records of an instance already have an entry in cache
         partners = self.env['res.partner'].search([])
-        partner_ids = self.env.prefetch['res.partner']
-        self.assertEqual(set(partners.ids), set(partner_ids))
+        partners_in_cache = self.env.with_model(partners)
+        self.assertEqual(partners, partners_in_cache)
 
         # countries have not been fetched yet; their cache must be empty
         countries = self.env['res.country'].browse()
-        self.assertFalse(self.env.prefetch['res.country'])
+        self.assertFalse(self.env.with_model(countries))
 
         # reading ONE partner should fetch them ALL
-        countries |= partners[0].country_id
-        country_cache = self.env.cache[partners._fields['country_id']]
-        self.assertLessEqual(set(partners._ids), set(country_cache))
+        countries = partners[0].country_id
+        partners_in_cache = self.env.with_field(partners._fields['country_id'])
+        self.assertLessEqual(partners, partners_in_cache)
 
         # read all partners, and check that the cache already contained them
-        country_ids = list(self.env.prefetch['res.country'])
+        countries_in_cache = self.env.with_model(countries)
         for p in partners:
             countries |= p.country_id
-        self.assertLessEqual(set(countries.ids), set(country_ids))
+        self.assertLessEqual(countries, countries_in_cache)
 
     @mute_logger('openerp.models')
     def test_70_one(self):

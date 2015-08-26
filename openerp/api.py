@@ -855,7 +855,7 @@ class Environment(object):
         self.cr, self.uid, self.context = self.args = (cr, uid, frozendict(context))
         self.registry = RegistryManager.get(cr.dbname)
         self.cache = defaultdict(dict)      # {field: {id: value, ...}, ...}
-        self.prefetch = defaultdict(set)    # {model_name: set(id), ...}
+        self._prefetch = defaultdict(set)   # {model_name: set(id), ...}
         self._dirty = defaultdict(set)      # {record: set(field_name), ...}
         self.computed = defaultdict(set)    # {field: set(id), ...}
         self.all = envs
@@ -938,6 +938,18 @@ class Environment(object):
         """ Return whether we are in 'onchange' draft mode. """
         return self.all.mode == 'onchange'
 
+    def prefetch(self, records):
+        """ Make sure ``records`` are present in cache (for prefetching). """
+        self._prefetch[records._name].update(records._ids)
+
+    def with_model(self, model):
+        """ Return the records in cache with the given ``model`` (recordset). """
+        return model.browse(self._prefetch[model._name])
+
+    def with_field(self, field):
+        """ Return the records in cache with the given field. """
+        return self[field.model_name].browse(self.cache[field])
+
     def invalidate(self, spec):
         """ Invalidate some fields for some records in the cache of all
             environments.
@@ -963,7 +975,7 @@ class Environment(object):
         """ Clear the cache of all environments. """
         for env in list(self.all):
             env.cache.clear()
-            env.prefetch.clear()
+            env._prefetch.clear()
             env._dirty.clear()
             env.computed.clear()
 

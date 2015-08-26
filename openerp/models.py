@@ -5413,7 +5413,7 @@ class BaseModel(object):
         records = object.__new__(cls)
         records.env = env
         records._ids = ids
-        env.prefetch[cls._name].update(ids)
+        env.prefetch(records)
         return records
 
     @api.v7
@@ -5810,10 +5810,8 @@ class BaseModel(object):
             (:class:`Field` instance).
         """
         env = self.env
-        prefetch_ids = env.prefetch[self._name]
-        prefetch_ids.update(self._ids)
-        ids = filter(None, prefetch_ids - set(env.cache[field]))
-        return self.browse(ids)
+        env.prefetch(self)
+        return (env.with_model(self) - env.with_field(field)).filtered('id')
 
     @api.model
     def refresh(self):
