@@ -857,7 +857,7 @@ class Environment(object):
         self.cache = defaultdict(dict)      # {field: {id: value, ...}, ...}
         self._prefetch = defaultdict(set)   # {model_name: set(id), ...}
         self._dirty = defaultdict(set)      # {record: set(field_name), ...}
-        self.computed = defaultdict(set)    # {field: set(id), ...}
+        self._computed = defaultdict(set)   # {field: set(id), ...}
         self.all = envs
         envs.add(self)
         return self
@@ -950,6 +950,21 @@ class Environment(object):
         """ Return the records in cache with the given field. """
         return self[field.model_name].browse(self.cache[field])
 
+    @contextmanager
+    def computing(self, fields, records):
+        """ Context manager that marks ``fields`` as being computed on ``records``. """
+        try:
+            for field in fields:
+                self._computed[field].update(records._ids)
+            yield
+        finally:
+            for field in fields:
+                self._computed[field].difference_update(records._ids)
+
+    def computed(self, field):
+        """ Return the records currently being computed for ``field``. """
+        return self[field.model_name].browse(self._computed[field])
+
     def invalidate(self, spec):
         """ Invalidate some fields for some records in the cache of all
             environments.
@@ -977,7 +992,7 @@ class Environment(object):
             env.cache.clear()
             env._prefetch.clear()
             env._dirty.clear()
-            env.computed.clear()
+            env._computed.clear()
 
     def clear(self):
         """ Clear all record caches, and discard all fields to recompute.

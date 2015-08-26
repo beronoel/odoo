@@ -853,18 +853,16 @@ class Field(object):
 
     def _compute_value(self, records):
         """ Invoke the compute method on ``records``. """
-        # initialize the fields to their corresponding null value in cache
-        computed = records._field_computed[self]
-        for field in computed:
+        fields = records._field_computed[self]
+        with records.env.computing(fields, records):
+            # initialize the fields to their corresponding null value in cache
+            values = {field.name: field.null(records.env) for field in fields}
             for record in records:
-                record._cache[field.name] = field.null(records.env)
-            records.env.computed[field].update(records._ids)
-        if isinstance(self.compute, basestring):
-            getattr(records, self.compute)()
-        else:
-            self.compute(records)
-        for field in computed:
-            records.env.computed[field].difference_update(records._ids)
+                record._cache.update(values)
+            if isinstance(self.compute, basestring):
+                getattr(records, self.compute)()
+            else:
+                self.compute(records)
 
     def compute_value(self, records):
         """ Invoke the compute method on ``records``; the results are in cache. """
@@ -998,15 +996,13 @@ class Field(object):
         # ``records``, except fields currently being computed
         spec = []
         for field, path in records._field_triggers[self]:
-            target = env[field.model_name]
-            computed = target.browse(env.computed[field])
             if path == 'id':
-                target = records - computed
+                target = records - env.computed(field)
             elif path and env.in_onchange:
-                target = env.with_field(field) - computed
+                target = env.with_field(field) - env.computed(field)
                 target = target.filtered(lambda rec: rec._mapped_cache(path) & records)
             else:
-                target = env.with_field(field) - computed
+                target = env.with_field(field) - env.computed(field)
 
             if target:
                 spec.append((field, target._ids))
