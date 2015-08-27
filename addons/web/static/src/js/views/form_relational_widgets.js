@@ -1153,7 +1153,10 @@ var One2ManyListView = X2ManyListView.extend({
         if (self.__focus) {
             self._on_blur_one2many(true);
             return this._super().then(function () {
-                self.start_edition(self.records.get(self.editor.form.datarecord.id));
+                var record_being_edited = self.records.get(self.editor.form.datarecord.id);
+                if (record_being_edited) {
+                    self.start_edition(record_being_edited);
+                }
             });
         }
         return this._super();
