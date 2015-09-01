@@ -569,7 +569,7 @@ class purchase_order(osv.osv):
         #For anglo-saxon accounting
         account_id = fiscal_obj.map_account(cr, uid, fpos, acc_id)
         if po_line.company_id.anglo_saxon_accounting and po_line.product_id and po_line.product_id.type == 'product':
-            acc_id = po_line.product_id.property_stock_account_input and po_line.product_id.property_stock_account_input.id
+            acc_id = po_line.product_id.property_stock_account_input_id and po_line.product_id.property_stock_account_input_id.id
             if not acc_id:
                 acc_id = po_line.product_id.categ_id.property_stock_account_input_categ_id and po_line.product_id.categ_id.property_stock_account_input_categ_id.id
             if acc_id:
@@ -1815,7 +1815,7 @@ class account_invoice_line(osv.Model):
 
                 # oa will be the stock input account
                 # first check the product, if empty check the category
-                oa = i_line.product_id.property_stock_account_input and i_line.product_id.property_stock_account_input.id
+                oa = i_line.product_id.property_stock_account_input_id and i_line.product_id.property_stock_account_input_id.id
                 if not oa:
                     oa = i_line.product_id.categ_id.property_stock_account_input_categ_id and i_line.product_id.categ_id.property_stock_account_input_categ_id.id
                 if oa:

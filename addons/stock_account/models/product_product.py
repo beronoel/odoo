@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp.osv import osv
-from openerp import api
+from openerp import api, models
 
 
-class product_product(osv.osv):
+class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     @api.onchange('type')

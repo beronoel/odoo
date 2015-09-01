@@ -98,8 +98,8 @@
     property_account_income_id: account_anglo_income_fifo
     property_account_expense_id: account_anglo_cogs_fifo
     property_account_creditor_price_difference: account_anglo_price_difference_fifo
-    property_stock_account_input: account_anglo_stock_input_fifo
-    property_stock_account_output: account_anglo_stock_output_fifo
+    property_stock_account_input_id: account_anglo_stock_input_fifo
+    property_stock_account_output_id: account_anglo_stock_output_fifo
     cost_method: 'average'
 -
   I create a draft Purchase Order.

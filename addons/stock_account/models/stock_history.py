@@ -1,42 +1,64 @@
 # -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from openerp import tools
-from openerp.osv import fields, osv
+from openerp import api, fields, models
 
 
-class stock_history(osv.osv):
+class StockHistory(models.Model):
     _name = 'stock.history'
     _auto = False
-    _order = 'date asc'
+    _order = 'operation_date asc'
 
-    def read_group(self, cr, uid, domain, fields, groupby, offset=0, limit=None, context=None, orderby=False, lazy=True):
-        res = super(stock_history, self).read_group(cr, uid, domain, fields, groupby, offset=offset, limit=limit, context=context, orderby=orderby, lazy=lazy)
-        if context is None:
-            context = {}
-        date = context.get('history_date')
+    move_id = fields.Many2one('stock.move', 'Stock Move', required=True)
+    location_id = fields.Many2one('stock.location', 'Location', required=True)
+    company_id = fields.Many2one('res.company', 'Company')
+    product_id = fields.Many2one('product.product', 'Product', required=True)
+    product_categ_id = fields.Many2one('product.category', 'Product Category', required=True)
+    quantity = fields.Float('Product Quantity')
+    operation_date = fields.Datetime('Operation Date')
+    price_unit_on_quant = fields.Float('Value')
+    inventory_value = fields.Float(compute='_get_inventory_value', string="Inventory Value", readonly=True)
+    source = fields.Char('Source')
+    product_template_id = fields.Many2one('product.template', 'Product Template', required=True)
+    serial_number = fields.Char('Serial Number', required=True)
+
+    def _get_inventory_value(self):
+        date = self.env.context.get('history_date')
+        ProductTemplate = self.env["product.template"]
+        for line in self:
+            if line.product_id.cost_method == 'real':
+                line.inventory_value = line.quantity * line.price_unit_on_quant
+            else:
+                line.inventory_value = line.quantity * ProductTemplate.get_history_price(line.product_id.product_tmpl_id.id, line.company_id.id, date=date)
+
+    @api.model
+    def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
+        res = super(StockHistory, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)
+        date = self.env.context.get('history_date')
         if 'inventory_value' in fields:
             group_lines = {}
             for line in res:
                 domain = line.get('__domain', [])
-                group_lines.setdefault(str(domain), self.search(cr, uid, domain, context=context))
+                group_lines.setdefault(str(domain), self.search(domain))
             line_ids = set()
             for ids in group_lines.values():
                 for product_id in ids:
-                    line_ids.add(product_id)
+                    line_ids.add(product_id.id)
             line_ids = list(line_ids)
             lines_rec = {}
             if line_ids:
-                cr.execute('SELECT id, product_id, price_unit_on_quant, company_id, quantity FROM stock_history WHERE id in %s', (tuple(line_ids),))
-                lines_rec = cr.dictfetchall()
+                self.env.cr.execute('SELECT id, product_id, price_unit_on_quant, company_id, quantity FROM stock_history WHERE id in %s', (tuple(line_ids),))
+                lines_rec = self.env.cr.dictfetchall()
             lines_dict = dict((line['id'], line) for line in lines_rec)
             product_ids = list(set(line_rec['product_id'] for line_rec in lines_rec))
-            products_rec = self.pool['product.product'].read(cr, uid, product_ids, ['cost_method', 'product_tmpl_id'], context=context)
+            products_rec = self.env['product.product'].search_read([('id', 'in', product_ids)], ['cost_method', 'product_tmpl_id'])
             products_dict = dict((product['id'], product) for product in products_rec)
             cost_method_product_tmpl_ids = list(set(product['product_tmpl_id'][0] for product in products_rec if product['cost_method'] != 'real'))
             histories = []
             if cost_method_product_tmpl_ids:
-                cr.execute('SELECT DISTINCT ON (product_template_id, company_id) product_template_id, company_id, cost FROM product_price_history WHERE product_template_id in %s AND datetime <= %s ORDER BY product_template_id, company_id, datetime DESC', (tuple(cost_method_product_tmpl_ids), date))
-                histories = cr.dictfetchall()
+                self.env.cr.execute('SELECT DISTINCT ON (product_template_id, company_id) product_template_id, company_id, cost FROM product_price_history WHERE product_template_id in %s AND datetime <= %s ORDER BY product_template_id, company_id, datetime DESC', (tuple(cost_method_product_tmpl_ids), date))
+                histories = self.env.cr.dictfetchall()
             histories_dict = {}
             for history in histories:
                 histories_dict[(history['product_template_id'], history['company_id'])] = history['cost']
@@ -44,7 +66,7 @@ class stock_history(osv.osv):
                 inv_value = 0.0
                 lines = group_lines.get(str(line.get('__domain', [])))
                 for line_id in lines:
-                    line_rec = lines_dict[line_id]
+                    line_rec = lines_dict[line_id.id]
                     product = products_dict[line_rec['product_id']]
                     if product['cost_method'] == 'real':
                         price = line_rec['price_unit_on_quant']
@@ -53,34 +75,6 @@ class stock_history(osv.osv):
                     inv_value += price * line_rec['quantity']
                 line['inventory_value'] = inv_value
         return res
-
-    def _get_inventory_value(self, cr, uid, ids, name, attr, context=None):
-        if context is None:
-            context = {}
-        date = context.get('history_date')
-        product_tmpl_obj = self.pool.get("product.template")
-        res = {}
-        for line in self.browse(cr, uid, ids, context=context):
-            if line.product_id.cost_method == 'real':
-                res[line.id] = line.quantity * line.price_unit_on_quant
-            else:
-                res[line.id] = line.quantity * product_tmpl_obj.get_history_price(cr, uid, line.product_id.product_tmpl_id.id, line.company_id.id, date=date, context=context)
-        return res
-
-    _columns = {
-        'move_id': fields.many2one('stock.move', 'Stock Move', required=True),
-        'location_id': fields.many2one('stock.location', 'Location', required=True),
-        'company_id': fields.many2one('res.company', 'Company'),
-        'product_id': fields.many2one('product.product', 'Product', required=True),
-        'product_categ_id': fields.many2one('product.category', 'Product Category', required=True),
-        'quantity': fields.float('Product Quantity'),
-        'date': fields.datetime('Operation Date'),
-        'price_unit_on_quant': fields.float('Value'),
-        'inventory_value': fields.function(_get_inventory_value, string="Inventory Value", type='float', readonly=True),
-        'source': fields.char('Source'),
-        'product_template_id': fields.many2one('product.template', 'Product Template', required=True),
-        'serial_number': fields.char('Serial Number', required=True),
-    }
 
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'stock_history')
@@ -94,7 +88,7 @@ class stock_history(osv.osv):
                 product_categ_id,
                 product_template_id,
                 SUM(quantity) as quantity,
-                date,
+                operation_date,
                 price_unit_on_quant,
                 source,
                 serial_number
@@ -109,7 +103,7 @@ class stock_history(osv.osv):
                     product_template.id AS product_template_id,
                     product_template.categ_id AS product_categ_id,
                     quant.qty AS quantity,
-                    stock_move.date AS date,
+                    stock_move.date AS operation_date,
                     quant.cost as price_unit_on_quant,
                     stock_move.origin AS source,
                     stock_production_lot.name AS serial_number
@@ -146,7 +140,7 @@ class stock_history(osv.osv):
                     product_template.id AS product_template_id,
                     product_template.categ_id AS product_categ_id,
                     - quant.qty AS quantity,
-                    stock_move.date AS date,
+                    stock_move.date AS operation_date,
                     quant.cost as price_unit_on_quant,
                     stock_move.origin AS source,
                     stock_production_lot.name AS serial_number
@@ -174,5 +168,5 @@ class stock_history(osv.osv):
                     dest_location.usage not in ('internal', 'transit'))
                 ))
                 AS foo
-                GROUP BY move_id, location_id, company_id, product_id, product_categ_id, date, price_unit_on_quant, source, product_template_id, serial_number
+                GROUP BY move_id, location_id, company_id, product_id, product_categ_id, operation_date, price_unit_on_quant, source, product_template_id, serial_number
             )""")

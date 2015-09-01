@@ -9,8 +9,8 @@
     valuation: real_time
     weight: 10
     volume: 1 
-    property_stock_account_input: o_expense
-    property_stock_account_output: o_income
+    property_stock_account_input_id: o_expense
+    property_stock_account_output_id: o_income
 -
   !record {model: product.product, id: product_landed_cost_2}:
     name: "LC product 2"
@@ -18,8 +18,8 @@
     valuation: real_time
     weight: 20
     volume: 1.5
-    property_stock_account_input: o_expense
-    property_stock_account_output: o_income
+    property_stock_account_input_id: o_expense
+    property_stock_account_output_id: o_income
 -
   I create 2 picking moving those products
 -

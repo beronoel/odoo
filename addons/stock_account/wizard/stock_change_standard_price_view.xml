@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
         <record id="view_change_standard_price" model="ir.ui.view">
             <field name="name">Change Standard Price</field>
             <field name="model">stock.change.standard.price</field>
@@ -27,7 +26,4 @@
             <field name="view_id" ref="view_change_standard_price"/>
             <field name="target">new</field>
         </record>
-
-    </data>
-</openerp>
-
+</odoo>

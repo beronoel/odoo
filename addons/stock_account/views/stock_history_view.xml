@@ -9,7 +9,7 @@
                 <field name="product_id" invisible="1"/>
                 <field name="move_id"/>
                 <field name="company_id" groups="base.group_multi_company"/>
-                <field name="date"/>
+                <field name="operation_date"/>
                 <field name="source"/>
                 <field name="quantity" sum="# of Products "/>
                 <field name="inventory_value" sum="Total Value"/>

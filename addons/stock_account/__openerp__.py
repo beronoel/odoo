@@ -39,9 +39,6 @@ Dashboard / Reports for Warehouse Management includes:
         'views/stock_config_settings_view.xml',
         'data/stock_account_post_install.yml',
     ],
-    'test': [
-
-    ],
     'installable': True,
     'auto_install': True,
 }
