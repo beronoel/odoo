@@ -2293,7 +2293,7 @@ class stock_move(osv.osv):
         """
         if move.picking_id and (move.picking_id.picking_type_id.use_existing_lots or move.picking_id.picking_type_id.use_create_lots) and \
             move.product_id.tracking != 'none':
-            if not (move.restrict_lot_id or (ops and ops.pack_lot_ids)):
+            if not (move.restrict_lot_id or (ops and (ops.pack_lot_ids or not ops.product_id))):
                 raise UserError(_('You need to provide a Lot/Serial Number for product %s') % move.product_id.name)
 
     def check_recompute_pack_op(self, cr, uid, ids, context=None):
