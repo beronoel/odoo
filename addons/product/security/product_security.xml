@@ -28,7 +28,7 @@
     </record>
 
     <record id="group_stock_packaging" model="res.groups">
-        <field name="name">Manage Product Packaging</field>
+        <field name="name">Manage Product Packaging Methods</field>
         <field name="category_id" ref="base.module_category_hidden"/>
     </record>
 

@@ -307,7 +307,8 @@ class stock_quant(osv.osv):
         'qty': fields.float('Quantity', required=True, help="Quantity of products in this quant, in the default unit of measure of the product", readonly=True, select=True),
         'product_uom_id': fields.related('product_id', 'uom_id', type='many2one', relation="product.uom", string='Unit of Measure', readonly=True),
         'package_id': fields.many2one('stock.quant.package', string='Package', help="The package containing this quant", readonly=True, select=True),
-        'packaging_type_id': fields.related('package_id', 'packaging_id', type='many2one', relation='product.packaging', string='Type of packaging', readonly=True, store=True),
+        'packaging_type_id': fields.related('package_id', 'packaging_id', type='many2one', relation='product.packaging', string='Packaging Method', readonly=True, store=True),
+        'ul_id': fields.related('package_id', 'ul_id', type='many2one', relation='product.ul', string='Package Type'),
         'reservation_id': fields.many2one('stock.move', 'Reserved for Move', help="The move the quant is reserved for", readonly=True, select=True),
         'lot_id': fields.many2one('stock.production.lot', 'Lot', readonly=True, select=True, ondelete="restrict"),
         'cost': fields.float('Unit Cost'),
@@ -1891,8 +1892,7 @@ class stock_move(osv.osv):
         'product_uom': fields.many2one('product.uom', 'Unit of Measure', required=True, states={'done': [('readonly', True)]}),
         'product_tmpl_id': fields.related('product_id', 'product_tmpl_id', type='many2one', relation='product.template', string='Product Template'),
 
-        'product_packaging': fields.many2one('product.packaging', 'preferred Packaging', help="It specifies attributes of packaging like type, quantity of packaging,etc."),
-
+        'product_packaging': fields.many2one('product.packaging', 'Preferred Packaging Method', help="Manual info"),
         'location_id': fields.many2one('stock.location', 'Source Location', required=True, select=True, auto_join=True,
                                        states={'done': [('readonly', True)]}, help="Sets a location if you produce at a fixed location. This can be a partner location if you subcontract the manufacturing operations."),
         'location_dest_id': fields.many2one('stock.location', 'Destination Location', required=True, states={'done': [('readonly', True)]}, select=True,
@@ -4089,6 +4089,7 @@ class stock_package(osv.osv):
         'complete_name': fields.function(_complete_name, type='char', string="Package Name",),
         'parent_left': fields.integer('Left Parent', select=1),
         'parent_right': fields.integer('Right Parent', select=1),
+        'ul_id': fields.many2one('product.ul', 'Package Type'),
         'packaging_id': fields.many2one('product.packaging', 'Packaging', help="This field should be completed only if everything inside the package share the same product, otherwise it doesn't really makes sense.", select=True),
         'location_id': fields.function(_get_package_info, type='many2one', relation='stock.location', string='Location', multi="package",
                                     store={

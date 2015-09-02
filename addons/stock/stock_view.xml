@@ -1949,6 +1949,7 @@
                     <field name="product_id"/>
                     <field name="location_id"/>
                     <field name="package_id" groups="stock.group_tracking_lot"/>
+                    <field name="ul_id" groups="stock.group_tracking_lot"/>
                     <field name="lot_id" groups="stock.group_production_lot"/>
                     <field name="owner_id" groups="stock.group_tracking_owner"/>
                     <group expand='0' string='Filters'>
@@ -2019,6 +2020,7 @@
                     <field name="owner_id" groups="stock.group_tracking_owner"/>
                     <field name="lot_id" groups="stock.group_production_lot"/>
                     <field name="package_id" groups="stock.group_tracking_lot"/>
+                    <field name="ul_id" invisible="1"/>
                     <field name="packaging_type_id" invisible="1"/>
                     <field name="in_date"/>
                     <field name="inventory_value"/>
@@ -2085,6 +2087,44 @@
             <field name="res_model">stock.quant</field>
         </record>
 
+        <record id="product_ul_form_view" model="ir.ui.view">
+            <field name="name">product.ul.form.view</field>
+            <field name="model">product.ul</field>
+            <field name="arch" type="xml">
+                <form string="Package Type">
+                    <field name="name" placeholder="e.g. Pallet, Box, EuroPallet"/>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_ul_tree" model="ir.ui.view">
+            <field name="name">product.ul.tree</field>
+            <field name="model">product.ul</field>
+            <field name="arch" type="xml">
+                <tree string="Package Types" editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="product_ul_form_action" model="ir.actions.act_window">
+            <field name="name">Types of Packages</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.ul</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to add a new Package Type.
+              </p><p>
+                On every pack we can set the type of package.
+                That way you can make a difference between
+                pallets and boxes or between different types of pallets
+                if you want.
+              </p>
+            </field>
+        </record>
+
         <record model="ir.ui.view" id="view_quant_package_form">
             <field name="name">stock.quant.package.form</field>
             <field name="model">stock.quant.package</field>
@@ -2105,9 +2145,10 @@
                         </div>
                         <group>
                             <group>
-                               <field name="packaging_id"/>
-                               <field name='company_id' groups="base.group_multi_company"/>
-                               <field name='owner_id' groups="stock.group_tracking_owner"/>
+                                <field name="ul_id"/>
+                                <field name="packaging_id" groups="stock.group_packaging"/>
+                                <field name='company_id' groups="base.group_multi_company"/>
+                                <field name='owner_id' groups="stock.group_tracking_owner"/>
                             </group>
                             <group>
                             <field name="location_id"/>
@@ -2130,7 +2171,7 @@
                                 <field name="children_ids">
                                     <tree string="Contained Packages">
                                         <field name="complete_name"/>
-                                        <field name="packaging_id"/>
+                                        <field name="packaging_id" groups="stock.group_stock_packaging"/>
                                         <field name="location_id"/>
                                     </tree>
                                 </field>
@@ -2149,7 +2190,8 @@
             <field name="arch" type="xml">
                 <tree string="Package">
                     <field name="complete_name"/>
-                    <field name="packaging_id"/>
+                    <field name="packaging_id" groups="stock.group_stock_packaging"/>
+                    <field name="ul_id"/>
                     <field name="location_id"/>
                     <field name="company_id"/>
                 </tree>
@@ -2163,11 +2205,13 @@
                 <search string="Package">
                     <field name="name" string="Package Name"/>
                     <field name="location_id"/>
-                    <field name="packaging_id"/>
+                    <field name="packaging_id" groups="stock.group_stock_packaging"/>
+                    <field name="ul_id"/>
                     <group  expand='0' string='Group by...'>
-                       <filter string='Location' domain="[]" context="{'group_by' : 'location_id'}"/>
-                       <filter string='Packaging' domain="[]" context="{'group_by' : 'packaging_id'}"/>
-                       <filter string='Company' domain="[]" context="{'group_by' : 'company_id'}" groups="base.group_multi_company"/>
+                        <filter string='Location' domain="[]" context="{'group_by' : 'location_id'}"/>
+                        <filter string='Package Type' domain="[]" context="{'group_by': 'ul_id'}"/>
+                        <filter string='Packaging' domain="[]" context="{'group_by' : 'packaging_id'}" groups="stock.group_stock_packaging"/>
+                        <filter string='Company' domain="[]" context="{'group_by' : 'company_id'}" groups="base.group_multi_company"/>
                    </group>
                 </search>
             </field>
@@ -2185,8 +2229,7 @@
         <menuitem id="menu_package_config" name="Packages" parent="menu_packs_config" action="action_package_view" groups="stock.group_tracking_lot" sequence="2"/>
         <menuitem id="menu_packagings" name="Packagings" parent="stock.menu_warehouse_report" action="product.action_packaging_view" groups="product.group_stock_packaging" sequence="3"/>
         <menuitem id="menu_packagings_config" name="Packagings" parent="menu_packs_config" action="product.action_packaging_view" groups="product.group_stock_packaging" sequence="3"/>
-
-
+        <menuitem id="menu_product_packaging_stock_action" action="product_ul_form_action" parent="menu_packs_config" sequence="3"/>
 
         <!--Routes-->
         <record id="stock_location_route_tree" model="ir.ui.view">

@@ -142,11 +142,19 @@ class product_uom(osv.osv):
             return {'value': {'factor': 1, 'factor_inv': 1}}
         return {}
 
+
+class product_ul(osv.osv):
+    _name = "product.ul"
+    _description = "Logistic Unit"
+    _columns = {
+        'name' : fields.char('Name', select=True, required=True, translate=True)
+    }
+
+
 #----------------------------------------------------------
 # Categories
 #----------------------------------------------------------
 class product_category(osv.osv):
-
     @api.multi
     def name_get(self):
         def get_names(cat):
@@ -549,9 +557,9 @@ class product_template(osv.osv):
                  "resized as a 64x64px image, with aspect ratio preserved. "\
                  "Use this field anywhere a small image is required."),
         'packaging_ids': fields.one2many(
-            'product.packaging', 'product_tmpl_id', 'Logistical Units',
+            'product.packaging', 'product_tmpl_id', 'Packaging Methods',
             help="Gives the different ways to package the same product. This has no impact on "
-                 "the picking order and is mainly used if you use the EDI module."),
+                 "the picking order."),
         'seller_ids': fields.one2many('product.supplierinfo', 'product_tmpl_id', 'Vendor'),
         'selected_seller_id': fields.function(_select_seller, type='many2one', relation='product.supplierinfo', string='Selected Seller', help='Technical field that selects a seller based on priority (sequence) and an optional partner and/or a minimal quantity in the context'),
         'seller_delay': fields.related('selected_seller_id','delay', type='integer', string='Vendor Lead Time',

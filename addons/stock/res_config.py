@@ -110,8 +110,8 @@ class stock_config_settings(osv.osv_memory):
             implied_group='product.group_uom',
             help="""Allows you to select and maintain different units of measure for products."""),
         'group_stock_packaging': fields.selection([
-            (0, 'Do not manage packaging'),
-            (1, 'Manage available packaging options per products')
+            (0, 'Do not manage packaging methods'),
+            (1, 'Manage available packaging methods per products by specifying the quantity by package (advanced)')
             ], "Packaging Methods",
             implied_group='product.group_stock_packaging',
             help="""Allows you to create and manage your packaging dimensions and types you want to be maintained in your system."""),
@@ -122,8 +122,8 @@ class stock_config_settings(osv.osv_memory):
             implied_group='stock.group_production_lot',
             help="""This allows you to assign a lot (or serial number) to the pickings and moves.  This can make it possible to know which production lot was sent to a certain client, ..."""),
         'group_stock_tracking_lot': fields.selection([
-            (0, 'Do not manage packaging'),
-            (1, 'Record packages used on packing: pallets, boxes, ...)')
+            (0, 'Do not manage packages'),
+            (1, 'Manage packages: pallets, boxes, ...)')
             ], "Packages",
             implied_group='stock.group_tracking_lot',
             help="""This allows to manipulate packages.  You can put something in, take something from a package, but also move entire packages and put them even in another package.  """),

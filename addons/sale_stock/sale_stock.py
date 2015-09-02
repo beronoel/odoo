@@ -90,7 +90,7 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    product_packaging = fields.Many2one('product.packaging', string='Packaging', default=False)
+    product_packaging = fields.Many2one('product.packaging', string='Packaging Method', default=False)
     route_id = fields.Many2one('stock.location.route', string='Route', domain=[('sale_selectable', '=', True)])
     product_tmpl_id = fields.Many2one('product.template', related='product_id.product_tmpl_id', string='Product Template')
     procurement_ids = fields.One2many('procurement.order', 'so_line_id', string='Procurements')
