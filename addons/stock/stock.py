@@ -349,25 +349,6 @@ class stock_quant(osv.osv):
                     line['inventory_value'] = inv_value
         return res
 
-    def action_view_quant_history(self, cr, uid, ids, context=None):
-        '''
-        This function returns an action that display the history of the quant, which
-        mean all the stock moves that lead to this quant creation with this quant quantity.
-        '''
-        mod_obj = self.pool.get('ir.model.data')
-        act_obj = self.pool.get('ir.actions.act_window')
-
-        result = mod_obj.get_object_reference(cr, uid, 'stock', 'action_move_form2')
-        id = result and result[1] or False
-        result = act_obj.read(cr, uid, [id], context={})[0]
-
-        move_ids = []
-        for quant in self.browse(cr, uid, ids, context=context):
-            move_ids += [move.id for move in quant.history_ids]
-
-        result['domain'] = "[('id','in',[" + ','.join(map(str, move_ids)) + "])]"
-        return result
-
     def quants_reserve(self, cr, uid, quants, move, link=False, context=None):
         '''This function reserves quants for the given move (and optionally given link). If the total of quantity reserved is enough, the move's state
         is also set to 'assigned'
