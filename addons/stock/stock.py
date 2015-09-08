@@ -2774,8 +2774,24 @@ class stock_move(osv.osv):
             code = 'incoming'
         return code
 
-    def _get_taxes(self, cr, uid, move, context=None):
-        return []
+    def show_picking(self, cr, uid, ids, context=None):
+        assert len(ids) > 0
+        picking_id = self.browse(cr, uid, ids[0], context=context).picking_id.id
+        if picking_id:
+            data_obj = self.pool['ir.model.data']
+            view = data_obj.xmlid_to_res_id(cr, uid, 'stock.view_picking_form')
+            return {
+                 'name': _('Transfer'),
+                 'type': 'ir.actions.act_window',
+                 'view_type': 'form',
+                 'view_mode': 'form',
+                 'res_model': 'stock.picking',
+                 'views': [(view, 'form')],
+                 'view_id': view,
+                 'target': 'new',
+                 'res_id': picking_id,
+            }
+
 
 class stock_inventory(osv.osv):
     _name = "stock.inventory"
@@ -4473,7 +4489,6 @@ class stock_pack_operation_lot(osv.osv):
         ('uniq_lot_name', 'unique(operation_id, lot_name)', 'You have already mentioned this lot name in another line')]
 
     def do_plus(self, cr, uid, ids, context=None):
-        #return {'type': 'ir.actions.act_window_close'}
         for packlot in self.browse(cr, uid, ids, context=context):
             self.write(cr, uid, [packlot.id], {'qty': packlot.qty + 1}, context=context)
         pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
