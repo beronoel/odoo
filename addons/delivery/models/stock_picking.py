@@ -6,6 +6,22 @@ from openerp.exceptions import UserError
 
 import openerp.addons.decimal_precision as dp
 
+class StockQuantPackage(models.Model):
+    _inherit = "stock.quant.package"
+
+    @api.one
+    @api.depends('quant_ids', 'package_ids')
+    def _compute_weight(self):
+        weight = 0
+        for quant in self.quant_ids:
+            weight += quant.qty * quant.product_id.weight
+        for pack in self.pack_ids:
+            pack._compute_weight()
+            weight += pack.weight
+        self.weight = weight
+
+    weight = fields.Float(compute='_compute_weight')
+
 
 class StockPicking(models.Model):
     _inherit = 'stock.picking'
@@ -22,6 +38,29 @@ class StockPicking(models.Model):
     carrier_tracking_ref = fields.Char(string='Carrier Tracking Ref', copy=False)
     number_of_packages = fields.Integer(string='Number of Packages', copy=False)
     weight_uom_id = fields.Many2one('product.uom', string='Unit of Measure', required=True, readonly="1", help="Unit of measurement for Weight", default=_default_uom)
+
+
+    @api.one
+    @api.depends('pack_operation_ids')
+    def _get_list_of_packages(self):
+        self.ensure_one()
+        packs = set()
+        for packop in self.pack_operation_ids:
+            if packop.result_package_id:
+                packs.add(packop.result_package_id.id)
+            elif packop.package_id and not packop.product_id:
+                packs.add(packop.package_id.id)
+        return list(packs)
+
+    @api.one
+    @api.depends('pack_operation_ids')
+    def _compute_not_packed_weight(self):
+        weight = 0.0
+        uom_obj = self.env['product.uom']
+        for packop in self.pack_operation_ids:
+            if packop.product_id and not packop.result_package_id:
+                weight += uom_obj._compute_qty(packop.product_uom_id , packop.product_qty, packop.product_id.uom_id) * packop.product_id.weight
+        self.weight = weight
 
     @api.depends('product_id', 'move_lines')
     def _cal_weight(self):
