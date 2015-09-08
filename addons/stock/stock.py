@@ -4766,11 +4766,11 @@ class stock_picking_type(osv.osv):
         'default_location_dest_id': fields.many2one('stock.location', 'Default Destination Location', help="This is the default destination location when you create a picking manually with this picking type. It is possible however to change it or that the routes put another location. If it is empty, it will check for the customer location on the partner. "),
         'code': fields.selection([('incoming', 'Suppliers'), ('outgoing', 'Customers'), ('internal', 'Internal')], 'Type of Operation', required=True),
         'return_picking_type_id': fields.many2one('stock.picking.type', 'Picking Type for Returns'),
-        'show_entire_packs': fields.boolean('Allow moving packs'),
+        'show_entire_packs': fields.boolean('Allow moving packs', help="If checked, this shows the packs to be moved as a whole in the Operations tab all the time, even if there was no entire pack reserved."),
         'warehouse_id': fields.many2one('stock.warehouse', 'Warehouse', ondelete='cascade'),
         'active': fields.boolean('Active'),
-        'use_create_lots': fields.boolean('Create New Lots'),
-        'use_existing_lots': fields.boolean('Use Existing Lots'),
+        'use_create_lots': fields.boolean('Create New Lots', help="If this is checked only, it will suppose you want to create new Serial Numbers / Lots, so you can provide them in a text field. "),
+        'use_existing_lots': fields.boolean('Use Existing Lots', help="If this is checked, you will be able to choose the Serial Number / Lots. You can also decide to not put lots in this picking type.  This means it will create stock with no lot or not put a restriction on the lot taken. "),
 
         # Statistics for the kanban view
         'last_done_picking': fields.function(_get_tristate_values,
