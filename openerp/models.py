@@ -5856,14 +5856,8 @@ class BaseModel(object):
         for fname in fnames:
             spec += self._fields[fname].modified(self)
 
-        cached_fields = {
-            field
-            for env in self.env.all
-            for field in env.cache
-        }
         # invalidate non-stored fields.function which are currently cached
-        spec += [(f, None) for f in self.pool.pure_function_fields
-                 if f in cached_fields]
+        spec += [(f, None) for f in self.pool.pure_function_fields]
 
         self.env.invalidate(spec)
 

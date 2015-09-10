@@ -981,13 +981,13 @@ class Environment(object):
         for env in list(self.all):
             c = env.cache
             for field, ids in spec:
-                if ids is None:
-                    if field in c:
+                if field in c:
+                    if ids is None:
                         del c[field]
-                else:
-                    field_cache = c[field]
-                    for id in ids:
-                        field_cache.pop(id, None)
+                    else:
+                        pop = c[field].pop
+                        for id in ids:
+                            pop(id, None)
 
     def invalidate_all(self):
         """ Clear the cache of all environments. """
