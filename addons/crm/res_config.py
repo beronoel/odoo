@@ -19,7 +19,12 @@ class crm_configuration(osv.TransientModel):
             (0, "Each mail sent to the alias creates a new opportunity"),
             (1, "Use leads if you need a qualification step before creating an opportunity or a customer")
             ], "Leads", 
-            implied_group='crm.group_use_lead')
+            implied_group='crm.group_use_lead'),
+        'voip_integration': fields.boolean("Activate the integrated VoIP widget to call your contacts from your browser", 'VoIP'),
+        'contracts_management': fields.boolean("Manage and forecast your recurring revenue with statistics on MRR, churn, lifetime value, etc"),
+        'esign': fields.boolean("Allow your partners to sign your contracts online"),
+        'digital_product': fields.boolean("Sell your digital products seamlessly"),
+        'customer_portal': fields.boolean("Activate the customer portal"),
     }
 
     _defaults = {

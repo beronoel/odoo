@@ -1614,6 +1614,49 @@ var FieldToggleBoolean = common.AbstractField.extend({
     },
 });
 
+/**
+    This widget is intended to be used in config settings.
+    When checked, an upgrade popup is showed to the user.
+*/
+var UpgradeCheckbox = FieldBoolean.extend({
+    events: {
+        'click input': 'click_on_input',
+    },
+
+    init: function() {
+        this._super.apply(this, arguments);
+    },
+
+    click_on_input: function() {
+        var message = 'Kikou';
+
+        var buttons = [
+            {
+                text: _t("Upgrade"),
+                classes: 'btn-primary',
+                close: true,
+                click: this.confirm_upgrade,
+            },
+            {
+                text: _t("Cancel"),
+                close: true,
+            }
+        ];
+
+        new Dialog(this, {
+            size: 'medium',
+            buttons: buttons,
+            $content: $('<div>', {
+                text: message,
+            }),
+            title: _t("You need to upgrade to the enterprise version for this option"),
+        }).open();
+    },
+
+    confirm_upgrade: function() {
+        console.log('Upgrade !');
+    },
+});
 
 /**
  * Registry of form fields, called by :js:`instance.web.FormView`.
@@ -1650,7 +1693,8 @@ core.form_widget_registry
     .add('kanban_state_selection', KanbanSelection)
     .add('statinfo', StatInfo)
     .add('timezone_mismatch', TimezoneMismatch)
-    .add('label_selection', LabelSelection);
+    .add('label_selection', LabelSelection)
+    .add('upgrade_checkbox', UpgradeCheckbox);
 
 
 /**
