@@ -40,8 +40,8 @@
                     <t t-set="page_title" t-value="'Your Warehouse'"/>
                     <p>
                         Odoo uses the concept of Warehouse as a building where you stock your goods.
-                        Typically, a small business as only one warehouse (or more likely, a
-                        storage room), but as your company grow, you may need to manage several
+                        Typically, a small business has only one warehouse (or more likely, a
+                        storage room), but as your company grows, you may need to manage several
                         storage facilities.
                     </p>
                     <h4>Configure your warehouses:</h4>
@@ -300,17 +300,24 @@
                         Numbers, usually identified by bar codes stuck on the products.
                     </p>
                     <p>
-                        Lots can be encoded on incoming shipments lines, internal moves and
-                        outgoing deliveries, and later can be separated into smaller lots
-                        depending on the quantities ordered, but they will always keep their
-                        initial lot number so you can track them.
+                        Lots can be encoded on incoming shipments, internal transfers and
+                        outgoing deliveries according to the settings in the picking type.
+                        For every product, you can define if it does not do any lot tracking at all,
+                        if it tracks by lot, or by unique serial number.
+                    </p>
+                    <p>
+                        In case of unique serial numbers, each serial number will correspond
+                        to exactly one piece.  In case of lots, you need to supply the quantity
+                        for each lot when you move that product.
                     </p>
                     <h4>To use Lot Tracking:</h4>
                     <ul>
                         <li><strong>Activate <i>Track lots or serial numbers</i></strong> in your <a t-att-href="prepare_backend_url('stock.action_stock_config_settings')">Inventory Settings</a>.</li>
-                        <li><strong>When you process a Purchase order</strong>, assign a lot number to a group of products by clicking on the <span class="fa fa-cog"/> icon (e.g. 0001)</li>
+                        <li>Set the products you want to track with lots or serial numbers by setting the Tracking field on the product form</li>
+                        <li><strong>When you process an incoming shipment, internal transfer or delivery</strong>, assign a lot number or different lot numbers or serial numbers to a product by clicking on the <span class="fa fa-list"/> icon</li>
                     </ul>
-                    <p>The lot number you created will be displayed next to the item's location. To track the lot, go into <strong><i>Traceability > Serial Numbers</i></strong>.</p>
+                    <p>To check the trajectory of a lot, you can find it back in <strong><i>Inventory Control > Serial Numbers</i></strong>
+                        and then Traceability or you can filter the Quantitative Valuation of a product with a certain lot.  </p>
                 </t>
 
                 <t t-call="web_planner.page">
