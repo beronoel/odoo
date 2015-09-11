@@ -1627,12 +1627,16 @@ var UpgradeCheckbox = FieldBoolean.extend({
         this._super.apply(this, arguments);
     },
 
+    start: function() {
+        this.$checkbox = $("input", this.$el);
+    },
+
     click_on_input: function() {
-        var message = 'Kikou';
+        var message = 'You need to upgrade to Odoo Enterprise to activate this feature.';
 
         var buttons = [
             {
-                text: _t("Upgrade"),
+                text: _t("Upgrade now"),
                 classes: 'btn-primary',
                 close: true,
                 click: this.confirm_upgrade,
@@ -1640,21 +1644,28 @@ var UpgradeCheckbox = FieldBoolean.extend({
             {
                 text: _t("Cancel"),
                 close: true,
-            }
+                click: this.cancel_upgrade,
+            },
         ];
 
-        new Dialog(this, {
-            size: 'medium',
-            buttons: buttons,
-            $content: $('<div>', {
-                text: message,
-            }),
-            title: _t("You need to upgrade to the enterprise version for this option"),
-        }).open();
+        if(this.$checkbox.is(':checked')) {
+            new Dialog(this, {
+                size: 'medium',
+                buttons: buttons,
+                $content: $('<div>', {
+                    text: message,
+                }),
+                title: _t("Odoo Enterprise"),
+            }).open();
+        }
     },
 
     confirm_upgrade: function() {
-        console.log('Upgrade !');
+        framework.redirect("https://www.odoo.com/odoo-enterprise/upgrade");
+    },
+
+    cancel_upgrade: function() {
+        this.getParent().$checkbox.prop('checked', false);
     },
 });
 
