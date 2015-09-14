@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_enterprise_config_settings" model="ir.ui.view">
+        <field name="name">accounting enterprise settings</field>
+        <field name="model">account.config.settings</field>
+        <field name="inherit_id" ref="account.view_account_config_settings"/>
+        <field name="arch" type="xml">
+            <group name="bank_cash" position="after">
+                <group>
+                    <field name="accounting_dashboard" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="dynamic_reports" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="bank_interfaces" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="statement_import" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="check_printing" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="customer_followups" class="oe_inline" widget="upgrade_radio"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

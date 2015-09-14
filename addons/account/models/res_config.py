@@ -100,6 +100,30 @@ class AccountConfigSettings(models.TransientModel):
     currency_exchange_journal_id = fields.Many2one('account.journal',
         related='company_id.currency_exchange_journal_id',
         string="Rate Difference Journal",)
+    accounting_dashboard = fields.Selection([
+            (0, "Disable accounting dashboard"),
+            (1, "Enable accounting dashboard"),
+            ], "Accounting Dashboard")
+    dynamic_reports = fields.Selection([
+            (0, "Disable dynamic reports"),
+            (1, "Enable dynamic reports"),
+            ], "Dynamic Reports")
+    bank_interfaces = fields.Selection([
+            (0, "Disable bank interfaces"),
+            (1, "Enable bank interfaces"),
+            ], "Bank Interfaces")
+    statement_import = fields.Selection([
+            (0, "Disable statement import (Coda, OFX, QIF)"),
+            (1, "Enable statement import (Coda, OFX, QIF)"),
+            ], "Statement Import")
+    check_printing = fields.Selection([
+            (0, "Disable check printing and deposit"),
+            (1, "Enable check printing and deposit"),
+            ], "Check printing & deposit")
+    customer_followups = fields.Selection([
+            (0, "Disable customer follow-ups"),
+            (1, "Enable customer follow-ups"),
+            ], "Customer Follow-ups")
 
     @api.model
     def _default_has_default_company(self):
