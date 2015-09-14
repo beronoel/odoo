@@ -78,9 +78,9 @@ class stock_config_settings(osv.osv_memory):
             help='Work with product variant allows you to define some variant of the same products, an ease the product management in the ecommerce for example',
             implied_group='product.group_product_variant'),
         'company_id': fields.many2one('res.company', 'Company', required=True),
-        'module_procurement_jit': fields.selection([
-            (1, 'Schedule orders in real time'),
-            (0, 'Run scheduler once a day')
+        'module_sale_auto_reserve': fields.selection([
+            (1, 'Reserve Orders Immediately'),
+            (0, 'Reserve Orders by running schedulers')
             ], "Procurements",
             help="""This allows Just In Time computation of procurement orders.
                 All procurement orders will be processed immediately, which could in some
