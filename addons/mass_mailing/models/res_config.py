@@ -14,4 +14,8 @@ class MassMailingConfiguration(osv.TransientModel):
             ], "Campaigns",
             implied_group='mass_mailing.group_mass_mailing_campaign',
             help="""Manage mass mailign using Campaigns"""),
+        'mass_mailing_templates': fields.selection([
+            (0, "Disable mass mailing templates"),
+            (1, "Enable mass mailing templates"),
+            ], "Templates"),
     }
