@@ -15,19 +15,19 @@
                             <label for="voip_integration"/> <span class="label label-primary">Enterprise Only</span>
                         </div>
                         <div>
-                            <field name="contracts_management" class="oe_inline"/>
+                            <field name="contracts_management" class="oe_inline" widget="upgrade_checkbox"/>
                             <label for="contracts_management"/> <span class="label label-primary">Enterprise Only</span>
                         </div>
                         <div>
-                            <field name="esign" class="oe_inline"/>
+                            <field name="esign" class="oe_inline" widget="upgrade_checkbox"/>
                             <label for="esign"/> <span class="label label-primary">Enterprise Only</span>
                         </div>
                         <div>
-                            <field name="digital_product" class="oe_inline"/>
+                            <field name="digital_product" class="oe_inline" widget="upgrade_checkbox"/>
                             <label for="digital_product"/> <span class="label label-primary">Enterprise Only</span>
                         </div>
                         <div>
-                            <field name="customer_portal" class="oe_inline"/>
+                            <field name="customer_portal" class="oe_inline" widget="upgrade_checkbox"/>
                             <label for="customer_portal"/> <span class="label label-primary">Enterprise Only</span>
                         </div>
                     </div>

@@ -1632,6 +1632,8 @@ var UpgradeCheckbox = FieldBoolean.extend({
     },
 
     click_on_input: function() {
+        var self = this;
+
         var message = 'You need to upgrade to Odoo Enterprise to activate this feature.';
 
         var buttons = [
@@ -1644,12 +1646,11 @@ var UpgradeCheckbox = FieldBoolean.extend({
             {
                 text: _t("Cancel"),
                 close: true,
-                click: this.cancel_upgrade,
             },
         ];
 
         if(this.$checkbox.is(':checked')) {
-            new Dialog(this, {
+            var dialog = new Dialog(this, {
                 size: 'medium',
                 buttons: buttons,
                 $content: $('<div>', {
@@ -1657,15 +1658,15 @@ var UpgradeCheckbox = FieldBoolean.extend({
                 }),
                 title: _t("Odoo Enterprise"),
             }).open();
+
+            dialog.on('closed', null, function() {
+                self.$checkbox.prop('checked', false);
+            });
         }
     },
 
     confirm_upgrade: function() {
-        framework.redirect("https://www.odoo.com/odoo-enterprise/upgrade");
-    },
-
-    cancel_upgrade: function() {
-        this.getParent().$checkbox.prop('checked', false);
+        framework.redirect("http://localhost/odoo-enterprise/upgrade");
     },
 });
 
