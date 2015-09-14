@@ -472,11 +472,12 @@ class res_config_settings(osv.osv_memory, res_config_module_installation_mixin):
             dep_name = [x['display_name'] for x in module_pool.search_read(
                 cr, uid, ['|', ('id', 'in', installed_module_ids), ('id', 'in', dep_ids), ('application', '=', True)], context=context)]
             if dep_name:
-                message = '\n'.join(dep_name)
+                # message = '\n'.join(dep_name)
+                message = ["- %s \n" % name for name in dep_name]
                 return {
                     'warning': {
                         'title': _('Warning!'),
-                        'message': _('Enabling this feature you will install following paying application(s) \n%s') % message,
+                        'message': _('Enabling this feature will install the following paying application(s) : \n%s') % message,
                     }
                 }
         return {}
