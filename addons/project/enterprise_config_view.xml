@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sale_enterprise_config_settings" model="ir.ui.view">
+        <field name="name">project enterprise settings</field>
+        <field name="model">project.config.settings</field>
+        <field name="inherit_id" ref="project.view_config_settings"/>
+        <field name="priority" eval="32"/>
+        <field name="arch" type="xml">
+            <group name="project_management" position="after">
+                <group>
+                    <field name="timesheets_apps" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="forecasts" class="oe_inline" widget="upgrade_radio"/>
+                    <field name="gantt_charts" class="oe_inline" widget="upgrade_radio"/>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

@@ -7,7 +7,7 @@
         <field name="priority" eval="32"/>
         <field name="arch" type="xml">
             <group name="config_alias" position="after">
-                <group name="Customer">
+                <group>
                     <field name="voip_integration" class="oe_inline" widget="upgrade_radio"/>
                     <field name="contracts_management" class="oe_inline" widget="upgrade_radio"/>
                     <field name="esign" class="oe_inline" widget="upgrade_radio"/>
