@@ -1618,7 +1618,7 @@ var FieldToggleBoolean = common.AbstractField.extend({
     This widget is intended to be used in config settings.
     When checked, an upgrade popup is showed to the user.
 */
-var UpgradeCheckbox = FieldBoolean.extend({
+var UpgradeRadio = FieldRadio.extend({
     events: {
         'click input': 'click_on_input',
     },
@@ -1627,29 +1627,26 @@ var UpgradeCheckbox = FieldBoolean.extend({
         this._super.apply(this, arguments);
     },
 
-    start: function() {
-        this.$checkbox = $("input", this.$el);
-    },
-
     click_on_input: function() {
         var self = this;
 
-        var message = 'You need to upgrade to Odoo Enterprise to activate this feature.';
+        if($(event.target).val() == 1) {
 
-        var buttons = [
-            {
-                text: _t("Upgrade now"),
-                classes: 'btn-primary',
-                close: true,
-                click: this.confirm_upgrade,
-            },
-            {
-                text: _t("Cancel"),
-                close: true,
-            },
-        ];
+            var message = 'You need to upgrade to Odoo Enterprise to activate this feature.';
 
-        if(this.$checkbox.is(':checked')) {
+            var buttons = [
+                {
+                    text: _t("Upgrade now"),
+                    classes: 'btn-primary',
+                    close: true,
+                    click: this.confirm_upgrade,
+                },
+                {
+                    text: _t("Cancel"),
+                    close: true,
+                },
+            ];
+
             var dialog = new Dialog(this, {
                 size: 'medium',
                 buttons: buttons,
@@ -1660,9 +1657,15 @@ var UpgradeCheckbox = FieldBoolean.extend({
             }).open();
 
             dialog.on('closed', null, function() {
-                self.$checkbox.prop('checked', false);
+                self.$('input').first().prop("checked", true);
             });
         }
+    },
+
+    render_value: function() {
+        this._super();
+        var e = this.$("label[for^='" + this.uniqueId + "']").last();
+        e.append(" <span class='label label-primary'>Enterprise</span>");
     },
 
     confirm_upgrade: function() {
@@ -1706,7 +1709,7 @@ core.form_widget_registry
     .add('statinfo', StatInfo)
     .add('timezone_mismatch', TimezoneMismatch)
     .add('label_selection', LabelSelection)
-    .add('upgrade_checkbox', UpgradeCheckbox);
+    .add('upgrade_radio', UpgradeRadio);
 
 
 /**

@@ -20,11 +20,26 @@ class crm_configuration(osv.TransientModel):
             (1, "Use leads if you need a qualification step before creating an opportunity or a customer")
             ], "Leads", 
             implied_group='crm.group_use_lead'),
-        'voip_integration': fields.boolean("Activate the integrated VoIP widget to call your contacts from your browser", 'VoIP'),
-        'contracts_management': fields.boolean("Manage and forecast your recurring revenue with statistics on MRR, churn, lifetime value, etc"),
-        'esign': fields.boolean("Allow your partners to sign your contracts online"),
-        'digital_product': fields.boolean("Sell your digital products seamlessly"),
-        'customer_portal': fields.boolean("Activate the customer portal"),
+        'voip_integration': fields.selection([
+            (0, "Do not activate the integrated VoIP widget"),
+            (1, "Activate the integrated VoIP widget"),
+            ], "VoIP"),
+        'contracts_management': fields.selection([
+            (0, "Do not manage reccuring revenue"),
+            (1, "Manage and forecast your recurring revenue"),
+            ], "Recuring revenue"),
+        'esign': fields.selection([
+            (0, "Do not allow partner to sign contracts online"),
+            (1, "Allow your partners to sign contracts online"),
+            ], "eSign"),
+        'digital_product': fields.selection([
+            (0, "Do not sell your digital products"),
+            (1, "Sell your digital products seamlessly"),
+            ], "Digital Products"),
+        'customer_portal': fields.selection([
+            (0, "Do not activate the customer portal"),
+            (1, "Activate the customer portal"),
+            ], "Customer Portal"),
     }
 
     _defaults = {
