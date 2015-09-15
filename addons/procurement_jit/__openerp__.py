@@ -9,7 +9,7 @@
     'description': """
 This module will automatically reserve the different pickings
 =============================================================
-In order to 
+In order to
 
 
     """,
@@ -17,7 +17,7 @@ In order to
     'depends': ['sale_stock'],
     'data': [],
     'demo': [],
-    'test': ['test/procurement_jit.yml'],
+    'test': [],
     'installable': True,
     'auto_install': True,
 }
