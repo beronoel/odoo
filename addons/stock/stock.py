@@ -2055,8 +2055,8 @@ class stock_move(osv.osv):
                     wh_route_ids = []
                     if move.warehouse_id:
                         wh_route_ids = [x.id for x in move.warehouse_id.route_ids]
-                    elif move.picking_type_id and move.picking_type_id.warehouse_id:
-                        wh_route_ids = [x.id for x in move.picking_type_id.warehouse_id.route_ids]
+                    elif move.picking_id.picking_type_id.warehouse_id:
+                        wh_route_ids = [x.id for x in move.picking_id.picking_type_id.warehouse_id.route_ids]
                     if wh_route_ids:
                         rules = push_obj.search(cr, uid, domain + [('route_id', 'in', wh_route_ids)], order='route_sequence, sequence', context=context)
                     if not rules:

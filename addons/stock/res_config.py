@@ -82,8 +82,8 @@ class stock_config_settings(osv.osv_memory):
             (1, 'Reserve Sale Orders Immediately On Confirmation'),
             (0, 'Reserve Sale Orders Manually or by Running the Schedulers')
             ], "Procurements",
-            help="""When a sale order is confirmed, it will
-                try to reserve it immediately.
+            help="""Allows you to automatically reserve the available
+            products when confirming a sale order.
                 This installs the module procurement_jit."""),
         'module_claim_from_delivery': fields.selection([
             (0, 'Do not manage claims'),

@@ -474,7 +474,7 @@ class SaleOrderLine(models.Model):
                 continue
             qty = 0.0
             for proc in line.procurement_ids:
-                qty += proc.product_qty #TODO: Product UoM conversion?
+                qty += proc.product_qty
             if float_compare(qty, line.product_uom_qty, precision_digits=precision) >= 0:
                 return False
 
