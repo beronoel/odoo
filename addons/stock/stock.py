@@ -2077,6 +2077,8 @@ class stock_move(osv.osv):
         res = []
         for move in moves:
             res.append(self._create_procurement(cr, uid, move, context=context))
+        # Run procurements immediately when generated from multiple moves
+        self.pool['procurement.order'].run(cr, uid, res, context=context)
         return res
 
     def write(self, cr, uid, ids, vals, context=None):
