@@ -7,8 +7,8 @@
     'version': '1.0',
     'category': 'Base',
     'description': """
-This module will automatically reserve the picking from stock when sale order is confirmed
-==========================================================================================
+This module will automatically reserve the picking from stock when a sale order is confirmed
+============================================================================================
 Upon confirmation of a sale order or when quantities are added,
 the picking that reserves from stock will be reserved if the
 necessary quantities are available.
@@ -19,7 +19,7 @@ use manual reservation or run the schedulers where the system
 will take into account the expected date and the priority.
 
 If this automatic reservation would reserve too much, you can
-still undo it by unreserving a picking.
+still unreserve a picking.
     """,
     'website': 'https://www.odoo.com/page/manufacturing',
     'depends': ['sale_stock'],
