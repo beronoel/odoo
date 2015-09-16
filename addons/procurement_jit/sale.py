@@ -3,12 +3,17 @@
 
 from openerp import api, fields, models, _
 
-class SaleOrder(models.Model):
-    _inherit = "sale.order"
+class SaleOrderLine(models.Model):
+    _inherit = "sale.order.line"
 
     @api.multi
-    def action_confirm(self):
-        res = super(SaleOrder, self).action_confirm()
-        for order in self:
-            order.picking_ids.filtered(lambda x: x.state=='confirmed').action_assign()
+    def _action_procurement_create(self):
+        res = super(SaleOrderLine, self)._action_procurement_create()
+        orders = list(set(x.order_id for x in self))
+        for order in orders:
+            order.picking_ids.filtered(lambda x: x.state=='confirmed' and not x.quant_reserved_exist).action_assign()
+            reassign = order.picking_ids.filtered(lambda x: x.state=='partially_available' or ((x.state=='confirmed') and x.quant_reserved_exist))
+            if reassign:
+                reassign.do_unreserve()
+                reassign.action_assign()
         return res
