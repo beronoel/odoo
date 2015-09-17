@@ -191,6 +191,7 @@
 - 
   !record {model: stock.picking, id: outgoing_fifo_shipment_cur}:
     picking_type_id: stock.picking_type_out
+    partner_id: base.res_partner_2
 -
   Picking needs movement from stock
 -
@@ -223,6 +224,7 @@
 - 
   !record {model: stock.picking, id: outgoing_fifo_shipment_ret}:
     picking_type_id: stock.picking_type_out
+    partner_id: base.res_partner_2
 - 
   Picking needs movement from stock
 -
@@ -274,6 +276,7 @@
 - 
   !record {model: stock.picking, id: outgoing_fifo_shipment_neg}:
     picking_type_id: stock.picking_type_out
+    partner_id: base.res_partner_2
 -
   Picking needs movement from stock
 -
@@ -302,6 +305,7 @@
 - 
   !record {model: stock.picking, id: outgoing_fifo_shipment_neg2}:
     picking_type_id: stock.picking_type_out
+    partner_id: base.res_partner_2
 -
   Picking needs movement from stock
 -
