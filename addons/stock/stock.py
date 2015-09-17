@@ -3600,9 +3600,6 @@ class stock_warehouse(osv.osv):
         wh_output_stock_loc = warehouse.wh_output_stock_loc_id
         wh_pack_stock_loc = warehouse.wh_pack_stock_loc_id
 
-        #fetch customer and supplier locations, for references
-        customer_loc, supplier_loc = self._get_partner_locations(cr, uid, warehouse.id, context=context)
-
         #create in, out, internal picking types for warehouse
         input_loc = wh_input_stock_loc
         if warehouse.reception_steps == 'one_step':
@@ -3633,7 +3630,7 @@ class stock_warehouse(osv.osv):
             'use_create_lots': True,
             'use_existing_lots': False,
             'sequence_id': in_seq_id,
-            'default_location_src_id': supplier_loc.id,
+            'default_location_src_id': False,
             'default_location_dest_id': input_loc.id,
             'sequence': max_sequence + 1,
             'color': color}, context=context)
@@ -3646,7 +3643,7 @@ class stock_warehouse(osv.osv):
             'sequence_id': out_seq_id,
             'return_picking_type_id': in_type_id,
             'default_location_src_id': output_loc.id,
-            'default_location_dest_id': customer_loc.id,
+            'default_location_dest_id': False,
             'sequence': max_sequence + 4,
             'color': color}, context=context)
         picking_type_obj.write(cr, uid, [in_type_id], {'return_picking_type_id': out_type_id}, context=context)
