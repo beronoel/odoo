@@ -11,8 +11,7 @@ class SaleOrderLine(models.Model):
         res = super(SaleOrderLine, self)._action_procurement_create()
         orders = list(set(x.order_id for x in self))
         for order in orders:
-            order.picking_ids.filtered(lambda x: x.state=='confirmed' and not x.quant_reserved_exist).action_assign()
-            reassign = order.picking_ids.filtered(lambda x: not x.printed and (x.state=='partially_available' or ((x.state=='confirmed') and x.quant_reserved_exist)))
+            reassign = order.picking_ids.filtered(lambda x: x.state=='confirmed' or ((x.state=='partially_available') and not x.printed))
             if reassign:
                 reassign.do_unreserve()
                 reassign.action_assign()
