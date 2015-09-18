@@ -121,6 +121,7 @@ class Dispatcher(object):
         if instance is None:
             return self
         return Proxy(self, instance)
+    def __call__(self): pass
 
 class XMLRPCMarshaller(object):
     serialize = Dispatcher()
