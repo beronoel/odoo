@@ -143,6 +143,8 @@ class RecordMarshaller(object):
 
     @serialize.register(types.NoneType)
     def dump_none(self, value):
+        if self.allow_none:
+            return E.nil()
         raise TypeError("cannot marshal None unless allow_none is enabled")
 
     @serialize.register(bool)
