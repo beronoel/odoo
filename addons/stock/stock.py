@@ -886,7 +886,7 @@ class stock_picking(models.Model):
                     location_id = partner.property_stock_supplier.id
                 else:
                     customerloc, supplierloc = self.pool['stock.warehouse']._get_partner_locations(cr, uid, [], context=context)
-                    location_id = supplierloc
+                    location_id = supplierloc.id
             else:
                 location_id = picking_type.default_location_src_id.id
 
@@ -896,7 +896,7 @@ class stock_picking(models.Model):
                     location_dest_id = partner.property_stock_customer.id
                 else:
                     customerloc, supplierloc = self.pool['stock.warehouse']._get_partner_locations(cr, uid, [], context=context)
-                    location_dest_id = customerloc
+                    location_dest_id = customerloc.id
             else:
                 location_dest_id = picking_type.default_location_dest_id.id
 
