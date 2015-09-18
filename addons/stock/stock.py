@@ -4867,7 +4867,7 @@ class StockPackOperation(models.Model):
         self.qty_done = sum([x.qty for x in self.pack_lot_ids])
         lotlist = []
         for packlot in self.pack_lot_ids:
-            name = packlot.lot_id and packlot.lot_id.name or packlot.name
+            name = packlot.lot_id and packlot.lot_id.name or packlot.lot_name
             if name:
                 if name in list:
                     return {'warning': _('You put %s at least twice.  Every number should only appear once.  ') % (name)}
