@@ -876,19 +876,27 @@ class stock_picking(models.Model):
             packop_ids = [op.id for op in picking.pack_operation_ids]
             self.pool.get('stock.pack.operation').write(cr, uid, packop_ids, {'owner_id': picking.owner_id.id}, context=context)
 
-    def onchange_picking_type(self, cr, uid, ids, picking_type_id, partner_id):
+    def onchange_picking_type(self, cr, uid, ids, picking_type_id, partner_id, context=None):
         res = {}
         if picking_type_id:
-            picking_type = self.pool['stock.picking.type'].browse(cr, uid, picking_type_id)
-            if not picking_type.default_location_src_id and partner_id:
-                partner = self.pool['res.partner'].browse(cr, uid, partner_id)
-                location_id = partner.property_stock_supplier.id
+            picking_type = self.pool['stock.picking.type'].browse(cr, uid, picking_type_id, context=context)
+            if not picking_type.default_location_src_id:
+                if partner_id:
+                    partner = self.pool['res.partner'].browse(cr, uid, partner_id, context=context)
+                    location_id = partner.property_stock_supplier.id
+                else:
+                    customerloc, supplierloc = self.pool['stock.warehouse']._get_partner_locations(cr, uid, [], context=context)
+                    location_id = supplierloc
             else:
                 location_id = picking_type.default_location_src_id.id
 
-            if not picking_type.default_location_dest_id and partner_id:
-                partner = self.pool['res.partner'].browse(cr, uid, partner_id)
-                location_dest_id = partner.property_stock_customer.id
+            if not picking_type.default_location_dest_id:
+                if partner_id:
+                    partner = self.pool['res.partner'].browse(cr, uid, partner_id, context=context)
+                    location_dest_id = partner.property_stock_customer.id
+                else:
+                    customerloc, supplierloc = self.pool['stock.warehouse']._get_partner_locations(cr, uid, [], context=context)
+                    location_dest_id = customerloc
             else:
                 location_dest_id = picking_type.default_location_dest_id.id
 
