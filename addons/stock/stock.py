@@ -4869,7 +4869,7 @@ class StockPackOperation(models.Model):
         for packlot in self.pack_lot_ids:
             name = packlot.lot_id and packlot.lot_id.name or packlot.lot_name
             if name:
-                if name in list:
+                if name in lotlist:
                     return {'warning': _('You put %s at least twice.  Every number should only appear once.  ') % (name)}
                 else:
                     lotlist.append(name)
