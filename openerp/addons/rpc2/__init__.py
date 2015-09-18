@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
 import collections
+import json
 import logging
 import threading
 import types
@@ -12,9 +13,9 @@ import werkzeug.wrappers
 from lxml import etree
 from lxml.builder import E
 
-import openerp.modules.registry
 from openerp import http, models, service
 from openerp.exceptions import AccessDenied
+from openerp.modules.registry import RegistryManager
 from openerp.service import security
 
 from . import global_, database, model
@@ -46,6 +47,30 @@ class Rpc2(http.Controller):
                 response = marshaller(f)
             except Exception, e:
                 response = service.wsgi_server.xmlrpc_convert_exception_int(e)
+        elif req.mimetype == 'application/json':
+            request = {}
+            try:
+                request = json.load(req.stream)
+                assert 'id' in request, "Notification requests are not supported"
+                result = self.dispatch(
+                    db, request['method'], request.get('params', []))
+                resp = {
+                    'jsonrpc': '2.0',
+                    'id': request['id'],
+                    'result': result
+                }
+            except Exception, e:
+                resp = {
+                    'jsonrpc': '2.0',
+                    'id': request.get('id'),
+                    'error': {
+                        # TODO: use XML-RPC fault codes from wsgi_server?
+                        'code': 200,
+                        'message': str(e),
+                        'data': http.serialize_exception(e)
+                    }
+                }
+            response = JSONMarshaller().encode(resp)
         else:
             return werkzeug.exceptions.UnsupportedMediaType(
                 "%s mime type not supported by /RPC2" % req.mimetype)
@@ -53,7 +78,7 @@ class Rpc2(http.Controller):
         return werkzeug.wrappers.Response(response, mimetype=req.mimetype)
 
     def dispatch(self, db, method, params):
-        if method.startswith('system'):
+        if method.startswith(('system.', 'rpc.')):
             raise NameError("System methods not supported")
         # FIXME: introspection ("system") methods
         #   - system.listMethods()
@@ -76,8 +101,8 @@ class Rpc2(http.Controller):
         threading.current_thread().uid = uid
         threading.current_thread().dbname = db
 
-        openerp.modules.registry.RegistryManager.check_registry_signaling(db)
-        registry = openerp.registry(db)
+        RegistryManager.check_registry_signaling(db)
+        registry = RegistryManager.get(db)
         try:
             if len(path) == 1:
                 [func] = path
@@ -86,7 +111,7 @@ class Rpc2(http.Controller):
                 model_name, func = method.rsplit('.', 1)
                 return model.dispatch(registry, uid, model_name, func, *params)
         finally:
-            openerp.modules.registry.RegistryManager.signal_caches_change(db)
+            RegistryManager.signal_caches_change(db)
 
 class Dispatcher(object):
     """ Dispatches values to instance methods based on value types
@@ -208,6 +233,15 @@ class XMLRPCMarshaller(object):
     def fallback(self, value):
         return self.serialize(vars(value))
 
+class JSONMarshaller(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, models.BaseModel):
+            return o.ids
+        if isinstance(o, collections.Mapping):
+            return dict(o)
+        if isinstance(o, collections.Iterable):
+            return list(o)
+        return super(JSONMarshaller, self).default(o)
 
 class Proxy(object):
     def __init__(self, dispatcher, instance):

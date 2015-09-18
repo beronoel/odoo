@@ -10,7 +10,7 @@ def dispatch(registry, uid, model, method, *args):
             "%s is a private method and can not be called over RPC" % method)
 
     subject, args, kwargs = itertools.islice(
-        itertools.chain(args, [None], [None]),
+        itertools.chain(args, [None, None, None]),
         0, 3)
     ids = []
     context = {}
