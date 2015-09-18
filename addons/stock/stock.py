@@ -4865,3 +4865,11 @@ class StockPackOperation(models.Model):
     @api.onchange('pack_lot_ids')
     def _onchange_packlots(self):
         self.qty_done = sum([x.qty for x in self.pack_lot_ids])
+        lotlist = []
+        for packlot in self.pack_lot_ids:
+            name = packlot.lot_id and packlot.lot_id.name or packlot.name
+            if name:
+                if name in list:
+                    return {'warning': _('You put %s at least twice.  Every number should only appear once.  ') % (name)}
+                else:
+                    lotlist.append(name)
