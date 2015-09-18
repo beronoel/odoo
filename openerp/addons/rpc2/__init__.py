@@ -14,7 +14,6 @@ from lxml import etree
 from lxml.builder import E
 
 from openerp import http, models, service
-from openerp.exceptions import AccessDenied
 from openerp.modules.registry import RegistryManager
 from openerp.service import security
 
@@ -73,7 +72,9 @@ class Rpc2(http.Controller):
             response = JSONMarshaller().encode(resp)
         else:
             return werkzeug.exceptions.UnsupportedMediaType(
-                "%s mime type not supported by /RPC2" % req.mimetype)
+                "%s mime type not supported by /RPC2, request may be either "
+                "XML-RPC as text/xml or JSON-RPC 2.0 as application/json"
+                % req.mimetype)
 
         return werkzeug.wrappers.Response(response, mimetype=req.mimetype)
 
@@ -93,10 +94,16 @@ class Rpc2(http.Controller):
             [func] = path
             return global_.dispatch(func, *params)
 
-        authorization = http.request.httprequest.authorization
-        uid = security.login(db, authorization.username, authorization.password)
+        uid = None
+        auth = http.request.httprequest.authorization
+        if auth and auth.type == 'basic':
+            uid = security.login(db, auth.username, auth.password)
+
         if not uid:
-            raise AccessDenied()
+            r = werkzeug.wrappers.Response(status=401)
+            r.www_authenticate.set_basic(
+                "Odoo-RPC")
+            raise werkzeug.exceptions.Unauthorized(response=r)
 
         threading.current_thread().uid = uid
         threading.current_thread().dbname = db
