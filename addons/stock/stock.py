@@ -4870,6 +4870,9 @@ class StockPackOperation(models.Model):
             name = packlot.lot_id and packlot.lot_id.name or packlot.lot_name
             if name:
                 if name in lotlist:
-                    return {'warning': _('You put %s at least twice.  Every number should only appear once.  ') % (name)}
+                    return {'warning': {
+                                'title': _('Every lot/serial number should appear only once'),
+                                'message': _("Lot/Serial Number %s appears at least twice in the list. ") % (name,)
+                    }}
                 else:
                     lotlist.append(name)
