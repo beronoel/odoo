@@ -26,29 +26,31 @@ class Rpc2(http.Controller):
     @http.route('/RPC2/', auth='none', methods=['POST'])
     def rpc2(self, db=None):
         req = http.request.httprequest
-        if req.mimetype != 'text/xml':
-            return werkzeug.exceptions.UnsupportedMediaType(
-                "XML-RPC only allows text/xml request types, got %s" % req.mimetype)
 
-        params, method = xmlrpclib.loads(req.stream.read())
-
-        try:
-            result = self.dispatch(db, method, params)
-        except Exception, e:
-            response = service.wsgi_server.xmlrpc_convert_exception_int(e)
-        else:
-            if result is None:
-                logger.warn(
-                    "Method %s returned `None`, converting to `False`", method)
-                result = False
-
-            response = (
+        if req.mimetype == 'text/xml':
+            marshaller = lambda result:(
                 "<?xml version='1.0'?>\n"
-                "<methodResponse>\n%s</methodResponse>\n" %
-                    RecordMarshaller('utf-8', allow_none=False).dumps((result,))
+                "<methodResponse>%s</methodResponse>\n" %
+                    XMLRPCMarshaller('utf-8', allow_none=True).dumps((result,))
             )
+            try:
+                params, method = xmlrpclib.loads(req.stream.read())
+                result = self.dispatch(db, method, params)
+                response = marshaller(result)
+            except NameError, e:
+                response = marshaller(xmlrpclib.Fault(
+                    faultCode=xmlrpclib.METHOD_NOT_FOUND,
+                    faultString=str(e)
+                ))
+            except xmlrpclib.Fault, f:
+                response = marshaller(f)
+            except Exception, e:
+                response = service.wsgi_server.xmlrpc_convert_exception_int(e)
+        else:
+            return werkzeug.exceptions.UnsupportedMediaType(
+                "%s mime type not supported by /RPC2" % req.mimetype)
 
-        return werkzeug.wrappers.Response(response, mimetype='text/xml' )
+        return werkzeug.wrappers.Response(response, mimetype=req.mimetype)
 
     def dispatch(self, db, method, params):
         if method.startswith('system'):
@@ -120,7 +122,7 @@ class Dispatcher(object):
             return self
         return Proxy(self, instance)
 
-class RecordMarshaller(object):
+class XMLRPCMarshaller(object):
     serialize = Dispatcher()
     def __init__(self, encoding='utf-8', allow_none=False):
         self.encoding = encoding
