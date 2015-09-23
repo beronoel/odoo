@@ -2404,6 +2404,7 @@ class stock_move(osv.osv):
                             quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, lot_id=lot, domain=domain, preferred_domain_list=[], context=context)
                             quants_to_reserve = [x for x in quants if x[0]]
                             quant_obj.quants_reserve(cr, uid, quants_to_reserve, move, record, context=context)
+                            lot_qty[lot] -= qty
 
         for move in todo_moves:
             if move.linked_move_operation_ids:
