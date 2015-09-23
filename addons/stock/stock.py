@@ -2401,7 +2401,7 @@ class stock_move(osv.osv):
                         if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                             qty = min(lot_qty[lot], move_qty)
                             quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, lot_id=lot, domain=domain, preferred_domain_list=[], context=context)
-                            quants_to_reserve = [x for x in quants if x[0] and x[0].lot_id]
+                            quants_to_reserve = [x for x in quants if x[0]]
                             quant_obj.quants_reserve(cr, uid, quants_to_reserve, move, record, context=context)
 
         for move in todo_moves:
@@ -2507,7 +2507,7 @@ class stock_move(osv.osv):
             for quant in quants_taken:
                 move_quants_dict[move].setdefault(quant[0].lot_id.id, [])
                 move_quants_dict[move][quant[0].lot_id.id] += [quant]
-            false_quants_move = [x for x in false_quants if x[0].reservation_id.id == move]
+            false_quants_move = [(x, x.qty) for x in false_quants if x[0].reservation_id.id == move]
             for lot in lot_qty:
                 move_quants_dict[move].setdefault(lot, [])
                 if float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0 and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0:
