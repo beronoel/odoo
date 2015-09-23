@@ -2397,6 +2397,7 @@ class stock_move(osv.osv):
                 for record in ops.linked_move_operation_ids:
                     move_qty = record.qty
                     domain = main_domain[move.id]
+                    move = record.move_id
                     for lot in lot_qty:
                         if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                             qty = min(lot_qty[lot], move_qty)
@@ -2491,7 +2492,6 @@ class stock_move(osv.osv):
     def _move_quants_by_lot(self, cr, uid, ops, lot_qty, quants_taken, false_quants, lot_move_qty, quant_dest_package_id, context=None):
         quant_obj = self.pool['stock.quant']
         move_quants_dict = {}
-        domain = [('qty', '>', 0)]
         fallback_domain = [('reservation_id', '=', False)]
         fallback_domain2 = ['&', ('reservation_id', 'not in', [x for x in lot_move_qty.keys()]), ('reservation_id', '!=', False)]
         preferred_domain_list = [fallback_domain] + [fallback_domain2]
@@ -2512,9 +2512,10 @@ class stock_move(osv.osv):
                 move_quants_dict[move].setdefault(lot, [])
                 if float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0 and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0:
                     # Search if we can find quants with that lot
+                    domain = [('qty', '>', 0)]
                     quants = quant_obj.quants_get_preferred_domain(cr, uid, lot_move_qty[move], move_rec, ops=ops, lot_id=lot, domain=domain,
                                                         preferred_domain_list=preferred_domain_list, context=context)
-                    while quants and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0:
+                    while float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0:
                         quant = quants.pop(0)
                         if quant[0] and quant[0].lot_id:
                             qty = min (lot_qty[lot], lot_move_qty[move], quant[1])
