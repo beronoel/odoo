@@ -2396,8 +2396,8 @@ class stock_move(osv.osv):
                     lot_qty[pack_lot.lot_id.id] = uom_obj._compute_qty(cr, uid, ops.product_uom_id.id, pack_lot.qty, ops.product_id.uom_id.id)
                 for record in ops.linked_move_operation_ids:
                     move_qty = record.qty
-                    domain = main_domain[move.id]
                     move = record.move_id
+                    domain = main_domain[move.id]
                     for lot in lot_qty:
                         if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                             qty = min(lot_qty[lot], move_qty)
