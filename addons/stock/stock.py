@@ -2402,9 +2402,9 @@ class stock_move(osv.osv):
                         if float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(move_qty, 0, precision_rounding=rounding) > 0:
                             qty = min(lot_qty[lot], move_qty)
                             quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, ops=ops, lot_id=lot, domain=domain, preferred_domain_list=[], context=context)
-                            quants_to_reserve = [x for x in quants if x[0]]
-                            quant_obj.quants_reserve(cr, uid, quants_to_reserve, move, record, context=context)
+                            quant_obj.quants_reserve(cr, uid, quants, move, record, context=context)
                             lot_qty[lot] -= qty
+                            move_qty -= qty
 
         for move in todo_moves:
             if move.linked_move_operation_ids:
@@ -2511,6 +2511,7 @@ class stock_move(osv.osv):
             false_quants_move = [(x, x.qty) for x in false_quants if x[0].reservation_id.id == move]
             for lot in lot_qty:
                 move_quants_dict[move].setdefault(lot, [])
+                redo_false_quants = False
                 if float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0 and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0:
                     # Search if we can find quants with that lot
                     domain = [('qty', '>', 0)]
@@ -2528,9 +2529,10 @@ class stock_move(osv.osv):
                             while false_quants_move and float_compare(lot_qty[lot], 0, precision_rounding=rounding) > 0 and float_compare(lot_move_qty[move], 0, precision_rounding=rounding) > 0:
                                 qty_min = min(lot_qty[lot], lot_move_qty[move])
                                 if false_quants_move[0][1] > qty_min:
-                                    false_quants_move[0][1] -= qty_min
+                                    false_quants_move[0] = (false_quants_move[0][0], false_quants_move[0][1] - qty_min)
                                     move_quants_dict[move][lot] += [(false_quants_move[0][0], qty_min)]
                                     qty = qty_min
+                                    redo_false_quants = True
                                 else:
                                     move_quants_dict[move][lot] += [false_quants_move[0]]
                                     qty = false_quants_move[0][1]
@@ -2544,9 +2546,14 @@ class stock_move(osv.osv):
                                 lot_move_qty[move] -= qty
 
                 #Move all the quants related to that lot/move
-                quant_obj.quants_move(cr, uid, move_quants_dict[move][lot], move_rec, ops.location_dest_id, location_from=ops.location_id,
+                if move_quants_dict[move][lot]:
+                    quant_obj.quants_move(cr, uid, move_quants_dict[move][lot], move_rec, ops.location_dest_id, location_from=ops.location_id,
                                                     lot_id=lot, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
                                                     dest_package_id=quant_dest_package_id, context=context)
+                    if redo_false_quants:
+                        move_rec = self.pool['stock.move'].browse(cr, uid, move, context=context)
+                        false_quants_move = [(x, x.qty) for x in move_rec.reserved_quant_ids if not x.lot_id]
+
 
     def action_done(self, cr, uid, ids, context=None):
         """ Process completely the moves given as ids and if all moves are done, it will finish the picking.
