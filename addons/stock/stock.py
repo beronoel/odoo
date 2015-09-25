@@ -4506,6 +4506,8 @@ class stock_pack_operation_lot(osv.osv):
 
     _defaults = {
         'qty': lambda cr, uid, ids, c: 1.0,
+        'qty_todo': lambda cr, uid, ids, c: 0.0,
+        'plus_visible': True,
     }
 
     def _check_lot(self, cr, uid, ids, context=None):
