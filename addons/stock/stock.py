@@ -3625,7 +3625,7 @@ class stock_warehouse(osv.osv):
 
         #choose the next available color for the picking types of this warehouse
         color = 0
-        available_colors = [c for c in range(0, 8)]  # put white color first
+        available_colors = [0, 3, 4, 5, 6, 7, 8, 1, 2]  # put white color first
         all_used_colors = self.pool.get('stock.picking.type').search_read(cr, uid, [('warehouse_id', '!=', False), ('color', '!=', False)], ['color'], order='color')
         #don't use sets to preserve the list order
         for x in all_used_colors:
