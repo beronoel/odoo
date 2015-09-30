@@ -2654,7 +2654,6 @@ class stock_move(osv.osv):
         move_dest_ids = set()
         for move in self.browse(cr, uid, ids, context=context):
             move_qty_cmp = float_compare(move_qty[move.id], 0, precision_rounding=move.product_id.uom_id.rounding)
-
             if move_qty_cmp > 0:  # (=In case no pack operations in picking)
                 main_domain = [('qty', '>', 0)]
                 preferred_domain = [('reservation_id', '=', move.id)]
@@ -4466,6 +4465,8 @@ class stock_pack_operation(osv.osv):
         show_reserved = any([x for x in pack.pack_lot_ids if x.qty_todo > 0.0])
         ctx.update({'serial': serial,
                     'only_create': only_create,
+                    'create_lots': picking_type.use_create_lots,
+                    'state_done': pack.picking_id.state == 'done',
                     'show_reserved': show_reserved})
         return {
              'name': _('Lot Details'),
@@ -4544,18 +4545,22 @@ class stock_pack_operation_lot(osv.osv):
         ('uniq_lot_name', 'unique(operation_id, lot_name)', 'You have already mentioned this lot name in another line')]
 
     def do_plus(self, cr, uid, ids, context=None):
+        pack_obj = self.pool['stock.pack.operation']
         for packlot in self.browse(cr, uid, ids, context=context):
             self.write(cr, uid, [packlot.id], {'qty': packlot.qty + 1}, context=context)
-            self.pool['stock.pack.operation'].write(cr, uid, [packlot.operation_id.id], {'qty_done': packlot.operation_id.qty_done + 1}, context=context)
-        pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
-        return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
+        pack = self.browse(cr, uid, ids[0], context=context).operation_id
+        qty_done = sum([x.qty for x in pack.pack_lot_ids])
+        pack_obj.write(cr, uid, [pack.id], {'qty_done': qty_done}, context=context)
+        return pack_obj.split_lot(cr, uid, [pack.id], context=context)
 
     def do_minus(self, cr, uid, ids, context=None):
+        pack_obj = self.pool['stock.pack.operation']
         for packlot in self.browse(cr, uid, ids, context=context):
             self.write(cr, uid, [packlot.id], {'qty': packlot.qty - 1}, context=context)
-            self.pool['stock.pack.operation'].write(cr, uid, [packlot.operation_id.id], {'qty_done': packlot.operation_id.qty_done - 1}, context=context)
-        pack = self.browse(cr, uid, ids[0], context=context).operation_id.id
-        return self.pool['stock.pack.operation'].split_lot(cr, uid, [pack], context=context)
+        pack = self.browse(cr, uid, ids[0], context=context).operation_id
+        qty_done = sum([x.qty for x in pack.pack_lot_ids])
+        pack_obj.write(cr, uid, [pack.id], {'qty_done': qty_done}, context=context)
+        return pack_obj.split_lot(cr, uid, [pack.id], context=context)
 
 
 class stock_move_operation_link(osv.osv):
