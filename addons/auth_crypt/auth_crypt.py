@@ -14,7 +14,7 @@ default_crypt_context = CryptContext(
     # kdf which can be verified by the context. The default encryption kdf is
     # the first of the list
     ['pbkdf2_sha512', 'md5_crypt'],
-    deprecated=['auto'],
+#    deprecated=['auto'],
 )
 
 class res_users(osv.osv):
