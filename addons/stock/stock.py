@@ -2594,11 +2594,20 @@ class stock_move(osv.osv):
                 tot_qty += pack_lot.qty
             if ops.pack_lot_ids and ops.product_id and float_compare(tot_qty, ops.product_qty, precision_rounding=ops.product_uom_id.rounding) != 0.0:
                 raise UserError(_('You have a difference between the quantity on the operation and the quantities specified for the lots. '))
+
             quants_taken = []
             false_quants = []
             lot_move_qty = {}
+            #Group links by move first
+            move_qty_ops = {}
             for record in ops.linked_move_operation_ids:
                 move = record.move_id
+                if not move_qty_ops.get(move):
+                    move_qty_ops[move] = record.qty
+                else:
+                    move_qty_ops[move] += record.qty
+            #Process every move only once
+            for move in move_qty_ops:
                 self.check_tracking(cr, uid, move, ops, context=context)
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
@@ -2606,7 +2615,7 @@ class stock_move(osv.osv):
                 dom = main_domain
                 if not ops.pack_lot_ids:
                     preferred_domain_list = [preferred_domain] + [fallback_domain] + [fallback_domain2]
-                    quants = quant_obj.quants_get_preferred_domain(cr, uid, record.qty, move, ops=ops, domain=dom,
+                    quants = quant_obj.quants_get_preferred_domain(cr, uid, move_qty_ops[move], move, ops=ops, domain=dom,
                                                         preferred_domain_list=preferred_domain_list, context=context)
 
                     quant_obj.quants_move(cr, uid, quants, move, ops.location_dest_id, location_from=ops.location_id,
@@ -2614,7 +2623,7 @@ class stock_move(osv.osv):
                                           dest_package_id=quant_dest_package_id, entire_pack=entire_pack, context=context)
                 else:
                     # Check what you can do with reserved quants already
-                    qty_on_link = record.qty
+                    qty_on_link = move_qty_ops[move]
                     rounding = ops.product_id.uom_id.rounding
                     for reserved_quant in move.reserved_quant_ids:
                         if not reserved_quant.lot_id:
@@ -2632,7 +2641,7 @@ class stock_move(osv.osv):
 
                 if not move_qty.get(move.id):
                     raise UserError(_("The roundings of your Unit of Measures %s on the move vs. %s on the product don't allow to do these operations or you are not transferring the picking at once. ") % (move.product_uom.name, move.product_id.uom_id.name))
-                move_qty[move.id] -= record.qty
+                move_qty[move.id] -= move_qty_ops[move]
 
             #Handle lots separately
             if ops.pack_lot_ids:
@@ -2645,6 +2654,7 @@ class stock_move(osv.osv):
         move_dest_ids = set()
         for move in self.browse(cr, uid, ids, context=context):
             move_qty_cmp = float_compare(move_qty[move.id], 0, precision_rounding=move.product_id.uom_id.rounding)
+
             if move_qty_cmp > 0:  # (=In case no pack operations in picking)
                 main_domain = [('qty', '>', 0)]
                 preferred_domain = [('reservation_id', '=', move.id)]
