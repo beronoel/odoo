@@ -2577,7 +2577,6 @@ class stock_move(osv.osv):
         for ops in operations:
             if ops.picking_id:
                 pickings.add(ops.picking_id.id)
-            main_domain = [('qty', '>', 0)]
             entire_pack=False
             if ops.product_id:
                 #If a product is given, the result is always put immediately in the result package (if it is False, they are without package)
@@ -2613,10 +2612,9 @@ class stock_move(osv.osv):
                 preferred_domain = [('reservation_id', '=', move.id)]
                 fallback_domain = [('reservation_id', '=', False)]
                 fallback_domain2 = ['&', ('reservation_id', '!=', move.id), ('reservation_id', '!=', False)]
-                dom = main_domain
                 if not ops.pack_lot_ids:
                     preferred_domain_list = [preferred_domain] + [fallback_domain] + [fallback_domain2]
-                    quants = quant_obj.quants_get_preferred_domain(cr, uid, move_qty_ops[move], move, ops=ops, domain=dom,
+                    quants = quant_obj.quants_get_preferred_domain(cr, uid, move_qty_ops[move], move, ops=ops, domain=main_domain,
                                                         preferred_domain_list=preferred_domain_list, context=context)
                     quant_obj.quants_move(cr, uid, quants, move, ops.location_dest_id, location_from=ops.location_id,
                                           lot_id=False, owner_id=ops.owner_id.id, src_package_id=ops.package_id.id,
