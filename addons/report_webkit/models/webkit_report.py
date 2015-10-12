@@ -14,7 +14,7 @@ import time
 import logging
 from functools import partial
 
-from report_helper import WebKitHelper
+from webkit_helper import WebKitHelper
 import openerp
 from openerp.modules.module import get_module_resource
 from openerp.report.report_sxw import *
