@@ -2,14 +2,15 @@
 
 import re
 
-from openerp import api, fields, models, _
-from openerp.osv import expression
-from openerp.exceptions import UserError
+from odoo import api, fields, models
+from odoo.osv import expression
+
 
 def sanitize_account_number(acc_number):
     if acc_number:
         return re.sub(r'\W+', '', acc_number).upper()
     return False
+
 
 class Bank(models.Model):
     _description = 'Bank'
@@ -49,6 +50,7 @@ class Bank(models.Model):
         banks = self.search(domain + args, limit=limit)
         return banks.name_get()
 
+
 class ResPartnerBank(models.Model):
     _name = 'res.partner.bank'
     _rec_name = 'acc_number'
@@ -70,14 +72,14 @@ class ResPartnerBank(models.Model):
         ('unique_number', 'unique(sanitized_acc_number)', 'Account Number must be unique'),
     ]
 
-    @api.one
     @api.depends('acc_number')
     def _compute_sanitized_acc_number(self):
+        self.ensure_one()
         self.sanitized_acc_number = sanitize_account_number(self.acc_number)
 
-    @api.one
     @api.depends('acc_type')
     def _compute_acc_type(self):
+        self.ensure_one()
         self.acc_type = 'bank'
 
     @api.model

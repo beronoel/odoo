@@ -2,28 +2,28 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import locale
-from locale import localeconv
 import logging
+from locale import localeconv
 from operator import itemgetter
 import re
 
-from openerp import tools, SUPERUSER_ID
-from openerp.osv import fields, osv
-from openerp.tools.safe_eval import safe_eval as eval
-from openerp.tools.translate import _
-from openerp.exceptions import UserError
+from odoo import api, fields, models, SUPERUSER_ID, tools, _
+from odoo.tools.safe_eval import safe_eval as eval
+from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
-class lang(osv.osv):
+
+class Lang(models.Model):
     _name = "res.lang"
     _description = "Languages"
     _order = "active desc,name"
 
     _disallowed_datetime_patterns = tools.DATETIME_FORMATS_MAP.keys()
-    _disallowed_datetime_patterns.remove('%y') # this one is in fact allowed, just not good practice
+    _disallowed_datetime_patterns.remove('%y')  # this one is in fact allowed, just not good practice
 
-    def install_lang(self, cr, uid, **args):
+    @api.model
+    def install_lang(self):
         """
 
         This method is called from openerp/addons/base/base_data.xml to load
@@ -33,15 +33,15 @@ class lang(osv.osv):
         found.
 
         """
+        IrValues = self.env['ir.values']
         # config['load_language'] is a comma-separated list or None
         lang = (tools.config['load_language'] or 'en_US').split(',')[0]
-        lang_ids = self.search(cr, uid, [('code','=', lang)])
-        if not lang_ids:
-            self.load_lang(cr, uid, lang)
-        ir_values_obj = self.pool.get('ir.values')
-        default_value = ir_values_obj.get(cr, uid, 'default', False, ['res.partner'])
+        lang_rec = self.search([('code', '=', lang)])
+        if not lang_rec:
+            self.load_lang(lang)
+        default_value = IrValues.get('default', False, ['res.partner'])
         if not default_value:
-            ir_values_obj.set(cr, uid, 'default', False, 'lang', ['res.partner'], lang)
+            IrValues.set('default', False, 'lang', ['res.partner'], lang)
         return True
 
     def load_lang(self, cr, uid, lang, lang_name=None):
@@ -97,10 +97,10 @@ class lang(osv.osv):
             'name': lang_name,
             'active': True,
             'translatable': True,
-            'date_format' : fix_datetime_format(locale.nl_langinfo(locale.D_FMT)),
-            'time_format' : fix_datetime_format(locale.nl_langinfo(locale.T_FMT)),
-            'decimal_point' : fix_xa0(str(locale.localeconv()['decimal_point'])),
-            'thousands_sep' : fix_xa0(str(locale.localeconv()['thousands_sep'])),
+            'date_format': fix_datetime_format(locale.nl_langinfo(locale.D_FMT)),
+            'time_format': fix_datetime_format(locale.nl_langinfo(locale.T_FMT)),
+            'decimal_point': fix_xa0(str(locale.localeconv()['decimal_point'])),
+            'thousands_sep': fix_xa0(str(locale.localeconv()['thousands_sep'])),
         }
         lang_id = False
         try:
@@ -118,133 +118,131 @@ class lang(osv.osv):
         # do not check during installation
         return not self.pool.ready or bool(self.search_count(cr, uid, []))
 
-    def _check_format(self, cr, uid, ids, context=None):
-        for lang in self.browse(cr, uid, ids, context=context):
+    @api.multi
+    @api.constrains('time_format', 'date_format')
+    def _check_format(self):
+        for lang in self:
             for pattern in self._disallowed_datetime_patterns:
-                if (lang.time_format and pattern in lang.time_format)\
-                    or (lang.date_format and pattern in lang.date_format):
-                    return False
-        return True
+                if (lang.time_format and pattern in lang.time_format) or (
+                   lang.date_format and pattern in lang.date_format):
+                    raise UserError(_('Invalid date/time format directive specified. Please refer to the list of allowed directives, displayed when you edit a language.'))
 
-    def _check_grouping(self, cr, uid, ids, context=None):
-        for lang in self.browse(cr, uid, ids, context=context):
-            try:
-                if not all(isinstance(x, int) for x in eval(lang.grouping)):
-                    return False
-            except Exception:
-                return False
-        return True
+    @api.multi
+    @api.constrains('grouping')
+    def _check_grouping(self):
+        for lang in self:
+            if not all(isinstance(x, int) for x in eval(lang.grouping)):
+                raise UserError(_('The Separator Format should be like [,n] where 0 < n :starting from Unit digit.-1 will end the separation. e.g. [3,2,-1] will represent 106500 to be 1,06,500;[1,2,-1] will represent it to be 106,50,0;[3] will represent it as 106,500. Provided ', ' as the thousand separator in each case.'))
 
-    def _get_default_date_format(self, cursor, user, context=None):
+    def _get_default_date_format(self):
         return '%m/%d/%Y'
 
-    def _get_default_time_format(self, cursor, user, context=None):
+    def _get_default_time_format(self):
         return '%H:%M:%S'
 
-    _columns = {
-        'name': fields.char('Name', required=True),
-        'code': fields.char('Locale Code', size=16, required=True, help='This field is used to set/get locales for user'),
-        'iso_code': fields.char('ISO code', size=16, required=False, help='This ISO code is the name of po files to use for translations'),
-        'translatable': fields.boolean('Translatable'),
-        'active': fields.boolean('Active'),
-        'direction': fields.selection([('ltr', 'Left-to-Right'), ('rtl', 'Right-to-Left')], 'Direction', required=True),
-        'date_format':fields.char('Date Format', required=True),
-        'time_format':fields.char('Time Format', required=True),
-        'grouping':fields.char('Separator Format', required=True,help="The Separator Format should be like [,n] where 0 < n :starting from Unit digit.-1 will end the separation. e.g. [3,2,-1] will represent 106500 to be 1,06,500;[1,2,-1] will represent it to be 106,50,0;[3] will represent it as 106,500. Provided ',' as the thousand separator in each case."),
-        'decimal_point':fields.char('Decimal Separator', required=True),
-        'thousands_sep':fields.char('Thousands Separator'),
-    }
-    _defaults = {
-        'active': False,
-        'translatable': False,
-        'direction': 'ltr',
-        'date_format':_get_default_date_format,
-        'time_format':_get_default_time_format,
-        'grouping': '[]',
-        'decimal_point': '.',
-        'thousands_sep': ',',
-    }
+    name = fields.Char(required=True)
+    code = fields.Char(string='Locale Code', size=16, required=True,
+                       help='This field is used to set/get locales for user')
+    iso_code = fields.Char(
+        size=16, required=False,
+        help='This ISO code is the name of po files to use for translations')
+    translatable = fields.Boolean(default=False)
+    active = fields.Boolean(default=False)
+    direction = fields.Selection([('ltr', 'Left-to-Right'),
+                                  ('rtl', 'Right-to-Left')], required=True,
+                                 default='ltr')
+    date_format = fields.Char(required=True, default=_get_default_date_format)
+    time_format = fields.Char(required=True, default=_get_default_time_format)
+    grouping = fields.Char(
+        string='Separator Format', required=True,
+        default='[]',
+        help="The Separator Format should be like [,n] where 0 < n :starting from Unit digit.-1 will end the separation. e.g. [3,2,-1] will represent 106500 to be 1,06,500;[1,2,-1] will represent it to be 106,50,0;[3] will represent it as 106,500. Provided ',' as the thousand separator in each case.")
+    decimal_point = fields.Char(string='Decimal Separator', required=True,
+                                default='.')
+    thousands_sep = fields.Char(string='Thousands Separator', default=',')
+
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'The name of the language must be unique !'),
-        ('code_uniq', 'unique (code)', 'The code of the language must be unique !'),
+        ('name_uniq', 'unique (name)', _('The name of the language must be unique !')),
+        ('code_uniq', 'unique (code)', _('The code of the language must be unique !')),
     ]
 
     _constraints = [
-        (_check_active, "At least one language must be active.", ['active']),
-        (_check_format, 'Invalid date/time format directive specified. Please refer to the list of allowed directives, displayed when you edit a language.', ['time_format', 'date_format']),
-        (_check_grouping, "The Separator Format should be like [,n] where 0 < n :starting from Unit digit.-1 will end the separation. e.g. [3,2,-1] will represent 106500 to be 1,06,500;[1,2,-1] will represent it to be 106,50,0;[3] will represent it as 106,500. Provided ',' as the thousand separator in each case.", ['grouping'])
-    ]
+        (_check_active, "At least one language must be active.", ['active'])]
 
+    @api.model
     @tools.ormcache('lang')
-    def _lang_get(self, cr, uid, lang):
-        lang_ids = self.search(cr, uid, [('code', '=', lang)]) or \
-                   self.search(cr, uid, [('code', '=', 'en_US')]) or \
-                   self.search(cr, uid, [])
-        return lang_ids[0]
+    def _lang_get(self, lang):
+        langs = self.search([('code', '=', lang)], limit=1) or self.search([('code', '=', 'en_US')], limit=1) or self.search([], limit=1)
+        return langs.id
 
+    @api.model
     @tools.ormcache('lang', 'monetary')
-    def _lang_data_get(self, cr, uid, lang, monetary=False):
+    def _lang_data_get(self, lang, monetary=False):
         if type(lang) in (str, unicode):
-            lang = self._lang_get(cr, uid, lang)
+            lang = self._lang_get(lang)
         conv = localeconv()
-        lang_obj = self.browse(cr, uid, lang)
-        thousands_sep = lang_obj.thousands_sep or conv[monetary and 'mon_thousands_sep' or 'thousands_sep']
-        decimal_point = lang_obj.decimal_point
-        grouping = lang_obj.grouping
+        lang_rec = self.browse(lang)
+        thousands_sep = lang_rec.thousands_sep or conv[monetary and 'mon_thousands_sep' or 'thousands_sep']
+        decimal_point = lang_rec.decimal_point
+        grouping = lang_rec.grouping
         return grouping, thousands_sep, decimal_point
 
+    @api.model
     @tools.ormcache()
-    def get_available(self, cr, uid, context=None):
+    def get_available(self):
         """ Return the available languages as a list of (code, name) sorted by name. """
-        langs = self.browse(cr, uid, self.search(cr, uid, [], context={'active_test': False}))
+        langs = self.with_context({'active_test': False}).search([])
         return sorted([(lang.code, lang.name) for lang in langs], key=itemgetter(1))
 
+    @api.model
     @tools.ormcache()
-    def get_installed(self, cr, uid, context=None):
+    def get_installed(self):
         """ Return the installed languages as a list of (code, name) sorted by name. """
-        langs = self.browse(cr, uid, self.search(cr, uid, []))
+        langs = self.search([])
         return sorted([(lang.code, lang.name) for lang in langs], key=itemgetter(1))
 
-    def create(self, cr, uid, vals, context=None):
+    @api.model
+    def create(self, vals):
         self.clear_caches()
-        return super(lang, self).create(cr, uid, vals, context=context)
+        return super(Lang, self).create(vals)
 
-    def write(self, cr, uid, ids, vals, context=None):
-        if isinstance(ids, (int, long)):
-             ids = [ids]
+    @api.multi
+    def write(self, vals):
+        if isinstance(self.ids, (int, long)):
+            self.ids = [self.ids]
 
         if 'code' in vals:
-            for rec in self.browse(cr, uid, ids, context):
+            for rec in self:
                 if rec.code != vals['code']:
                     raise UserError(_("Language code cannot be modified."))
 
         if vals.get('active') == False:
-            users = self.pool.get('res.users')
-            for current_id in ids:
-                current_language = self.browse(cr, uid, current_id, context=context)
-                if users.search(cr, uid, [('lang', '=', current_language.code)], context=context):
+            for current_id in self.ids:
+                current_language = self.browse(current_id)
+                if self.env['res.users'].search([('lang', '=', current_language.code)]):
                     raise UserError(_("Cannot unactivate a language that is currently used by users."))
 
         self.clear_caches()
-        return super(lang, self).write(cr, uid, ids, vals, context)
+        return super(Lang, self).write(vals)
 
-    def unlink(self, cr, uid, ids, context=None):
-        if context is None:
-            context = {}
-        languages = self.read(cr, uid, ids, ['code','active'], context=context)
+    @api.multi
+    def unlink(self):
+        languages = self.read(['code', 'active'])
         for language in languages:
-            ctx_lang = context.get('lang')
-            if language['code']=='en_US':
+            ctx_lang = self.env.context.get('lang')
+            if language['code'] == 'en_US':
                 raise UserError(_("Base Language 'en_US' can not be deleted!"))
-            if ctx_lang and (language['code']==ctx_lang):
-                raise UserError(_("You cannot delete the language which is User's Preferred Language!"))
+            if ctx_lang and (language['code'] == ctx_lang):
+                raise UserError(
+                    _("You cannot delete the language which is User's Preferred Language!"))
             if language['active']:
                 raise UserError(_("You cannot delete the language which is Active!\nPlease de-activate the language first."))
-            trans_obj = self.pool.get('ir.translation')
-            trans_ids = trans_obj.search(cr, uid, [('lang','=',language['code'])], context=context)
-            trans_obj.unlink(cr, uid, trans_ids, context=context)
+
+            irtranslation = self.env['ir.translation']
+            translations = irtranslation.search([('lang', '=', language['code'])])
+            translations.unlink()
         self.clear_caches()
-        return super(lang, self).unlink(cr, uid, ids, context=context)
+        return super(Lang, self).unlink()
 
     #
     # IDS: can be a list of IDS or a list of XML_IDS
@@ -272,12 +270,10 @@ class lang(osv.osv):
                 formatted = intersperse(formatted, eval_lang_grouping, thousands_sep)[0]
 
         return formatted
-
 #    import re, operator
 #    _percent_re = re.compile(r'%(?:\((?P<key>.*?)\))?'
 #                             r'(?P<modifiers>[-#0-9 +*.hlL]*?)[eEfFgGdiouxXcrs%]')
 
-lang()
 
 def split(l, counts):
     """
@@ -297,7 +293,7 @@ def split(l, counts):
 
     """
     res = []
-    saved_count = len(l) # count to use when encoutering a zero
+    saved_count = len(l)  # count to use when encoutering a zero
     for count in counts:
         if not l:
             break
@@ -317,6 +313,7 @@ def split(l, counts):
 
 intersperse_pat = re.compile('([^0-9]*)([^ ]*)(.*)')
 
+
 def intersperse(string, counts, separator=''):
     """
 
@@ -324,7 +321,9 @@ def intersperse(string, counts, separator=''):
 
     """
     left, rest, right = intersperse_pat.match(string).groups()
-    def reverse(s): return s[::-1]
+
+    def reverse(s):
+        return s[::-1]
     splits = split(reverse(rest), counts)
     res = separator.join(map(reverse, reverse(splits)))
-    return left + res + right, len(splits) > 0 and len(splits) -1 or 0
+    return left + res + right, len(splits) > 0 and len(splits) - 1 or 0

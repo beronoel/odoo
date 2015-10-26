@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data noupdate="0">
         <!--
         Resource: res.partner.category
         -->
-
         <record id="res_partner_category_0" model="res.partner.category">
             <field name="name">Partner</field>
             <field name="color" eval="1"/>
@@ -247,5 +246,5 @@
             <field eval="0" name="customer"/>
         </record>
     </data>
-</openerp>
+</odoo>
 

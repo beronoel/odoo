@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
-
+<odoo>
         <!-- change password wizard -->
         <record id="change_password_wizard_view" model="ir.ui.view">
             <field name="name">Change Password</field>
@@ -36,6 +34,15 @@
             groups="base.group_erp_manager"/>
 
         <!-- res.groups -->
+        <record id="view_group_tree" model="ir.ui.view">
+            <field name="name">res.groups.tree</field>
+            <field name="model">res.groups</field>
+            <field name="arch" type="xml">
+                <tree string="Groups">
+                    <field name="display_name"/>
+                </tree>
+            </field>
+        </record>
         <record id="view_groups_search" model="ir.ui.view">
             <field name="name">res.groups.search</field>
             <field name="model">res.groups</field>
@@ -116,11 +123,12 @@
             <field name="name">Groups</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">res.groups</field>
+            <field name="view_mode">tree,form</field>
             <field name="view_type">form</field>
             <field name="context">{'search_default_no_share': 1}</field>
             <field name="help">A group is a set of functional areas that will be assigned to the user in order to give them access and rights to specific applications and tasks in the system. You can create custom groups or edit the ones existing by default in order to customize the view of the menu that users will be able to see. Whether they can have a read, write, create and delete access right can be managed from here.</field>
         </record>
-        <menuitem action="action_res_groups" id="menu_action_res_groups" parent="base.menu_users" groups="base.group_no_one" sequence="3"/>
+        <menuitem id="menu_action_res_groups" action="action_res_groups" parent="base.menu_users" groups="base.group_no_one" sequence="3"/>
 
         <!-- res.users -->
         <record id="view_users_simple_form" model="ir.ui.view">
@@ -141,8 +149,7 @@
                             <field name="email" invisible="1"/>
                             <label for="login" class="oe_edit_only" string="Email Address"/>
                             <h2>
-                                <field name="login" on_change="on_change_login(login)"
-                                        placeholder="email@yourcompany.com"/>
+                                <field name="login" placeholder="email@yourcompany.com"/>
                             </h2>
                             <label for="company_id" class="oe_edit_only" groups="base.group_light_multi_company"/>
                             <field name="company_id" context="{'user_preference': 0}" groups="base.group_light_multi_company"/>
@@ -182,7 +189,7 @@
                             <h1><field name="name" required="1"/></h1>
                             <field name="email" invisible="1"/>
                             <label for="login" class="oe_edit_only" string="Email Address"/>
-                            <h2><field name="login" on_change="on_change_login(login)"/></h2>
+                            <h2><field name="login"/></h2>
                             <group>
                                 <field name="partner_id" readonly="1" required="0" groups="base.group_no_one"
                                         attrs="{'invisible': [('id', '=', False)]}"/>
@@ -252,7 +259,7 @@
             </field>
         </record>
         <!-- dummy update on group, to force the view above to be update -->
-        <record model="res.groups" id="group_no_one"/>
+        <record id="group_no_one" model="res.groups"/>
         <record id="action_res_users" model="ir.actions.act_window">
             <field name="name">Users</field>
             <field name="type">ir.actions.act_window</field>
@@ -275,7 +282,7 @@
             <field name="view_id" ref="view_users_form"/>
             <field name="act_window_id" ref="action_res_users"/>
         </record>
-        <menuitem action="action_res_users" id="menu_action_res_users" parent="base.menu_users" sequence="0"/>
+        <menuitem id="menu_action_res_users" action="action_res_users" parent="base.menu_users" sequence="0"/>
 
         <record id="view_users_form_simple_modif" model="ir.ui.view">
             <field name="name">res.users.preferences.form</field>
@@ -320,7 +327,4 @@
             <field name="view_id" ref="view_users_form_simple_modif"/>
             <field name="act_window_id" ref="action_res_users_my"/>
         </record>
-
-
-    </data>
-</openerp>
+</odoo>

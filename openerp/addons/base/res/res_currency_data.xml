@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
     <data noupdate="1">
         <!-- The Following currency rates are considered as on 1st Jan,2010 against EUR. -->
         <!-- Currencies -->
@@ -143,7 +143,6 @@
         <record id="AUD" model="res.currency">
             <field name="name">AUD</field>
             <field name="symbol">$</field>
-            <field name="position">before</field>
             <field name="rounding">0.01</field>
             <field name="active" eval="False"/>
         </record>
@@ -243,7 +242,6 @@
         <record id="NZD" model="res.currency">
             <field name="name">NZD</field>
             <field name="symbol">$</field>
-            <field name="position">before</field>
             <field name="rounding">0.01</field>
             <field name="active" eval="False"/>
         </record>
@@ -1224,4 +1222,4 @@
         </record>
 
     </data>
-</openerp>
+</odoo>

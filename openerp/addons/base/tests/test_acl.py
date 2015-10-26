@@ -24,19 +24,21 @@ class TestACL(common.TransactionCase):
 
     def _set_field_groups(self, model, field_name, groups):
         field = model._fields[field_name]
-        column = model._columns[field_name]
+        # stored fields not includes in column.
+        column = model._columns.get(field_name)
         old_groups = field.groups
-        old_prefetch = column._prefetch
-
+        old_prefetch = column._prefetch if column else False
         field.groups = groups
-        column.groups = groups
-        column._prefetch = False
+        if column:
+            column.groups = groups
+            column._prefetch = False
 
         @self.addCleanup
         def cleanup():
             field.groups = old_groups
-            column.groups = old_groups
-            column._prefetch = old_prefetch
+            if column:
+                column.groups = old_groups
+                column._prefetch = old_prefetch
 
     def test_field_visibility_restriction(self):
         """Check that model-level ``groups`` parameter effectively restricts access to that

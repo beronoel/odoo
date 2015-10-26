@@ -480,7 +480,7 @@ class calendar_alarm_manager(osv.AbstractModel):
 
     def get_next_notif(self, cr, uid, context=None):
         ajax_check_every_seconds = 300
-        partner = self.pool['res.users'].read(cr, SUPERUSER_ID, uid, ['partner_id', 'calendar_last_notif_ack'], context=context)
+        partner = self.pool['res.users'].read(cr, SUPERUSER_ID, uid, ['partner_id', 'calendar_last_notif_ack'], context=context)[0]
         all_notif = []
 
         if not partner:
@@ -756,7 +756,7 @@ class calendar_event(osv.Model):
 
         tz = context.get('tz', False)
         if not tz:  # tz can have a value False, so dont do it in the default value of get !
-            context['tz'] = self.pool.get('res.users').read(cr, SUPERUSER_ID, uid, ['tz'])['tz']
+            context['tz'] = self.pool.get('res.users').read(cr, SUPERUSER_ID, uid, ['tz'])[0]['tz']
             tz = context['tz']
         tz = tools.ustr(tz).encode('utf-8') # make safe for str{p,f}time()
 

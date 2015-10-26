@@ -2,12 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from operator import itemgetter
-import time
 
-from openerp import models, api
-from openerp.osv import osv, orm, fields
-from openerp.tools.misc import attrgetter
-from openerp.exceptions import UserError
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 
 # -------------------------------------------------------------------------
 # Properties
@@ -26,54 +23,47 @@ TYPE2FIELD = {
     'selection': 'value_text',
 }
 
-class ir_property(osv.osv):
+
+class IrProperty(models.Model):
     _name = 'ir.property'
 
-    _columns = {
-        'name': fields.char('Name', select=1),
+    name = fields.Char(index=True)
+    res_id = fields.Char(string='Resource',
+                         help="If not set, acts as a default value for new resources",
+                         index=True)
+    company_id = fields.Many2one('res.company', string='Company', index=True)
+    fields_id = fields.Many2one('ir.model.fields', string='Field',
+                                ondelete='cascade', required=True, index=True)
+    value_float = fields.Float(string='Value')
+    value_integer = fields.Integer(string='Value')
+    value_text = fields.Text(string='Value')  # will contain (char, text)
+    value_binary = fields.Binary(string='Value')
+    value_reference = fields.Char(string='Value')
+    value_datetime = fields.Datetime(string='Value')
+    type = fields.Selection([('char', 'Char'),
+                             ('float', 'Float'),
+                             ('boolean', 'Boolean'),
+                             ('integer', 'Integer'),
+                             ('text', 'Text'),
+                             ('binary', 'Binary'),
+                             ('many2one', 'Many2One'),
+                             ('date', 'Date'),
+                             ('datetime', 'DateTime'),
+                             ('selection', 'Selection'),
+                             ],
+                            required=True,
+                            default='many2one',
+                            index=True)
 
-        'res_id': fields.char('Resource', help="If not set, acts as a default value for new resources", select=1),
-        'company_id': fields.many2one('res.company', 'Company', select=1),
-        'fields_id': fields.many2one('ir.model.fields', 'Field', ondelete='cascade', required=True, select=1),
-
-        'value_float' : fields.float('Value'),
-        'value_integer' : fields.integer('Value'),
-        'value_text' : fields.text('Value'), # will contain (char, text)
-        'value_binary' : fields.binary('Value'),
-        'value_reference': fields.char('Value'),
-        'value_datetime' : fields.datetime('Value'),
-
-        'type' : fields.selection([('char', 'Char'),
-                                   ('float', 'Float'),
-                                   ('boolean', 'Boolean'),
-                                   ('integer', 'Integer'),
-                                   ('text', 'Text'),
-                                   ('binary', 'Binary'),
-                                   ('many2one', 'Many2One'),
-                                   ('date', 'Date'),
-                                   ('datetime', 'DateTime'),
-                                   ('selection', 'Selection'),
-                                  ],
-                                  'Type',
-                                  required=True,
-                                  select=1),
-    }
-
-    _defaults = {
-        'type': 'many2one',
-    }
-
-    def _update_values(self, cr, uid, ids, values):
+    def _update_values(self, values):
         value = values.pop('value', None)
         if not value:
             return values
 
-        prop = None
         type_ = values.get('type')
         if not type_:
-            if ids:
-                prop = self.browse(cr, uid, ids[0])
-                type_ = prop.type
+            if self.ids:
+                type_ = self.type
             else:
                 type_ = self._defaults['type']
 
@@ -82,77 +72,81 @@ class ir_property(osv.osv):
             raise UserError(_('Invalid type'))
 
         if field == 'value_reference':
-            if isinstance(value, orm.BaseModel):
+            if isinstance(value, models.BaseModel):
                 value = '%s,%d' % (value._name, value.id)
             elif isinstance(value, (int, long)):
                 field_id = values.get('fields_id')
                 if not field_id:
-                    if not prop:
+                    if not self:
                         raise ValueError()
-                    field_id = prop.fields_id
+                    field_id = self.fields_id
                 else:
-                    field_id = self.pool.get('ir.model.fields').browse(cr, uid, field_id)
+                    field_id = self.env['ir.model.fields'].browse(field_id)
 
                 value = '%s,%d' % (field_id.relation, value)
 
         values[field] = value
         return values
 
-    def write(self, cr, uid, ids, values, context=None):
-        return super(ir_property, self).write(cr, uid, ids, self._update_values(cr, uid, ids, values), context=context)
+    @api.multi
+    def write(self, values):
+        return super(IrProperty, self).write(self._update_values(values))
 
-    def create(self, cr, uid, values, context=None):
-        return super(ir_property, self).create(cr, uid, self._update_values(cr, uid, None, values), context=context)
+    @api.model
+    def create(self, values):
+        return super(IrProperty, self).create(self._update_values(values))
 
+    @api.v7
     def get_by_record(self, cr, uid, record, context=None):
-        if record.type in ('char', 'text', 'selection'):
-            return record.value_text
-        elif record.type == 'float':
-            return record.value_float
-        elif record.type == 'boolean':
-            return bool(record.value_integer)
-        elif record.type == 'integer':
-            return record.value_integer
-        elif record.type == 'binary':
-            return record.value_binary
-        elif record.type == 'many2one':
-            if not record.value_reference:
+        prop = self.browse(cr, uid, record.id, context)
+        return prop.get_by_record()
+
+    @api.v8
+    def get_by_record(self):
+        self.ensure_one()
+        if self.type in ('char', 'text', 'selection'):
+            return self.value_text
+        elif self.type == 'float':
+            return self.value_float
+        elif self.type == 'boolean':
+            return bool(self.value_integer)
+        elif self.type == 'integer':
+            return self.value_integer
+        elif self.type == 'binary':
+            return self.value_binary
+        elif self.type == 'many2one':
+            if not self.value_reference:
                 return False
-            model, resource_id = record.value_reference.split(',')
-            value = self.pool[model].browse(cr, uid, int(resource_id), context=context)
+            model, resource_id = self.value_reference.split(',')
+            value = self.env[model].browse(int(resource_id))
             return value.exists()
-        elif record.type == 'datetime':
-            return record.value_datetime
-        elif record.type == 'date':
-            if not record.value_datetime:
+        elif self.type == 'datetime':
+            return self.value_datetime
+        elif self.type == 'date':
+            if not self.value_datetime:
                 return False
-            return time.strftime('%Y-%m-%d', time.strptime(record.value_datetime, '%Y-%m-%d %H:%M:%S'))
+            return fields.Date.from_string(self.value_datetime)
         return False
 
-    def get(self, cr, uid, name, model, res_id=False, context=None):
-        domain = self._get_domain(cr, uid, name, model, context=context)
+    @api.model
+    def get(self, name, model, res_id=False):
+        domain = self._get_domain(name, model)
         if domain is not None:
             domain = [('res_id', '=', res_id)] + domain
             #make the search with company_id asc to make sure that properties specific to a company are given first
-            nid = self.search(cr, uid, domain, limit=1, order='company_id asc', context=context)
-            if not nid: return False
-            record = self.browse(cr, uid, nid[0], context=context)
-            return self.get_by_record(cr, uid, record, context=context)
+            prop = self.search(domain, limit=1, order='company_id')
+            if not prop:
+                return False
+            return prop.get_by_record()
         return False
 
-    def _get_domain(self, cr, uid, prop_name, model, context=None):
-        context = context or {}
-        cr.execute('select id from ir_model_fields where name=%s and model=%s', (prop_name, model))
-        res = cr.fetchone()
-        if not res:
+    def _get_domain(self, prop_name, model):
+        field = self.env['ir.model.fields'].search([('name', '=', prop_name), ('model', '=', model)], limit=1)
+        if not field:
             return None
 
-        cid = context.get('force_company')
-        if not cid:
-            company = self.pool.get('res.company')
-            cid = company._company_default_get(cr, uid, model, res[0], context=context)
-
-        return [('fields_id', '=', res[0]), ('company_id', 'in', [cid, False])]
+        cid = self.env.context.get('force_company', self.env['res.company']._company_default_get().id)
+        return [('fields_id', '=', field.id), ('company_id', 'in', [cid, False])]
 
     @api.model
     def get_multi(self, name, model, ids):
@@ -160,8 +154,7 @@ class ir_property(osv.osv):
             the given `ids`, and return a dictionary mapping `ids` to their
             corresponding value.
         """
-        if not ids:
-            return {}
+        if not ids: return {}
 
         domain = self._get_domain(name, model)
         if domain is None:
@@ -173,13 +166,13 @@ class ir_property(osv.osv):
         domain += [('res_id', 'in', list(refs))]
 
         # note: order by 'company_id asc' will return non-null values first
-        props = self.search(domain, order='company_id asc')
+        props = self.search(domain, order='company_id')
         result = {}
         for prop in props:
             # for a given res_id, take the first property only
-            id = refs.pop(prop.res_id, None)
-            if id is not None:
-                result[id] = self.get_by_record(prop)
+            res_id = refs.pop(prop.res_id, None)
+            if res_id is not None:
+                result[res_id] = prop.get_by_record()
 
         # set the default value to the ids that are not in result
         default_value = result.pop(False, False)
@@ -207,9 +200,8 @@ class ir_property(osv.osv):
         default_value = clean(self.get(name, model))
 
         # retrieve the properties corresponding to the given record ids
-        self._cr.execute("SELECT id FROM ir_model_fields WHERE name=%s AND model=%s", (name, model))
-        field_id = self._cr.fetchone()[0]
-        company_id = self.env.context.get('force_company') or self.env['res.company']._company_default_get(model, field_id).id
+        field_id = self.env['ir.model.fields'].search([('name', '=', name), ('model', '=', model)]).id
+        company_id = self.env.context.get('force_company', self.env['res.company']._company_default_get().id)
         refs = {('%s,%s' % (model, id)): id for id in values}
         props = self.search([
             ('fields_id', '=', field_id),
@@ -219,11 +211,10 @@ class ir_property(osv.osv):
 
         # modify existing properties
         for prop in props:
-            id = refs.pop(prop.res_id)
-            value = clean(values[id])
+            value = clean(values[refs.pop(prop.res_id)])
             if value == default_value:
                 prop.unlink()
-            elif value != clean(prop.get_by_record(prop)):
+            elif value != clean(prop.get_by_record()):
                 prop.write({'value': value})
 
         # create new properties for records that do not have one yet
@@ -248,6 +239,7 @@ class ir_property(osv.osv):
         field = self.env[model]._fields[name]
         if field.type == 'many2one':
             comodel = field.comodel_name
+
             def makeref(value):
                 return value and '%s,%s' % (comodel, value)
             if operator == "=":
@@ -261,8 +253,7 @@ class ir_property(osv.osv):
                 value = map(makeref, value)
             elif operator in ('=like', '=ilike', 'like', 'not like', 'ilike', 'not ilike'):
                 # most probably inefficient... but correct
-                target = self.env[comodel]
-                target_names = target.name_search(value, operator=operator, limit=None)
+                target_names = self.env[comodel].name_search(value, operator=operator, limit=None)
                 target_ids = map(itemgetter(0), target_names)
                 operator, value = 'in', map(makeref, target_ids)
         elif field.type in ('integer', 'float'):
@@ -285,7 +276,6 @@ class ir_property(osv.osv):
             elif value >= 0 and operator == '<':
                 operator = '>='
                 include_zero = True
-
 
         # retrieve the properties that match the condition
         domain = self._get_domain(name, model)

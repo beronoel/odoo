@@ -55,7 +55,7 @@ class TestAPI(common.TransactionCase):
         partners2 = self.env['res.partner'].search([])[:10]
         self.assertIsRecordset(partners1, 'res.partner')
         self.assertIsRecordset(partners2, 'res.partner')
-        self.assertEqual(list(partners1), list(partners2))
+        self.assertEqual(list(partners1).sort(), list(partners2).sort())
 
     @mute_logger('openerp.models')
     def test_03_query_offset_limit(self):
@@ -64,7 +64,7 @@ class TestAPI(common.TransactionCase):
         partners2 = self.env['res.partner'].search([])[3:10]
         self.assertIsRecordset(partners1, 'res.partner')
         self.assertIsRecordset(partners2, 'res.partner')
-        self.assertEqual(list(partners1), list(partners2))
+        self.assertEqual(list(partners1).sort(), list(partners2).sort())
 
     @mute_logger('openerp.models')
     def test_04_query_count(self):
