@@ -3,12 +3,15 @@
 
 import json
 import werkzeug
+import itertools
+from datetime import datetime
 
 from odoo import fields, http, _
 from odoo.http import request
 from odoo.addons.website.models.website import slug, unslug
 from odoo.addons.website.controllers.main import QueryURL
 from odoo.exceptions import UserError
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools import html2plaintext
 
 
@@ -25,9 +28,11 @@ class WebsiteBlog(http.Controller):
             (r, label) = group['create_date']
             start, end = r.split('/')
             group['create_date'] = label
-            group['date_begin'] = self._to_date(start)
-            group['date_end'] = self._to_date(end)
-        return groups
+            group['date_begin'] = fields.Date.to_string(self._to_date(start))
+            group['date_end'] = fields.Date.to_string(self._to_date(end))
+            group['month'] = self._to_date(start).strftime("%B")
+            group['year'] = self._to_date(start).strftime("%Y")
+        return {year: [m for m in months] for year, months in itertools.groupby(groups, lambda g: g['year'])}
 
     def _to_date(self, dt):
         """ create_date is a datetime so start and end are datetime strings,
@@ -40,8 +45,14 @@ class WebsiteBlog(http.Controller):
         '/blog/page/<int:page>',
     ], type='http', auth="public", website=True)
     def blogs(self, page=1, **post):
+        Blog = request.env['blog.blog']
+        blogs = Blog.search([], limit=2)
+        if len(blogs) == 1:
+            return werkzeug.utils.redirect('/blog/%s' % slug(blogs[0]), code=302)
+
         BlogPost = request.env['blog.post']
         total = BlogPost.search([], count=True)
+
         pager = request.website.pager(
             url='/blog',
             total=total,
@@ -133,7 +144,6 @@ class WebsiteBlog(http.Controller):
                 tag_ids.append(current_tag)
             tag_ids = request.env['blog.tag'].browse(tag_ids).exists()
             return ','.join(map(slug, tag_ids))
-
         values = {
             'blog': blog,
             'blogs': blogs,
@@ -143,6 +153,7 @@ class WebsiteBlog(http.Controller):
             'active_tag_ids': active_tag_ids,
             'tags_list' : tags_list,
             'blog_posts': blog_posts,
+            'blog_posts_cover_properties': [json.loads(b.cover_properties) for b in blog_posts],
             'pager': pager,
             'nav_list': self.nav_list(blog),
             'blog_url': blog_url,
