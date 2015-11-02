@@ -40,7 +40,7 @@ class ProcurementGroup(models.Model):
     _order = "id desc"
 
     name = fields.Char(string='Reference', required=True, default=lambda self: self.env['ir.sequence'].next_by_code('procurement_group') or '')
-    move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')], string='Delivery Method', required=True, default=lambda self: 'direct')
+    move_type = fields.Selection([('direct', 'Partial'), ('one', 'All at once')], string='Delivery Type', required=True, default=lambda self: 'direct')
     procurement_ids = fields.One2many('procurement.order', 'group_id', string='Procurements')
 
 
@@ -100,6 +100,13 @@ class ProcurementOrder(models.Model):
                 raise UserError(_('Cannot delete Procurement Order(s) which are in %s state.') % s.state)
         return super(ProcurementOrder, unlink_ids).unlink()
 
+    @api.model
+    def create(self, vals):
+        procurement = super(ProcurementOrder, self).create(vals)
+        if not self._context.get('procurement_autorun_defer'):
+            procurement.run()
+        return procurement
+
     @api.multi
     def do_view_procurements(self):
         '''
@@ -131,10 +138,6 @@ class ProcurementOrder(models.Model):
     @api.multi
     def reset_to_confirmed(self):
         return self.write({'state': 'confirmed'})
-
-    @api.v7
-    def run(self, cr, uid, ids, autocommit=False, context=None):
-        self.browse(cr, uid, ids, context).run(autocommit)
 
     @api.multi
     def run(self, autocommit=False):
@@ -206,7 +209,6 @@ class ProcurementOrder(models.Model):
     @api.model
     def _run(self, procurement):
         '''This method implements the resolution of the given procurement
-            :param procurement: browse record
             :returns: True if the resolution of the procurement was a success, False otherwise to set it in exception
         '''
         return True
@@ -266,14 +268,6 @@ class ProcurementOrder(models.Model):
 
         return {}
 
-    @api.v8
+    @api.model
     def run_scheduler(self, use_new_cursor=False, company_id=False):
-        return self.run_scheduler_new(use_new_cursor=False, company_id=False)
-
-    @api.v7
-    def run_scheduler(self, cr, uid, use_new_cursor=False, company_id=False, context=None):
-        '''
-        Call the scheduler to check the procurement order. This is intented to be done for all existing companies at
-        the same time, so we're running all the methods as SUPERUSER to avoid intercompany and access rights issues.
-        '''
-        return self._model.run_scheduler_new(cr, uid, use_new_cursor=False, company_id=False, context=context)
+        return self.run_scheduler_new(use_new_cursor=False, company_id=False)  #use_new_cursor = use_new_cursor?
