@@ -144,8 +144,8 @@ class ProcurementOrder(models.Model):
         for procurement in self:
             if procurement.state not in ("running", "done"):
                 try:
-                    if self._assign(procurement):
-                        res = self._run(procurement)
+                    if procurement._assign():
+                        res = procurement._run()
                         if res:
                             procurement.write({'state': 'running'})
                         else:
@@ -165,12 +165,12 @@ class ProcurementOrder(models.Model):
 
     @api.multi
     def check(self, autocommit=False):
-        done_ids = []
+        done_procs = self.env['procurement.order']
         for procurement in self:
             try:
-                result = self._check(procurement)
+                result = procurement._check()
                 if result:
-                    done_ids.append(procurement.id)
+                    done_procs |= procurement
                 if autocommit:
                     self._cr.commit()
             except OperationalError:
@@ -179,14 +179,13 @@ class ProcurementOrder(models.Model):
                     continue
                 else:
                     raise
-        if done_ids:
-            for procurement in self:
-                procurement.write({'state': 'done'})
-        return done_ids
+        if done_procs:
+            done_procs.write({'state': 'done'})
+        return done_procs
 
     # Method to overwrite in different procurement modules
-    @api.model
-    def _find_suitable_rule(self, procurement):
+    @api.multi
+    def _find_suitable_rule(self):
         '''This method returns a procurement.rule that depicts what to do with the given procurement
         in order to complete its needs. It returns False if no suiting rule is found.
             :param procurement: browse record
@@ -195,14 +194,14 @@ class ProcurementOrder(models.Model):
         return False
 
     @api.model
-    def _assign(self, procurement):
+    def _assign(self):
         #if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
-        if procurement.rule_id:
+        if self.rule_id:
             return True
-        elif procurement.product_id.type not in ('service', 'digital'):
-            rule_id = self._find_suitable_rule(procurement)
+        elif self.product_id.type not in ('service', 'digital'):
+            rule_id = self._find_suitable_rule()
             if rule_id:
-                procurement.write({'rule_id': rule_id})
+                self.write({'rule_id': rule_id})
                 return True
         return False
 
