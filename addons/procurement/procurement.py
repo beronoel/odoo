@@ -193,7 +193,7 @@ class ProcurementOrder(models.Model):
         '''
         return False
 
-    @api.model
+    @api.multi
     def _assign(self):
         #if the procurement already has a rule assigned, we keep it (it has a higher priority as it may have been chosen manually)
         if self.rule_id:
@@ -205,15 +205,15 @@ class ProcurementOrder(models.Model):
                 return True
         return False
 
-    @api.model
-    def _run(self, procurement):
+    @api.multi
+    def _run(self):
         '''This method implements the resolution of the given procurement
             :returns: True if the resolution of the procurement was a success, False otherwise to set it in exception
         '''
         return True
 
-    @api.model
-    def _check(self, procurement):
+    @api.multi
+    def _check(self):
         '''Returns True if the given procurement is fulfilled, False otherwise
             :param procurement: browse record
             :rtype: boolean
