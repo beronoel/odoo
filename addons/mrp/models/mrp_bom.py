@@ -35,8 +35,7 @@ class MrpBom(models.Model):
     product_uom_id = fields.Many2one('product.uom', default=_get_uom_id, string='Product Unit of Measure', required=True, help="Unit of Measure (Unit of Measure) is the unit of measurement for the inventory control", oldname='product_uom')
     sequence = fields.Integer(string='Sequence', help="Gives The sequence order when displaying a list of bills of material.")
     ready_to_produce = fields.Selection([('all_available', 'All components'), ('asap', 'The components of 1st operation')], string='Ready when are available', required=True, default='asap',)
-    operation_ids = fields.One2many('mrp.routing.workcenter', 'bom_id', string='Operations', help="The list of operations (list of work centers) to produce the finished product. "
-                                 "The routing is mainly used to compute work center costs during operations and to plan future loads on work centers based on production planning.")
+    operation_ids = fields.One2many('mrp.routing.workcenter', 'bom_id', string='Operations', help="The list of operations (list of work centers) to produce the finished product.")
     product_rounding = fields.Float(string='Product Rounding', help="Rounding applied on the product quantity.")
     picking_type_id = fields.Many2one('stock.picking.type', string='Picking Type', domain=[('code', '=', 'manufacturing')], help="When a procurement has a ‘produce’ route with a picking type set, it will try to create a Manufacturing Order for that product using a BOM of the same picking type. That allows to define pull rules for products with different routing (different BOMs)")
     product_efficiency = fields.Float(string='Manufacturing Efficiency', default=1.0, required=True, help="A factor of 0.9 means a loss of 10% during the production process.")
@@ -78,6 +77,9 @@ class MrpBom(models.Model):
                     bom_empty_prop = bom
         return bom_empty_prop
 
+    def get_operation_lines(self):
+        return self.operation_ids
+
     def _prepare_wc_line(self, wc_use, level=0, factor=1):
         wc = wc_use.workcenter_id
         d, m = divmod(factor, wc_use.workcenter_id.capacity_per_cycle)
@@ -99,7 +101,7 @@ class MrpBom(models.Model):
             'product_uom_id': bom_line.product_uom_id.id
         }
 
-    def explode(self, product, factor, properties=None, level=0, routing_id=False, previous_products=None, master_bom=None):
+    def explode(self, product, factor, properties=None, level=0, previous_products=None, master_bom=None):
         """ Finds Products and Work Centers for related BoM for manufacturing order.
         :param product: Select a particular variant of the BoM. If False use BoM without variants.
         :param factor: Factor represents the quantity, but in UoM of the BoM, taking into account the numbers produced by the BoM
@@ -129,9 +131,9 @@ class MrpBom(models.Model):
         result = []
         result2 = []
 
-        routing = (routing_id and self.env['mrp.routing'].browse(routing_id)) or self.routing_id or False
-        if routing:
-            for wc_use in routing.workcenter_line_ids:
+        operation_lines = self.get_operation_lines()
+        if operation_lines:
+            for wc_use in operation_lines:
                 result2.append(self._prepare_wc_line(wc_use, level=level, factor=factor))
 
         for bom_line in self.bom_line_ids:
@@ -223,7 +225,6 @@ class MrpBomLine(models.Model):
     product_uom_id = fields.Many2one('product.uom', string='Product Unit of Measure', required=True, default=_get_uom_id,
                                      help="Unit of Measure (Unit of Measure) is the unit of measurement for the inventory control", oldname='product_uom')
     sequence = fields.Integer(default=1, help="Gives the sequence order when displaying.")
-    routing_id = fields.Many2one('mrp.routing', string='Routing', help="The list of operations (list of work centers) to produce the finished product. The routing is mainly used to compute work center costs during operations and to plan future loads on work centers based on production planning.")
     product_rounding = fields.Float(string='Product Rounding', help="Rounding applied on the product quantity.")
     product_efficiency = fields.Float(string='Manufacturing Efficiency', required=True, default=1.0, help="A factor of 0.9 means a loss of 10% within the production process.")
     property_ids = fields.Many2many('mrp.property', string='Properties')  # Not used

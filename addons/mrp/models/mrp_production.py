@@ -55,9 +55,6 @@ class MrpProduction(models.Model):
     date_finished = fields.Datetime(string='End Date', index=True, readonly=True, copy=False)
     bom_id = fields.Many2one('mrp.bom', string='Bill of Material', readonly=True, states={'draft': [('readonly', False)]},
                              help="Bill of Materials allow you to define the list of required raw materials to make a finished product.")
-    routing_id = fields.Many2one('mrp.routing', string='Routing', on_delete='set null', readonly=True, states={'draft': [('readonly', False)]},
-                                 help="The list of operations (list of work centers) to produce the finished product. The routing is mainly used "
-                                      "to compute work center costs during operations and to plan future loads on work centers based on production plannification.")
     move_prod_id = fields.Many2one('stock.move', string='Product Move', readonly=True, copy=False)
     move_line_ids = fields.One2many('stock.move', 'raw_material_production_id', string='Products to Consume',
                                     domain=[('state', 'not in', ('done', 'cancel'))], readonly=True, states={'draft': [('readonly', False)]}, oldname='move_lines')
@@ -159,23 +156,19 @@ class MrpProduction(models.Model):
         if not self.product_id:
             self.product_uom_id = False
             self.bom_id = False
-            self.routing_id = False
             self.product_tmpl_id = False
         else:
             bom_point = self.env['mrp.bom']._bom_find(product=self.product_id, properties=[])
-            routing_id = False
-            if bom_point:
-                routing_id = bom_point.routing_id
             self.product_uom_id = self.product_id.uom_id and self.product_id.uom_id.id or False
             self.bom_id = bom_point.id
-            self.routing_id = routing_id and routing_id.id or False
             self.product_tmpl_id = self.product_id.product_tmpl_id.id
 
-    @api.onchange('bom_id')
-    def onchange_bom_id(self):
-        if not self.bom_id:
-            self.routing_id = False
-        self.routing_id = self.bom_id.routing_id.id or False
+    #TODO feed operation lines into MO from BoM
+    #@api.onchange('bom_id')
+    #def onchange_bom_id(self):
+    #    if not self.bom_id:
+    #        self.routing_id = False
+    #    self.routing_id = self.bom_id.routing_id.id or False
 
     def _prepare_lines(self, properties=None):
         # search BoM structure and route
@@ -183,7 +176,7 @@ class MrpProduction(models.Model):
         if not bom_point:
             bom_point = self.env['mrp.bom']._bom_find(product=self.product_id, properties=properties)
             if bom_point:
-                self.write({'bom_id': bom_point.id, 'routing_id': bom_point.routing_id and bom_point.routing_id.id or False})
+                self.write({'bom_id': bom_point.id})
 
         if not bom_point:
             raise UserError(_("Cannot find a bill of material for this product."))
@@ -191,7 +184,7 @@ class MrpProduction(models.Model):
         # get components and workcenter_line_ids from BoM structure
         factor = self.product_uom_id._compute_qty(self.product_qty, bom_point.product_uom_id.id)
         # product_line_ids, workcenter_line_ids
-        return bom_point.explode(self.product_id, factor / bom_point.product_qty, properties=properties, routing_id=self.routing_id.id)
+        return bom_point.explode(self.product_id, factor / bom_point.product_qty, properties=properties)
 
     def _action_compute_lines(self, properties=None):
         """ Compute product_line_ids and workcenter_line_ids from BoM structure
@@ -626,9 +619,10 @@ class MrpProduction(models.Model):
         source_location = self.location_src_id
         prod_location = source_location
         prev_move = False
-        if self.bom_id.operation_ids and self.bom_id.operation_ids.routing_id and self.bom_id.operation_ids.routing_id.location_id and self.bom_id.operation_ids.routing_id.location_id != source_location:
-            source_location = self.bom_id.operation_ids.routing_id.location_id
-            prev_move = True
+        #TODO: to check, not needed anymore I think
+        #if self.bom_id.operation_ids and self.bom_id.operation_ids.routing_id and self.bom_id.operation_ids.routing_id.location_id and self.bom_id.operation_ids.routing_id.location_id != source_location:
+        #    source_location = self.bom_id.operation_ids.routing_id.location_id
+        #    prev_move = True
 
         destination_location = self.product_id.property_stock_production
         move = self.env['stock.move'].create({

@@ -16,5 +16,4 @@ class TestOrderDemo(TestMrpUsers):
             'location_src_id': self.env.ref('stock.stock_location_14').id,
             'location_dest_id': self.env.ref('stock.stock_location_output').id,
             'bom_id': self.env.ref('mrp.mrp_bom_9').id,
-            'routing_id': self.env.ref('mrp.mrp_routing_1').id
         })

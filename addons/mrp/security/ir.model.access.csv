@@ -1,7 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_account_analytic_line_user,account.analytic.line,account.model_account_analytic_line,group_mrp_user,1,1,1,0
 access_mrp_workcenter,mrp.workcenter,model_mrp_workcenter,mrp.group_mrp_user,1,0,0,0
-access_mrp_routing,mrp.routing,model_mrp_routing,mrp.group_mrp_user,1,0,0,0
 access_mrp_routing_workcenter,mrp.routing.workcenter,model_mrp_routing_workcenter,mrp.group_mrp_user,1,0,0,0
 access_mrp_bom,mrp.bom,model_mrp_bom,group_mrp_user,1,0,0,0
 access_mrp_bom_line,mrp.bom.line,model_mrp_bom_line,group_mrp_user,1,0,0,0
@@ -13,7 +12,6 @@ access_mrp_production_product_line,mrp.production.product.line,model_mrp_product
 access_procurement,procurement.order,model_procurement_order,mrp.group_mrp_user,1,1,1,1
 access_mrp_workcenter_manager,mrp.workcenter.manager,model_mrp_workcenter,mrp.group_mrp_manager,1,1,1,1
 access_mrp_resource_manager,access_mrp_resource manager,resource.model_resource_resource,mrp.group_mrp_manager,1,1,1,1
-access_mrp_routing_manager,mrp.routing.manager,model_mrp_routing,mrp.group_mrp_manager,1,1,1,1
 access_mrp_routing_workcenter_manager,mrp.routing.workcenter.manager,model_mrp_routing_workcenter,mrp.group_mrp_manager,1,1,1,1
 access_mrp_bom_manager,mrp.bom.manager,model_mrp_bom,mrp.group_mrp_manager,1,1,1,1
 access_mrp_bom_line_manager,mrp.bom.line.manager,model_mrp_bom_line,mrp.group_mrp_manager,1,1,1,1

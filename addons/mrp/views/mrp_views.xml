@@ -291,87 +291,6 @@
             parent="menu_mrp_configuration"
             sequence="40"/>
 
-        <!-- Routings -->
-        <record id="mrp_routing_form_view" model="ir.ui.view">
-            <field name="name">mrp.routing.form</field>
-            <field name="model">mrp.routing</field>
-            <field name="arch" type="xml">
-                <form string="Routing">
-                    <sheet>
-                        <group>
-                            <group>
-                                <field name="name"/>
-                                <field name="code"/>
-                            </group>
-                            <group>
-                                <field name="location_id"/>
-                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
-                                <field name="active"/>
-                           </group>
-                        </group>
-                        <notebook>
-                            <page string="Work Center Operations">
-                                <field name="workcenter_line_ids" string="Operation"/>
-                            </page>
-                            <page string="Notes">
-                                <field name="note"/>
-                            </page>
-                        </notebook>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-        <record id="mrp_routing_tree_view" model="ir.ui.view">
-            <field name="name">mrp.routing.tree</field>
-            <field name="model">mrp.routing</field>
-            <field name="arch" type="xml">
-                <tree string="Routing">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="location_id"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                </tree>
-            </field>
-        </record>
-        <record id="mrp_routing_search_view" model="ir.ui.view">
-            <field name="name">mrp.routing.search</field>
-            <field name="model">mrp.routing</field>
-            <field name="arch" type="xml">
-                <search string="Routing">
-                    <field name="name" string="Routing" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
-                    <filter string="Inactive" domain="[('active','=',False)]"/>
-                    <field name="location_id"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                    <group expand="0" string="Group By...">
-                        <filter string="Production Location" domain="[]" context="{'group_by':'location_id'}"/>
-                    </group>
-                </search>
-            </field>
-        </record>
-        <record id="mrp_routing_action" model="ir.actions.act_window">
-            <field name="name">Routings</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">mrp.routing</field>
-            <field name="view_type">form</field>
-            <field name="view_id" ref="mrp_routing_tree_view"/>
-            <field name="search_view_id" ref="mrp_routing_search_view"/>
-            <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to create a new routing.
-              </p><p>
-                Routings allow you to create and manage the manufacturing
-                operations that should be followed within your work centers in
-                order to produce a product.  They are attached to bills of
-                materials that will define the required raw materials.
-              </p>
-            </field>
-        </record>
-        <menuitem id="menu_mrp_routing_action"
-          action="mrp_routing_action"
-          parent="menu_mrp_configuration"
-          groups="group_mrp_routings"
-          sequence="50"/>
-
         <!-- Bill of Materials -->
         <record id="mrp_bom_form_view" model="ir.ui.view">
             <field name="name">mrp.bom.form</field>
@@ -390,12 +309,6 @@
                             </div>
                             <field name="ready_to_produce"/>
                             <field name="picking_type_id"/>
-                            <!-- TODO: put in a separate module
-                            <label for="routing_id" class="oe_inline" groups="mrp.group_mrp_routings"/>
-                            <div groups="mrp.group_mrp_routings">
-                                <field name="routing_id" class="oe_inline"/>
-                            </div>
-                            -->
                         </group>
                         <group>
                             <field name="name"/>
@@ -489,7 +402,6 @@
                     <group expand="0" string="Group By...">
                         <filter string="Product" domain="[]" context="{'group_by':'product_tmpl_id'}"/>
                         <filter string='Default Unit of Measure' domain="[]" context="{'group_by' : 'product_uom_id'}"/>
-                        <filter string="Routings" domain="[]" context="{'group_by':'routing_id'}"/>
                    </group>
                 </search>
             </field>
@@ -532,7 +444,6 @@
                     <field name="product_rounding"/>
                     <field name="product_efficiency"/>
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
-                    <field name="routing_id"/>
                     <field name="attribute_value_ids" widget="many2many_tags" groups="product.group_product_variant"/>
                     <field name="property_ids" widget="many2many_tags" groups="product.group_mrp_properties"/>
                 </tree>
@@ -547,7 +458,6 @@
                     <field name="sequence" invisible="1"/>
                     <field name="product_id"/>
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
-                    <field name="routing_id" groups="mrp.group_mrp_routings"/>
                 </tree>
             </field>
         </record>
@@ -562,7 +472,6 @@
                         <filter string="Bill Of Material" domain="[]" context="{'group_by':'bom_id'}"/>
                         <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
                         <filter string='Default Unit of Measure' domain="[]" context="{'group_by' : 'product_uom_id'}"/>
-                        <filter string="Routings" domain="[]" context="{'group_by':'routing_id'}"/>
                    </group>
                 </search>
             </field>
@@ -626,7 +535,6 @@
                                                 ('product_tmpl_id.product_variant_ids','=',product_id),
                                                 ('product_id','=',False)]"
                                 context="{'default_product_id': product_id, 'default_product_tmpl_id': product_tmpl_id}" required="1"/>
-                            <field name="routing_id" groups="mrp.group_mrp_routings"/>
                             <field name="user_id" context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'mrp.group_mrp_user']}"/>
                             <field name="origin"/>
                         </group>
@@ -763,7 +671,6 @@
                     <field name="product_id"/>
                     <field name="product_qty" sum="Total Qty"/>
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
-                    <field name="routing_id" groups="mrp.group_mrp_routings"/>
                     <field name="hour_total" sum="Total Hours"/>
                     <field name="cycle_total" sum="Total Cycles"/>
                     <field name="origin"/>
@@ -812,7 +719,7 @@
             <field name="model">mrp.production</field>
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
-                <calendar color="routing_id" date_start="date_planned" string="Manufacturing Orders">
+                <calendar color="bom_id" date_start="date_planned" string="Manufacturing Orders">
                     <field name="name"/>
                     <field name="product_id"/>
                     <field name="product_qty"/>
@@ -823,7 +730,7 @@
             <field name="name">mrp.production.gantt</field>
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
-                <gantt date_stop="date_finished" date_start="date_start" progress="progress" string="Productions" default_group_by="routing_id">
+                <gantt date_stop="date_finished" date_start="date_start" progress="progress" string="Productions" default_group_by="bom_id">
                 </gantt>
             </field>
         </record>
@@ -866,10 +773,8 @@
                         help="Production started late"/>
                     <field name="product_tmpl_id"/>
                     <field name="product_id"/>
-                    <field name="routing_id" groups="mrp.group_mrp_routings"/>
                     <group expand="0" string="Group By...">
                         <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                        <filter string="Routing" domain="[]" context="{'group_by':'routing_id'}"/>
                         <filter string="Status" domain="[]" context="{'group_by':'state'}"/>
                         <filter string="Scheduled Month" domain="[]" context="{'group_by':'date_planned'}" help="Scheduled Date by Month"/>
                     </group>
