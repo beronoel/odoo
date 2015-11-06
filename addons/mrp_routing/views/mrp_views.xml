@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Routings Workcenter -->
+        <record id="mrp_routing_workcenter_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.routing.workcenter.form</field>
+            <field name="model">mrp.routing.workcenter</field>
+            <field name="arch" type="xml">
+                <form string="Routing Work Centers">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="workcenter_id"/>
+                                <field name="sequence" groups="base.group_no_one"/>
+                            </group><group>
+                                <field name="cycle_nbr"/>
+                                <field name="hour_nbr" widget="float_time"/>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                            </group>
+                        </group>
+                        <label for="note"/>
+                        <field name="note"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Routings -->
+        <record id="mrp_routing_form_view" model="ir.ui.view">
+            <field name="name">mrp.routing.form</field>
+            <field name="model">mrp.routing</field>
+            <field name="arch" type="xml">
+                <form string="Routing">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="code"/>
+                            </group>
+                            <group>
+                                <field name="location_id"/>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                <field name="active"/>
+                           </group>
+                        </group>
+                        <notebook>
+                            <page string="Work Center Operations">
+                                <field name="workcenter_line_ids" string="Operation"/>
+                            </page>
+                            <page string="Notes">
+                                <field name="note"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="mrp_routing_tree_view" model="ir.ui.view">
+            <field name="name">mrp.routing.tree</field>
+            <field name="model">mrp.routing</field>
+            <field name="arch" type="xml">
+                <tree string="Routing">
+                    <field name="code"/>
+                    <field name="name"/>
+                    <field name="location_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
+        <record id="mrp_routing_search_view" model="ir.ui.view">
+            <field name="name">mrp.routing.search</field>
+            <field name="model">mrp.routing</field>
+            <field name="arch" type="xml">
+                <search string="Routing">
+                    <field name="name" string="Routing" filter_domain="['|',('name','ilike',self),('code','ilike',self)]"/>
+                    <filter string="Inactive" domain="[('active','=',False)]"/>
+                    <field name="location_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Production Location" domain="[]" context="{'group_by':'location_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="mrp_routing_action" model="ir.actions.act_window">
+            <field name="name">Routings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mrp.routing</field>
+            <field name="view_type">form</field>
+            <field name="view_id" ref="mrp_routing_tree_view"/>
+            <field name="search_view_id" ref="mrp_routing_search_view"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                Click to create a new routing.
+              </p><p>
+                Routings allow you to create and manage the manufacturing
+                operations that should be followed within your work centers in
+                order to produce a product.  They are attached to bills of
+                materials that will define the required raw materials.
+              </p>
+            </field>
+        </record>
+        <menuitem id="menu_mrp_routing_action"
+          action="mrp_routing_action"
+          parent="menu_mrp_configuration"
+          groups="group_mrp_routings"
+          sequence="50"/>
+
+        <!-- Bill of Materials -->
+        <record id="mrp_bom_form_view_inherit" model="ir.ui.view">
+            <field name="name">mrp.bom.form</field>
+            <field name="model">mrp.bom</field>
+            <field name="arch" type="xml">
+                <form string="Bill of Material">
+                    <sheet>
+                    <group>
+                        <group>
+                            <field name="product_tmpl_id"/>
+                            <field name="product_id" groups="product.group_product_variant"/>
+                            <label for="product_qty" string="Quantity"/>
+                            <div>
+                                <field name="product_qty" class="oe_inline"/>
+                                <field name="product_uom_id" options="{'no_open':True,'no_create':True}" class="oe_inline" groups="product.group_uom"/>
+                            </div>
+                            <field name="ready_to_produce"/>
+                            <field name="picking_type_id"/>
+                            <!-- TODO: put in a separate module
+                            <label for="routing_id" class="oe_inline" groups="mrp.group_mrp_routings"/>
+                            <div groups="mrp.group_mrp_routings">
+                                <field name="routing_id" class="oe_inline"/>
+                            </div>
+                            -->
+                        </group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code" string="Reference"/>
+                            <field name="bom_type" widget="radio"/>
+                            <p colspan="2" class="oe_grey" attrs="{'invisible': [('bom_type','=','normal')]}">
+                                When processing a sales order for this product, the delivery order
+                                will contain the raw materials, instead of the finished product.
+                            </p>
+                            <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Components">
+                            <field name="bom_line_ids" widget="one2many_list">
+                                <tree string="Components" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="product_qty"/>
+                                    <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
+                                    <field name="product_rounding" groups="mrp.group_rounding_efficiency"/>
+                                    <field name="product_efficiency" groups="mrp.group_rounding_efficiency"/>
+                                    <field name="attribute_value_ids" widget="many2many_tags" domain="[('product_ids.product_tmpl_id', '=', parent.product_tmpl_id)]" groups="product.group_product_variant"/>
+                                    <field name="property_ids" widget="many2many_tags" groups="product.group_mrp_properties"/>
+                                    <field name="operation_id" groups="mrp.group_mrp_routings"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Routing" groups="mrp.group_mrp_routings">
+                            <field name="operation_ids">
+                                <tree string="Operations" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="workcenter_id"/>
+                                    <field name="cycle_nbr"/>
+                                    <field name="hour_nbr"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Properties" groups="base.group_no_one">
+                            <group>
+                                <group>
+                                    <field name="sequence"/>
+                                    <field name="active"/>
+                                </group>
+                                <group>
+                                    <field name="product_rounding"/>
+                                    <field name="product_efficiency"/>
+                                </group>
+                            </group>
+                            <separator string="Properties" groups="product.group_mrp_properties"/>
+                            <group>
+                                <group>
+                                    <field name="property_ids" widget="many2many_tags" groups="product.group_mrp_properties"/>
+                                </group>
+                                <group/>
+                            </group>
+                        </page>
+                    </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                         <field name="message_follower_ids" widget="mail_followers"/>
+                         <field name="message_ids" colspan="4" widget="mail_thread" nolabel="1"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+</odoo>
