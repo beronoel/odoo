@@ -626,8 +626,8 @@ class MrpProduction(models.Model):
         source_location = self.location_src_id
         prod_location = source_location
         prev_move = False
-        if self.bom_id.routing_id and self.bom_id.routing_id.location_id and self.bom_id.routing_id.location_id != source_location:
-            source_location = self.bom_id.routing_id.location_id
+        if self.bom_id.operation_ids and self.bom_id.operation_ids.routing_id and self.bom_id.operation_ids.routing_id.location_id and self.bom_id.operation_ids.routing_id.location_id != source_location:
+            source_location = self.bom_id.operation_ids.routing_id.location_id
             prev_move = True
 
         destination_location = self.product_id.property_stock_production

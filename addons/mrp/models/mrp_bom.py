@@ -25,7 +25,6 @@ class MrpBom(models.Model):
     active = fields.Boolean(string='Active', default=True, help="If the active field is set to False, it will allow you to hide the bills of material without removing it.")
     bom_type = fields.Selection([('normal', 'Manufacture this product'), ('phantom', 'Ship this product as a set of components (kit)')], string='BoM Type', required=True, default='normal',
                                 help="Set: When processing a sales order for this product, the delivery order will contain the raw materials, instead of the finished product.", oldname='type')
-    position = fields.Char(string='Internal Reference', help="Reference to a position in an external plan.")
     product_tmpl_id = fields.Many2one('product.template', string='Product', domain="[('type', '!=', ['product', 'consu'])]", required=True)
     product_id = fields.Many2one('product.product', string='Product Variant',
                                  domain="['&', ('product_tmpl_id','=',product_tmpl_id), ('type','!=', ['product', 'consu'])]",
@@ -34,12 +33,12 @@ class MrpBom(models.Model):
     categ_id = fields.Many2one('product.category', related='product_tmpl_id.categ_id', string='Product Category', readonly=True, store=True)
     product_qty = fields.Float(string='Product Quantity', required=True, default=1.0, digits=dp.get_precision('Product Unit of Measure'))
     product_uom_id = fields.Many2one('product.uom', default=_get_uom_id, string='Product Unit of Measure', required=True, help="Unit of Measure (Unit of Measure) is the unit of measurement for the inventory control", oldname='product_uom')
-    date_start = fields.Date(string='Valid From', help="Validity of this BoM. Keep empty if it's always valid.")
-    date_stop = fields.Date(string='Valid Until', help="Validity of this BoM. Keep empty if it's always valid.")
     sequence = fields.Integer(string='Sequence', help="Gives The sequence order when displaying a list of bills of material.")
-    routing_id = fields.Many2one('mrp.routing', string='Routing', help="The list of operations (list of work centers) to produce the finished product. "
+    ready_to_produce = fields.Selection([('all_available', 'All components'), ('asap', 'The components of 1st operation')], string='Ready when are available', required=True, default='asap',)
+    operation_ids = fields.One2many('mrp.routing.workcenter', 'bom_id', string='Operations', help="The list of operations (list of work centers) to produce the finished product. "
                                  "The routing is mainly used to compute work center costs during operations and to plan future loads on work centers based on production planning.")
     product_rounding = fields.Float(string='Product Rounding', help="Rounding applied on the product quantity.")
+    picking_type_id = fields.Many2one('stock.picking.type', string='Picking Type', domain=[('code', '=', 'manufacturing')], help="When a procurement has a ‘produce’ route with a picking type set, it will try to create a Manufacturing Order for that product using a BOM of the same picking type. That allows to define pull rules for products with different routing (different BOMs)")
     product_efficiency = fields.Float(string='Manufacturing Efficiency', default=1.0, required=True, help="A factor of 0.9 means a loss of 10% during the production process.")
     property_ids = fields.Many2many('mrp.property', string='Properties')
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env['res.company']._company_default_get('mrp.bom'))
@@ -66,8 +65,6 @@ class MrpBom(models.Model):
             return False
         if self.env.context.get('company_id'):
             domain = domain + [('company_id', '=', self.env.context['company_id'])]
-        domain = domain + ['|', ('date_start', '=', False), ('date_start', '<=', today_date),
-                           '|', ('date_stop', '=', False), ('date_stop', '>=', today_date)]
         # order to prioritize bom with product_id over the one without
         boms = self.search(domain, order='sequence, product_id')
         # Search a BoM which has all properties specified, or if you can not find one, you could
@@ -225,8 +222,6 @@ class MrpBomLine(models.Model):
     product_qty = fields.Float(string='Product Quantity', required=True, default=1.0, digits=dp.get_precision('Product Unit of Measure'))
     product_uom_id = fields.Many2one('product.uom', string='Product Unit of Measure', required=True, default=_get_uom_id,
                                      help="Unit of Measure (Unit of Measure) is the unit of measurement for the inventory control", oldname='product_uom')
-    date_start = fields.Date(string='Valid From', help="Validity of component. Keep empty if it's always valid.")
-    date_stop = fields.Date(string='Valid Until', help="Validity of component. Keep empty if it's always valid.")
     sequence = fields.Integer(default=1, help="Gives the sequence order when displaying.")
     routing_id = fields.Many2one('mrp.routing', string='Routing', help="The list of operations (list of work centers) to produce the finished product. The routing is mainly used to compute work center costs during operations and to plan future loads on work centers based on production planning.")
     product_rounding = fields.Float(string='Product Rounding', help="Rounding applied on the product quantity.")
@@ -234,6 +229,7 @@ class MrpBomLine(models.Model):
     property_ids = fields.Many2many('mrp.property', string='Properties')  # Not used
     bom_id = fields.Many2one('mrp.bom', string='Parent BoM', ondelete='cascade', index=True, required=True)
     attribute_value_ids = fields.Many2many('product.attribute.value', string='Variants', help="BOM Product Variants needed form apply this line.")
+    operation_id = fields.Many2one('mrp.routing.workcenter', string='Consumed in Operation Sequence #', help="The operation where the components are consumed, or the finished products created.")
     child_line_ids = fields.One2many('mrp.bom.line', compute='_get_child_bom_lines', string='BOM lines of the referred bom')
 
     _sql_constraints = [
@@ -247,8 +243,6 @@ class MrpBomLine(models.Model):
         :param product: Selected product produced.
         :return: True or False
         """
-        if self.date_start and self.date_start > fields.Date.today() or self.date_stop and self.date_stop < fields.Date.today():
-            return True
         # all bom_line_id variant values must be in the product
         if self.attribute_value_ids:
             if not product or self.attribute_value_ids - product.attribute_value_ids:

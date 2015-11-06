@@ -184,3 +184,11 @@ class StockMove(models.Model):
                 if order.test_ready():
                     workflow.trg_validate(self.env.uid, 'mrp.production', order.id, 'moves_ready', self.env.cr)
         return res
+
+
+class StockPickingType(models.Model):
+    _inherit = 'stock.picking.type'
+
+    code = fields.Selection(selection_add=[('mrp_operation', 'Manufacturing Operation')])
+    
+

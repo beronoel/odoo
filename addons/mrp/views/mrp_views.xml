@@ -388,10 +388,14 @@
                                 <field name="product_qty" class="oe_inline"/>
                                 <field name="product_uom_id" options="{'no_open':True,'no_create':True}" class="oe_inline" groups="product.group_uom"/>
                             </div>
+                            <field name="ready_to_produce"/>
+                            <field name="picking_type_id"/>
+                            <!-- TODO: put in a separate module
                             <label for="routing_id" class="oe_inline" groups="mrp.group_mrp_routings"/>
                             <div groups="mrp.group_mrp_routings">
                                 <field name="routing_id" class="oe_inline"/>
                             </div>
+                            -->
                         </group>
                         <group>
                             <field name="name"/>
@@ -414,23 +418,31 @@
                                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
                                     <field name="product_rounding" groups="mrp.group_rounding_efficiency"/>
                                     <field name="product_efficiency" groups="mrp.group_rounding_efficiency"/>
-                                    <field name="date_start"/>
-                                    <field name="date_stop"/>
                                     <field name="attribute_value_ids" widget="many2many_tags" domain="[('product_ids.product_tmpl_id', '=', parent.product_tmpl_id)]" groups="product.group_product_variant"/>
                                     <field name="property_ids" widget="many2many_tags" groups="product.group_mrp_properties"/>
+                                    <field name="operation_id" groups="mrp.group_mrp_routings"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Routing" groups="mrp.group_mrp_routings">
+                            <field name="operation_ids">
+                                <tree string="Operations" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="workcenter_id"/>
+                                    <field name="cycle_nbr"/>
+                                    <field name="hour_nbr"/>
+                                    <field name="note"/>
                                 </tree>
                             </field>
                         </page>
                         <page string="Properties" groups="base.group_no_one">
                             <group>
                                 <group>
-                                    <field name="position"/>
                                     <field name="sequence"/>
                                     <field name="active"/>
                                 </group>
                                 <group>
-                                    <field name="date_start"/>
-                                    <field name="date_stop"/>
                                     <field name="product_rounding"/>
                                     <field name="product_efficiency"/>
                                 </group>
@@ -478,7 +490,6 @@
                         <filter string="Product" domain="[]" context="{'group_by':'product_tmpl_id'}"/>
                         <filter string='Default Unit of Measure' domain="[]" context="{'group_by' : 'product_uom_id'}"/>
                         <filter string="Routings" domain="[]" context="{'group_by':'routing_id'}"/>
-                        <filter string="Valid From Month" domain="[]" context="{'group_by':'date_start'}" help="Valid From Date by Month"/>
                    </group>
                 </search>
             </field>
@@ -521,8 +532,6 @@
                     <field name="product_rounding"/>
                     <field name="product_efficiency"/>
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
-                    <field name="date_start"/>
-                    <field name="date_stop"/>
                     <field name="routing_id"/>
                     <field name="attribute_value_ids" widget="many2many_tags" groups="product.group_product_variant"/>
                     <field name="property_ids" widget="many2many_tags" groups="product.group_mrp_properties"/>
@@ -539,8 +548,6 @@
                     <field name="product_id"/>
                     <field name="product_uom_id" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
                     <field name="routing_id" groups="mrp.group_mrp_routings"/>
-                    <field name="date_start"/>
-                    <field name="date_stop"/>
                 </tree>
             </field>
         </record>
@@ -556,7 +563,6 @@
                         <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
                         <filter string='Default Unit of Measure' domain="[]" context="{'group_by' : 'product_uom_id'}"/>
                         <filter string="Routings" domain="[]" context="{'group_by':'routing_id'}"/>
-                        <filter string=" Valid From Month" domain="[]" context="{'group_by':'date_start'}" help="Valid From Date by Month"/>
                    </group>
                 </search>
             </field>

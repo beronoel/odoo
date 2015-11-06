@@ -78,49 +78,6 @@
         </record>
 
 
-        <!-- Resource: mrp.routing.workcenter -->
-
-        <record id="mrp_routing_workcenter_0" model="mrp.routing.workcenter">
-            <field name="routing_id" ref="mrp_routing_0"/>
-            <field name="workcenter_id" ref="mrp_workcenter_0"/>
-            <field name="name">Manual Assembly</field>
-            <field name="hour_nbr">2</field>
-            <field name="sequence">5</field>
-        </record>
-
-        <record id="mrp_routing_workcenter_1" model="mrp.routing.workcenter">
-            <field name="routing_id" ref="mrp_routing_1"/>
-            <field name="workcenter_id" ref="mrp_workcenter_0"/>
-            <field name="name">Long time assembly</field>
-            <field name="hour_nbr">5</field>
-            <field name="cycle_nbr">2</field>
-            <field name="sequence">15</field>
-        </record>
-
-        <record id="mrp_routing_workcenter_3" model="mrp.routing.workcenter">
-            <field name="routing_id" ref="mrp_routing_1"/>
-            <field name="workcenter_id" ref="mrp_workcenter_0"/>
-            <field name="name">Testing</field>
-            <field name="hour_nbr">1</field>
-            <field name="sequence">10</field>
-        </record>
-
-        <record id="mrp_routing_workcenter_4" model="mrp.routing.workcenter">
-            <field name="routing_id" ref="mrp_routing_1"/>
-            <field name="workcenter_id" ref="mrp_workcenter_1"/>
-            <field name="name">Packing</field>
-            <field name="hour_nbr">0.5</field>
-            <field name="sequence">5</field>
-        </record>
-
-        <record id="mrp_routing_workcenter_2" model="mrp.routing.workcenter">
-            <field name="routing_id" ref="mrp_routing_2"/>
-            <field name="workcenter_id" ref="mrp_workcenter_2"/>
-            <field name="cycle_nbr">0.5</field>
-            <field name="hour_nbr">2</field>
-            <field name="sequence">5</field>
-            <field name="name">Manual Assembly</field>
-        </record>
 
     <!-- Resource: mrp.property.group -->
 
@@ -245,10 +202,167 @@
             <field name="product_tmpl_id" ref="product.product_product_18_product_template"/>
             <field name="product_uom_id" ref="product.product_uom_unit"/>
             <field name="sequence">5</field>            
-            <field name="routing_id" ref="mrp_routing_0"/>
+            <field name="bom_type">normal</field>
+        </record>
+        <record id="mrp_bom_2" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_19_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>            
+            <field name="bom_type">normal</field>
+        </record>
+        <record id="mrp_bom_3" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_19_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">10</field>            
+            <field name="bom_type">normal</field>
+        </record>
+        <record id="mrp_bom_4" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_27_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>            
             <field name="bom_type">normal</field>
         </record>
 
+        <record id="mrp_bom_5" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_27_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">10</field>            
+            <field name="bom_type">normal</field>
+        </record>
+        <record id="mrp_bom_6" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_16_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>            
+            <field name="bom_type">normal</field>
+        </record>
+        <record id="mrp_bom_8" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>            
+            <field name="bom_type">normal</field>
+        </record>
+
+        <record id="mrp_bom_property_0" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>
+            <field name="bom_type">normal</field>
+            <field name="property_ids" eval="[(6,0,[ref('mrp_property_0')])]"/>
+        </record>
+
+        <record id="mrp_bom_no_property_line" model="mrp.bom">
+            <field name="product_id" ref="product.product_product_14"/>
+            <field name="product_tmpl_id" ref="product.product_product_14_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>
+            <field name="code">default</field>
+            <field name="bom_type">phantom</field>
+        </record>
+
+        <record id="mrp_bom_property_line" model="mrp.bom">
+            <field name="product_id" ref="product.product_product_14"/>
+            <field name="product_tmpl_id" ref="product.product_product_14_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>
+            <field name="bom_type">phantom</field>
+            <field name="property_ids" eval="[(6,0,[ref('mrp_property_0')])]"/>
+        </record>
+        <record id="mrp_bom_9" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">4</field>
+            <field name="bom_type">phantom</field>
+        </record>
+        <record id="mrp_bom_10" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_5_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">5</field>            
+            <field name="bom_type">phantom</field>
+        </record>
+        <record id="mrp_bom_11" model="mrp.bom">
+            <field name="product_tmpl_id" ref="product.product_product_4_product_template"/>
+            <field name="product_uom_id" ref="product.product_uom_unit"/>
+            <field name="sequence">1</field>            
+            <field name="bom_type">normal</field>
+        </record>
+
+        <!-- Resource: mrp.routing.workcenter -->
+
+        <record id="mrp_routing_workcenter_bom1_op1" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_1"/>
+            <field name="workcenter_id" ref="mrp_workcenter_0"/>
+            <field name="name">Manual Assembly</field>
+            <field name="hour_nbr">2</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom4_op1" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_4"/>
+            <field name="workcenter_id" ref="mrp_workcenter_0"/>
+            <field name="name">Long time assembly</field>
+            <field name="hour_nbr">5</field>
+            <field name="cycle_nbr">2</field>
+            <field name="sequence">15</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom4_op2" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_4"/>
+            <field name="workcenter_id" ref="mrp_workcenter_0"/>
+            <field name="name">Testing</field>
+            <field name="hour_nbr">1</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom4_op3" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_4"/>
+            <field name="workcenter_id" ref="mrp_workcenter_1"/>
+            <field name="name">Packing</field>
+            <field name="hour_nbr">0.5</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="mrp_routing_workcenter_bom2_op1" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_2"/>
+            <field name="workcenter_id" ref="mrp_workcenter_0"/>
+            <field name="name">Long time assembly</field>
+            <field name="hour_nbr">5</field>
+            <field name="cycle_nbr">2</field>
+            <field name="sequence">15</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom2_op2" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_2"/>
+            <field name="workcenter_id" ref="mrp_workcenter_0"/>
+            <field name="name">Testing</field>
+            <field name="hour_nbr">1</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom2_op3" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_2"/>
+            <field name="workcenter_id" ref="mrp_workcenter_1"/>
+            <field name="name">Packing</field>
+            <field name="hour_nbr">0.5</field>
+            <field name="sequence">5</field>
+        </record>
+
+        <record id="mrp_routing_workcenter_bom9_op1" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_9"/>
+            <field name="workcenter_id" ref="mrp_workcenter_2"/>
+            <field name="cycle_nbr">0.5</field>
+            <field name="hour_nbr">2</field>
+            <field name="sequence">5</field>
+            <field name="name">Manual Assembly</field>
+        </record>
+        <record id="mrp_routing_workcenter_bom10_op1" model="mrp.routing.workcenter">
+            <field name="bom_id" ref="mrp_bom_10"/>
+            <field name="workcenter_id" ref="mrp_workcenter_2"/>
+            <field name="cycle_nbr">0.5</field>
+            <field name="hour_nbr">2</field>
+            <field name="sequence">5</field>
+            <field name="name">Manual Assembly</field>
+        </record>
+
+        <!-- Bom components -->
         <record id="mrp_bom_line_1" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_17"/>
             <field name="product_qty">2</field>
@@ -260,13 +374,6 @@
         <record id="product.product_product_19_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
         </record>
-        <record id="mrp_bom_2" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_19_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>            
-            <field name="routing_id" ref="mrp_routing_1"/>
-            <field name="bom_type">normal</field>
-        </record>
 
         <record id="mrp_bom_line_2" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_18"/>
@@ -276,12 +383,6 @@
             <field name="bom_id" ref="mrp_bom_2"/>
         </record>
 
-        <record id="mrp_bom_3" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_19_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">10</field>            
-            <field name="bom_type">normal</field>
-        </record>
 
         <record id="mrp_bom_line_3" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_17"/>
@@ -293,13 +394,6 @@
 
         <record id="product.product_product_27_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
-        </record>
-        <record id="mrp_bom_4" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_27_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>            
-            <field name="routing_id" ref="mrp_routing_1"/>
-            <field name="bom_type">normal</field>
         </record>
 
         <record id="mrp_bom_line_4" model="mrp.bom.line">
@@ -325,14 +419,6 @@
             <field name="sequence">6</field>            
             <field name="bom_id" ref="mrp_bom_4"/>
         </record>
-
-        <record id="mrp_bom_5" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_27_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">10</field>            
-            <field name="bom_type">normal</field>
-        </record>
-
         <record id="mrp_bom_line_7" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_40"/>
             <field name="product_qty">1</field>
@@ -359,12 +445,6 @@
 
         <record id="product.product_product_16_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
-        </record>
-        <record id="mrp_bom_6" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_16_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>            
-            <field name="bom_type">normal</field>
         </record>
 
         <record id="mrp_bom_line_10" model="mrp.bom.line">
@@ -433,29 +513,6 @@
         <record id="product.product_product_3_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
         </record>
-        <record id="mrp_bom_8" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>            
-            <field name="bom_type">normal</field>
-        </record>
-
-        <record id="mrp_bom_property_0" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>
-            <field name="bom_type">normal</field>
-            <field name="property_ids" eval="[(6,0,[ref('mrp_property_0')])]"/>
-        </record>
-
-        <record id="mrp_bom_no_property_line" model="mrp.bom">
-            <field name="product_id" ref="product.product_product_14"/>
-            <field name="product_tmpl_id" ref="product.product_product_14_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>
-            <field name="code">default</field>
-            <field name="bom_type">phantom</field>
-        </record>
         <record id="mrp_bom_line_no_prop_1" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_13"/>
             <field name="product_qty">1</field>
@@ -479,15 +536,6 @@
         </record>
 
 
-
-        <record id="mrp_bom_property_line" model="mrp.bom">
-            <field name="product_id" ref="product.product_product_14"/>
-            <field name="product_tmpl_id" ref="product.product_product_14_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>
-            <field name="bom_type">phantom</field>
-            <field name="property_ids" eval="[(6,0,[ref('mrp_property_0')])]"/>
-        </record>
 
         <record id="mrp_bom_line_17" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_6"/>
@@ -529,13 +577,6 @@
             <field name="bom_id" ref="mrp_bom_8"/>
         </record>
 
-        <record id="mrp_bom_9" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_3_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">4</field>
-            <field name="routing_id" ref="mrp_routing_2"/>
-            <field name="bom_type">phantom</field>
-        </record>
 
         <record id="mrp_bom_line_22" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_7"/>
@@ -580,13 +621,6 @@
         <record id="product.product_product_5_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
         </record>
-        <record id="mrp_bom_10" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_5_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">5</field>            
-            <field name="routing_id" ref="mrp_routing_2"/>
-            <field name="bom_type">phantom</field>
-        </record>
 
         <record id="mrp_bom_line_27" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_6"/>
@@ -630,12 +664,6 @@
 
         <record id="product.product_product_4_product_template" model="product.template">
             <field name="route_ids" eval="[(6, 0, [ref('mrp.route_warehouse0_manufacture')])]"/>
-        </record>
-        <record id="mrp_bom_11" model="mrp.bom">
-            <field name="product_tmpl_id" ref="product.product_product_4_product_template"/>
-            <field name="product_uom_id" ref="product.product_uom_unit"/>
-            <field name="sequence">1</field>            
-            <field name="bom_type">normal</field>
         </record>
         <record id="mrp_bom_line_32" model="mrp.bom.line">
             <field name="product_id" ref="product.product_product_14"/>
