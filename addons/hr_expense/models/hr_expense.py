@@ -210,7 +210,7 @@ class HrExpense(models.Model):
 
         #create the move that will contain the accounting entries
         move = self.env['account.move'].create({
-            'journal_id': self.journal_id.id,
+            'journal_id': self[0].journal_id.id,
             'company_id': self.env.user.company_id.id,
         })
 
