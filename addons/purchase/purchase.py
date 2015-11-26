@@ -614,6 +614,16 @@ class PurchaseOrderLine(models.Model):
 
         self.price_unit = price_unit
 
+    @api.onchange('product_qty')
+    def _onchange_product_uom_qty(self):
+        if self.state == 'purchase' and self.product_id.type in ['product', 'consu'] and self.product_uom_qty < self._origin.product_uom_qty:
+            warning_mess = {
+                'title': _('Ordered quantity decreased!'),
+                'message' : _('You are decreasing the ordered quantity! Do not forget to manually update the delivery order if needed.'),
+            }
+            return {'warning': warning_mess}
+        return {}
+
     @api.multi
     def write(self, values):
         lines = False
