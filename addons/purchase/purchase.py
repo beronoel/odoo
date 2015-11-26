@@ -513,7 +513,7 @@ class PurchaseOrderLine(models.Model):
             }
 
             # Fullfill all related procurements with this po line
-            diff_quantity = line.product_qty
+            diff_quantity = sum(line.move_ids.mapped('product_uom_qty')) if line.move_ids else line.product_qty
             for procurement in line.procurement_ids:
                 procurement_qty = procurement.product_uom._compute_qty_obj(procurement.product_uom, procurement.product_qty, line.product_uom)
                 tmp = template.copy()
@@ -613,6 +613,22 @@ class PurchaseOrderLine(models.Model):
             price_unit = self.env['product.uom']._compute_price(seller.product_uom.id, price_unit, to_uom_id=self.product_uom.id)
 
         self.price_unit = price_unit
+
+    @api.multi
+    def write(self, values):
+        lines = False
+        if 'product_uom_qty' in values:
+            precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
+            lines = self.filtered(
+                lambda r: r.state == 'purchase' and r.product_id.type in ['product', 'consu'] and float_compare(r.product_uom_qty, values['product_uom_qty'], precision_digits=precision) == -1)
+        result = super(PurchaseOrderLine, self).write(values)
+        if lines:
+            pickings = self.order_id.picking_ids.filtered(lambda r: r.state == 'draft')
+            picking = pickings[0] if pickings else pickings.create(self.order_id._prepare_picking())
+            moves = lines._create_stock_moves(picking)
+            moves.action_confirm()
+            moves.force_assign()
+        return result
 
     def _suggest_quantity(self):
         '''
