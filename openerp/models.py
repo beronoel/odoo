@@ -6209,15 +6209,24 @@ class RecordCache(MutableMapping):
         value = self._record.env.cache[field].get(self._record.id, dummy)
         return default if isinstance(value, SpecialValue) else value
 
-    def set_failed(self, exception, field=None):
-        """ Mark the given field (or all fields) with the given exception. """
+    def set_special(self, field, getter):
+        """ Set the given ``getter`` as the cached value of ``field``. """
         if isinstance(field, basestring):
             field = self._record._fields[field]
-        cache, id = self._record.env.cache, self._record.id
-        value = FailedValue(exception)
+        self._record.env.cache[field][self._record.id] = SpecialValue(getter)
+
+    def set_failed(self, exception, field=None):
+        """ Mark the given field (or all fields) with the given exception. """
+        def getter():
+            raise exception
         for field in ([field] if field else self._record._fields.itervalues()):
-            if field.name != 'id':
-                cache[field][id] = value
+            self.set_special(field, getter)
+
+
+class SpecialValue(object):
+    """ Encapsulate a function that returns a field's value in cache. """
+    def __init__(self, getter):
+        self.get = getter
 
 
 AbstractModel = BaseModel
@@ -6329,4 +6338,4 @@ def _normalize_ids(arg, atoms={int, long, str, unicode, NewId}):
 
 # keep those imports here to avoid dependency cycle errors
 from .osv import expression
-from .fields import Field, SpecialValue, FailedValue
+from .fields import Field

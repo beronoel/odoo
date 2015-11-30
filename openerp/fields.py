@@ -26,24 +26,6 @@ _logger = logging.getLogger(__name__)
 
 Default = object()                      # default value for __init__() methods
 
-class SpecialValue(object):
-    """ Encapsulates a value in the cache in place of a normal value. """
-    def __init__(self, value):
-        self.value = value
-    def get(self):
-        return self.value
-
-class FailedValue(SpecialValue):
-    """ Special value that encapsulates an exception instead of a value. """
-    def __init__(self, exception):
-        self.exception = exception
-    def get(self):
-        raise self.exception
-
-def _check_value(value):
-    """ Return ``value``, or call its getter if ``value`` is a :class:`SpecialValue`. """
-    return value.get() if isinstance(value, SpecialValue) else value
-
 def copy_cache(records, env):
     """ Recursively copy the cache of ``records`` to the environment ``env``. """
     for record, target in zip(records, records.with_env(env)):
@@ -1716,22 +1698,6 @@ class Many2one(_Relational):
         return ustr(value.display_name)
 
 
-class UnionUpdate(SpecialValue):
-    """ Placeholder for a value update; when this value is taken from the cache,
-        it returns ``record[field.name] | value`` and stores it in the cache.
-    """
-    def __init__(self, field, record, value):
-        self.args = (field, record, value)
-
-    def get(self):
-        field, record, value = self.args
-        # in order to read the current field's value, remove self from cache
-        del record._cache[field]
-        # read the current field's value, and update it in cache only
-        record._cache[field] = new_value = record[field.name] | value
-        return new_value
-
-
 class _RelationalMulti(_Relational):
     """ Abstract class for relational fields *2many. """
 
@@ -1741,7 +1707,15 @@ class _RelationalMulti(_Relational):
             if self in record._cache:
                 record._cache[self] = record[self.name] | value
             else:
-                record._cache[self] = UnionUpdate(self, record, value)
+                record._cache.set_special(self, self._update_getter(record, value))
+
+    def _update_getter(self, record, value):
+        def getter():
+            # read the current field's value, and update it in cache only
+            del record._cache[self]
+            result = record._cache[self] = record[self.name] | value
+            return result
+        return getter
 
     def convert_to_cache(self, value, record, validate=True):
         if isinstance(value, BaseModel):
