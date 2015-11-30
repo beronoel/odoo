@@ -898,7 +898,7 @@ class Field(object):
                     try:
                         self._compute_value(record)
                     except Exception as exc:
-                        record._cache[self.name] = FailedValue(exc)
+                        record._cache.set_failed(exc, self)
 
     def determine_value(self, record):
         """ Determine the value of ``self`` for ``record``. """
@@ -917,12 +917,11 @@ class Field(object):
                         computed = record._field_computed[self]
                         for source, target in zip(recs, recs.with_env(env)):
                             try:
-                                values = target._convert_to_cache({
+                                target._cache.update(target._convert_to_cache({
                                     f.name: source[f.name] for f in computed
-                                }, validate=False)
-                            except MissingError as e:
-                                values = FailedValue(e)
-                            target._cache.update(values)
+                                }, validate=False))
+                            except MissingError as exc:
+                                target._cache.set_failed(exc)
                     # the result is saved to database by BaseModel.recompute()
                     return
 

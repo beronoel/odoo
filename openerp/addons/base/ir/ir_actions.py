@@ -409,7 +409,8 @@ class ir_actions_act_window(osv.osv):
         if len(existing) < len(self):
             # mark missing records in cache with a failed value
             exc = MissingError(_("Record does not exist or has been deleted."))
-            (self - existing)._cache.update(openerp.fields.FailedValue(exc))
+            for record in (self - existing):
+                record._cache.set_failed(exc)
         return existing
 
     @openerp.api.model

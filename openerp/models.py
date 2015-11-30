@@ -3357,8 +3357,8 @@ class BaseModel(object):
                 record = self.browse(values.pop('id'))
                 record._cache.update(record._convert_to_cache(values, validate=False))
             if not self._cache.contains(field):
-                e = AccessError("No value found for %s.%s" % (self, field.name))
-                self._cache[field] = FailedValue(e)
+                exc = AccessError("No value found for %s.%s" % (self, field.name))
+                self._cache.set_failed(exc, field)
 
     @api.multi
     def _read_from_database(self, field_names, inherited_field_names=[]):
@@ -3503,7 +3503,8 @@ class BaseModel(object):
                     _('The requested operation cannot be completed due to security restrictions. Please contact your system administrator.\n\n(Document type: %s, Operation: %s)') % \
                     (self._name, 'read')
                 )
-                forbidden._cache.update(FailedValue(exc))
+                for record in forbidden:
+                    record._cache.set_failed(exc)
 
     @api.multi
     def get_metadata(self):
@@ -5054,7 +5055,8 @@ class BaseModel(object):
         if len(existing) < len(self):
             # mark missing records in cache with a failed value
             exc = MissingError(_("Record does not exist or has been deleted."))
-            (self - existing)._cache.update(FailedValue(exc))
+            for record in (self - existing):
+                record._cache.set_failed(exc)
         return existing
 
     def check_recursion(self, cr, uid, ids, context=None, parent=None):
@@ -6187,18 +6189,6 @@ class RecordCache(MutableMapping):
         values = dict.fromkeys(self._recs._ids, value)
         self._recs.env.cache[field].update(values)
 
-    def update(self, *args, **kwargs):
-        """ Update the cache of all records in ``records``. If the argument is a
-            ``SpecialValue``, update all fields (except "magic" columns).
-        """
-        if args and isinstance(args[0], SpecialValue):
-            values = dict.fromkeys(self._recs._ids, args[0])
-            for name, field in self._recs._fields.iteritems():
-                if name != 'id':
-                    self._recs.env.cache[field].update(values)
-        else:
-            return super(RecordCache, self).update(*args, **kwargs)
-
     def __delitem__(self, field):
         """ Remove the cached value of ``field`` for all ``records``. """
         if isinstance(field, basestring):
@@ -6218,6 +6208,16 @@ class RecordCache(MutableMapping):
     def __len__(self):
         """ Return the number of fields with a regular value in cache. """
         return sum(1 for name in self)
+
+    def set_failed(self, exception, field=None):
+        """ Mark the given field (or all fields) with the given exception. """
+        if isinstance(field, basestring):
+            field = self._recs._fields[field]
+        cache, id = self._recs.env.cache, self._recs.id
+        value = FailedValue(exception)
+        for field in ([field] if field else self._recs._fields.itervalues()):
+            if field.name != 'id':
+                cache[field][id] = value
 
 
 AbstractModel = BaseModel
