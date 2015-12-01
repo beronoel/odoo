@@ -1059,17 +1059,22 @@ class Environment(object):
     def check_cache(self):
         """ Check the cache consistency. """
         # make a full copy of the cache, and invalidate it
-        cache_dump = dict(
-            (field, dict(field_cache))
-            for field, field_cache in self.cache.iteritems()
-        )
+        cache_dump = defaultdict(dict)
+        for field, field_cache in self.cache.iteritems():
+            field_dump = cache_dump[field]
+            records = self[field.model_name].browse(filter(None, field_cache))
+            for record in records:
+                if record.id:
+                    try:
+                        field_dump[record.id] = record[field.name]
+                    except Exception:
+                        pass
         self.invalidate_all()
 
         # re-fetch the records, and compare with their former cache
         invalids = []
         for field, field_dump in cache_dump.iteritems():
-            ids = filter(None, field_dump)
-            records = self[field.model_name].browse(ids)
+            records = self[field.model_name].browse(list(field_dump))
             for record in records:
                 try:
                     cached = field_dump[record.id]
