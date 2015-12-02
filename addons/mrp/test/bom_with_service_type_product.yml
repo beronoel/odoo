@@ -1,25 +1,59 @@
 -
+  Final Product Template Creation
+-
+  !record {model: product.template, id: mrp_bom_product_template_final}:
+    name: Template Computer SC234
+    type: consu
+    route_ids:
+      - mrp.route_warehouse0_manufacture
+-
+  Final Product Product Creation
+-
+  !record {model: product.product, id: mrp_bom_product_final}:
+    name: Computer SC234
+    standard_price: 300.0
+    list_price: 450.0
+    type: consu
+-
+  Ingredient Product Product 1 Creation
+-
+  !record {model: product.product, id: mrp_bom_product_1}:
+    name: Support Service
+    standard_price: 25.5
+    list_price: 38.25
+    type: service
+    uom_id : product.product_uom_hour
+    uom_po_id: product.product_uom_hour
+-
+  Ingredient Product Product 2 Creation
+-
+  !record {model: product.product, id: mrp_bom_product_2}:
+    name: GrapWorks Software
+    standard_price: 155.0
+    list_price: 173.0
+    type: consu
+-
   I create Bill of Materials with one service type product and one consumable product.
 -
   !record {model: mrp.bom, id: mrp_bom_test1}:
     company_id: base.main_company
-    product_tmpl_id: product.product_product_3_product_template
-    product_id: product.product_product_3
+    product_tmpl_id: mrp_bom_product_template_final
+    product_id: mrp_bom_product_final
     product_uom: product.product_uom_unit
     product_qty: 1.0
     type: normal
     bom_line_ids:
-      - product_id: product.product_product_2
+      - product_id: mrp_bom_product_1
         product_uom: product.product_uom_unit
         product_qty: 1.0
-      - product_id: product.product_product_44
+      - product_id: mrp_bom_product_2
         product_uom: product.product_uom_unit
         product_qty: 1.0
 -
   I make the production order using BoM having one service type product and one consumable product.
 -
   !record {model: mrp.production, id: mrp_production_servicetype_mo1}:
-    product_id: product.product_product_3
+    product_id: mrp_bom_product_final
     product_qty: 1.0
     bom_id: mrp_bom_test1
     date_planned: !eval time.strftime('%Y-%m-%d %H:%M:%S')

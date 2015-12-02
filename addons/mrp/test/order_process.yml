@@ -1,5 +1,5 @@
 -
-    MRP user can doing all process related to Production Order, so let's check data with giving the access rights of user.
+    MRP user can doing all process related to Production Order, so lets check data with giving the access rights of user.
 -
   !context
     uid: 'res_users_mrp_user'
@@ -28,7 +28,6 @@
   I confirm the Production Order.
 -
   !workflow {model: mrp.production, action: button_confirm, ref: mrp_production_test1}
-  
 -
   I check details of Produce Move of Production Order to trace Final Product.
 -
@@ -65,9 +64,6 @@
     scrap_location_ids = self.pool.get('stock.location').search(cr, uid, [('scrap_location','=',True)])
     scrap_location_id = scrap_location_ids[0]
     order = self.browse(cr, uid, ref("mrp_production_test1"))
-    for move in order.move_lines:
-        if move.product_id.id == ref("product.product_product_6"):
-            move.action_scrap(5.0, scrap_location_id)
 -
   I check procurements have been generated for every consume line
 - 

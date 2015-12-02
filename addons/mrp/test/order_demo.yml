@@ -1,5 +1,66 @@
 -
-  MRP user can create Production Order, so let's check data with giving the access rights of user.
+  Records Creation
+-
+  !record {model: product.product, id: ingredient_product_1}:
+    name: Apple In-Ear Headphones
+    standard_price: 70.0
+    list_price: 79.0
+    type: consu
+-
+  !record {model: product.product, id: ingredient_product_2}:
+    name: Computer Case
+    standard_price: 20.0
+    list_price: 25.0
+    type: consu
+-
+  !record {model: product.product, id: ingredient_product_3}:
+    name: iPod
+    standard_price: 14.0
+    list_price: 16.5
+    type: consu
+-
+  !record {model: product.product, id: ingredient_product_4}:
+    name: iMac
+    standard_price: 1299.0
+    list_price: 1799.0
+    type: consu
+-
+  !record {model: product.product, id: ingredient_product_5}:
+    name: RAM SR5
+    standard_price: 78.0
+    list_price: 85.0
+    type: consu
+-
+  Bom Creation
+-
+  !record {model: mrp.bom, id: mrp_demo_bom}:
+    product_tmpl_id: mrp_bom_product_template_final
+    sequence: 4
+    type: phantom
+    routing_id: mrp_routing_2
+    bom_line_ids:
+      - product_id: ingredient_product_1
+        product_qty: 1
+        product_uom: product.product_uom_unit
+        sequence: 2
+      - product_id: ingredient_product_2
+        product_qty: 1
+        product_uom: product.product_uom_unit
+        sequence: 4
+      - product_id: ingredient_product_3
+        product_qty: 1
+        product_uom: product.product_uom_unit
+        sequence: 6
+      - product_id: ingredient_product_4
+        product_qty: 1
+        product_uom: product.product_uom_unit
+        sequence: 8
+      - product_id: ingredient_product_5
+        product_qty: 1
+        product_uom: product.product_uom_unit
+        sequence: 10
+-
+  MRP user can create Production Order, so lets check data with giving the access rights of user.
 -
   !context
     uid: 'res_users_mrp_user'
@@ -7,11 +68,9 @@
   I create Production Order of PC Assemble SC349 to produce 5.0 Unit.
 -
   !record {model: mrp.production, id: mrp_production_test1}:
-    product_id: product.product_product_3
+    product_id: mrp_bom_product_final
     product_qty: 5.0
     location_src_id: stock.stock_location_14
     location_dest_id: stock.stock_location_output
-    bom_id: mrp_bom_9
-    routing_id: mrp.mrp_routing_1
-    
-    
+    bom_id: mrp_demo_bom
+    routing_id: mrp_routing_1   

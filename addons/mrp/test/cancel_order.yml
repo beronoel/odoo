@@ -1,5 +1,5 @@
 -
-  MRP user can cancelled Production Order, so let's check data with giving the access rights of user.
+  MRP user can cancelled Production Order, so lets check data with giving the access rights of user.
 -
   !context
     uid: 'res_users_mrp_user'
