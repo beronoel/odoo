@@ -30,9 +30,18 @@
             <field name="subject">Your registration at ${object.event_id.name}</field>
             <field name="body_html"><![CDATA[
 <p>Dear ${object.name},</p>
-<p>Thank you for your inquiry.</p>
-<p>We confirm your registration to the event <b>${object.event_id.name}</b>. You will receive emails with practical information.</p>
-<p>If you have any questions, please let us know.</p>
+<p>Thank you for your subscription to the <b>${object.event_id.name}</b> event.We are looking forward to seeing you there.</p>
+<p>This event will take place at
+<b>
+%if object.event_id.address_id.name
+${object.event_id.address_id.name},
+%endif
+%if object.event_id.address_id.street
+${object.event_id.address_id.street},
+%endif
+${object.event_id.address_id.city}</b> on <b>${datetime.datetime.strptime(object.event_id.date_begin_located, "%Y-%m-%d %H:%M:%S").strftime('%d %B %Y, %I:%M %p')}</b></p>
+<p>Thank you for your participation! If you have any questions, please let us know.</p>
+</p>
 <p>Best regards,</p>]]></field>
         </record>
 
@@ -55,6 +64,48 @@ from ${object.event_id.date_begin_located} to ${object.event_id.date_end_located
 <p>If you have any questions, please let us know.</p>
 <p>Best regards,</p>]]></field>
         </record>
-
+        <record id="event_change_notification" model="mail.template">
+            <field name="name">Event: schedule change</field>
+            <field name="model_id" ref="event.model_event_registration"/>
+            <field name="email_from">${(object.event_id.organizer_id.email or object.event_id.user_id.email or '')|safe}</field>
+            <field name="email_to" >${object.email|safe}</field>
+            <field name="reply_to">${object.event_id.reply_to|safe}</field>
+            <field name="subject">
+%if object.event_id.state == 'confirm'
+Schedule of event ${object.event_id.name} changed.
+%endif
+%if object.event_id.state == 'cancel'
+Event ${object.event_id.name} is cancelled.
+%endif
+</field>
+            <field name="body_html"><![CDATA[
+<p>Hello ${object.name},</p>
+%if object.event_id.state == 'cancel'
+<p>We regret to inform you that the event <b>${object.event_id.name}</b> scheduled for <b> ${datetime.datetime.strptime(object.event_id.date_begin_located, "%Y-%m-%d %H:%M:%S").strftime('%d %B %Y, %I:%M %p')}</b> is cancelled.</p>
+<p>We sincerely apologize for the inconvenience.</p>
+% endif
+%if object.event_id.state == 'confirm'
+<p>Some schedule information about the <b>${object.event_id.name}</b> event has been changed. 
+We are looking forward to seeing you there.</p>
+<p>This event will take place at <b>
+%if object.event_id.address_id.name
+${object.event_id.address_id.name}
+%endif
+</b> <b>
+%if object.event_id.address_id.street
+, ${object.event_id.address_id.street}
+%endif
+% if object.event_id.address_id.street2
+, ${object.event_id.address_id.street2}
+%endif
+</b> <b>
+%if object.event_id.address_id.city
+, ${object.event_id.address_id.city}
+%endif
+</b> on <b> ${datetime.datetime.strptime(object.event_id.date_begin_located, "%Y-%m-%d %H:%M:%S").strftime('%d %B %Y, %I:%M %p')}</b></p>
+<p>Thank you for your participation!</p>
+% endif
+<p>Best regards,</p>]]></field>
+        </record>
     </data>
 </openerp>
