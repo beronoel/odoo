@@ -50,6 +50,8 @@ Main Features
         'views/ir_actions_views.xml',
         'views/res_partner_views.xml',
         'views/contact_views.xml',
+        'static/src/xml/tour.xml',
+        'data/mail_tour_data.xml',
     ],
     'demo': [
         'data/mail_demo.xml',

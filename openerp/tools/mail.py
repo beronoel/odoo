@@ -26,7 +26,7 @@ _logger = logging.getLogger(__name__)
 
 tags_to_kill = ["script", "head", "meta", "title", "link", "style", "frame", "iframe", "base", "object", "embed"]
 tags_to_remove = ['html', 'body']
-whitelist_classes = set(['WordSection1', 'MsoNormal', 'SkyDrivePlaceholder', 'oe_mail_expand', 'stopSpelling'])
+whitelist_classes = set(['WordSection1', 'MsoNormal', 'SkyDrivePlaceholder', 'oe_mail_expand', 'stopSpelling', 'o_mail_chat_button_tour'])
 
 # allow new semantic HTML5 tags
 allowed_tags = clean.defs.tags | frozenset('article section header footer hgroup nav aside figure main'.split() + [etree.Comment])

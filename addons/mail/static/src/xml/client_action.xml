@@ -85,11 +85,16 @@
             <div t-if="channel.type === channel_type" t-att-data-channel-id="channel.id" t-att-title="channel.name"
                  t-attf-class="o_mail_chat_channel_item #{channel.unread_counter ? ' o_unread_message' : ''} #{(active_channel_id == channel.id) ? 'o_active': ''}">
                 <span class="o_channel_name">
-                    <span t-if="display_status">
-                        <t t-call="mail.chat.UserStatus">
-                            <t t-set="status" t-value="channel.status"/>
-                        </t>
-                    </span>
+                    <t t-if="channel.name !== 'Jack Bot'">
+                        <span t-if="display_status">
+                            <t t-call="mail.chat.UserStatus">
+                                <t t-set="status" t-value="channel.status"/>
+                            </t>
+                        </span>
+                    </t>
+                    <t t-if="channel.name === 'Jack Bot'">
+                         <i class="o_mail_user_status fa fa-heart" title="Online"/>
+                    </t>
                     <span t-if="display_hash" class="o_mail_hash">#</span>
                     <t t-esc="channel.name"/>
                     <i t-if="channel.mass_mailing" class="fa fa-envelope-o" title="Sends messages by email"/>
@@ -129,6 +134,7 @@
             <button type="button" class="btn btn-default btn-sm o_mail_chat_button_new_message" title="Compose a new message">Send mail</button>
             <button type="button" class="btn btn-default btn-sm o_mail_chat_button_unsubscribe" title="Unsubscribe from channel">Unsubscribe</button>
             <button type="button" class="btn btn-default btn-sm o_mail_chat_button_settings" title="Open channel settings">Settings</button>
+            <button type="button" class="btn btn-default btn-sm o_mail_chat_button_tour" title="Explore Odoo Discuss" id="mail_chat_button_tour">Explore Odoo Discuss</button>
         </div>
     </t>
 

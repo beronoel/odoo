@@ -58,6 +58,20 @@ Administrator</span>]]></field>
             <field name="active" eval="False"/>
         </record>
 
+        <!-- Odoo bot user & partner-->
+        <record id="res_partner_bot" model="res.partner">
+            <field name="name">Jack Bot</field>
+            <field name="email">bot</field>
+            <field name="image" type="base64" file="mail_bot/static/img/JackBot.png"/>
+        </record>
+
+        <record id="res_user_bot" model="res.users">
+            <field name="partner_id" ref="res_partner_bot"/>
+            <field name="login">bot</field>
+            <field name="active" eval="False"/> 
+            <field name="image" type="base64" file="mail_bot/static/img/JackBot.png"/>
+        </record>
+
         <record id="main_partner" model="res.partner">
             <field name="company_id" ref="main_company"/>
         </record>

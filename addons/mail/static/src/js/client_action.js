@@ -15,6 +15,7 @@ var Model = require('web.Model');
 
 var pyeval = require('web.pyeval');
 var SearchView = require('web.SearchView');
+var Tour = require('web.Tour');
 var Widget = require('web.Widget');
 
 var QWeb = core.qweb;
@@ -457,6 +458,10 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
         var self = this;
         return chat_manager.get_messages({channel_id: this.channel.id, domain: this.domain}).then(function(result) {
             self.thread.render(result, self.get_thread_rendering_options(result));
+            self.thread.$("a.o_mail_chat_button_tour").click(function(){
+                Tour.run('tour_mail', 'tutorial');
+                location.reload()
+            });
             self.update_button_status(result.length === 0);
         });
     },
