@@ -31,7 +31,7 @@ class TestSale(AccountingTestCase):
         self.products = {
             'prod_order': self.env.ref('product.product_product_43'),
             'prod_del': self.env.ref('product.product_product_47'),
-            'serv_order': self.env.ref('product.product_product_0'),
+            'serv_order': self.env.ref('product.service_order'),
             'serv_del': self.env.ref('product.product_product_56'),
         }
 
