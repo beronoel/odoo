@@ -725,7 +725,7 @@ QWERTY keyboard</field>
         </record>
 
 
-        <record id="product_product_47" model="product.product">
+        <record id="product_delivery" model="product.product">
             <field name="name">Switch, 24 ports</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">55.0</field>
