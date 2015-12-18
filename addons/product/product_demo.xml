@@ -54,7 +54,7 @@
             <field name="description">Example of products to invoice based on delivery.</field>
         </record>
 
-        <record id="product_product_1b" model="product.product">
+        <record id="service_cost" model="product.product">
             <field name="name">External Audit</field>
             <field name="categ_id" ref="product_category_3"/>
             <field name="standard_price">160</field>
