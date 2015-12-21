@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
-        <record id="product.product_product_59" model="product.product">
+        <record id="product.consu_delivery" model="product.product">
             <field name="invoice_policy">delivery</field>
         </record>
 

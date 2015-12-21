@@ -6,10 +6,6 @@
             <field eval="[(4, ref('base.group_sale_salesman'))]" name="groups_id"/>
         </record>
 
-    <!--
-    Resource: product.category
-    -->
- 
         <record id="product_category_2" model="product.category">
             <field name="parent_id" ref="product.product_category_all"/>
             <field name="name">Internal</field>
@@ -26,11 +22,6 @@
             <field name="parent_id" ref="product_category_1"/>
             <field name="name">Physical</field>
         </record>
-
-    <!-- Apple Products -->
-        <!--
-    Resource: product.product
-    -->
 
         <record id="service_order" model="product.product">
             <field name="name">Prepaid Consulting</field>
@@ -54,17 +45,6 @@
             <field name="default_code">DSKLM12</field>
         </record>
 
-        <record id="product_product_1" model="product.product">
-            <field name="name">GAP Analysis Service</field>
-            <field name="categ_id" ref="product_category_3"/>
-            <field name="standard_price">20.5</field>
-            <field name="list_price">30.75</field>
-            <field name="type">service</field>
-            <field name="uom_id" ref="product_uom_hour"/>
-            <field name="uom_po_id" ref="product_uom_hour"/>
-            <field name="description">Example of products to invoice based on delivery.</field>
-        </record>
-
         <record id="service_cost" model="product.product">
             <field name="name">External Audit</field>
             <field name="categ_id" ref="product_category_3"/>
@@ -76,6 +56,38 @@
             <field name="description">Example of products to invoice based on cost.</field>
         </record>
 
+        <record id="product_delivery" model="product.product">
+            <field name="name">Switch, 24 ports</field>
+            <field name="categ_id" ref="product_category_5"/>
+            <field name="standard_price">55.0</field>
+            <field name="list_price">70.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product_uom_unit"/>
+            <field name="uom_po_id" ref="product_uom_unit"/>
+            <field name="default_code">SW24</field>
+        </record>
+
+        <record id="product_order" model="product.product">
+            <field name="name">Zed+ Antivirus</field>
+            <field name="categ_id" ref="product_category_4"/>
+            <field name="standard_price">235.0</field>
+            <field name="list_price">280.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product_uom_unit"/>
+            <field name="uom_po_id" ref="product_uom_unit"/>
+            <field name="default_code">Zplus</field>
+        </record>
+
+        <record id="product_product_1" model="product.product">
+            <field name="name">GAP Analysis Service</field>
+            <field name="categ_id" ref="product_category_3"/>
+            <field name="standard_price">20.5</field>
+            <field name="list_price">30.75</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="product_uom_hour"/>
+            <field name="uom_po_id" ref="product_uom_hour"/>
+            <field name="description">Example of products to invoice based on delivery.</field>
+        </record>
 
         <record id="product_product_2" model="product.product">
             <field name="name">Support Services</field>
@@ -197,8 +209,6 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="value_id" ref="product_attribute_value_2"/>
             <field name="price_extra">50.40</field>
         </record>
-
-        <!-- -->
 
         <record id="product_product_5b" model="product.product">
             <field name="name">Bose Mini Bluetooth Speaker</field>
@@ -687,18 +697,6 @@ QWERTY keyboard</field>
         </record>
 
 
-        <record id="product_order" model="product.product">
-            <field name="name">Zed+ Antivirus</field>
-            <field name="categ_id" ref="product_category_4"/>
-            <field name="standard_price">235.0</field>
-            <field name="list_price">280.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">Zplus</field>
-        </record>
-
-
         <record id="product_product_44" model="product.product">
             <field name="name">GrapWorks Software</field>
             <field name="categ_id" ref="product_category_4"/>
@@ -736,16 +734,6 @@ QWERTY keyboard</field>
         </record>
 
 
-        <record id="product_delivery" model="product.product">
-            <field name="name">Switch, 24 ports</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">55.0</field>
-            <field name="list_price">70.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">SW24</field>
-        </record>
 
 
         <record id="product_product_48" model="product.product">
@@ -869,7 +857,7 @@ QWERTY keyboard</field>
             <field name="default_code">LTLSRVR</field>
         </record>
 
-        <record id="product_product_59" model="product.product">
+        <record id="consu_delivery" model="product.product">
             <field name="name">Server</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">65000.0</field>

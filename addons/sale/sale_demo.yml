@@ -51,7 +51,7 @@
               self._update(cr, uid, 'account.invoice.line', 'sale', vals, 'test_crm_sale_invoice_1_line_2')
               vals = {
                   'name': 'Server with raid 10 and 2048ECC ram',
-                  'product_id': ref('product.product_product_59'),
+                  'product_id': ref('product.consu_delivery'),
                   'invoice_id': ref('test_crm_sale_invoice_1'),
                   'price_unit': 4800,
                   'quantity': 4,
