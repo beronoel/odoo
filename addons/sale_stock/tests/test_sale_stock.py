@@ -55,7 +55,8 @@ class TestSaleStock(TestSale):
         del_qties = [sol.qty_delivered for sol in self.so.order_line]
         del_qties_truth = [2.0 if sol.product_id.type in ['product', 'consu'] else 0.0 for sol in self.so.order_line]
         self.assertEqual(del_qties, del_qties_truth, 'Sale Stock: delivered quantities are wrong after complete delivery')
-        # invoice on delivery
+        # Without timesheet, we manually set the delivered qty for the product serv_del
+        self.so.order_line[1]['qty_delivered'] = 2.0
         inv_id = self.so.action_invoice_create()
         self.assertEqual(self.so.invoice_status, 'invoiced',
                          'Sale Stock: so invoice_status should be "fully invoiced" after complete delivery and invoicing')
