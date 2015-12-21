@@ -795,6 +795,7 @@ QWERTY keyboard</field>
             <field name="default_code">RJ45</field>
         </record>
 
+
         <record id="product_product_54" model="product.product">
             <field name="name">Ergonomic Mouse</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -818,7 +819,7 @@ QWERTY keyboard</field>
             <field name="default_code">DSKTAB96</field>
         </record>
 
-        <record id="product_product_57" model="product.product">
+        <record id="consu_delivery_03" model="product.product">
             <field name="name">Basic Computer</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">25000.0</field>
@@ -1158,7 +1159,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_37" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_47_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_product_template"/>
             <field name="name" ref="base.res_partner_12"/>
             <field name="delay">7</field>
             <field name="min_qty">1</field>

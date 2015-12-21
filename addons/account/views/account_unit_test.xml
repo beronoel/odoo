@@ -20,7 +20,7 @@
         </record>
         <record id="test_invoice_1_line_1" model="account.invoice.line">
             <field name="name">Basic computer with Dvorak keyboard and left-handed mouse</field>
-            <field name="product_id" ref="product.product_product_57"/>
+            <field name="product_id" ref="product.consu_delivery_03"/>
             <field name="invoice_id" ref="test_invoice_1"/>
             <field name="price_unit">250</field>
             <field name="quantity">1</field>

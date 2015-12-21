@@ -33,7 +33,7 @@
           if account_sale_id:
               vals = {
                   'name': 'Basic computer with Dvorak keyboard and left-handed mouse',
-                  'product_id': ref('product.product_product_57'),
+                  'product_id': ref('product.consu_delivery_03'),
                   'invoice_id': ref('test_crm_sale_invoice_1'),
                   'price_unit': 250,
                   'quantity': 1,
