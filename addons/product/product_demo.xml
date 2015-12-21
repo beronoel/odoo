@@ -528,17 +528,6 @@ QWERTY keyboard</field>
             <field name="default_code">LAP-CUS</field>
         </record>
 
-        <record id="product_product_30" model="product.product">
-            <field name="name">Pen drive, SP-4</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">126.0</field>
-            <field name="list_price">145.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">PD-SP4</field>
-        </record>
-
         <record id="product_product_31" model="product.product">
             <field name="name">Multimedia Speakers</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -892,14 +881,6 @@ QWERTY keyboard</field>
             <field name="delay">2</field>
             <field name="min_qty">12</field>
             <field name="price">90</field>
-        </record>
-
-        <record id="product_supplierinfo_27" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_30_product_template"/>
-            <field name="name" ref="base.res_partner_3"/>
-            <field name="delay">2</field>
-            <field name="min_qty">12</field>
-            <field name="price">126</field>
         </record>
 
         <record id="product_supplierinfo_28" model="product.supplierinfo">
