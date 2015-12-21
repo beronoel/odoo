@@ -783,18 +783,6 @@ QWERTY keyboard</field>
             <field name="default_code">SIW162</field>
         </record>
 
-
-        <record id="product_product_52" model="product.product">
-            <field name="name">30m RJ45 wire</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">300.0</field>
-            <field name="list_price">250.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">RJ45</field>
-        </record>
-
         <record id="consu_delivery_03" model="product.product">
             <field name="name">Basic Computer</field>
             <field name="categ_id" ref="product_category_5"/>

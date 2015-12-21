@@ -32,7 +32,7 @@
         price_unit: 50.0
         quantity: 3
       - name: '30m RJ45 wire'
-        product_id: product.product_product_52
+        product_id: product.consu_delivery_01
         price_unit: 25
         quantity: 20
 -
