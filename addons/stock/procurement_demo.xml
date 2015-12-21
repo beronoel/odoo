@@ -122,7 +122,7 @@
             <field name="type">product</field>
         </record>
 
-        <record id="product.product_product_33" model="product.product">
+        <record id="product.product_delivery_01" model="product.product">
             <field name="type">product</field>
         </record>
 
