@@ -528,18 +528,6 @@ QWERTY keyboard</field>
             <field name="default_code">LAP-CUS</field>
         </record>
 
-        <record id="product_product_28" model="product.product">
-            <field name="name">External Hard disk</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">390.0</field>
-            <field name="list_price">405.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">EXT-HDD</field>
-        </record>
-
-
         <record id="product_product_29" model="product.product">
             <field name="name">Pen drive, SP-2</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -956,7 +944,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_24" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_28_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
             <field name="name" ref="base.res_partner_2"/>
             <field name="delay">4</field>
             <field name="min_qty">1</field>
@@ -964,7 +952,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_25" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_28_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
             <field name="name" ref="base.res_partner_1"/>
             <field name="delay">5</field>
             <field name="min_qty">1</field>
