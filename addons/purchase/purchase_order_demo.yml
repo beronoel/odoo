@@ -104,7 +104,7 @@
   !record {model: purchase.order, id: purchase_order_6}:
     partner_id: base.res_partner_1
     order_line:
-      - product_id: product.product_product_38
+      - product_id: product.product_delivery_02
         name: Ink Cartridge
         price_unit: 58
         product_qty: 9

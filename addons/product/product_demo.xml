@@ -612,7 +612,7 @@ QWERTY keyboard</field>
         </record>
 
 
-        <record id="product_product_38" model="product.product">
+        <record id="product_delivery_02" model="product.product">
             <field name="name">Ink Cartridge</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">60.0</field>
@@ -1016,7 +1016,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_33" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_38_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
             <field name="name" ref="base.res_partner_1"/>
             <field name="delay">4</field>
             <field name="min_qty">1</field>
