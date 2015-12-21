@@ -563,18 +563,6 @@ QWERTY keyboard</field>
             <field name="default_code">MM-SPK</field>
         </record>
 
-        <record id="product_product_34" model="product.product">
-            <field name="name">Webcam</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">38.0</field>
-            <field name="list_price">45.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">WCAM</field>
-        </record>
-
-
         <record id="product_product_35" model="product.product">
             <field name="name">Blank CD</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -940,14 +928,6 @@ QWERTY keyboard</field>
             <field name="delay">2</field>
             <field name="min_qty">12</field>
             <field name="price">57</field>
-        </record>
-
-        <record id="product_supplierinfo_30" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_34_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">2</field>
-            <field name="min_qty">5</field>
-            <field name="price">38</field>
         </record>
 
         <record id="product_supplierinfo_31" model="product.supplierinfo">

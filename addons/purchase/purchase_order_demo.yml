@@ -133,7 +133,7 @@
         price_unit: 13.5
         product_uom: product.product_uom_unit
         date_planned: !eval time.strftime('%Y-%m-%d')
-      - product_id: product.product_product_34
+      - product_id: product.product_delivery_02
         name: Webcam
         product_qty: 15
         price_unit: 38.0
