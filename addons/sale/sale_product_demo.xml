@@ -45,10 +45,6 @@
             <field name="invoice_policy">delivery</field>
         </record>
 
-        <record id="product.product_product_41" model="product.product">
-            <field name="invoice_policy">delivery</field>
-        </record>
-
         <record id="product.product_delivery_02" model="product.product">
             <field name="invoice_policy">delivery</field>
         </record>
