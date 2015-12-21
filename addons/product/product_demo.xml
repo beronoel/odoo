@@ -611,31 +611,6 @@ QWERTY keyboard</field>
             <field name="default_code">PRINT</field>
         </record>
 
-
-        <record id="product_delivery_02" model="product.product">
-            <field name="name">Ink Cartridge</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">60.0</field>
-            <field name="list_price">65.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">INK</field>
-        </record>
-
-
-        <record id="product_product_39" model="product.product">
-            <field name="name">Toner Cartridge</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">66.0</field>
-            <field name="list_price">70.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">TONER</field>
-        </record>
-
-
         <record id="product_product_40" model="product.product">
             <field name="name">Windows 7 Professional</field>
             <field name="categ_id" ref="product_category_4"/>
@@ -1024,7 +999,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_34" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_39_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_01_product_template"/>
             <field name="name" ref="base.res_partner_1"/>
             <field name="delay">4</field>
             <field name="min_qty">1</field>

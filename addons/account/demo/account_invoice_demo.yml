@@ -94,7 +94,7 @@
       - name: 'Toner Cartridge'
         price_unit: 10.0
         quantity: 1.0
-        product_id: product.product_product_39
+        product_id: product.product_delivery_01
         uom_id: product.product_uom_unit
       - name: 'Zed+ Antivirus'
         price_unit: 4.0
