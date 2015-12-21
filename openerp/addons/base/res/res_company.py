@@ -5,7 +5,7 @@ import os
 import re
 
 from openerp import api, fields, models, tools, _
-from openerp.exceptions import UserError
+from openerp.exceptions import ValidationError
 
 
 class ResCompany(models.Model):
@@ -87,11 +87,9 @@ class ResCompany(models.Model):
     _header_a4 = _header_main % ('21.7cm', '27.7cm', '27.7cm', '27.7cm', '27.8cm', '27.3cm', '25.3cm', '25.0cm', '25.0cm', '24.6cm', '24.6cm', '24.5cm', '24.5cm')
     _header_letter = _header_main % ('20cm', '26.0cm', '26.0cm', '26.0cm', '26.1cm', '25.6cm', '23.6cm', '23.3cm', '23.3cm', '22.9cm', '22.9cm', '22.8cm', '22.8cm')
 
-    #Default methods
     def _get_header(self):
         try:
-            header_file = tools.file_open(os.path.join(
-                'base', 'report', 'corporate_rml_header.rml'))
+            header_file = tools.file_open(os.path.join('base', 'report', 'corporate_rml_header.rml'))
             try:
                 return header_file.read()
             finally:
@@ -102,22 +100,21 @@ class ResCompany(models.Model):
     def _get_font(self):
         res = self.env['res.font'].search(
             [('family', '=', 'Helvetica'), ('mode', '=', 'all')], limit=1)
-        return res and res.id
+        return res
 
     def _get_logo(self):
         return open(os.path.join(tools.config['root_path'], 'addons', 'base', 'res', 'res_company_logo.png'), 'rb') .read().encode('base64')
 
     def _get_euro(self):
-        #currency return not ret
         rate = self.env['res.currency.rate'].search([('rate', '=', 1)], limit=1)
-        return rate and rate.id
+        return rate.currency_id
 
     name = fields.Char(related='partner_id.name', string='Company Name',
                        required=True, store=True)
     parent_id = fields.Many2one('res.company', string='Parent Company', index=True)
     child_ids = fields.One2many('res.company', 'parent_id', string='Child Companies')
     partner_id = fields.Many2one('res.partner', string='Partner', required=True)
-    rml_header = fields.Text(required=True, default=_get_header)
+    rml_header = fields.Text(string='RML Header', required=True, default=_get_header)
     rml_header1 = fields.Char(string='Company Tagline', help="Appears by default on the top right corner of your printed documents (report header).")
     rml_header2 = fields.Text(string='RML Internal Header', required=True,
                               default=_header2)
@@ -133,7 +130,7 @@ class ResCompany(models.Model):
         default=lambda self: self._get_font(),
         domain=[('mode', 'in', ('Normal', 'Regular', 'all', 'Book'))],
         help="Set the font into the report header, it will be used as default font in the RML reports of the user company")
-    logo = fields.Binary(related='partner_id.image', default=_get_logo)
+    logo = fields.Binary(related='partner_id.image', default=lambda self: self._get_logo())
     logo_web = fields.Binary(compute='_compute_logo_web', store=True)
     currency_id = fields.Many2one('res.currency', string='Currency',
                                   default=lambda self: self._get_euro(),
@@ -141,26 +138,26 @@ class ResCompany(models.Model):
     user_ids = fields.Many2many('res.users', 'res_company_users_rel', 'cid', 'user_id',
                                 string='Accepted Users')
     account_no = fields.Char(string='Account No.')
-    street = fields.Char(compute='_compute_address_data', inverse='_inverse_address_data_street',
+    street = fields.Char(compute='_compute_address_data', inverse='_inverse_street',
                          string="Street")
-    street2 = fields.Char(compute='_compute_address_data', inverse='_inverse_address_data_street2',
+    street2 = fields.Char(compute='_compute_address_data', inverse='_inverse_street2',
                           string="Street2")
-    zip = fields.Char(compute='_compute_address_data', inverse='_inverse_address_data_zip')
-    city = fields.Char(compute='_compute_address_data', inverse='_inverse_address_data_city')
+    zip = fields.Char(compute='_compute_address_data', inverse='_inverse_zip')
+    city = fields.Char(compute='_compute_address_data', inverse='_inverse_city')
     state_id = fields.Many2one('res.country.state', compute='_compute_address_data',
-                               inverse='_inverse_address_data_state',
+                               inverse='_inverse_state',
                                string="Fed. State")
     bank_ids = fields.One2many('res.partner.bank', 'company_id', string='Bank Accounts',
                                help='Bank accounts related to this company')
     country_id = fields.Many2one('res.country', compute='_compute_address_data',
-                                 inverse='_inverse_address_data_country',
+                                 inverse='_inverse_country',
                                  string="Country")
     email = fields.Char(related='partner_id.email', string="Email", store=True)
     phone = fields.Char(related='partner_id.phone', string="Phone", store=True)
     fax = fields.Char(compute='_compute_address_data', inverse='_inverse_address_data_fax')
     website = fields.Char(related='partner_id.website')
     vat = fields.Char(related='partner_id.vat', string="Tax ID")
-    company_registry = fields.Char()
+    company_registry = fields.Char(string='Company Registry')
     rml_paper_format = fields.Selection([('a4', 'A4'), ('us_letter', 'US Letter')],
                                         string="Paper Format", required=True,
                                         default='a4',
@@ -170,12 +167,11 @@ class ResCompany(models.Model):
         ('name_uniq', 'unique (name)', _('The company name must be unique !'))
     ]
 
-    # Compute methods
     @api.multi
     def _compute_address_data(self):
         for company in self.filtered(lambda company: company.partner_id):
-            address_data = company.partner_id.sudo().address_get(adr_pref=['default'])
-            if address_data['default']:
+            address_data = company.partner_id.sudo().address_get(adr_pref=['contact'])
+            if address_data['contact']:
                 company.street = company.partner_id.street
                 company.street2 = company.partner_id.street2
                 company.city = company.partner_id.city
@@ -189,37 +185,35 @@ class ResCompany(models.Model):
         for company in self:
             company.logo_web = tools.image_resize_image(company.partner_id.image, (180, None))
 
-    # Inverse method
-    def _inverse_address_data_street(self):
+    def _inverse_street(self):
         self.partner_id.street = self.street
 
-    def _inverse_address_data_street2(self):
+    def _inverse_street2(self):
         self.partner_id.street2 = self.street2
 
-    def _inverse_address_data_zip(self):
+    def _inverse_zip(self):
         self.partner_id.zip = self.zip
 
-    def _inverse_address_data_city(self):
+    def _inverse_city(self):
         self.partner_id.city = self.city
 
-    def _inverse_address_data_state(self):
+    def _inverse_state(self):
         self.partner_id.state_id = self.state_id.id
 
-    def _inverse_address_data_country(self):
+    def _inverse_country(self):
         self.partner_id.country_id = self.country_id.id
 
     def _inverse_address_data_fax(self):
         self.partner_id.fax = self.fax
 
-    # Onchange method
     @api.onchange('rml_paper_format')
     def onchange_rml_paper_format(self):
         if self.rml_paper_format == 'us_letter':
             self.rml_header = self._header_letter
-        self.rml_header = self._header_a4
+        else:
+            self.rml_header = self._header_a4
 
-    @api.onchange('custom_footer', 'phone', 'fax', 'email', 'website', 'vat',
-                  'company_registry', 'bank_ids')
+    @api.onchange('custom_footer', 'phone', 'fax', 'email', 'website', 'vat', 'company_registry', 'bank_ids')
     def onchange_footer(self):
         if self.custom_footer:
             return {}
@@ -238,8 +232,7 @@ class ResCompany(models.Model):
 
     @api.onchange('state_id')
     def onchange_state(self):
-        if self.state_id:
-            self.country_id = self.state_id.country_id.id
+        self.country_id = self.state_id.country_id
 
     @api.onchange('font', 'rml_header', 'rml_header2', 'rml_header3')
     def onchange_font_name(self):
@@ -261,9 +254,9 @@ class ResCompany(models.Model):
         res = {'domain': {'state_id': []}}
         currency_id = self._get_euro()
         if self.country_id:
-            currency_id = self.country_id.currency_id.id
-            res['domain'] = {'state_id': [('country_id', '=', self.country_id.id)]}
-        self.currency_id = currency_id
+            currency_id = self.country_id.currency_id
+            res['domain']['state_id'] = [('country_id', '=', self.country_id.id)]
+        res['value'] = {'currency_id': currency_id}
         return res
 
     @api.multi
@@ -272,16 +265,16 @@ class ResCompany(models.Model):
 
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
-        context = dict(self.env.context or {})
+        context = dict(self.env.context)
         if context.pop('user_preference', None):
             # We browse as superuser. Otherwise, the user would be able to
             # select only the currently visible companies (according to rules,
             # which are probably to allow to see the child companies) even if
             # she belongs to some other companies.
-            cmp_ids = list(set([self.env.user.company_id.id] + [
-                cmp.id for cmp in self.env.user.company_ids]))
+            user = self.env.user.with_context(context)
+            cmp_ids = list(set(user.company_id.ids + user.company_ids.ids))
             args = (args or []) + [('id', 'in', cmp_ids)]
-        return super(ResCompany, self.sudo()).name_search(
+        return super(ResCompany, self.sudo().with_context(context)).name_search(
             name=name, args=args, operator=operator, limit=limit)
 
     @api.returns('self')
@@ -293,30 +286,27 @@ class ResCompany(models.Model):
         """
         return self.pool['res.users']._get_company(cr, uid, context=context)
 
-    @tools.ormcache('uid', 'company')
+    @tools.ormcache('self.env.uid', 'company')
     def _get_company_children(self, company=None):
-        # return directly
         if not company:
             return []
-        ids = self.search([('parent_id', 'child_of', [company])])
-        return ids
+        return self.search([('parent_id', 'child_of', [company])]).ids
 
-    @api.multi
-    def _get_partner_hierarchy(self, company_id):
-        #un used code remove
-        if company_id:
-            if self.parent_id:
-                return self._get_partner_hierarchy(self.parent_id.id)
-            else:
-                return self._get_partner_descendance(company_id, [])
-
-    def _get_partner_descendance(self, company_id, descendance):
-        #un used code remove
-        descendance.append(self.partner_id.id)
-        for child_id in self._get_company_children(company_id):
-            if child_id != company_id:
-                descendance = self._get_partner_descendance(child_id, descendance)
-        return descendance
+    # # Unused code
+    # @api.multi
+    # def _get_partner_hierarchy(self, company_id):
+    #     if company_id:
+    #         if self.parent_id:
+    #             return self._get_partner_hierarchy(self.parent_id.id)
+    #         else:
+    #             return self._get_partner_descendance(company_id, [])
+    # # Unused code
+    # def _get_partner_descendance(self, company_id, descendance):
+    #     descendance.append(self.partner_id.id)
+    #     for child_id in self._get_company_children(company_id):
+    #         if child_id != company_id:
+    #             descendance = self._get_partner_descendance(child_id, descendance)
+    #     return descendance
 
     #
     # This function restart the cache on the _get_company_children method
@@ -344,6 +334,6 @@ class ResCompany(models.Model):
         return super(ResCompany, self).write(values)
 
     @api.constrains('parent_id')
-    def _check_recursion(self):
-        if not super(ResCompany, self)._check_recursion():
-            raise UserError(_('Error ! You cannot create recursive companies.'))
+    def _check_parent_id(self):
+        if not self._check_recursion():
+            raise ValidationError(_('Error ! You cannot create recursive companies.'))
