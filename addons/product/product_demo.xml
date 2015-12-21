@@ -611,18 +611,6 @@ QWERTY keyboard</field>
             <field name="default_code">PRINT</field>
         </record>
 
-        <record id="product_product_40" model="product.product">
-            <field name="name">Windows 7 Professional</field>
-            <field name="categ_id" ref="product_category_4"/>
-            <field name="standard_price">330.0</field>
-            <field name="list_price">470.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">Win7</field>
-        </record>
-
-
         <record id="product_product_41" model="product.product">
             <field name="name">Windows Home Server 2011</field>
             <field name="categ_id" ref="product_category_4"/>

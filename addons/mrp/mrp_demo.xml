@@ -299,7 +299,7 @@
         </record>
 
         <record id="mrp_bom_line_4" model="mrp.bom.line">
-            <field name="product_id" ref="product.product_product_40"/>
+            <field name="product_id" ref="product.consu_delivery_01"/>
             <field name="product_qty">1</field>
             <field name="product_uom" ref="product.product_uom_unit"/>
             <field name="sequence">2</field>            
@@ -329,7 +329,7 @@
         </record>
 
         <record id="mrp_bom_line_7" model="mrp.bom.line">
-            <field name="product_id" ref="product.product_product_40"/>
+            <field name="product_id" ref="product.consu_delivery_01"/>
             <field name="product_qty">1</field>
             <field name="product_uom" ref="product.product_uom_unit"/>
             <field name="sequence">2</field>            

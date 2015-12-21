@@ -142,10 +142,6 @@
             <field name="image" type="base64" file="product/static/img/product_product_37-image.jpg"/>
         </record>
 
-        <record id="product_product_40" model="product.product">
-            <field name="image" type="base64" file="product/static/img/product_product_40-image.jpg"/>
-        </record>
-
         <record id="product_product_41" model="product.product">
             <field name="image" type="base64" file="product/static/img/product_product_41-image.jpg"/>
         </record>
