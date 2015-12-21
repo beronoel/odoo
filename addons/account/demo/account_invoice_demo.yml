@@ -15,7 +15,7 @@
         price_unit: 642.0
         quantity: 5
       - name: 'Linutop'
-        product_id: product.product_product_50
+        product_id: product.consu_delivery_03
         price_unit: 280.0
         quantity: 5.0
 -
