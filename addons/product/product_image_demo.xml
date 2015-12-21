@@ -186,11 +186,11 @@
             <field name="image" type="base64" file="product/static/img/product_product_45-image.jpg"/>
         </record>
 
-        <record id="product_product_46" model="product.product">
-            <field name="image" type="base64" file="product/static/img/product_product_46-image.jpg"/>
+        <record id="product_delivery_02" model="product.product">
+            <field name="image" type="base64" file="product/static/img/product_delivery_02-image.jpg"/>
         </record>
 
-        <record id="product_delivery" model="product.product">
+        <record id="product_delivery_01" model="product.product">
             <field name="image" type="base64" file="product/static/img/product_product_47-image.jpg"/>
         </record>
 

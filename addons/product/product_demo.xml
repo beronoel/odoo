@@ -58,7 +58,7 @@
             <field name="default_code">SERV_COST</field>
         </record>
 
-        <record id="product_delivery" model="product.product">
+        <record id="product_delivery_01" model="product.product">
             <field name="name">Switch, 24 ports</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">55.0</field>
@@ -67,6 +67,17 @@
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">PROD_DEL</field>
+        </record>
+
+        <record id="product_delivery_02" model="product.product">
+            <field name="name">Datacard</field>
+            <field name="categ_id" ref="product_category_5"/>
+            <field name="standard_price">35.0</field>
+            <field name="list_price">40.0</field>
+            <field name="type">consu</field>
+            <field name="uom_id" ref="product_uom_unit"/>
+            <field name="uom_po_id" ref="product_uom_unit"/>
+            <field name="default_code">PROD_DEL02</field>
         </record>
 
         <record id="product_order" model="product.product">
@@ -329,7 +340,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="price_extra">6.40</field>
         </record>
 
-        <!-- -->
+        <!-- MRP Demo Data-->
 
         <record id="product_product_12" model="product.product">
             <field name="name">Mouse, Wireless</field>
@@ -723,18 +734,6 @@ QWERTY keyboard</field>
             <field name="default_code">ROUT_430</field>
         </record>
 
-
-        <record id="product_product_46" model="product.product">
-            <field name="name">Datacard</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">35.0</field>
-            <field name="list_price">40.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">DC</field>
-        </record>
-
         <record id="product_product_49" model="product.product">
             <field name="name">Dell Inspiron Laptop without OS</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -1078,7 +1077,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_36" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_46_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
             <field name="name" ref="base.res_partner_1"/>
             <field name="delay">5</field>
             <field name="min_qty">1</field>
@@ -1086,7 +1085,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_37" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_delivery_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_01_product_template"/>
             <field name="name" ref="base.res_partner_12"/>
             <field name="delay">7</field>
             <field name="min_qty">1</field>
