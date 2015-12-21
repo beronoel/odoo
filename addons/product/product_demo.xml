@@ -844,7 +844,7 @@ QWERTY keyboard</field>
             <field name="default_code">BASICCOMP</field>
         </record>
 
-        <record id="product_product_58" model="product.product">
+        <record id="consu_delivery_02" model="product.product">
             <field name="name">Little server</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">45000.0</field>
@@ -857,7 +857,7 @@ QWERTY keyboard</field>
             <field name="default_code">LTLSRVR</field>
         </record>
 
-        <record id="consu_delivery" model="product.product">
+        <record id="consu_delivery_01" model="product.product">
             <field name="name">Server</field>
             <field name="categ_id" ref="product_category_5"/>
             <field name="standard_price">65000.0</field>
