@@ -19,6 +19,7 @@
   I make the production order using BoM having one service type product and one consumable product.
 -
   !record {model: mrp.production, id: mrp_production_servicetype_mo1}:
+    name: 'MO-Test'
     product_id: product.product_product_3
     product_qty: 1.0
     bom_id: mrp_bom_test1

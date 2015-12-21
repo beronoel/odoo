@@ -54,7 +54,7 @@
   Confirm sales order
 - 
   !python {model: sale.order}: |
-    self.action_confirm(cr, uid, ref("sale_order_product_manu"), context=context)
+    self.action_confirm(cr, uid, [ref("sale_order_product_manu")], context=context)
 -
   I run scheduler.
 -

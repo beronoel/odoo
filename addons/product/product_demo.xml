@@ -223,6 +223,8 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="price_extra">50.40</field>
         </record>
 
+        <!-- Ecommerce products -->
+
         <record id="product_product_5b" model="product.product">
             <field name="name">Bose Mini Bluetooth Speaker</field>
             <field name="categ_id" ref="product_category_5"/>
