@@ -43,6 +43,17 @@
             <field name="description">Example of product to invoice on order.</field>
         </record>
 
+        <record id="service_delivery" model="product.product">
+            <field name="name">Cost-plus Contract</field>
+            <field name="categ_id" ref="product_category_5"/>
+            <field name="standard_price">200.0</field>
+            <field name="list_price">180.0</field>
+            <field name="type">service</field>
+            <field name="uom_id" ref="product_uom_unit"/>
+            <field name="uom_po_id" ref="product_uom_unit"/>
+            <field name="default_code">DSKLM12</field>
+        </record>
+
         <record id="product_product_1" model="product.product">
             <field name="name">GAP Analysis Service</field>
             <field name="categ_id" ref="product_category_3"/>
@@ -830,18 +841,6 @@ QWERTY keyboard</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="default_code">DSKTAB96</field>
-        </record>
-
-
-        <record id="product_product_56" model="product.product">
-            <field name="name">Desktop Lamp</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">200.0</field>
-            <field name="list_price">180.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">DSKLM12</field>
         </record>
 
         <record id="product_product_57" model="product.product">

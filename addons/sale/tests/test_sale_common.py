@@ -32,7 +32,7 @@ class TestSale(AccountingTestCase):
             'prod_order': self.env.ref('product.product_order'),
             'prod_del': self.env.ref('product.product_delivery'),
             'serv_order': self.env.ref('product.service_order'),
-            'serv_del': self.env.ref('product.product_product_56'),
+            'serv_del': self.env.ref('product.service_delivery'),
         }
 
         self.partner = self.env.ref('base.res_partner_1')
