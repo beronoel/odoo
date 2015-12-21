@@ -763,7 +763,7 @@ Weight: 31 grams</field>
         <record id="product.product_product_42_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.Software')])]"/>
         </record>
-        <record id="product.product_product_43_product_template" model="product.template">
+        <record id="product.product_order_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.Software')])]"/>
         </record>
         <record id="product.product_product_44_product_template" model="product.template">

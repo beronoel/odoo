@@ -99,7 +99,7 @@
       - name: 'Zed+ Antivirus'
         price_unit: 4.0
         quantity: 1.0
-        product_id: product.product_product_43
+        product_id: product.product_order
         uom_id: product.product_uom_unit
 -
   !record {model: account.invoice, id: demo_invoice_january_wages}:

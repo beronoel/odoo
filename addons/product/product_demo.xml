@@ -32,6 +32,7 @@
             <field name="uom_id" ref="product_uom_hour"/>
             <field name="uom_po_id" ref="product_uom_hour"/>
             <field name="description">Example of product to invoice on order.</field>
+            <field name="default_code">SERV_ORDER</field>
         </record>
 
         <record id="service_delivery" model="product.product">
@@ -42,7 +43,7 @@
             <field name="type">service</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">DSKLM12</field>
+            <field name="default_code">SERV_DEL</field>
         </record>
 
         <record id="service_cost" model="product.product">
@@ -54,6 +55,7 @@
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Example of products to invoice based on cost.</field>
+            <field name="default_code">SERV_COST</field>
         </record>
 
         <record id="product_delivery" model="product.product">
@@ -64,7 +66,7 @@
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">SW24</field>
+            <field name="default_code">PROD_DEL</field>
         </record>
 
         <record id="product_order" model="product.product">
@@ -75,7 +77,7 @@
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">Zplus</field>
+            <field name="default_code">PROD_ORDER</field>
         </record>
 
         <record id="product_product_1" model="product.product">
@@ -769,7 +771,7 @@ QWERTY keyboard</field>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Dvorak keyboard 
             left-handed mouse</field>
-            <field name="default_code">BASICCOMP</field>
+            <field name="default_code">CONS_DEL03</field>
         </record>
 
         <record id="consu_delivery_02" model="product.product">
@@ -782,7 +784,7 @@ QWERTY keyboard</field>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">raid 1 
             512ECC ram</field>
-            <field name="default_code">LTLSRVR</field>
+            <field name="default_code">CONS_DEL02</field>
         </record>
 
         <record id="consu_delivery_01" model="product.product">
@@ -795,7 +797,7 @@ QWERTY keyboard</field>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">raid 10 
             2048ECC ram</field>
-            <field name="default_code">SERVER</field>
+            <field name="default_code">CONS_DEL01</field>
         </record>
 
         <!--
