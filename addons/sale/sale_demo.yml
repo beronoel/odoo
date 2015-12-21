@@ -60,7 +60,7 @@
               self._update(cr, uid, 'account.invoice.line', 'sale', vals, 'test_crm_sale_invoice_1_line_3')
               vals = {
                   'name': 'Basic formation with Dvorak',
-                  'product_id': ref('product.product_product_53'),
+                  'product_id': ref('product.consu_delivery_01'),
                   'invoice_id': ref('test_crm_sale_invoice_2'),
                   'price_unit': 500,
                   'quantity': 1,
