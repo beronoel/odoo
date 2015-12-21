@@ -28,7 +28,7 @@
     date_invoice: !eval time.strftime('%Y-%m')+'-08'
     invoice_line_ids:
       - name: '8-port Switch'
-        product_id: product.product_product_51
+        product_id: product.consu_delivery_03
         price_unit: 50.0
         quantity: 3
       - name: '30m RJ45 wire'

@@ -771,18 +771,6 @@ QWERTY keyboard</field>
             <field name="default_code">LIN12</field>
         </record>
 
-
-        <record id="product_product_51" model="product.product">
-            <field name="name">8-port Switch</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">725.0</field>
-            <field name="list_price">600.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">SIW162</field>
-        </record>
-
         <record id="consu_delivery_03" model="product.product">
             <field name="name">Basic Computer</field>
             <field name="categ_id" ref="product_category_5"/>
