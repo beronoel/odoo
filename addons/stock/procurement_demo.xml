@@ -167,10 +167,6 @@
             <field name="type">product</field>
         </record>
 
-        <record id="product.product_product_48" model="product.product">
-            <field name="type">product</field>
-        </record>
-
     </data>
 </openerp>
     
