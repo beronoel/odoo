@@ -245,7 +245,7 @@
     location_id: stock.stock_location_suppliers
     location_dest_id: stock.stock_location_shop0
     move_lines:
-      - product_id: product.product_product_32
+      - product_id: product.product_delivery_01
         product_uom: product.product_uom_unit
         product_uom_qty: 45.0
         picking_type_id: chi_picking_type_in

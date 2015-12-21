@@ -575,18 +575,6 @@ QWERTY keyboard</field>
             <field name="default_code">MM-SPK</field>
         </record>
 
-        <record id="product_product_32" model="product.product">
-            <field name="name">Headset standard</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">57.0</field>
-            <field name="list_price">62.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="description">Hands free headset for laptop PC with in-line microphone and headphone plug.</field>
-            <field name="default_code">HEAD</field>
-        </record>
-
         <record id="product_product_33" model="product.product">
             <field name="name">Headset USB</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -1021,7 +1009,7 @@ QWERTY keyboard</field>
         </record>
 
         <record id="product_supplierinfo_29" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_32_product_template"/>
+            <field name="product_tmpl_id" ref="product_delivery_01_product_template"/>
             <field name="name" ref="base.res_partner_3"/>
             <field name="delay">2</field>
             <field name="min_qty">12</field>
