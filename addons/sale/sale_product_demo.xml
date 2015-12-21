@@ -33,10 +33,6 @@
             <field name="invoice_policy">delivery</field>
         </record>
 
-        <record id="product.product_product_44" model="product.product">
-            <field name="invoice_policy">delivery</field>
-        </record>
-
         <record id="product.product_order" model="product.product">
             <field name="invoice_policy">order</field>
         </record>

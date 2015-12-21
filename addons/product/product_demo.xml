@@ -588,20 +588,6 @@ QWERTY keyboard</field>
             <field name="default_code">OSuite</field>
         </record>
 
-
-        <record id="product_product_44" model="product.product">
-            <field name="name">GrapWorks Software</field>
-            <field name="categ_id" ref="product_category_4"/>
-            <field name="standard_price">155.0</field>
-            <field name="list_price">173.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="description_sale">Full featured image editing software.</field>
-            <field name="default_code">GRAPs/w</field>
-        </record>
-
-
         <record id="product_product_45" model="product.product">
             <field name="name">Router R430</field>
             <field name="categ_id" ref="product_category_5"/>
