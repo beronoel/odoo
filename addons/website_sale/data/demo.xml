@@ -721,9 +721,6 @@ Weight: 31 grams</field>
         <record id="product.product_delivery_02_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.External_Hard_Drive')])]"/>
         </record>
-        <record id="product.product_product_31_product_template" model="product.template">
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.Speakers')])]"/>
-        </record>
         <record id="product.product_product_35_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.Components')])]"/>
         </record>

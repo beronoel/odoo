@@ -36,7 +36,7 @@
   !record {model: purchase.order, id: purchase_order_2}:
     partner_id: base.res_partner_3
     order_line:
-      - product_id: product.product_product_31
+      - product_id: product.product_delivery_02
         name: Multimedia Speakers
         price_unit: 132.50
         product_qty: 20.0

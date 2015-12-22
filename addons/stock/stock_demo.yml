@@ -106,7 +106,7 @@
     location_id: stock.stock_location_stock
     location_dest_id: stock.stock_location_customers
     move_lines:
-      - product_id: product.product_product_31
+      - product_id: product.product_delivery_02
         product_uom: product.product_uom_unit
         product_uom_qty: 45.0
         picking_type_id: stock.picking_type_out
@@ -193,7 +193,7 @@
    location_id: stock.stock_location_suppliers
    location_dest_id: stock.stock_location_stock
    move_lines:
-     - product_id: product.product_product_31
+     - product_id: product.product_delivery_02
        product_uom: product.product_uom_unit
        product_uom_qty: 50.0
        picking_type_id: stock.picking_type_in
@@ -310,7 +310,7 @@
     location_id: stock.stock_location_shop0
     location_dest_id: stock.stock_location_customers
     move_lines:
-      - product_id: product.product_product_31
+      - product_id: product.product_delivery_02
         product_uom: product.product_uom_unit
         product_uom_qty: 45.0
         picking_type_id: chi_picking_type_out
