@@ -174,21 +174,21 @@ HDD SH-1</field>
             <field name="description_sale">7.9‑inch (diagonal) LED-backlit, 128Gb
 Dual-core A5 with quad-core graphics
 FaceTime HD Camera, 1.2 MP Photos</field>
-            <field name="default_code">A2323</field>
+            <field name="default_code">E-COM01</field>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_1'), ref('product.product_attribute_value_3')])]"/>
         </record>
         <record id="product_product_4b" model="product.product">
-            <field name="default_code">A2324</field>
+            <field name="default_code">E-COM02</field>
             <field name="product_tmpl_id" ref="product_product_4_product_template"/>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_1'), ref('product.product_attribute_value_4')])]"/>
         </record>
         <record id="product_product_4c" model="product.product">
-            <field name="default_code">A2325</field>
+            <field name="default_code">E-COM03</field>
             <field name="product_tmpl_id" ref="product_product_4_product_template"/>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_2'), ref('product.product_attribute_value_3')])]"/>
         </record>
         <record id="product_product_4d" model="product.product">
-            <field name="default_code">A2326</field>
+            <field name="default_code">E-COM04</field>
             <field name="product_tmpl_id" ref="product_product_4_product_template"/>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_2'), ref('product.product_attribute_value_4')])]"/>
         </record>
@@ -232,7 +232,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description_sale">Bose's smallest portable Bluetooth speaker</field>
-            <field name="default_code">B3423</field>
+            <field name="default_code">E-COM05</field>
         </record>
 
 
@@ -245,7 +245,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
             <field name="description">Custom computer shipped in kit.</field>
-            <field name="default_code">B3424</field>
+            <field name="default_code">E-COM06</field>
         </record>
 
         <record id="product_product_6" model="product.product">
@@ -256,7 +256,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">A1232</field>
+            <field name="default_code">E-COM07</field>
             <field name='weight'>0.330</field>
         </record>
 
@@ -268,7 +268,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">A8767</field>
+            <field name="default_code">E-COM08</field>
         </record>
 
         <record id="product_product_8" model="product.product">
@@ -279,7 +279,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">A1090</field>
+            <field name="default_code">E-COM09</field>
             <field name='weight'>9.54</field>
         </record>
 
@@ -291,7 +291,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">AK789</field>
+            <field name="default_code">E-COM10</field>
         </record>
 
         <record id="product_product_10" model="product.product">
@@ -302,7 +302,7 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">M-Opt</field>
+            <field name="default_code">E-COM11</field>
         </record>
 
         <!-- -->
@@ -315,11 +315,11 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="type">consu</field>
             <field name="uom_id" ref="product_uom_unit"/>
             <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">A6678</field>
+            <field name="default_code">E-COM12</field>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_1')])]"/>
         </record>
         <record id="product_product_11b" model="product.product">
-            <field name="default_code">A6679</field>
+            <field name="default_code">E-COM13</field>
             <field name="product_tmpl_id" ref="product_product_11_product_template"/>
             <field name="attribute_value_ids" eval="[(6,0,[ref('product.product_attribute_value_2')])]"/>
         </record>
@@ -499,21 +499,6 @@ FaceTime HD Camera, 1.2 MP Photos</field>
 Standard-1294P Processor
 QWERTY keyboard</field>
             <field name="default_code">LAP-E5</field>
-        </record>
-
-        <record id="product_product_26" model="product.product">
-            <field name="name">Laptop S3450</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">3000.0</field>
-            <field name="list_price">3245.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="description">17" Monitor
-6GB RAM
-Hi-Speed 234Q Processor
-QWERTY keyboard</field>
-            <field name="default_code">LAP-S3</field>
         </record>
 
         <record id="product_product_27" model="product.product">
@@ -753,14 +738,6 @@ QWERTY keyboard</field>
             <field name="delay">8</field>
             <field name="min_qty">1</field>
             <field name="price">2870</field>
-        </record>
-
-        <record id="product_supplierinfo_23" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_26_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">8</field>
-            <field name="min_qty">1</field>
-            <field name="price">3000</field>
         </record>
 
         <record id="product_supplierinfo_24" model="product.supplierinfo">
