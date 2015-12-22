@@ -721,9 +721,6 @@ Weight: 31 grams</field>
         <record id="product.product_delivery_02_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.External_Hard_Drive')])]"/>
         </record>
-        <record id="product.product_product_37_product_template" model="product.template">
-            <field name="public_categ_ids" eval="[(6,0,[ref('product.printer')])]"/>
-        </record>
         <record id="product.product_product_42_product_template" model="product.template">
             <field name="public_categ_ids" eval="[(6,0,[ref('product.Software')])]"/>
         </record>

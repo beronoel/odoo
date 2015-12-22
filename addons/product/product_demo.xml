@@ -528,18 +528,6 @@ QWERTY keyboard</field>
             <field name="default_code">LAP-CUS</field>
         </record>
 
-        <record id="product_product_37" model="product.product">
-            <field name="name">Printer, All-in-one</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">4258.0</field>
-            <field name="list_price">4410.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="description">All in one hi-speed printer with fax and scanner.</field>
-            <field name="default_code">PRINT</field>
-        </record>
-
         <record id="product_product_42" model="product.product">
             <field name="name">Office Suite</field>
             <field name="categ_id" ref="product_category_4"/>
@@ -927,14 +915,6 @@ QWERTY keyboard</field>
             <field name="delay">3</field>
             <field name="min_qty">0</field>
             <field name="price">12.50</field>
-        </record>
-
-        <record id="product_supplierinfo_46" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_37_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">5</field>
-            <field name="min_qty">0</field>
-            <field name="price">4258</field>
         </record>
 
         <record id="product_supplierinfo_47" model="product.supplierinfo">
