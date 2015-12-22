@@ -3,14 +3,6 @@
 
         <!-- Resource: stock.warehouse.orderpoint -->
 
-        <record id="stock_warehouse_orderpoint_0" model="stock.warehouse.orderpoint">
-            <field name="product_max_qty">25.0</field>
-            <field name="product_min_qty">5.0</field>
-            <field name="product_uom" ref="product.product_uom_dozen"/>
-            <field model="stock.warehouse" name="warehouse_id" search="[]"/>
-            <field name="product_id" ref="product.product_product_36"/>
-            <!-- <field name="location_id" ref="stock.stock_location_stock"/> -->
-        </record>
         <record id="stock_warehouse_orderpoint_1" model="stock.warehouse.orderpoint">
             <field name="product_max_qty">10.0</field>
             <field name="product_min_qty">5.0</field>
