@@ -528,17 +528,6 @@ QWERTY keyboard</field>
             <field name="default_code">LAP-CUS</field>
         </record>
 
-        <record id="product_product_45" model="product.product">
-            <field name="name">Router R430</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">55.0</field>
-            <field name="list_price">60.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">ROUT_430</field>
-        </record>
-
         <record id="product_product_49" model="product.product">
             <field name="name">Dell Inspiron Laptop without OS</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -823,14 +812,6 @@ QWERTY keyboard</field>
             <field name="delay">4</field>
             <field name="min_qty">1</field>
             <field name="price">66</field>
-        </record>
-
-        <record id="product_supplierinfo_35" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_45_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">5</field>
-            <field name="min_qty">1</field>
-            <field name="price">55</field>
         </record>
 
         <record id="product_supplierinfo_36" model="product.supplierinfo">
