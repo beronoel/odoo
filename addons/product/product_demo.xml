@@ -528,17 +528,6 @@ QWERTY keyboard</field>
             <field name="default_code">LAP-CUS</field>
         </record>
 
-        <record id="product_product_49" model="product.product">
-            <field name="name">Dell Inspiron Laptop without OS</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">46900.0</field>
-            <field name="list_price">44000.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">DELL15</field>
-        </record>
-
         <record id="consu_delivery_03" model="product.product">
             <field name="name">Basic Computer</field>
             <field name="categ_id" ref="product_category_5"/>
