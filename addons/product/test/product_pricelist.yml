@@ -29,6 +29,7 @@
     from openerp.tools import float_compare
     context.update({'quantity':5})
     product = self.browse(cr, uid, ref("product_product_25"), context=context)
+    import pdb; pdb.set_trace()
     assert float_compare(product.price, product.lst_price-product.lst_price*(0.05), precision_digits=2) == 0, "Wrong sale price: IT component if more than 3 Unit."
 -
   I check sale price of LCD Monitor.

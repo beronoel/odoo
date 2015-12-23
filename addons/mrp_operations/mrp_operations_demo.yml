@@ -18,7 +18,7 @@
 -
   !record {model: mrp.production, id: mrp_production_mo1}:
     location_src_id: stock.stock_location_stock
-    product_id: product.product_product_16
+    product_id: product.product_product_3
     product_qty: 5.0
 -
   !workflow {model: mrp.production, action: button_confirm, ref: mrp_production_mo1}

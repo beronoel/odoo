@@ -17,7 +17,7 @@ class TestMoveExplode(common.TransactionCase):
         #product that has a phantom bom
         self.product_bom = self.env.ref('product.product_product_3')
         #bom with that product
-        self.bom = self.env.ref('mrp.mrp_bom_9')
+        self.bom = self.env.ref('mrp.mrp_bom_kit')
         #partner agrolait
         self.partner = self.env.ref('base.res_partner_1')
         #bom: PC Assemble (with property: DDR 512MB)

@@ -305,8 +305,6 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="default_code">E-COM11</field>
         </record>
 
-        <!-- -->
-
         <record id="product_product_11" model="product.product">
             <field name="name">iPod</field>
             <field name="categ_id" ref="product_category_5"/>
