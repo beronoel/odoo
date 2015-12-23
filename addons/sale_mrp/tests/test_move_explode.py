@@ -21,7 +21,7 @@ class TestMoveExplode(common.TransactionCase):
         #partner agrolait
         self.partner = self.env.ref('base.res_partner_1')
         #bom: PC Assemble (with property: DDR 512MB)
-        self.bom_prop = self.env.ref('mrp.mrp_bom_property_0')
+        self.bom_prop = self.env.ref('mrp.mrp_bom_manufacture')
 
         self.template = self.env.ref('product.product_product_3_product_template')
         #property: DDR 512MB

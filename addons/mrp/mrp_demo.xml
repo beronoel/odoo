@@ -246,6 +246,7 @@
             <field name="product_uom" ref="product.product_uom_unit"/>
             <field name="sequence">10</field>
             <field name="routing_id" ref="mrp_routing_0"/>
+            <field name="property_ids" eval="[(6,0,[ref('mrp_property_4')])]"/>
         </record>
 
         <record id="mrp_bom_manufacture_line_1" model="mrp.bom.line">
@@ -371,27 +372,27 @@
             <field name="bom_id" ref="mrp_bom_kit"/>
         </record>
 
-    <record id="mrp_production_1" model="mrp.production">
-        <field name="product_id" ref="product.product_product_3"/>
-        <field name="product_uom" ref="product.product_uom_unit"/>
-        <field name="product_qty">3</field>
-        <field name="location_src_id" ref="stock.stock_location_stock"/>
-        <field name="location_dest_id" ref="stock.stock_location_output"/>
-        <field name="bom_id" ref="mrp_bom_manufacture"/>
-        <field name="routing_id" ref="mrp.mrp_routing_2"/>
-    </record>
+        <record id="mrp_production_1" model="mrp.production">
+            <field name="product_id" ref="product.product_product_3"/>
+            <field name="product_uom" ref="product.product_uom_unit"/>
+            <field name="product_qty">3</field>
+            <field name="location_src_id" ref="stock.stock_location_stock"/>
+            <field name="location_dest_id" ref="stock.stock_location_output"/>
+            <field name="bom_id" ref="mrp_bom_manufacture"/>
+            <field name="routing_id" ref="mrp.mrp_routing_2"/>
+        </record>
 
-    <record id="mrp_production_2" model="mrp.production">
-        <field name="product_id" ref="product.product_product_5"/>
-        <field name="product_uom" ref="product.product_uom_unit"/>
-        <field name="location_src_id" ref="stock.stock_location_stock"/>
-        <field name="location_dest_id" ref="stock.stock_location_output"/>
-        <field name="bom_id" ref="mrp.mrp_bom_kit"/>
-        <field name="routing_id" ref="mrp.mrp_routing_1"/>
-    </record>
-    <workflow action="button_confirm" model="mrp.production" ref="mrp_production_1"/>
+        <record id="mrp_production_2" model="mrp.production">
+            <field name="product_id" ref="product.product_product_5"/>
+            <field name="product_uom" ref="product.product_uom_unit"/>
+            <field name="location_src_id" ref="stock.stock_location_stock"/>
+            <field name="location_dest_id" ref="stock.stock_location_output"/>
+            <field name="bom_id" ref="mrp.mrp_bom_kit"/>
+            <field name="routing_id" ref="mrp.mrp_routing_1"/>
+        </record>
+        <workflow action="button_confirm" model="mrp.production" ref="mrp_production_1"/>
 
-    <!-- Run Scheduler -->
-    <function model="procurement.order" name="run_scheduler"/>
+        <!-- Run Scheduler -->
+        <function model="procurement.order" name="run_scheduler"/>
     </data>
 </openerp>
