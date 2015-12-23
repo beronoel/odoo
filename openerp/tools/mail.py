@@ -49,9 +49,6 @@ class _Cleaner(clean.Cleaner):
         'border', 'border-color', 'border-radius', 'height', 'margin', 'padding', 'width', 'max-width', 'min-width',
         # tables
         'border-collapse', 'border-spacing', 'caption-side', 'empty-cells', 'table-layout']
-    _style_replace = {
-        ''
-    }
 
     def __call__(self, doc):
         super(_Cleaner, self).__call__(doc)
@@ -74,7 +71,6 @@ class _Cleaner(clean.Cleaner):
         if el.tag == 'object' and el.get('type') == "image/svg+xml":
             return True
         return super(_Cleaner, self).allow_element(el)
-
 
 def html_sanitize(src, silent=True, strict=False, strip_style=False, strip_classes=False):
     if not src:
