@@ -213,9 +213,10 @@ class XMLTranslator(object):
             try:
                 # parse the translation to validate it
                 etree.fromstring("<div>%s</div>" % encode(trans), parser=self.parser)
-            except etree.ParseError:
+            except etree.ParseError, e:
+                _logger.error("Wrong translation for\n%s\n%s\n%s", term, trans, e.msg)
                 # fallback: escape the translation
-                trans = escape(trans)
+                # trans = escape(trans)
             text = text.replace(term, trans)
         return text
 
