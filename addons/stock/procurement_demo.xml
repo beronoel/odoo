@@ -62,10 +62,6 @@
             <field name="type">product</field>
         </record>
 
-        <record id="product.product_product_21" model="product.product">
-            <field name="type">product</field>
-        </record>
-
         <record id="product.product_product_22" model="product.product">
             <field name="type">product</field>
         </record>
