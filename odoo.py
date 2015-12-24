@@ -153,6 +153,12 @@ def main():
     elif len(sys.argv) == 2 and sys.argv[1] in cmds:
         cmds[sys.argv[1]]()
     else:
+        if 'gevent' in sys.argv:
+            sys.argv.remove('gevent')
+            import gevent.monkey
+            gevent.monkey.patch_all()
+            import psycogreen.gevent
+            psycogreen.gevent.patch_psycopg()
         import openerp
         openerp.cli.main()
 
