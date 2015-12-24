@@ -630,28 +630,12 @@ QWERTY keyboard</field>
             <field name="price">390</field>
         </record>
 
-        <record id="product_supplierinfo_25" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">5</field>
-            <field name="min_qty">1</field>
-            <field name="price">395</field>
-        </record>
-
         <record id="product_supplierinfo_26" model="product.supplierinfo">
             <field name="product_tmpl_id" ref="product_delivery_01_product_template"/>
             <field name="name" ref="base.res_partner_3"/>
             <field name="delay">2</field>
             <field name="min_qty">12</field>
             <field name="price">90</field>
-        </record>
-
-        <record id="product_supplierinfo_33" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_delivery_02_product_template"/>
-            <field name="name" ref="base.res_partner_1"/>
-            <field name="delay">4</field>
-            <field name="min_qty">1</field>
-            <field name="price">60</field>
         </record>
 
         <record id="product_supplierinfo_34" model="product.supplierinfo">
@@ -676,14 +660,6 @@ QWERTY keyboard</field>
             <field name="delay">7</field>
             <field name="min_qty">1</field>
             <field name="price">55</field>
-        </record>
-
-        <record id="product_supplierinfo_42" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_delivery_01_product_template"/>
-            <field name="name" ref="base.res_partner_3"/>
-            <field name="delay">2</field>
-            <field name="min_qty">0</field>
-            <field name="price">60</field>
         </record>
 
         <record id="product_supplierinfo_43" model="product.supplierinfo">
