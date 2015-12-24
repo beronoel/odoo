@@ -64,7 +64,7 @@
   !record {model: purchase.order, id: purchase_order_4}:
     partner_id: base.res_partner_4
     order_line:
-      - product_id: product.product_product_14
+      - product_id: product.product_delivery_02
         name: RAM SR2 (kit)
         price_unit: 85.50
         product_qty: 6.0

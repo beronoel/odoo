@@ -416,17 +416,6 @@ FaceTime HD Camera, 1.2 MP Photos</field>
             <field name="default_code">CARD</field>
         </record>
 
-        <record id="product_product_14" model="product.product">
-            <field name="name">RAM SR2 (kit)</field>
-            <field name="categ_id" ref="product_category_5"/>
-            <field name="standard_price">87.0</field>
-            <field name="list_price">95.0</field>
-            <field name="type">consu</field>
-            <field name="uom_id" ref="product_uom_unit"/>
-            <field name="uom_po_id" ref="product_uom_unit"/>
-            <field name="default_code">RAM-SR2</field>
-        </record>
-
         <record id="product_product_15" model="product.product">
             <field name="name">RAM SR3</field>
             <field name="categ_id" ref="product_category_5"/>
@@ -633,14 +622,6 @@ QWERTY keyboard</field>
             <field name="delay">5</field>
             <field name="min_qty">1</field>
             <field name="price">78</field>
-        </record>
-
-        <record id="product_supplierinfo_10" model="product.supplierinfo">
-            <field name="product_tmpl_id" ref="product_product_14_product_template"/>
-            <field name="name" ref="base.res_partner_4"/>
-            <field name="delay">5</field>
-            <field name="min_qty">1</field>
-            <field name="price">87</field>
         </record>
 
         <record id="product_supplierinfo_11" model="product.supplierinfo">
