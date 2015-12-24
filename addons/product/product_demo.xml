@@ -482,6 +482,32 @@ QWERTY keyboard</field>
             <field name="default_code">CONS_DEL01</field>
         </record>
 
+        <!-- Membership products -->
+
+        <record id="membership_0" model="product.product">
+            <field name="name">Gold Membership</field>
+            <field name="list_price">180</field>
+            <field name="categ_id" ref="product.product_category_1"/>
+            <field name="type">service</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record id="membership_1" model="product.product">
+            <field name="name">Silver Membership</field>
+            <field name="categ_id" ref="product.product_category_1"/>
+            <field name="list_price">80</field>
+            <field name="type">service</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <record id="membership_2" model="product.product">
+            <field name="name">Basic Membership</field>
+            <field name="categ_id" ref="product.product_category_1"/>
+            <field name="list_price">40</field>
+            <field name="type">service</field>
+            <field name="active" eval="False"/>
+        </record>
+
         <!--
     Resource: product.supplierinfo
     -->
