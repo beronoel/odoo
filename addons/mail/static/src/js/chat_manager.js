@@ -30,7 +30,7 @@ var discuss_ids = {};
 var global_unread_counter = 0;
 var pinned_dm_partners = [];  // partner_ids we have a pinned DM with
 
-// Window focus/unfocus, beep and title
+// Utils: Window focus/unfocus, beep, tab title, parsing html strings
 //----------------------------------------------------------------------------------
 var beep = (function () {
     if (typeof(Audio) === "undefined") {
@@ -75,6 +75,25 @@ function notify_incoming_message (msg, options) {
         }
     }
 }
+
+// suggested regexp (gruber url matching regexp, adapted to js, see https://gist.github.com/gruber/8891611)
+var url_regexp = /\b((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/gi;
+function add_link(text) {
+    return text.replace(url_regexp, function (url) {
+        var href = (!/^(f|ht)tps?:\/\//i.test(url)) ? "http://" + url : url;
+        return '<a href="' + href + '">' + url + '</a>';
+    });
+}
+
+function parse_and_add_link(html_string) {
+    return _.map($('<div>').html(html_string).contents(), function (node) {
+        if (node.nodeType === 3) return add_link(node.data);
+        if (node.tagName === "A") return node.outerHTML;
+        node.innerHTML = parse_and_add_link(node.innerHTML);
+        return node.outerHTML;
+    }).join("");
+}
+
 
 // Message and channel manipulation helpers
 //----------------------------------------------------------------------------------
@@ -206,6 +225,9 @@ function make_message (data) {
     } else {
         msg.avatar_src = "/mail/static/src/img/smiley/avatar.jpg";
     }
+
+    // add anchor tags to urls
+    msg.body = parse_and_add_link(msg.body);
 
     // Compute url of attachments
     _.each(msg.attachment_ids, function(a) {
