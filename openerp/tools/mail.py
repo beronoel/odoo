@@ -509,18 +509,6 @@ def html_email_clean(html, remove=False, shorten=False, max_length=300, expand_o
 # HTML/Text management
 #----------------------------------------------------------
 
-def html_keep_url(text):
-    """ Transform the url into clickable link with <a/> tag """
-    idx = 0
-    final = ''
-    link_tags = re.compile(r"""(?<!["'])((ftp|http|https):\/\/(\w+:{0,1}\w*@)?([^\s<"']+)(:[0-9]+)?(\/|\/([^\s<"']))?)(?![^\s<"']*["']|[^\s<"']*</a>)""")
-    for item in re.finditer(link_tags, text):
-        final += text[idx:item.start()]
-        final += '<a href="%s" target="_blank">%s</a>' % (item.group(0), item.group(0))
-        idx = item.end()
-    final += text[idx:]
-    return final
-
 def html2plaintext(html, body_id=None, encoding='utf-8'):
     """ From an HTML text, convert the HTML to plain text.
     If @param body_id is provided then this is the tag where the
