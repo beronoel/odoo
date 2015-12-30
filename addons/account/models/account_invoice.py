@@ -197,7 +197,7 @@ class AccountInvoice(models.Model):
         ], readonly=True, index=True, change_default=True,
         default=lambda self: self._context.get('type', 'out_invoice'),
         track_visibility='always')
-
+    invoice_refund_ids = fields.Many2many('account.invoice', 'invoice_refund_rel', 'invoice_id', 'refund_id', string="Refund")
     number = fields.Char(related='move_id.name', store=True, readonly=True, copy=False)
     move_name = fields.Char(string='Journal Entry', readonly=True,
         default=False, copy=False,
@@ -947,7 +947,9 @@ class AccountInvoice(models.Model):
             # create the new invoice
             values = self._prepare_refund(invoice, date_invoice=date_invoice, date=date,
                                     description=description, journal_id=journal_id)
-            new_invoices += self.create(values)
+            refund_invoice = self.create(values)
+            invoice.invoice_refund_ids = [(4, refund_invoice.id)]
+            new_invoices += refund_invoice
         return new_invoices
 
     @api.v8
@@ -1057,6 +1059,7 @@ class AccountInvoiceLine(models.Model):
         if self.invoice_line_tax_ids:
             taxes = self.invoice_line_tax_ids.compute_all(price, currency, self.quantity, product=self.product_id, partner=self.invoice_id.partner_id)
         self.price_subtotal = price_subtotal_signed = taxes['total_excluded'] if taxes else self.quantity * price
+        self.price_total = taxes['total_included'] if taxes else self.quantity * price
         if self.invoice_id.currency_id and self.invoice_id.currency_id != self.invoice_id.company_id.currency_id:
             price_subtotal_signed = self.invoice_id.currency_id.compute(price_subtotal_signed, self.invoice_id.company_id.currency_id)
         sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
@@ -1087,6 +1090,8 @@ class AccountInvoiceLine(models.Model):
         help="The income or expense account related to the selected product.")
     price_unit = fields.Float(string='Unit Price', required=True, digits=dp.get_precision('Product Price'))
     price_subtotal = fields.Monetary(string='Amount',
+        store=True, readonly=True, compute='_compute_price')
+    price_total = fields.Monetary(string='Amount',
         store=True, readonly=True, compute='_compute_price')
     price_subtotal_signed = fields.Monetary(string='Amount Signed', currency_field='company_currency_id',
         store=True, readonly=True, compute='_compute_price',

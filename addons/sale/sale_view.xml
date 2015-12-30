@@ -254,6 +254,8 @@
                                     <field name="qty_invoiced"
                                         invisible="not context.get('show_sale')"/>
                                     <field name="qty_to_invoice" invisible="1"/>
+                                    <field name="amt_to_invoice" invisible="1"/>
+                                    <field name="amt_invoiced" invisible="1"/>
                                     <field name="product_uom"
                                         attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
                                         context="{'company_id': parent.company_id}"
