@@ -77,8 +77,13 @@ function notify_incoming_message (msg, options) {
 }
 
 function parse_and_transform(html_string, transform_function) {
-    var children = $('<div>').html(html_string).contents();
-    return _parse_and_transform(children, transform_function);
+    var string = html_string
+                .replace(/&lt;/g, "OPENBRACKET")
+                .replace(/&gt;/g, "CLOSEBRACKET");
+    var children = $('<div>').html(string).contents();
+    return _parse_and_transform(children, transform_function)
+                .replace(/OPENBRACKET/g, "&lt;")
+                .replace(/CLOSEBRACKET/g, "&gt;");
 }
 function _parse_and_transform(nodes, transform_function) {
     return _.map(nodes, function (node) {
