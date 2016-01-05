@@ -77,14 +77,13 @@ function notify_incoming_message (msg, options) {
 }
 
 function parse_and_transform(html_string, transform_function) {
-    var string = html_string
-                .replace(/&lt;/g, "OPENBRACKET")
-                .replace(/&gt;/g, "CLOSEBRACKET");
+    var open_token = "OPEN" + Date.now();
+    var string = html_string.replace(/&lt;/g, open_token);
     var children = $('<div>').html(string).contents();
     return _parse_and_transform(children, transform_function)
-                .replace(/OPENBRACKET/g, "&lt;")
-                .replace(/CLOSEBRACKET/g, "&gt;");
+                .replace(new RegExp(open_token, "g"), "&lt;");
 }
+
 function _parse_and_transform(nodes, transform_function) {
     return _.map(nodes, function (node) {
         return transform_function(node, function () {
@@ -246,6 +245,7 @@ function make_message (data) {
 
     // add anchor tags to urls
     msg.body = parse_and_transform(msg.body, add_link);
+    console.log(msg.body);
 
     // Compute url of attachments
     _.each(msg.attachment_ids, function(a) {
