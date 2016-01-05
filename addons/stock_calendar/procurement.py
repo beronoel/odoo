@@ -155,13 +155,6 @@ class procurement_order(osv.osv):
                 return (date1, res[0][1])
         return (False, False)
 
-    def _convert_to_tz(self, cr, uid, date, context=None):
-        if not context or not context.get('tz'):
-            return date
-        utc_date = pytz.UTC.localize(date)
-        timezone = pytz.timezone(context['tz'])
-        return utc_date.astimezone(timezone)
-
     def _get_group(self, cr, uid, orderpoint, context=None):
         """
             Will return the groups and the end dates of the intervals of the purchase calendar
