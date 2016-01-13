@@ -1109,7 +1109,15 @@ var X2ManyList = ListView.List.extend({
                 value = JSON.parse(JSON.stringify(value));
 
                 var field = this.group.view.editor.form.fields[column.name];
-                column.dataset = column.dataset || field && field.dataset || new data.BufferedDataSet(column, column.relation, column.context);
+
+                if (!column.dataset) {
+                    column.dataset = field && field.dataset || new data.BufferedDataSet(column, column.relation, column.context);
+                }
+                if (!column.dataset_read_ids) {
+                    column.dataset_read_ids = [];
+                    column.dataset_read_fields = [];
+                    column.dataset_read_defs = [];
+                }
 
                 var ids;
                 if (_.find(value, function(id) { return typeof(id) !== "number"; } )) {
@@ -1120,9 +1128,26 @@ var X2ManyList = ListView.List.extend({
                     ids = value;
                 }
 
+                // use deferred to read only once
+                var def = $.Deferred();
+                column.dataset_read_ids = column.dataset_read_ids.concat(ids);
+                column.dataset_read_fields = column.dataset_read_fields.concat(fields);
+                column.dataset_read_defs.push(def);
+                column.dataset_read_time = setTimeout(function () {
+                    var ids = _.uniq(column.dataset_read_ids);
+                    var fields = _.uniq(column.dataset_read_fields);
+                    var defs = _.clone(column.dataset_read_defs);
+                    column.dataset_read_ids = column.dataset_read_fields = column.dataset_read_defs = null;
+                    column.dataset.read_ids(ids, fields).done(function () {
+                        _.invoke(defs, 'resolve');
+                    });
+                });
+
                 record.set(column.id + '__display', false, {'silent': true});
-                column.dataset.read_ids(ids, fields).done(function (records) {
-                    record.set(column.id + '__display', _.pluck(records, 'display_name').join(', '));
+                def.then(function () {
+                    column.dataset.read_ids(ids, fields).done(function (records) {
+                        record.set(column.id + '__display', _.pluck(records, 'display_name').join(', '));
+                    });
                 });
             }
 
