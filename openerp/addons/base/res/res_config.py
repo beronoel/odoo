@@ -665,3 +665,10 @@ class ResConfigSettings(models.TransientModel, ResConfigModuleInstallationMixin)
         if (action_id):
             return RedirectWarning(msg % values, action_id, _('Go to the configuration panel'))
         return UserError(msg % values)
+
+    def apply_my_config(self, cr, uid, values, context=None):
+        # Create a res_config instance, update the values 
+        # and call execute to trigger the next actions
+        wizard_id = self.create(cr, uid, values, context=context)
+        return self.execute(cr, uid, [wizard_id], context=context)
+
