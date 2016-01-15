@@ -22,6 +22,11 @@ class project_task_type(osv.osv):
         'name': fields.char('Stage Name', required=True, translate=True),
         'description': fields.text('Description', translate=True),
         'sequence': fields.integer('Sequence'),
+        'active': fields.boolean(
+            'Active',
+            help='Set to False to archive this column and all its content. It will'
+                 'not be included in search result, unless specifically asked through'
+                 'the active_test = False domain part.'),
         'project_ids': fields.many2many('project.project', 'project_task_type_rel', 'type_id', 'project_id', 'Projects'),
         'legend_priority': fields.char(
             'Priority Management Explanation', translate=True,
@@ -49,7 +54,16 @@ class project_task_type(osv.osv):
     _defaults = {
         'sequence': 1,
         'project_ids': _get_default_project_ids,
+        'active': True,
     }
+
+    def archive(self, cr, uid, ids, archive, archive_content=True, context=None):
+        self.write(cr, uid, ids, {'active': not archive}, context=context)
+        if archive_content:
+            task_ids = self.pool['project.task'].search(cr, uid, [('stage_id', 'in', ids)], context=context)
+            # TODO: archive method on project task
+            self.pool['project.task'].write(cr, uid, task_ids, {'active': not archive}, context=context)
+        return True
 
 
 class project(osv.osv):
@@ -310,17 +324,80 @@ class project(osv.osv):
         return super(project, self).create(cr, uid, vals, context=create_context)
 
     def write(self, cr, uid, ids, vals, context=None):
+        if context is None:
+            context = {}
         # if alias_model has been changed, update alias_model_id accordingly
         if vals.get('alias_model'):
             model_ids = self.pool.get('ir.model').search(cr, uid, [('model', '=', vals.get('alias_model', 'project.task'))])
             vals.update(alias_model_id=model_ids[0])
         res = super(project, self).write(cr, uid, ids, vals, context=context)
         if 'active' in vals:
-            # archiving/unarchiving a project does it on its tasks, too
-            projects = self.browse(cr, uid, ids, context)
-            tasks = projects.with_context(active_test=False).mapped('tasks')
-            tasks.write({'active': vals['active']})
+            if vals['active']:
+                context['active_test'] = False
+            self.archive(cr, uid, ids, not vals['active'], archive_content=True, context=context)
         return res
+
+    def archive(self, cr, uid, ids, archive, archive_content=True, context=None):
+        """ Archive a project and probably its content. """
+        if not archive:
+            if context is None:
+                context = {}
+            context = {'active_test': False}
+        task_ids = self.pool['project.task'].search(cr, uid, [('project_id', 'in', ids)], context=context)
+        self.pool['project.task'].write(cr, uid, task_ids, {'active': not archive}, context=context)
+        self.archive_stage(cr, uid, ids, archive, archive_content=False, context=context)
+
+    def archive_stage(self, cr, uid, ids, archive, stage_ids=None, archive_content=True, context=None):
+        """ Archive columns belonging to some projects.
+
+        :param archive: if True, archive aka set active=False. If False, unarchive
+                        aka set active=True.
+        :param stage_ids: archive some specific columns of the project. tasks
+                          belonging to those columns are archived. Stages are
+                          archived if not used by other projects.
+        :param archive_content: archive project content, aka tasks. You may try
+                                to archive a column without archiving its content.
+        """
+        if not archive:
+            if context is None:
+                context = {}
+            context.update(active_test=False)
+        if stage_ids:
+            domain = ['&', '&', ('active', '=', archive), ('project_ids', 'in', ids), ('id', 'in', stage_ids)]
+        else:
+            domain = ['&', ('active', '=', archive), ('project_ids', 'in', ids)]
+        TaskType = self.pool['project.task.type']
+        project_stage_ids = set(TaskType.search(cr, uid, domain, context=context))
+
+        # filter only stages used in the current project - as the 'in' operator
+        # of the ORM gives stages containing at least the selection but not a
+        # a subset, we do it manually
+        project_ids = set(ids)
+        unused_stage_ids = set()
+        for stage in TaskType.browse(cr, uid, list(project_stage_ids), context=context):
+            if set(stage.project_ids.ids) <= project_ids:
+                unused_stage_ids.add(stage.id)
+
+        # archive task whose column should not be touched
+        if archive_content:
+            self.archive_stage_content(
+                cr, uid, ids,
+                archive,
+                list(project_stage_ids - unused_stage_ids),
+                context=context)
+        # archive columns with their tasks
+        return TaskType.archive(cr, uid, list(unused_stage_ids), archive, archive_content=archive_content, context=context)
+
+    def archive_stage_content(self, cr, uid, ids, archive, stage_ids, context=None):
+        """ As project is an umbrella for several items like tasks or issues
+        this method exists to be inherited and improved in future addons that
+        enhance projects. """
+        Task = self.pool['project.task']
+        task_ids = Task.search(
+            cr, uid,
+            [('stage_id', 'in', stage_ids)],
+            context=context)
+        Task.write(cr, uid, task_ids, {'active': not archive}, context=context)
 
 
 class task(osv.osv):
