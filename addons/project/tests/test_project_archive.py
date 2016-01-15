@@ -97,7 +97,7 @@ class TestProjectArchive(TestProjectBase):
 
         Stage = self.env['project.task.type']
         projects = self.project_pigs | self.project_goats
-        projects.archive(True, archive_content=True)
+        projects.archive(True)
         projects.invalidate_cache()
 
         self.assertEqual(

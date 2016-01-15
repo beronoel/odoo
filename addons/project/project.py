@@ -332,13 +332,11 @@ class project(osv.osv):
             vals.update(alias_model_id=model_ids[0])
         res = super(project, self).write(cr, uid, ids, vals, context=context)
         if 'active' in vals:
-            if vals['active']:
-                context['active_test'] = False
-            self.archive(cr, uid, ids, not vals['active'], archive_content=True, context=context)
+            self.archive(cr, uid, ids, not vals['active'], context=context)
         return res
 
-    def archive(self, cr, uid, ids, archive, archive_content=True, context=None):
-        """ Archive a project and probably its content. """
+    def archive(self, cr, uid, ids, archive, context=None):
+        """ Archive a project and its content. """
         if not archive:
             if context is None:
                 context = {}
@@ -358,23 +356,20 @@ class project(osv.osv):
         :param archive_content: archive project content, aka tasks. You may try
                                 to archive a column without archiving its content.
         """
-        if not archive:
-            if context is None:
-                context = {}
-            context.update(active_test=False)
+        local_ctx = dict(context or {}, active_test=False)
         if stage_ids:
             domain = ['&', '&', ('active', '=', archive), ('project_ids', 'in', ids), ('id', 'in', stage_ids)]
         else:
             domain = ['&', ('active', '=', archive), ('project_ids', 'in', ids)]
         TaskType = self.pool['project.task.type']
-        project_stage_ids = set(TaskType.search(cr, uid, domain, context=context))
+        project_stage_ids = set(TaskType.search(cr, uid, domain, context=local_ctx))
 
         # filter only stages used in the current project - as the 'in' operator
         # of the ORM gives stages containing at least the selection but not a
         # a subset, we do it manually
         project_ids = set(ids)
         unused_stage_ids = set()
-        for stage in TaskType.browse(cr, uid, list(project_stage_ids), context=context):
+        for stage in TaskType.browse(cr, uid, list(project_stage_ids), context=local_ctx):
             if set(stage.project_ids.ids) <= project_ids:
                 unused_stage_ids.add(stage.id)
 
@@ -392,12 +387,13 @@ class project(osv.osv):
         """ As project is an umbrella for several items like tasks or issues
         this method exists to be inherited and improved in future addons that
         enhance projects. """
+        local_ctx = dict(context or {}, active_test=False)
         Task = self.pool['project.task']
         task_ids = Task.search(
             cr, uid,
-            [('stage_id', 'in', stage_ids)],
-            context=context)
-        Task.write(cr, uid, task_ids, {'active': not archive}, context=context)
+            [('project_id', 'in', ids), ('stage_id', 'in', stage_ids)],
+            context=local_ctx)
+        return Task.write(cr, uid, task_ids, {'active': not archive}, context=local_ctx)
 
 
 class task(osv.osv):
