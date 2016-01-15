@@ -476,6 +476,28 @@ class project(osv.Model):
             issues.write({'active': vals['active']})
         return res
 
+    def archive(self, cr, uid, ids, archive, context=None):
+        res = super(project, self).archive(cr, uid, ids, archive, context=context)
+        local_ctx = dict(context or {}, active_test=False)
+        Issue = self.pool['project.issue']
+        issue_ids = Issue.search(
+            cr, uid,
+            [('project_id', 'in', ids)],
+            context=local_ctx)
+        Issue.write(cr, uid, issue_ids, {'active': not archive}, context=local_ctx)
+        return res
+
+    def archive_stage_content(self, cr, uid, ids, archive, stage_ids, context=None):
+        res = super(project, self).archive_stage_content(cr, uid, ids, archive, stage_ids, context=context)
+        local_ctx = dict(context or {}, active_test=False)
+        Issue = self.pool['project.issue']
+        issue_ids = Issue.search(
+            cr, uid,
+            [('project_id', 'in', ids), ('stage_id', 'in', stage_ids)],
+            context=local_ctx)
+        Issue.write(cr, uid, issue_ids, {'active': not archive}, context=local_ctx)
+        return res
+
 
 class account_analytic_account(osv.Model):
     _inherit = 'account.analytic.account'
