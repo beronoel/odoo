@@ -1,20 +1,14 @@
-# -*- encoding: utf-8 -*-
-from openerp import models
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+from odoo import models
 
 
-class account_invoice_line(models.Model):
+class AccountInvoiceLine(models.Model):
     _inherit = ['account.invoice.line']
 
-    def get_digital_purchases(self,uid):
-        user = self.env['res.users'].browse(uid)
-        partner = user.partner_id
+    def get_digital_purchases(self):
 
         # Get paid invoices
-        purchases = self.sudo().search_read(
-            domain=[('invoice_id.state', '=', 'paid'), ('invoice_id.partner_id', '=', partner.id), ('product_id.product_tmpl_id.type', '=', 'digital')],
-            fields=['product_id'],
-        )
+        purchases = self.sudo().search([('invoice_id.state', '=', 'paid'), ('invoice_id.partner_id', '=', self.env.user.partner_id.id), ('product_id.product_tmpl_id.type', '=', 'digital')])
 
-        # I only want product_ids, but search_read insists in giving me a list of
-        # (product_id: <id>, name: <product code> <template_name> <attributes>)
-        return map(lambda x: x['product_id'][0], purchases)
+        return purchases.mapped('product_id')

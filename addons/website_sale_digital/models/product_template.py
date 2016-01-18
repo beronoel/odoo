@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-from openerp import models, fields, api, _
+from odoo import models, fields, api, _
 
 
-class product_template(models.Model):
+class ProductTemplate(models.Model):
     _inherit = ['product.template']
 
     attachment_count = fields.Integer(compute='_compute_attachment_count', string="File")
@@ -18,7 +18,7 @@ class product_template(models.Model):
 
     @api.model
     def _get_product_template_type(self):
-        res = super(product_template, self)._get_product_template_type()
+        res = super(ProductTemplate, self)._get_product_template_type()
         if 'digital' not in [item[0] for item in res]:
             res.append(('digital', 'Digital Content'))
         return res

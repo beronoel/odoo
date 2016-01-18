@@ -1,19 +1,17 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Website Sale Digital - Sell digital products',
-    'version': '0.1',
     'description': """
 Sell digital product using attachments to virtual products
 """,
-    'author': 'Odoo S.A.',
     'depends': [
         'document',
         'website_sale',
     ],
-    'installable': True,
     'data': [
-        'views/templates.xml',
         'views/product_views.xml',
+        'views/templates.xml',
     ],
     'demo': [
         'data/product_template_demo.xml',

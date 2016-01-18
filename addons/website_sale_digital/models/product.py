@@ -1,8 +1,9 @@
-# -*- encoding: utf-8 -*-
-from openerp import models, fields, api, _
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+from odoo import models, fields, api, _
 
 
-class product_product(models.Model):
+class Product(models.Model):
     _inherit = 'product.product'
 
     attachment_count = fields.Integer(compute='_compute_attachment_count', string="File")
