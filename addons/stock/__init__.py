@@ -6,6 +6,7 @@ import res_company
 import stock_incoterms
 import stock_location
 import stock_location_route
+import stock_production_lot
 import stock_picking_type
 import barcode_rule
 import partner

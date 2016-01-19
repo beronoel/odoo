@@ -34,7 +34,7 @@ class StockPickingType(models.Model):
 
     @api.multi
     def _get_picking_count(self):
-        obj = self.env['stock.picking']
+        StockPicking = self.env['stock.picking']
         domains = {
             'count_picking_draft': [('state', '=', 'draft')],
             'count_picking_waiting': [('state', 'in', ('confirmed', 'waiting'))],
@@ -45,7 +45,7 @@ class StockPickingType(models.Model):
         }
         result = {}
         for field in domains:
-            data = obj.read_group(domains[field] +
+            data = StockPicking.read_group(domains[field] +
                 [('state', 'not in', ('done', 'cancel')), ('picking_type_id', 'in', self.ids)],
                 ['picking_type_id'], ['picking_type_id'])
             count = dict(map(lambda x: (x['picking_type_id'] and x['picking_type_id'][0], x['picking_type_id_count']), data))

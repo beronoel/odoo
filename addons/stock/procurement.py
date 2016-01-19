@@ -69,11 +69,10 @@ class ProcurementOrder(models.Model):
             res.append(location.location_id.id)
         return res
 
-    @api.multi
     @api.onchange('warehouse_id')
     def change_warehouse_id(self):
         if self.warehouse_id:
-            self.location_id = self.warehouse_id
+            self.location_id = self.warehouse_id.lot_stock_id.id
 
     #Doing assignation, ... in multi
     @api.model
@@ -198,13 +197,12 @@ class ProcurementOrder(models.Model):
         '''we try to first find a rule among the ones defined on the procurement order group and if none is found, we try on the routes defined for the product, and finally we fallback on the default behavior'''
         Rule = self.env['procurement.rule']
         self.ensure_one()
-        procurement = self
         warehouse_route_ids = []
-        if procurement.warehouse_id:
-            domain += ['|', ('warehouse_id', '=', procurement.warehouse_id.id), ('warehouse_id', '=', False)]
-            warehouse_route_ids = procurement.warehouse_id.route_ids.ids
-        product_route_ids = procurement.product_id.route_ids.ids + procurement.product_id.categ_id.total_route_ids.ids
-        procurement_route_ids = procurement.route_ids.ids
+        if self.warehouse_id:
+            domain += ['|', ('warehouse_id', '=', self.warehouse_id.id), ('warehouse_id', '=', False)]
+            warehouse_route_ids = self.warehouse_id.route_ids.ids
+        product_route_ids = self.product_id.route_ids.ids + self.product_id.categ_id.total_route_ids.ids
+        procurement_route_ids = self.route_ids.ids
         procurement_rules = Rule.search(domain + [('route_id', 'in', procurement_route_ids)], order='route_sequence, sequence')
         if not procurement_rules:
             procurement_rules = Rule.search(domain + [('route_id', 'in', product_route_ids)], order='route_sequence, sequence')
@@ -272,14 +270,14 @@ class ProcurementOrder(models.Model):
 
     @api.model
     def _run(self, procurement):
-        Move = self.env['stock.move']
+        StockMove = self.env['stock.move']
         if procurement.rule_id.action == 'move':
             if not procurement.rule_id.location_src_id:
                 procurement.message_post(body=_('No source location defined!'))
                 return False
             move_dict = self._run_move_create(procurement)
             # create the move as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
-            Move.sudo().create(move_dict)
+            StockMove.sudo().create(move_dict)
             return True
         return super(ProcurementOrder, self)._run(procurement)
 
@@ -341,9 +339,6 @@ class ProcurementOrder(models.Model):
         and the availability of moves. This function is intended to be run for all the companies at the same time, so
         we run functions as SUPERUSER to avoid intercompanies and access rights issues.
         @param self: The object pointer
-        @param cr: The current row, from the database cursor,
-        @param uid: The current user ID for security checks
-        @param ids: List of selected IDs
         @param use_new_cursor: if set, use a dedicated cursor and auto-commit after processing each procurement.
             This is appropriate for batch jobs only.
         @param context: A standard dictionary for contextual values
@@ -389,7 +384,7 @@ class ProcurementOrder(models.Model):
     def _prepare_orderpoint_procurement(self, orderpoint, product_qty):
         return {
             'name': orderpoint.name,
-            'date_planned': self._get_orderpoint_date_planned(orderpoint, datetime.today()),
+            'date_planned': self._get_orderpoint_date_planned(orderpoint, fields.Date.today()),
             'product_id': orderpoint.product_id.id,
             'product_qty': product_qty,
             'company_id': orderpoint.company_id.id,

@@ -105,11 +105,11 @@ class StockLocation(models.Model):
     @api.model
     def get_putaway_strategy(self, location, product):
         ''' Returns the location where the product has to be put, if any compliant putaway strategy is found. Otherwise returns None.'''
-        putaway_obj = self.env['product.putaway']
+        PutaWay = self.env['product.putaway']
         loc = location
         while loc:
             if loc.putaway_strategy_id:
-                res = putaway_obj.putaway_apply(loc.putaway_strategy_id, product)
+                res = PutaWay.putaway_apply(loc.putaway_strategy_id, product)
                 if res:
                     return res
             loc = loc.location_id

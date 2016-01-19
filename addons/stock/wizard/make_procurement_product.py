@@ -9,7 +9,6 @@ class MakeProcurement(models.TransientModel):
     _name = 'make.procurement'
     _description = 'Make Procurements'
 
-    @api.multi
     @api.onchange('product_id')
     def onchange_product_id(self, prod_id):
         product = self.env['product.product'].browse(prod_id)
@@ -62,26 +61,24 @@ class MakeProcurement(models.TransientModel):
 
     @api.model
     def default_get(self, fields):
-        cxt = self.env.context
-        record = cxt.get('active_id')
+        record_id = self.env.context.get('active_id')
 
-        if cxt.get('active_model') == 'product.template':
-            product_ids = self.env['product.product'].search([('product_tmpl_id', '=', record)], limit=1)
+        if self.env.context.get('active_model') == 'product.template':
+            product_ids = self.env['product.product'].search([('product_tmpl_id', '=', self._context.get('active_id'))])
             if product_ids:
-                record_id = product_ids.id
+                record_id = product_ids[0]
 
         res = super(MakeProcurement, self).default_get(fields)
 
         if record_id and 'product_id' in fields:
-            proxy = self.env['product.product']
-            product = proxy.search([('id', '=', record_id)], limit=1)
-            if product:
-                res['product_id'] = product.id
-                res['uom_id'] = product.uom_id.id
+            product_ids = self.env['product.product'].search([('id', '=', record_id.id)], limit=1)
+            if product_ids:
+                res['product_id'] = product_ids.id
+                res['uom_id'] = product_ids.uom_id.id
 
         if 'warehouse_id' in fields:
-            warehouse_id = self.env['stock.warehouse'].search([], limit=1)
-            res['warehouse_id'] = warehouse_id.id if warehouse_id else False
+            warehouse_id = self.env['stock.warehouse'].search([]).ids
+            res['warehouse_id'] = warehouse_id[0] if warehouse_id else False
 
         return res
 
