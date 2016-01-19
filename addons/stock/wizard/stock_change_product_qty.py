@@ -3,7 +3,7 @@
 
 from odoo import api, fields, models, tools, _
 import openerp.addons.decimal_precision as dp
-from openerp.exceptions import UserError, AccessError
+from odoo.exceptions import UserError, AccessError
 
 
 class StockChangeProductQty(models.TransientModel):
@@ -100,11 +100,11 @@ class StockChangeProductQty(models.TransientModel):
             inventory_id.action_done()
         return {}
 
-    @api.onchange('location_id', 'product_id')
+    @api.onchange('location_id')
     def onchange_location_id(self):
         if self.location_id:
             qty_wh = 0.0
-            qty = self.product_id._product_available(location=self.location_id.id)
+            qty = self.product_id.with_context(location=self.location_id.id)._product_available()
             if self.product_id.id in qty:
                 qty_wh = qty[self.product_id.id]['qty_available']
             return {'value': {'new_quantity': qty_wh}}

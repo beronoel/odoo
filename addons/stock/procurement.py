@@ -384,7 +384,7 @@ class ProcurementOrder(models.Model):
     def _prepare_orderpoint_procurement(self, orderpoint, product_qty):
         return {
             'name': orderpoint.name,
-            'date_planned': self._get_orderpoint_date_planned(orderpoint, fields.Date.today()),
+            'date_planned': self._get_orderpoint_date_planned(orderpoint, datetime.today()),
             'product_id': orderpoint.product_id.id,
             'product_qty': product_qty,
             'company_id': orderpoint.company_id.id,
