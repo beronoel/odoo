@@ -2,6 +2,12 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from stock import *
+import res_company
+import stock_incoterms
+import stock_location
+import stock_location_route
+import stock_picking_type
+import barcode_rule
 import partner
 import product
 import procurement
