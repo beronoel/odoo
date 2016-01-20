@@ -46,6 +46,7 @@
 - 
   !python {model: product.product}: |
     product = self.browse(cr, uid, ref("product_average_icecream"))
+    product.invalidate_cache()
     assert product.qty_available == 10.0, 'Wrong quantity in stock after first reception'
     assert product.standard_price == 60.0, 'Standard price should be the price of the first reception!'
 - 
@@ -131,5 +132,6 @@
 - 
   !python {model: product.product}: |
     product = self.browse(cr, uid, ref("product_average_icecream"))
+    product.invalidate_cache()
     assert product.qty_available == 20.5, 'Reception of purchase order in grams leads to wrong quantity in stock'
     assert round(self.browse(cr, uid, ref("product_average_icecream")).standard_price, 2) == 78.05, 'Standard price as average price of third reception with other UoM incorrect! Got %s instead of 78.05' % (round(self.browse(cr, uid, ref("product_average_icecream")).standard_price, 2),)

@@ -52,9 +52,9 @@ class StockPickingType(models.Model):
             for tid in self.ids:
                 result.setdefault(tid, {})[field] = count.get(tid, 0)
         for tid in self:
-            if result[tid]['count_picking']:
-                tid.rate_picking_late = result[tid]['count_picking_late'] * 100 / result[tid]['count_picking']
-                tid.rate_picking_backorders = result[tid]['count_picking_backorders'] * 100 / result[tid]['count_picking']
+            if result[tid.id]['count_picking']:
+                tid.rate_picking_late = result[tid.id]['count_picking_late'] * 100 / result[tid.id]['count_picking']
+                tid.rate_picking_backorders = result[tid.id]['count_picking_backorders'] * 100 / result[tid.id]['count_picking']
             else:
                 tid.rate_picking_late = 0
                 tid.rate_picking_backorders = 0

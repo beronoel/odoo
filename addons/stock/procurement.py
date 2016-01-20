@@ -425,7 +425,10 @@ class ProcurementOrder(models.Model):
                 ops_dict[key] += [op]
             for key in product_dict.keys():
                 self.with_context({'location': ops_dict[key][0].location_id.id})
-                prod_qty = [x._product_available() for x in product_dict[key]]
+                ctx = self.env.context
+                ctx.update({{'location': ops_dict[key][0].location_id.id}})
+                # prod_qty = [x._product_available() for x in product_dict[key]]
+                prod_qty = self.pool['product.product']._product_available(self.env.cr, self.env.uid, [x.id for x in product_dict[key]], context=ctx)
                 order_point_ids = Orderpoint.browse([x.id for x in ops_dict[key]])
                 subtract_qty = order_point_ids.subtract_procurements_from_orderpoints()
                 for op in ops_dict[key]:

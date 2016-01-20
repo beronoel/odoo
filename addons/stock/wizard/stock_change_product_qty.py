@@ -104,7 +104,9 @@ class StockChangeProductQty(models.TransientModel):
     def onchange_location_id(self):
         if self.location_id:
             qty_wh = 0.0
-            qty = self.product_id.with_context(location=self.location_id.id)._product_available()
+            self.env.context.update(location=self.location_id.id)
+            qty = self.pool['product.product']._product_available(self.env.cr, self.env.uid, self.product_id.ids, context=self.env.context)
+            # qty = self.product_id._model.with_context(location=self.location_id.id)._product_available()
             if self.product_id.id in qty:
                 qty_wh = qty[self.product_id.id]['qty_available']
             return {'value': {'new_quantity': qty_wh}}

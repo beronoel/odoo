@@ -124,6 +124,7 @@ class StockConfigSettings(models.TransientModel):
         dp = self.env.ref('product.decimal_stock_weight')
         return {'decimal_precision': dp.digits}
 
+    @api.multi
     def set_default_dp(self):
         self.ensure_one()
         self.env.ref('product.decimal_stock_weight').write({'digits': self.decimal_precision})
