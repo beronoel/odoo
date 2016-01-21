@@ -15,7 +15,6 @@ class StockLocationPath(models.Model):
     @api.multi
     @api.depends('route_id.sequence')
     def _get_rules(self):
-        print "_get_rules >>>>>>>>>>>>>>>>>>>>>>>"
         res = []
         for route in self:
             res += [x.id for x in route.push_ids]
@@ -42,7 +41,6 @@ class StockLocationPath(models.Model):
 
     @api.model
     def _prepare_push_apply(self, rule, move):
-        print "_prepare_push_apply >>>>>>>>>>>>>>>>>>>>>>>", self, rule, move
         newdate = (datetime.strptime(move.date_expected, DEFAULT_SERVER_DATETIME_FORMAT) + relativedelta.relativedelta(days=rule.delay or 0)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         return {
                 'origin': move.origin or move.picking_id.name or "/",
@@ -60,7 +58,6 @@ class StockLocationPath(models.Model):
 
     @api.model
     def _apply(self, rule, move):
-        print "_apply >>>>>>>>>>>>>>>>>>>>>>>", self, rule, move
         newdate = (datetime.strptime(move.date_expected, DEFAULT_SERVER_DATETIME_FORMAT) + relativedelta.relativedelta(days=rule.delay or 0)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         if rule.auto == 'transparent':
             old_dest_location = move.location_dest_id.id
