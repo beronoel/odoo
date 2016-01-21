@@ -6,6 +6,9 @@ import res_company
 import stock_incoterms
 import stock_location
 import stock_location_route
+import stock_pack_operation_lot
+import stock_move_operation_link
+import stock_location_path
 import stock_production_lot
 import stock_warehouse_orderpoint
 import stock_picking_type

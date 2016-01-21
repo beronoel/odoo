@@ -104,7 +104,6 @@ class StockWarehouseOrderpoint(models.Model):
         if self.warehouse_id:
             self.location_id = self.warehouse_id.lot_stock_id.id
 
-    @api.multi
     @api.onchange('product_id')
     def onchange_product_id(self):
         """ Finds UoM for changed product.
