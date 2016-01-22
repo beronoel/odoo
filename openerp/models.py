@@ -3237,15 +3237,7 @@ class BaseModel(object):
 
         return fields
 
-    # add explicit old-style implementation to read()
-    @api.v7
-    def read(self, cr, user, ids, fields=None, context=None, load='_classic_read'):
-        records = self.browse(cr, user, ids, context)
-        result = BaseModel.read(records, fields, load=load)
-        return result if isinstance(ids, list) else (bool(result) and result[0])
-
-    # new-style implementation of read()
-    @api.v8
+    @api.multi_single
     def read(self, fields=None, load='_classic_read'):
         """ read([fields])
 

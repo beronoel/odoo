@@ -388,6 +388,36 @@ def multi(method):
     return make_wrapper(multi, method, old_api, method)
 
 
+def multi_single(method):
+    """ Decorate a record-style method where ``self`` is a recordset. The method
+        typically defines an operation on records. Such a method::
+
+            @api.multi_single
+            def method(self, args):
+                ...
+
+        may be called in both record and traditional styles, like::
+
+            # recs = model.browse(cr, uid, ids, context)
+            elements = recs.method(args)
+
+            # with a list of ids, return a list of elements
+            elements = model.method(cr, uid, ids, args, context=context)
+
+            # with a single id, return a single element or False
+            element = model.method(cr, uid, id, args, context=context)
+    """
+    split = get_context_split(method)
+
+    def old_api(self, cr, uid, ids, *args, **kwargs):
+        context, args, kwargs = split(args, kwargs)
+        recs = self.browse(cr, uid, ids, context)
+        result = method(recs, *args, **kwargs)
+        return result if isinstance(ids, list) else (bool(result) and result[0])
+
+    return make_wrapper(multi_single, method, old_api, method)
+
+
 def one(method):
     """ Decorate a record-style method where ``self`` is expected to be a
         singleton instance. The decorated method automatically loops on records,
