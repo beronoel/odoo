@@ -896,7 +896,7 @@ class stock_picking(models.Model):
             good_pack = False
             pack_destination = False
             while loop:
-                pack_quants = pack_obj.get_content(cr, uid, [test_pack.id], context=context)
+                pack_quants = pack_obj.get_content(cr, uid, [test_pack.id], context=context).ids
                 all_in = True
                 for quant in quant_obj.browse(cr, uid, pack_quants, context=context):
                     # If the quant is not in the quants to compare and not in the common location
@@ -977,7 +977,7 @@ class stock_picking(models.Model):
         top_lvl_packages = self._get_top_level_packages(cr, uid, quants_suggested_locations, context=context)
         # and then create pack operations for the top-level packages found
         for pack in top_lvl_packages:
-            pack_quant_ids = pack_obj.get_content(cr, uid, [pack.id], context=context)
+            pack_quant_ids = pack_obj.get_content(cr, uid, [pack.id], context=context).ids
             pack_quants = quant_obj.browse(cr, uid, pack_quant_ids, context=context)
             vals.append({
                     'picking_id': picking.id,
@@ -1166,7 +1166,7 @@ class stock_picking(models.Model):
             #and deffer the operation if there is some ambiguity on the move to select
             if ops.package_id and not ops.product_id and (not done_qtys or ops.qty_done):
                 #entire package
-                quant_ids = package_obj.get_content(cr, uid, [ops.package_id.id], context=context)
+                quant_ids = package_obj.get_content(cr, uid, [ops.package_id.id], context=context).ids
                 for quant in quant_obj.browse(cr, uid, quant_ids, context=context):
                     remaining_qty_on_quant = quant.qty
                     if quant.reservation_id:
@@ -3316,176 +3316,3 @@ class stock_warehouse(osv.osv):
             'view_type': 'form',
             'limit': 20
         }
-
-# -------------------------
-# Packaging related stuff
-# -------------------------
-
-from openerp.report import report_sxw
-
-class stock_package(osv.osv):
-    """
-    These are the packages, containing quants and/or other packages
-    """
-    _name = "stock.quant.package"
-    _description = "Physical Packages"
-    _parent_name = "parent_id"
-    _parent_store = True
-    _parent_order = 'name'
-    _order = 'parent_left'
-
-    def name_get(self, cr, uid, ids, context=None):
-        res = self._complete_name(cr, uid, ids, 'complete_name', None, context=context)
-        return res.items()
-
-    def _complete_name(self, cr, uid, ids, name, args, context=None):
-        """ Forms complete name of location from parent location to child location.
-        @return: Dictionary of values
-        """
-        res = {}
-        for m in self.browse(cr, uid, ids, context=context):
-            res[m.id] = m.name
-            parent = m.parent_id
-            while parent:
-                res[m.id] = parent.name + ' / ' + res[m.id]
-                parent = parent.parent_id
-        return res
-
-    def _get_packages(self, cr, uid, ids, context=None):
-        """Returns packages from quants for store"""
-        res = set()
-        for quant in self.browse(cr, uid, ids, context=context):
-            pack = quant.package_id
-            while pack:
-                res.add(pack.id)
-                pack = pack.parent_id
-        return list(res)
-
-    def _get_package_info(self, cr, uid, ids, name, args, context=None):
-        quant_obj = self.pool.get("stock.quant")
-        default_company_id = self.pool.get('res.users').browse(cr, uid, uid, context=context).company_id.id
-        res = dict((res_id, {'location_id': False, 'company_id': default_company_id, 'owner_id': False}) for res_id in ids)
-        for pack in self.browse(cr, uid, ids, context=context):
-            quants = quant_obj.search(cr, uid, [('package_id', 'child_of', pack.id)], context=context)
-            if quants:
-                quant = quant_obj.browse(cr, uid, quants[0], context=context)
-                res[pack.id]['location_id'] = quant.location_id.id
-                res[pack.id]['owner_id'] = quant.owner_id.id
-                res[pack.id]['company_id'] = quant.company_id.id
-            else:
-                res[pack.id]['location_id'] = False
-                res[pack.id]['owner_id'] = False
-                res[pack.id]['company_id'] = False
-        return res
-
-    def _get_packages_to_relocate(self, cr, uid, ids, context=None):
-        res = set()
-        for pack in self.browse(cr, uid, ids, context=context):
-            res.add(pack.id)
-            if pack.parent_id:
-                res.add(pack.parent_id.id)
-        return list(res)
-
-    _columns = {
-        'name': fields.char('Package Reference', select=True, copy=False),
-        'complete_name': fields.function(_complete_name, type='char', string="Package Name",),
-        'parent_left': fields.integer('Left Parent', select=1),
-        'parent_right': fields.integer('Right Parent', select=1),
-        'packaging_id': fields.many2one('product.packaging', 'Packaging', help="This field should be completed only if everything inside the package share the same product, otherwise it doesn't really makes sense.", select=True),
-        'location_id': fields.function(_get_package_info, type='many2one', relation='stock.location', string='Location', multi="package",
-                                    store={
-                                       'stock.quant': (_get_packages, ['location_id'], 10),
-                                       'stock.quant.package': (_get_packages_to_relocate, ['quant_ids', 'children_ids', 'parent_id'], 10),
-                                    }, readonly=True, select=True),
-        'quant_ids': fields.one2many('stock.quant', 'package_id', 'Bulk Content', readonly=True),
-        'parent_id': fields.many2one('stock.quant.package', 'Parent Package', help="The package containing this item", ondelete='restrict', readonly=True),
-        'children_ids': fields.one2many('stock.quant.package', 'parent_id', 'Contained Packages', readonly=True),
-        'company_id': fields.function(_get_package_info, type="many2one", relation='res.company', string='Company', multi="package", 
-                                    store={
-                                       'stock.quant': (_get_packages, ['company_id'], 10),
-                                       'stock.quant.package': (_get_packages_to_relocate, ['quant_ids', 'children_ids', 'parent_id'], 10),
-                                    }, readonly=True, select=True),
-        'owner_id': fields.function(_get_package_info, type='many2one', relation='res.partner', string='Owner', multi="package",
-                                store={
-                                       'stock.quant': (_get_packages, ['owner_id'], 10),
-                                       'stock.quant.package': (_get_packages_to_relocate, ['quant_ids', 'children_ids', 'parent_id'], 10),
-                                    }, readonly=True, select=True),
-    }
-    _defaults = {
-        'name': lambda self, cr, uid, context: self.pool.get('ir.sequence').next_by_code(cr, uid, 'stock.quant.package') or _('Unknown Pack')
-    }
-
-    def _check_location_constraint(self, cr, uid, packs, context=None):
-        '''checks that all quants in a package are stored in the same location. This function cannot be used
-           as a constraint because it needs to be checked on pack operations (they may not call write on the
-           package)
-        '''
-        quant_obj = self.pool.get('stock.quant')
-        for pack in packs:
-            parent = pack
-            while parent.parent_id:
-                parent = parent.parent_id
-            quant_ids = self.get_content(cr, uid, [parent.id], context=context)
-            quants = [x for x in quant_obj.browse(cr, uid, quant_ids, context=context) if x.qty > 0]
-            location_id = quants and quants[0].location_id.id or False
-            if not [quant.location_id.id == location_id for quant in quants]:
-                raise UserError(_('Everything inside a package should be in the same location'))
-        return True
-
-    def action_print(self, cr, uid, ids, context=None):
-        context = dict(context or {}, active_ids=ids)
-        return self.pool.get("report").get_action(cr, uid, ids, 'stock.report_package_barcode_small', context=context)
-    
-    
-    def unpack(self, cr, uid, ids, context=None):
-        quant_obj = self.pool.get('stock.quant')
-        for package in self.browse(cr, uid, ids, context=context):
-            quant_ids = [quant.id for quant in package.quant_ids]
-            quant_obj.write(cr, SUPERUSER_ID, quant_ids, {'package_id': package.parent_id.id or False}, context=context)
-            children_package_ids = [child_package.id for child_package in package.children_ids]
-            self.write(cr, uid, children_package_ids, {'parent_id': package.parent_id.id or False}, context=context)
-        #delete current package since it contains nothing anymore
-        self.unlink(cr, uid, ids, context=context)
-        return self.pool.get('ir.actions.act_window').for_xml_id(cr, uid, 'stock', 'action_package_view', context=context)
-
-    def get_content(self, cr, uid, ids, context=None):
-        child_package_ids = self.search(cr, uid, [('id', 'child_of', ids)], context=context)
-        return self.pool.get('stock.quant').search(cr, uid, [('package_id', 'in', child_package_ids)], context=context)
-
-    def get_content_package(self, cr, uid, ids, context=None):
-        quants_ids = self.get_content(cr, uid, ids, context=context)
-        res = self.pool.get('ir.actions.act_window').for_xml_id(cr, uid, 'stock', 'quantsact', context=context)
-        res['domain'] = [('id', 'in', quants_ids)]
-        return res
-
-    def _get_product_total_qty(self, cr, uid, package_record, product_id, context=None):
-        ''' find the total of given product 'product_id' inside the given package 'package_id'''
-        quant_obj = self.pool.get('stock.quant')
-        all_quant_ids = self.get_content(cr, uid, [package_record.id], context=context)
-        total = 0
-        for quant in quant_obj.browse(cr, uid, all_quant_ids, context=context):
-            if quant.product_id.id == product_id:
-                total += quant.qty
-        return total
-
-    def _get_all_products_quantities(self, cr, uid, package_id, context=None):
-        '''This function computes the different product quantities for the given package
-        '''
-        quant_obj = self.pool.get('stock.quant')
-        res = {}
-        for quant in quant_obj.browse(cr, uid, self.get_content(cr, uid, package_id, context=context)):
-            if quant.product_id.id not in res:
-                res[quant.product_id.id] = 0
-            res[quant.product_id.id] += quant.qty
-        return res
-
-    #Remove me?
-    def copy_pack(self, cr, uid, id, default_pack_values=None, default=None, context=None):
-        stock_pack_operation_obj = self.pool.get('stock.pack.operation')
-        if default is None:
-            default = {}
-        new_package_id = self.copy(cr, uid, id, default_pack_values, context=context)
-        default['result_package_id'] = new_package_id
-        op_ids = stock_pack_operation_obj.search(cr, uid, [('result_package_id', '=', id)], context=context)
-        for op_id in op_ids:
-            stock_pack_operation_obj.copy(cr, uid, op_id, default, context=context)

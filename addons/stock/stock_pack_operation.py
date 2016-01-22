@@ -20,8 +20,8 @@ class StockPackOperation(models.Model):
         if not operation.package_id or operation.product_id:
             return {operation.product_id: operation.remaining_qty}
         #get the total of products the package contains
-        # res = self.package_id._get_all_products_quantities()
-        res = self.env['stock.quant.package']._get_all_products_quantities(self.package_id)
+        res = self.package_id._get_all_products_quantities()
+        # res = self.env['stock.quant.package']._get_all_products_quantities(self.package_id)
         #reduce by the quantities linked to a move
         for record in operation.linked_move_operation_ids:
             if record.move_id.product_id.id not in res:
