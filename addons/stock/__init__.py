@@ -8,6 +8,7 @@ import stock_location
 import stock_location_route
 import stock_inventory
 import stock_inventory_line
+import stock_pack_operation
 import stock_pack_operation_lot
 import stock_move_operation_link
 import stock_location_path
