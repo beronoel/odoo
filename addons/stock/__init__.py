@@ -6,6 +6,7 @@ import res_company
 import stock_incoterms
 import stock_location
 import stock_location_route
+import stock_quant
 import stock_inventory
 import stock_inventory_line
 import stock_package
