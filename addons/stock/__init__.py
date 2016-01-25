@@ -9,6 +9,7 @@ import stock_location_route
 import stock_quant
 import stock_inventory
 import stock_inventory_line
+import stock_warehouse
 import stock_package
 import stock_pack_operation
 import stock_pack_operation_lot
