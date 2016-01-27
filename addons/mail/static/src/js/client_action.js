@@ -42,10 +42,8 @@ var PartnerInviteDialog = Dialog.extend({
                 click: _.bind(this.on_click_add, this),
             }],
         });
-        this.PartnersModel = new Model('res.partner');
     },
     start: function(){
-        var self = this;
         this.$input = this.$('.o_mail_chat_partner_invite_input');
         this.$input.select2({
             width: '100%',
@@ -56,7 +54,7 @@ var PartnerInviteDialog = Dialog.extend({
                 return $('<span>').text(item.text).prepend(status);
             },
             query: function (query) {
-                self.PartnersModel.call('im_search', [query.term, 20]).then(function(result){
+                chat_manager.search_partner(query.term).then(function(result){
                     var data = [];
                     _.each(result, function(partner){
                         partner.text = partner.name;
@@ -279,7 +277,8 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
         this.$('.o_mail_add_channel[data-type=dm]').find("input").autocomplete({
             source: function(request, response) {
                 self.last_search_val = _.escape(request.term);
-                chat_manager.search_partner(self.last_search_val).done(response);
+                var options = { exclude_pinned_partners: true };
+                chat_manager.search_partner(self.last_search_val, 20, options).done(response);
             },
             select: function(event, ui) {
                 var partner_id = ui.item.id;

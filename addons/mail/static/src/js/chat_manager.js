@@ -964,8 +964,12 @@ var chat_manager = {
         return parse_and_transform(message_body, inline);
     },
 
-    search_partner: function (search_val, limit) {
-        return PartnerModel.call('im_search', [search_val, limit || 20]).then(function(result) {
+    search_partner: function (search_val, limit, options) {
+        var excluded_ids = [];
+        if (options && options.exclude_pinned_partners) {
+            excluded_ids = pinned_dm_partners;
+        }
+        return PartnerModel.call('im_search', [search_val, limit || 20, excluded_ids]).then(function(result) {
             var values = [];
             _.each(result, function(user) {
                 var escaped_name = _.escape(user.name);

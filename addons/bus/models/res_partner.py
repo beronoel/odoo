@@ -28,14 +28,16 @@ class ResPartner(models.Model):
             partner.im_status = res.get(partner.id, 'offline')
 
     @api.model
-    def im_search(self, name, limit=20):
+    def im_search(self, name, limit=20, excluded_ids=None):
         """ Search partner with a name and return its id, name and im_status.
             Note : the user must be logged
             :param name : the partner name to search
             :param limit : the limit of result to return
         """
+        if excluded_ids is None:
+            excluded_ids = []
         name = '%' + name + '%'
-        excluded_partner_ids = [self.env.user.partner_id.id]
+        excluded_partner_ids = excluded_ids + [self.env.user.partner_id.id]
         self.env.cr.execute("""
             SELECT
                 U.id as user_id,
