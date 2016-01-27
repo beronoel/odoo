@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <odoo>
     <data>
-
+        <!-- TODO -->
         <record id="module_category_im_livechat" model="ir.module.category">
             <field name="name">Live Support</field>
             <field name="sequence" eval="20" />

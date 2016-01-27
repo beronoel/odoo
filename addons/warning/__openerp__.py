@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-
 {
     'name': 'Warning Messages and Alerts',
     'version': '1.0',
-    'category': 'Tools',
+    'category': 'Extra Tools',
     'description': """
 Module to trigger warnings in Odoo objects.
 ==============================================

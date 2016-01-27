@@ -1,6 +1,6 @@
 {
     'name': 'Link Tracker',
-    'category': 'Hidden',
+    'category': 'Extra Tools',
     'description': """
 Create short and trackable URLs.
 =====================================================

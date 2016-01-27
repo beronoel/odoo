@@ -1,7 +1,7 @@
 {
     'name': 'Report',
     'category': 'Base',
-    'summary': 'Report',
+    'summary': 'Productivity/Report',
     'version': '1.0',
     'description': """
 Report

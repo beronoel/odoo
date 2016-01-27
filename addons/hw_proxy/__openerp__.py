@@ -5,7 +5,7 @@
 {
     'name': 'Hardware Proxy',
     'version': '1.0',
-    'category': 'Point Of Sale',
+    'category': 'Point of Sale',
     'sequence': 6,
     'summary': 'Connect the Web Client to Hardware Peripherals',
     'website': 'https://www.odoo.com/page/point-of-sale',

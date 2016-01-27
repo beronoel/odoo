@@ -4,7 +4,7 @@
 {
     'name': 'VAT Number Validation',
     'version': '1.0',
-    'category': 'Hidden/Dependency',
+    'category': 'Hidden/Dependency', # TODO
     'description': """
 VAT validation for Partner's VAT numbers.
 =========================================

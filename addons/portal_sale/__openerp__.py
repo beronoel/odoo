@@ -5,6 +5,7 @@
 {
     'name': 'Portal Sale',
     'version': '0.1',
+    'category': 'Hidden',
     'category': 'Tools',
     'complexity': 'easy',
     'description': """
@@ -32,5 +33,4 @@ by default, you simply need to configure a Paypal account in the Accounting/Invo
         'security/ir.model.access.csv',
     ],
     'auto_install': True,
-    'category': 'Hidden',
 }

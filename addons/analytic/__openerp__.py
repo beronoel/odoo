@@ -5,7 +5,7 @@
     'name' : 'Analytic Accounting',
     'version': '1.1',
     'website' : 'https://www.odoo.com/page/accounting',
-    'category': 'Hidden/Dependency',
+    'category': 'Hidden/Dependency', # TODO
     'depends' : ['base', 'decimal_precision', 'mail', 'report'],
     'description': """
 Module for defining analytic accounting object.

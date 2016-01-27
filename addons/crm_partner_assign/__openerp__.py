@@ -5,7 +5,7 @@
 {
     'name': 'Partner Assignation & Geolocation',
     'version': '1.0',
-    'category': 'Customer Relationship Management',
+    'category': 'Customer Relationship Management', # TODO
     'description': """
 This is the module used by Odoo SA to redirect customers to its partners, based on geolocation.
 ======================================================================================================

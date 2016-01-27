@@ -5,7 +5,7 @@
 {
     'name': 'Barcode Scanner Hardware Driver',
     'version': '1.0',
-    'category': 'Hardware Drivers',
+    'category': 'Extra Tools/Driver',
     'sequence': 6,
     'summary': 'Hardware Driver for Barcode Scanners',
     'website': 'https://www.odoo.com/page/point-of-sale',

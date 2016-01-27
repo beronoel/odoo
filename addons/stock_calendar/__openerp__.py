@@ -39,7 +39,7 @@
     'website': 'https://www.odoo.com/page/warehouse',
     'images': [],
     'depends': ['purchase', 'resource'],
-    'category': 'Warehouse Management',
+    'category': 'Inventory',
     'sequence': 16,
     'demo': [
 

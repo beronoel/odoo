@@ -2,7 +2,7 @@
 
 {
     'name': 'Adyen Payment Acquirer',
-    'category': 'Hidden',
+    'category': 'Extra Tools',
     'summary': 'Payment Acquirer: Adyen Implementation',
     'version': '1.0',
     'description': """Adyen Payment Acquirer""",

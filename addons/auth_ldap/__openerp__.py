@@ -6,7 +6,7 @@
     'depends' : ['base'],
     #'description': < auto-loaded from README file
     'website' : 'https://www.odoo.com',
-    'category' : 'Authentication',
+    'category' : 'Extra Tools',
     'data' : [
         'users_ldap_view.xml',
         'user_ldap_installer.xml',

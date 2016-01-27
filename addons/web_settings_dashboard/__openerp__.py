@@ -3,7 +3,7 @@
     'name': 'Odoo Settings Dashboard',
     'version': '1.0',
     'summary': 'Quick actions for installing new app, adding users, completing planners, etc.',
-    'category': 'Tools',
+    'category': 'Hidden',
     'description':
     """
 Odoo dashboard

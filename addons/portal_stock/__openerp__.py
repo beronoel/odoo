@@ -5,7 +5,7 @@
 {
     'name': 'Portal Stock',
     'version': '0.1',
-    'category': 'Tools',
+    'category': 'Hidden',
     'complexity': 'easy',
     'description': """
 This module adds access rules to your portal if stock and portal are installed.
@@ -18,5 +18,4 @@ This module adds access rules to your portal if stock and portal are installed.
     ],
     'installable': True,
     'auto_install': True,
-    'category': 'Hidden',
 }

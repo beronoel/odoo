@@ -6,6 +6,7 @@
     'sequence': 125,
     'description': """
         Track employees' equipment and manage maintenance requests.""",
+    'category': 'Human Resources',
     'depends': ['hr'],
     'summary': 'Equipments, Assets, Internal Hardware, Allocation Tracking',
     'data': [

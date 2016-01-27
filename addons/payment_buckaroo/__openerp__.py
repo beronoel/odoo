@@ -2,7 +2,7 @@
 
 {
     'name': 'Buckaroo Payment Acquirer',
-    'category': 'Hidden',
+    'category': 'Extra Tools',
     'summary': 'Payment Acquirer: Buckaroo Implementation',
     'version': '1.0',
     'description': """Buckaroo Payment Acquirer""",

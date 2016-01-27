@@ -4,7 +4,7 @@
 {
     'name': 'Notes',
     'version': '1.0',
-    'category': 'Tools',
+    'category': 'Productivity',
     'description': """
 This module allows users to create their own notes inside Odoo
 =================================================================

@@ -5,9 +5,7 @@
 {
     'name': 'Marketing Campaign - Demo',
     'version': '1.0',
-    'depends': ['marketing_campaign',
-                 'crm',
-    ],
+    'depends': ['marketing_campaign', 'crm'],
     'category': 'Marketing',
     'description': """
 Demo data for the module marketing_campaign.

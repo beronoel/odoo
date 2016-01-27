@@ -4,7 +4,7 @@
 {
     'name': 'Intrastat Reporting',
     'version': '1.0',
-    'category': 'Accounting & Finance',
+    'category': 'Accounting', # TODO
     'description': """
 A module that adds intrastat reports.
 =====================================

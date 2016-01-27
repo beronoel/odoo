@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Planner',
-    'category': 'Planner',
+    'category': 'Hidden',
     'summary': 'Help to configure application',
     'version': '1.0',
     'description': """Application Planner""",

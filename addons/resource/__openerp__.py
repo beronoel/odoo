@@ -4,7 +4,7 @@
 {
     'name' : 'Resource',
     'version' : '1.1',
-    'category' : 'Hidden/Dependency',
+    'category' : 'Hidden/Dependency', # TODO
     'website' : 'http://www.openerp.com',
     'description': """
 Module for resource management.

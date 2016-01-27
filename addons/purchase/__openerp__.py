@@ -5,7 +5,7 @@
 {
     'name': 'Purchase Management',
     'version': '1.2',
-    'category': 'Purchase Management',
+    'category': 'Purchase',
     'sequence': 60,
     'summary': 'Purchase Orders, Receipts, Vendor Bills',
     'description': """
