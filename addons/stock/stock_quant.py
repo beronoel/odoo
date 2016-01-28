@@ -39,11 +39,11 @@ class StockQuant(models.Model):
                 #if the company of the quant is different than the current user company, force the company in the context
                 #then re-do a browse to read the property fields for the good company.
                 quant.with_context(force_company=quant.company_id.id)
-            quant.inventory_value = quant._get_inventory_value()
+            quant.inventory_value = self._get_inventory_value(quant)
 
-    @api.multi
-    def _get_inventory_value(self):
-        return self.product_id.standard_price * self.qty
+    @api.model
+    def _get_inventory_value(self, quant):
+        return quant.product_id.standard_price * quant.qty
 
     name = fields.Char(compute="_get_quant_name", string='Identifier')
     product_id = fields.Many2one('product.product', 'Product', required=True, ondelete="restrict", readonly=True, select=True)
@@ -272,6 +272,7 @@ class StockQuant(models.Model):
         '''Create a quant in the destination location and create a negative quant in the source location if it's an internal location.
         '''
         price_unit = self.env['stock.move'].get_price_unit(move)
+        # price_unit = move.get_price_unit()
         location = force_location_to or move.location_dest_id
         rounding = move.product_id.uom_id.rounding
         vals = {
