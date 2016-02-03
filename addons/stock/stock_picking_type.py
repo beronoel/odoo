@@ -67,10 +67,9 @@ class StockPickingType(models.Model):
 
     @api.multi
     def _get_action(self, action):
-        result = self.env.ref(action, raise_if_not_found=True)
-        result = result.read()[0]
+        result = self.env.ref(action, raise_if_not_found=True).read()[0]
         if self:
-            result.display_name = self.display_name
+            result['display_name'] = self.display_name
         return result
 
     @api.multi
@@ -87,6 +86,10 @@ class StockPickingType(models.Model):
 
     @api.multi
     def get_action_picking_tree_ready(self):
+        return self._get_action('stock.action_picking_tree_ready')
+
+    @api.multi
+    def get_stock_picking_action_picking_type(self):
         return self._get_action('stock.action_picking_tree_ready')
 
     @api.onchange('code')

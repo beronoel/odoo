@@ -319,6 +319,18 @@ class StockMove(models.Model):
         self.env['procurement.order'].run(res)
         return res
 
+    @api.model
+    def create(self, vals):
+        picking_obj = self.env['stock.picking']
+        track = not self.env.context.get('mail_notrack') and vals.get('picking_id')
+        if track:
+            picking = picking_obj.browse(vals['picking_id'])
+            initial_values = {picking.id: {'state': picking.state}}
+        res = super(StockMove, self).create(vals)
+        if track:
+            picking.message_track(picking_obj.fields_get(['state']), initial_values)
+        return res
+
     @api.multi
     def write(self, vals):
         # Check that we do not modify a stock.move which is done

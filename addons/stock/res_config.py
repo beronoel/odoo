@@ -20,12 +20,12 @@ class StockConfigSettings(models.TransientModel):
             # warehouses = wh_obj.browse(cr, uid, whs, context=context)
             if obj.group_stock_multiple_locations:
                 # Check inactive picking types and of warehouses make them active (by warehouse)
-                inttypes = warehouses.filtered(lambda x: not x.int_type_id.active)
+                inttypes = warehouses.filtered(lambda x: not x.int_type_id.active).mapped('int_type_id')
                 if inttypes:
                     inttypes.write({'active': True})
             else:
                 # Check active internal picking types of warehouses and make them inactive
-                inttypes = warehouses.filtered(lambda x: x.int_type_id.active and x.reception_steps == 'one_step' and x.delivery_steps == 'ship_only')
+                inttypes = warehouses.filtered(lambda x: x.int_type_id.active and x.reception_steps == 'one_step' and x.delivery_steps == 'ship_only').mapped('int_type_id')
                 if inttypes:
                     inttypes.write({'active': False})
         return True

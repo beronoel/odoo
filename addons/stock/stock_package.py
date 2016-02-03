@@ -114,6 +114,7 @@ class StockPackage(models.Model):
         #delete current package since it contains nothing anymore
         self.unlink()
         return self.env.ref('stock.action_package_view').read()[0]
+
     @api.multi
     def get_content(self):
         child_package_ids = self.search([('id', 'child_of', self.ids)]).ids
