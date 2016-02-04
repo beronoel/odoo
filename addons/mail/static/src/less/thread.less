@@ -43,6 +43,12 @@
         padding: 4px @odoo-horizontal-padding;
         margin-bottom: 0px;
 
+        &.o_message_preview {
+            .o_thread_message_core {
+                color: lightgray;
+            }
+        }
+
         .o_thread_message_sidebar {
             .o-flex(0, 0, @mail-thread-avatar-size);
             margin-right: 10px;
@@ -105,6 +111,7 @@
             &.o_mail_note {
                 background-color: @gray-lighter;
             }
+
 
             .o_mail_subject {
                 font-style: italic;

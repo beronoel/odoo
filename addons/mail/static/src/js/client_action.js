@@ -562,13 +562,19 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
             options.model = this.selected_message.model;
             options.res_id = this.selected_message.res_id;
         }
+        if (this.selected_message) {
+            self.render_snackbar('mail.chat.MessageSentSnackbar', {record_name: self.selected_message.record_name}, 5000);
+            self.unselect_message();
+        } else {
+            this.thread.add_message_preview(message);
+            this.fetch_and_render_thread();
+            this.thread.scroll_to();
+        }
         chat_manager
             .post_message(message, options)
             .then(function() {
-                if (self.selected_message) {
-                    self.render_snackbar('mail.chat.MessageSentSnackbar', {record_name: self.selected_message.record_name}, 5000);
-                    self.unselect_message();
-                } else {
+                if (!self.selected_message) {
+                    self.thread.remove_message_preview(message);
                     self.thread.scroll_to();
                 }
             })

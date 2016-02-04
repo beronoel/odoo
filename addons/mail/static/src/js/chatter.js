@@ -777,10 +777,14 @@ var Chatter = form_common.AbstractField.extend({
     on_post_message: function (message) {
         var self = this;
         var options = {model: this.model, res_id: this.res_id};
+        this.thread.add_message_preview(message);
+        this.fetch_and_render_thread(this.msg_ids);
+        this.close_composer();
         chat_manager
             .post_message(message, options)
             .then(function () {
-                self.close_composer();
+                self.thread.remove_message_preview(message);
+                self.fetch_and_render_thread(self.msg_ids);
                 if (message.partner_ids.length) {
                     self.refresh_followers(); // refresh followers' list
                 }

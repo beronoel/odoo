@@ -8,6 +8,7 @@ var Model = require('web.Model');
 var session = require('web.session');
 var time = require('web.time');
 var web_client = require('web.web_client');
+console.log(session);
 
 var _t = core._t;
 var LIMIT = 100;
@@ -24,6 +25,7 @@ var messages = [];
 var channels = [];
 var channels_preview_def;
 var channel_defs = {};
+var message_defs = {};
 var chat_unread_counter = 0;
 var unread_conversation_counter = 0;
 var emojis = [];
@@ -159,6 +161,9 @@ function add_message (data, options) {
                 }
             }
         });
+        if (msg.id in message_defs) {
+            message_defs[msg.id].resolve(msg);
+        }
         if (!options.silent) {
             chat_manager.bus.trigger('new_message', msg);
         }
@@ -483,10 +488,12 @@ function on_notification (notifications) {
         var model = notification[0][1];
         if (model === 'ir.needaction') {
             // new message in the inbox
-            on_needaction_notification(notification[1]);
+            setTimeout(function() {
+                on_needaction_notification(notification[1]);
+            }, 1000);
         } else if (model === 'mail.channel') {
             // new message in a channel
-            on_channel_notification(notification[1]);
+            setTimeout(function () {on_channel_notification(notification[1]);}, 1000);
         } else if (model === 'res.partner') {
             // channel joined/left, message marked as read/(un)starred, chat open/closed
             on_partner_notification(notification[1]);
@@ -671,7 +678,16 @@ var chat_manager = {
                 message_type: 'comment',
                 content_subtype: 'html',
                 subtype: 'mail.mt_comment',
-            }));
+            }, {shadow: true})).then(function (id) {
+                console.log(id);
+                var message = chat_manager.get_message(id);
+                if (message) {
+                    return $.when(message);
+                } else {
+                    message_defs[id] = $.Deferred();
+                    return message_defs[id];
+                }
+            });
         }
         if ('model' in options && 'res_id' in options) {
             // post a message in a chatter
@@ -683,14 +699,19 @@ var chat_manager = {
                 subtype_id: data.subtype_id,
             });
 
+            var def = $.Deferred();
             var model = new Model(options.model);
-            return model.call('message_post', [options.res_id], msg).then(function (msg_id) {
-                return MessageModel.call('message_format', [msg_id]).then(function (msgs) {
+            model.call('message_post', [options.res_id], msg, {shadow: true}).then(function (msg_id) {
+                return MessageModel.call('message_format', [msg_id], {}, {shadow: true}).then(function (msgs) {
                     msgs[0].model = options.model;
                     msgs[0].res_id = options.res_id;
                     add_message(msgs[0]);
                 });
             });
+
+            setTimeout(function () {def.resolve();}, 2000);
+
+            return def;
         }
     },
 

@@ -67,12 +67,14 @@ var Thread = Widget.extend({
         });
         this.expanded_msg_ids = [];
         this.selected_id = null;
+        this.previews = [];
     },
 
     render: function (messages, options) {
         clearTimeout(this.auto_render_timeout);
         var self = this;
         var msgs = _.map(messages, this._preprocess_message.bind(this));
+        msgs = msgs.concat(this.previews);
         if (this.options.display_order === ORDER.DESC) {
             msgs.reverse();
         }
@@ -84,6 +86,9 @@ var Thread = Widget.extend({
         // directly from a channel that follows it)
         var prev_msg;
         _.each(msgs, function (msg) {
+            if (msg.is_preview) {
+                return;
+            }
             if (!prev_msg || (Math.abs(msg.date.diff(prev_msg.date)) > 60000) ||
                 prev_msg.message_type !== 'comment' || msg.message_type !== 'comment' ||
                 (prev_msg.author_id[0] !== msg.author_id[0]) || prev_msg.model !== msg.model ||
@@ -97,6 +102,7 @@ var Thread = Widget.extend({
 
         this.$el.html(QWeb.render('mail.ChatThread', {
             messages: msgs,
+            previews: this.previews,
             options: options,
             ORDER: ORDER,
         }));
@@ -170,6 +176,27 @@ var Thread = Widget.extend({
             duration: 200,
         });
         return done;
+    },
+
+    add_message_preview: function(preview) {
+        preview.id = "test";
+        preview.day = _t("Today");
+        preview.date = moment();
+        preview.is_preview = true;
+        preview.display_avatar = false;
+        preview.author_id = [3];
+        preview.body = preview.content;
+        preview.message_type = "content";
+        this.previews.push(preview);
+        console.log(preview);
+    },
+
+    remove_message_preview: function(preview) {
+        this.previews = _.reject(this.previews, preview);
+    },
+
+    clear_message_previews: function() {
+        this.previews = [];
     },
 
     /**
