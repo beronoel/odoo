@@ -55,14 +55,21 @@ Tour.register({
         {
             title:     _t("Open your inbox in one click!"),
             content:   _t("Click here to open your inbox directly, wherever you are. Accessing your mails has never been so easy"),
-            element:   '.navbar .navbar-right .fa.fa-comment',
+            element:   '.navbar .navbar-right .fa.fa-at',
+            placement: 'bottom',
+            popover:   { next: _t("Got it"), fixed: true},
+        },
+        {
+            title:     _t("Open your conversations!"),
+            content:   _t("Click here to open your conversations"),
+            element:   '.navbar .navbar-right .o_no_notification',
             placement: 'bottom',
             popover:   { next: _t("Got it"), fixed: true},
         },
         {
             title:     _t("@ mentions!"),
             content:   _t("Send an message to someone by mentionning him into it. The message will be automatically forwarded to the mentionned person. In the same way, every message in which you're mentionned will come in your inbox."),
-            element:   '.navbar .navbar-right .fa.fa-comment',
+            element:   '.navbar .navbar-right .fa.fa-at',
             placement: 'bottom',
             popover:   { next: _t("Got it"), fixed: true },
         },
@@ -94,7 +101,7 @@ Tour.register({
             content:   _t("Now you're ready to go! Have a wonderful day, and welcome to Odoo!"),
             element:   '.o_web_settings_dashboard_invitations',
             placement: 'bottom',
-            popover:   { next: _t("Finish"), next: _t("Skip"), fixed: true},
+            popover:   { next: _t("Finish"), fixed: true},
         },
     ]
 });

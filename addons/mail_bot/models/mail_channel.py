@@ -10,7 +10,6 @@ class Channel(models.Model):
     _inherit = ['mail.channel']
     _bot_conversation = {}    
     
-    bot_options_list = ['help', 'ping', 'intro', 'options']
     bot_messages_intro = [
         "<p>" + _("Hi! Pleasure to meet you. I can show you a couple things. Type <b>something</b> again to know more!") + "<p>",
 
@@ -45,11 +44,6 @@ class Channel(models.Model):
         elif body == 'help':
             bot_message_body = "<p>" + _("If you have other questions about Odoo, you might find the answer in our ") + "<a href='https://www.odoo.com/documentation/user/' target='_blank'>User Documentation</a>" + "</p>" + \
                    "<p>" + _("And if you would like to get in touch with one Odoo collaborator, please ") + "<a href='https://www.odoo.com/page/contactus' target='_blank'>" + _("Contact Us!") + "</a></p>"
-            self._bot_message_post(bot_message_body, author_id)
-        elif body == 'options':
-            bot_options_enumerated = ', '.join([str(item) for item in self.bot_options_list])
-            bot_message_body = "<p>" + _("The available options you may type on the chatter with me are the followings: ") + "</p>" + \
-                               "<p>" + bot_options_enumerated + "</p>"
             self._bot_message_post(bot_message_body, author_id)
 
         # 'Intro' conversation management
