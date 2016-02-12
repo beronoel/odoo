@@ -5547,6 +5547,10 @@ class BaseModel(object):
         #assert all(isinstance(id, IdType) for id in ids), "Browsing invalid ids: %s" % ids
         return self._browse(ids, self.env, prefetch)
 
+    def browse_ref(self, xml_id):
+        """ Return the record corresponding to ``xml_id``, or an empty recordset. """
+        return self.env.ref(xml_id, model=self._name)
+
     #
     # Internal properties, for manipulating the instance's implementation
     #

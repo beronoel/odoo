@@ -899,9 +899,25 @@ class Environment(object):
         context = self.context if context is None else context
         return Environment(cr, uid, context)
 
-    def ref(self, xml_id, raise_if_not_found=True):
-        """ return the record corresponding to the given ``xml_id`` """
-        return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
+    def ref(self, xml_id, raise_if_not_found=True, model=None):
+        """ Return the record corresponding to the given ``xml_id``.
+        In case the ``xml_id`` is not found, the result depends on parameters
+        ``raise_if_not_found`` and ``model``::
+
+            # raises an exception if not found
+            ref(xml_id)
+
+            # returns None if not found
+            ref(xml_id, raise_if_not_found=False)
+
+            # returns an empty recordset of the model if not found
+            ref(xml_id, model='stuff')
+
+        """
+        if model:
+            return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=False) or self[model]
+        else:
+            return self['ir.model.data'].xmlid_to_object(xml_id, raise_if_not_found=raise_if_not_found)
 
     @property
     def user(self):
