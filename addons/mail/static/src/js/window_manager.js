@@ -1,6 +1,7 @@
 odoo.define('mail.window_manager', function (require) {
 "use strict";
 
+var bus = require('bus.bus').bus;
 var chat_manager = require('mail.chat_manager');
 var ExtendedChatWindow = require('mail.ExtendedChatWindow');
 
@@ -289,7 +290,8 @@ function update_sessions (message, scrollBottom) {
     _.each(chat_sessions, function (session) {
         if (_.contains(message.channel_ids, session.id)) {
             var message_visible = !display_state.chat_windows_hidden && !session.window.folded &&
-                                  !session.window.is_hidden && session.window.thread.is_at_bottom();
+                                  !session.window.is_hidden && session.window.thread.is_at_bottom() &&
+                                  bus.is_odoo_focused();
             if (message_visible && !session.keep_unread) {
                 chat_manager.mark_channel_as_seen(chat_manager.get_channel(session.id));
             }

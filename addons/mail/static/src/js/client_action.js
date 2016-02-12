@@ -1,6 +1,7 @@
 odoo.define('mail.chat_client_action', function (require) {
 "use strict";
 
+var bus = require('bus.bus').bus;
 var chat_manager = require('mail.chat_manager');
 var composer = require('mail.composer');
 var ChatThread = require('mail.ChatThread');
@@ -582,7 +583,7 @@ var ChatAction = Widget.extend(ControlPanelMixin, {
     on_new_message: function (message) {
         var self = this;
         if (_.contains(message.channel_ids, this.channel.id)) {
-            if (this.channel.type !== 'static' && this.thread.is_at_bottom()) {
+            if (this.channel.type !== 'static' && this.thread.is_at_bottom() && bus.is_odoo_focused()) {
                 chat_manager.mark_channel_as_seen(this.channel);
             }
 
