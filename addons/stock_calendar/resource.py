@@ -95,7 +95,7 @@ class resource_calendar(osv.osv):
 
             if current_interval[0] < leave[0] < current_interval[1]:
                 current_interval[1] = leave[0]
-                intervals.append((current_interval[0], current_interval[1]))
+                intervals.append((current_interval[0], current_interval[1], current_group))
                 current_interval = [leave[1], interval[1]]
             # if current_interval[0] <= leave[1] <= current_interval[1]:
             if current_interval[0] <= leave[1]:
@@ -294,7 +294,7 @@ class resource_calendar(osv.osv):
 
         intervals = []
         work_dt = start_dt.replace(hour=0, minute=0, second=0)
-
+        
         # no calendar: try to use the default_interval, then return directly
         if id is None:
             if default_interval:
@@ -330,7 +330,6 @@ class resource_calendar(osv.osv):
         for interval in working_intervals:
             work_intervals = self.interval_remove_leaves_group(cr, uid, interval, leaves, context=context)
             intervals += work_intervals
-
         return intervals
 
 
