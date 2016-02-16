@@ -16,6 +16,11 @@
                 var callback = window.location.href.match(/callback=([^&amp;=]+)/)[1];
             </script>
             <link t-if="enable_editor and inline_mode" rel="stylesheet" href="/web_editor/static/src/css/inline.css" type="text/css"/>
+            <script type="text/javascript">
+                var odoo = {};
+                odoo.session_info = <t t-raw="session_info"/>;
+                odoo.currencies = <t t-raw="currencies"/>;
+            </script>
             <t t-if="not dont_load_assets">
                 <t t-call-assets="web_editor.assets_editor"/>
                 <style>
