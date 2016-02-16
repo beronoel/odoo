@@ -15,7 +15,7 @@
 
     <link rel="stylesheet" href='/website/static/src/css/website.css'/>
 
-    <script type="text/javascript" src="/web/static/src/js/framework/session_instance.js"></script>
+    <script type="text/javascript" src="/web/static/src/js/services/session.js"></script>
     <script type="text/javascript" src="/website/static/src/js/website.js"></script>
     <script type="text/javascript" src="/website/static/src/js/website.share.js"></script>
 
