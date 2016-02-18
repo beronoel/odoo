@@ -38,7 +38,7 @@
                 <t t-call-assets="report.assets_editor"/>
             </t>
         </head>
-        <body class="container" t-att-style="editable and 'margin-top: 40px;'">
+        <body t-att-class="body_classname or 'container'" t-att-style="editable and 'margin-top: 40px;'">
             <div id="wrapwrap">
                 <main>
                     <t t-raw="0"/>
@@ -49,7 +49,6 @@
 </template>
 
 <template id="html_container">
-    <t t-set="body_classname" t-value="'container'"/>
     <t t-call="report.layout">
         <t t-raw="0"/>
     </t>
@@ -185,7 +184,7 @@
                 </script>
             </t>
         </head>
-        <body class="container" onload="subst()">
+        <body t-att-class="body_classname or 'container'" onload="subst()">
             <t t-raw="body"/>
         </body>
     </html>
