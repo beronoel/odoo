@@ -539,7 +539,6 @@ class res_config_settings(osv.osv_memory, res_config_module_installation_mixin):
         if context is None:
             context = {}
 
-        context = dict(context, active_test=False)
         if not self.pool['res.users']._is_admin(cr, uid, [uid]):
             raise openerp.exceptions.AccessError(_("Only administrators can change the settings"))
 

@@ -644,6 +644,7 @@ class groups_implied(osv.osv):
         res = super(groups_implied, self).write(cr, uid, ids, values, context)
         if values.get('users') or values.get('implied_ids'):
             # add all implied groups (to all users of each group)
+            context = dict(context, active_test=False)
             for g in self.browse(cr, uid, ids, context=context):
                 gids = map(int, g.trans_implied_ids)
                 vals = {'users': [(4, u.id) for u in g.users]}
