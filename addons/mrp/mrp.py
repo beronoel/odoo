@@ -984,6 +984,7 @@ class mrp_production(osv.osv):
         precision = self.pool['decimal.precision'].precision_get(cr, uid, 'Product Unit of Measure')
 
         main_production_move = False
+        action_consume = False
         if production_mode == 'consume_produce':
             # To produce remaining qty of final product
             produced_products = {}
@@ -999,9 +1000,12 @@ class mrp_production(osv.osv):
                 if wiz:
                     lot_id = wiz.lot_id.id
                 qty = min(subproduct_factor * production_qty_uom, produce_product.product_qty) #Needed when producing more than maximum quantity
-                new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
+                if produce_product.product_id.id == production.product_id.id:
+                    action_consume = (qty, lot_id)
+                else:
+                    new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
                                                          location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
-                stock_mov_obj.write(cr, uid, new_moves, {'production_id': production_id}, context=context)
+                    stock_mov_obj.write(cr, uid, new_moves, {'production_id': production_id}, context=context)
                 remaining_qty = subproduct_factor * production_qty_uom - qty
                 if not float_is_zero(remaining_qty, precision_digits=precision):
                     # In case you need to make more than planned
@@ -1041,7 +1045,12 @@ class mrp_production(osv.osv):
                     stock_mov_obj.write(cr, uid, [extra_move_id], {'restrict_lot_id': consume['lot_id'],
                                                                     'consumed_for': main_production_move}, context=context)
                     stock_mov_obj.action_done(cr, uid, [extra_move_id], context=context)
-
+        
+        if action_consume:
+            # Calculate price
+            new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
+                                                         location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
+            stock_mov_obj.write(cr, uid, new_moves, {'production_id': production_id}, context=context)
         self.message_post(cr, uid, production_id, body=_("%s produced") % self._description, context=context)
 
         # Remove remaining products to consume if no more products to produce
