@@ -12,6 +12,9 @@ var ORDER = {
     DESC: -1,
 };
 
+var read_more = _t('read more');
+var read_less = _t('read less');
+
 function time_from_now(date) {
     if (moment().diff(date, 'seconds') < 45) {
         return _t("now");
@@ -111,6 +114,17 @@ var Thread = Widget.extend({
                 .data('date', msg.date);
         });
 
+        this.$('[data-o-mail-quote="1"]').each(function () {
+            var $content = $(this);
+            var $read_more = $('<a class="o_mail_read_more" href="#"></a>').text(read_more);
+            var is_read_more = true;
+            $read_more.click(function() {
+                is_read_more = !is_read_more;
+                $content.toggle(!is_read_more);
+                $read_more.text(is_read_more ? read_more : read_less);
+            });
+            $read_more.insertBefore($content);
+        });
         if (!this.update_timestamps_interval) {
             this.update_timestamps_interval = setInterval(function() {
                 self.update_timestamps();
@@ -121,7 +135,7 @@ var Thread = Widget.extend({
     update_timestamps: function () {
         this.$('.o_mail_timestamp').each(function() {
             var date = $(this).data('date');
-            $(this).html('- ' + time_from_now(date));
+            $(this).html(time_from_now(date));
         });
     },
     on_click_redirect: function (event) {
