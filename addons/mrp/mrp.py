@@ -810,23 +810,6 @@ class mrp_production(osv.osv):
         """
         for production in self.browse(cr, uid, ids):
             total_cost = self._costs_generate(cr, uid, production)
-            if production.product_id.cost_method == 'real':
-                for consumed_move in production.move_lines2:
-                    for consumed_quant in consumed_move.quant_ids:
-                        total_cost += consumed_quant.inventory_value
-
-                from_uom = production.product_uom
-                to_uom = production.product_id.uom_id
-                quant_cost = total_cost / self.pool['product.uom']._compute_qty_obj(cr, uid, from_uom, production.product_qty, to_uom)
-                self._apply_cost_from_production(cr, uid, production, quant_cost, context=context)
-
-    def _apply_cost_from_production(self, cr, uid, production, quant_cost, context=None):
-        """Update the quant value based on computed production cost"""
-        for produced_product in production.move_created_ids2:
-            if produced_product.product_id == production.product_id:
-                # only the produced product
-                # should only have one quant at the end of the production
-                self.pool['stock.quant'].write(cr, SUPERUSER_ID, produced_product.quant_ids.ids, {'cost': quant_cost}, context=context)
 
     def action_production_end(self, cr, uid, ids, context=None):
         """ Changes production state to Finish and writes finished date.
@@ -1047,6 +1030,16 @@ class mrp_production(osv.osv):
                     stock_mov_obj.action_done(cr, uid, [extra_move_id], context=context)
         
         if action_consume:
+            total_cost = 0
+            if production.product_id.cost_method == 'real':
+                for consumed_move in production.move_lines2: #Should only take partial stuff
+                    for consumed_quant in consumed_move.quant_ids:
+                        total_cost += consumed_quant.inventory_value
+                #import pdb; pdb.set_trace()
+                from_uom = production.product_uom
+                to_uom = production.product_id.uom_id
+                price_unit = total_cost / self.pool['product.uom']._compute_qty_obj(cr, uid, from_uom, production.product_qty, to_uom)
+                stock_mov_obj.write(cr, uid, [produce_product.id], {'price_unit': price_unit}, context=context)
             # Calculate price
             new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
                                                          location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
