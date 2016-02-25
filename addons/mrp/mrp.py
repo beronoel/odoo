@@ -1039,9 +1039,9 @@ class mrp_production(osv.osv):
                 from_uom = production.product_uom
                 to_uom = production.product_id.uom_id
                 price_unit = total_cost / self.pool['product.uom']._compute_qty_obj(cr, uid, from_uom, production.product_qty, to_uom)
-                stock_mov_obj.write(cr, uid, [produce_product.id], {'price_unit': price_unit}, context=context)
+                stock_mov_obj.write(cr, uid, [main_production_move], {'price_unit': price_unit}, context=context)
             # Calculate price
-            new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
+            new_moves = stock_mov_obj.action_consume(cr, uid, [main_production_move], qty,
                                                          location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
             stock_mov_obj.write(cr, uid, new_moves, {'production_id': production_id}, context=context)
         self.message_post(cr, uid, production_id, body=_("%s produced") % self._description, context=context)
