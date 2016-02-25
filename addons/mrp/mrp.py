@@ -977,6 +977,7 @@ class mrp_production(osv.osv):
                 if not produced_products.get(produced_product.product_id.id, False):
                     produced_products[produced_product.product_id.id] = 0
                 produced_products[produced_product.product_id.id] += produced_product.product_qty
+            main_production_moves = []
             for produce_product in production.move_created_ids:
                 subproduct_factor = self._get_subproduct_factor(cr, uid, production.id, produce_product.id, context=context)
                 lot_id = False
@@ -985,6 +986,7 @@ class mrp_production(osv.osv):
                 qty = min(subproduct_factor * production_qty_uom, produce_product.product_qty) #Needed when producing more than maximum quantity
                 if produce_product.product_id.id == production.product_id.id:
                     action_consume = (qty, lot_id)
+                    main_production_moves.append(produce_product.id)
                 else:
                     new_moves = stock_mov_obj.action_consume(cr, uid, [produce_product.id], qty,
                                                          location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
@@ -997,10 +999,10 @@ class mrp_production(osv.osv):
                                                                                              'production_id': production_id}, context=context)
                     stock_mov_obj.action_confirm(cr, uid, [extra_move_id], context=context)
                     stock_mov_obj.action_done(cr, uid, [extra_move_id], context=context)
+                    main_production_moves.append(extra_move_id)
 
-                if produce_product.product_id.id == production.product_id.id:
-                    main_production_move = produce_product.id
-
+        total_consume_moves = []
+        main_production_move = main_production_moves and main_production_moves[0] or False
         if production_mode in ['consume', 'consume_produce']:
             if wiz:
                 consume_lines = []
@@ -1020,6 +1022,7 @@ class mrp_production(osv.osv):
                     consumed_qty = min(remaining_qty, raw_material_line.product_qty)
                     stock_mov_obj.action_consume(cr, uid, [raw_material_line.id], consumed_qty, raw_material_line.location_id.id,
                                                  restrict_lot_id=consume['lot_id'], consumed_for=main_production_move, context=context)
+                    total_consume_moves.append(raw_material_line.id)
                     remaining_qty -= consumed_qty
                 if not float_is_zero(remaining_qty, precision_digits=precision):
                     #consumed more in wizard than previously planned
@@ -1028,18 +1031,20 @@ class mrp_production(osv.osv):
                     stock_mov_obj.write(cr, uid, [extra_move_id], {'restrict_lot_id': consume['lot_id'],
                                                                     'consumed_for': main_production_move}, context=context)
                     stock_mov_obj.action_done(cr, uid, [extra_move_id], context=context)
+                    total_consume_moves.append(extra_move_id)
         
         if action_consume:
-            total_cost = 0
+            # Calculate total cost in case of real price
             if production.product_id.cost_method == 'real':
-                for consumed_move in production.move_lines2: #Should only take partial stuff
+                total_cost = 0
+                for consumed_move in stock_mov_obj.browse(cr, uid, total_consume_moves):
                     for consumed_quant in consumed_move.quant_ids:
                         total_cost += consumed_quant.inventory_value
-                #import pdb; pdb.set_trace()
+                        print "Intermediary Total Cost:", total_cost
                 from_uom = production.product_uom
                 to_uom = production.product_id.uom_id
-                price_unit = total_cost / self.pool['product.uom']._compute_qty_obj(cr, uid, from_uom, production.product_qty, to_uom)
-                stock_mov_obj.write(cr, uid, [main_production_move], {'price_unit': price_unit}, context=context)
+                price_unit = total_cost / production_qty_uom
+                stock_mov_obj.write(cr, uid, main_production_moves, {'price_unit': price_unit}, context=context)
             # Calculate price
             new_moves = stock_mov_obj.action_consume(cr, uid, [main_production_move], qty,
                                                          location_id=produce_product.location_id.id, restrict_lot_id=lot_id, context=context)
