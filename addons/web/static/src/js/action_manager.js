@@ -742,15 +742,6 @@ var ActionManager = Widget.extend({
         this.dialog_stop();
         return $.when();
     },
-    ir_actions_server: function (action, options) {
-        var self = this;
-        this.rpc('/web/action/run', {
-            action_id: action.id,
-            context: action.context || {}
-        }).done(function (action) {
-            self.do_action(action, options);
-        });
-    },
     ir_actions_report_xml: function(action, options) {
         var self = this;
         framework.blockUI();
