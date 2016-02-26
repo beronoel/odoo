@@ -1118,18 +1118,20 @@ class Action(http.Controller):
 
         base_action = Actions.read([action_id], ['type'], request.context)
         if base_action:
-            ctx = request.context
             action_type = base_action[0]['type']
-            if action_type == 'ir.actions.report.xml':
-                ctx.update({'bin_size': True})
-            if additional_context:
-                ctx.update(additional_context)
-            action = request.session.model(action_type).read([action_id], False, ctx)
-            if action:
-                value = clean_action(action[0])
+            if action_type == 'ir.actions.server':
+                value = self.run(base_action[0]['id'])
+            else:
+                ctx = request.context
+                if additional_context:
+                    ctx = request.context.update(additional_context)
+                if action_type == 'ir.actions.report.xml':
+                    ctx.update({'bin_size': True})
+                action = request.session.model(action_type).read([action_id], False, ctx)
+                if action:
+                    value = clean_action(action[0])
         return value
 
-    @http.route('/web/action/run', type='json', auth="user")
     def run(self, action_id):
         return_action = request.session.model('ir.actions.server').run(
             [action_id], request.context)
