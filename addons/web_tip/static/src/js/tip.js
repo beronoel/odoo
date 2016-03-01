@@ -4,8 +4,8 @@ odoo.define('web_tip.web_tip', function (require) {
 var core = require('web.core');
 var Model = require('web.DataModel');
 var WebClient = require('web.WebClient');
-var formView = require('web.FormView');
 var utils = require('web.utils');
+var session = require('web.session');
 
 var bus = core.bus;
 var Class = core.Class;
@@ -14,15 +14,8 @@ var Tips = Class.extend({
     init: function() {
         var self = this;
 
-        this.tips = [];
+        this.tips = session.tips;
         this.view = null;
-
-        var Tips = new Model('web.tip');
-        Tips.query(['title', 'description', 'action_id', 'model', 'type', 'mode', 'trigger_selector',
-            'highlight_selector', 'end_selector', 'end_event', 'placement', 'is_consumed'])
-            .all().then(function(tips) {
-                self.tips = tips;
-            });
 
         bus.on('action', this, function(action) {
             self.on_action(action);
