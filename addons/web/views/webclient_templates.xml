@@ -298,17 +298,17 @@
     <template id="web.webclient_bootstrap" name="Webclient Bootstrap">
         <t t-call="web.layout">
             <t t-set="head">
+                <script type="text/javascript">
+                    var odoo = {
+                        session_info: <t t-raw="session_info"/>,
+                        csrf_token: "<t t-esc="request.csrf_token(None)"/>",
+                        db_info: <t t-raw="db_info"/>,
+                    };
+                </script>
+
                 <t t-call-assets="web.assets_common" t-js="false"/>
                 <t t-call-assets="web.assets_backend" t-js="false"/>
                 <t t-call-assets="web.assets_common" t-css="false"/>
-                <script type="text/javascript">
-                    odoo.define('web.csrf', function (require) {
-                        var token = "<t t-esc="request.csrf_token(None)"/>";
-                        require('web.core').csrf_token = token;
-                        require('qweb').default_dict.csrf_token = token;
-                    });
-                    odoo.db_info = <t t-raw="db_info"/>;
-                </script>
                 <t t-call-assets="web.assets_backend" t-css="false"/>
 
                 <script type="text/javascript">

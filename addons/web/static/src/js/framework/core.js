@@ -91,6 +91,8 @@ _.extend(qweb.default_dict, {
     'moment': function(date) { return new moment(date); },
 });
 
+qweb.default_dict.csrf_token = odoo.csrf_token;
+
 qweb.preprocess_node = function() {
     // Note that 'this' is the Qweb Node
     switch (this.node.nodeType) {
@@ -191,6 +193,7 @@ return {
     // community and enterprise edition
     one2many_view_registry: new Registry(),
 
+    csrf_token: odoo.csrf_token,
 };
 
 
