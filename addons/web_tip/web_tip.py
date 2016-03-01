@@ -1,7 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from openerp import models, fields, api
-
+from openerp.http import request
 
 class tip(models.Model):
     _name = 'web.tip'
@@ -30,3 +30,14 @@ class tip(models.Model):
     @api.multi
     def consume(self):
        self.write({'user_ids': [(4, self.env.uid)]})
+
+class TipSession(models.Model):
+    _inherit = 'ir.http'
+
+    def session_info(self):
+        Tip = request.env['web.tip']
+        tips = Tip.search([]).read(['title', 'description', 'action_id', 'model', 'type', 'mode', 'trigger_selector', 'highlight_selector', 'end_selector', 'end_event', 'placement', 'is_consumed'])
+        result = super(TipSession, self).session_info()
+        result['tips'] = [tip for tip in tips if not tip.get('is_consumed')]
+        return result
+
