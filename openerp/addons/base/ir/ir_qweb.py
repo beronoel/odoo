@@ -1123,7 +1123,7 @@ class AssetsBundle(object):
         context['inherit_branding'] = False
         context['inherit_branding_auto'] = False
         context['rendering_bundle'] = True
-        self.html = self.registry['ir.ui.view'].render(self.cr, self.uid, xmlid, context=context)
+        self.html = self.registry['ir.ui.view'].cached_render(self.cr, self.uid, xmlid, context=context)
         self.parse()
 
     def parse(self):

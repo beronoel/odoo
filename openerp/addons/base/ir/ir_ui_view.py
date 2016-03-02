@@ -1024,6 +1024,11 @@ class view(osv.osv):
         # Deprecated: templates are translated once read from database
         return arch
 
+    @openerp.tools.ormcache_context('uid', 'id_or_xml_id', keys=('lang',))
+    def cached_render(self, cr, uid, id_or_xml_id, engine='ir.qweb', context=None):
+        # should only be used on ~static qweb template
+        return self.render(cr, uid, id_or_xml_id, engine=engine, context=context)
+
     @openerp.tools.ormcache('uid', 'id')
     def get_view_xmlid(self, cr, uid, id):
         imd = self.pool['ir.model.data']
