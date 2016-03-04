@@ -105,8 +105,8 @@
         <t t-call-assets="web_editor.assets_editor" t-js="false"/>
     </xpath>
     <xpath expr="//t[@t-call-assets='web.assets_backend'][@t-css='false']" position="after">
-        <t t-call-assets="web_editor.summernote" t-css="false"/>
-        <t t-call-assets="web_editor.assets_editor" t-css="false"/>
+        <t t-call-assets="web_editor.summernote" t-css="false" t-async="true"/>
+        <t t-call-assets="web_editor.assets_editor" t-css="false" t-async="true"/>
     </xpath>
 </template>
 <template id="qunit_suite" inherit_id="web.qunit_suite">
