@@ -1723,6 +1723,67 @@ var UpgradeRadio = FieldRadio.extend(AbstractFieldUpgrade, {
     },
 });
 
+/**
+    This widget is intended to be used on Text fields. It will provide Ace Editor for editing XML and Python.
+*/
+
+var AceEditor = common.AbstractField.extend(common.ReinitializeFieldMixin, {
+    template: "AceEditor",
+    init: function() {
+        this._super.apply(this, arguments);
+        var mode = this.options.mode || 'xml';
+        var mode_to_load = mode == 'xml' ? 'mode_xml' : 'mode_python';
+        if (!window.ace) {
+            $(QWeb.render("LoadAce", {'mode': mode_to_load})).appendTo($("head"));
+        }
+    },
+    initialize_content: function () {
+        if (! this.get("effective_readonly")) {
+            this.aceEditor = ace.edit(this.$('.ace-view-editor')[0]);
+            this.aceEditor.setTheme("ace/theme/monokai");
+        }
+    },
+    destroy_content: function() {
+        if (this.aceEditor) {
+            this.aceEditor.destroy();
+        }
+    },
+    render_value: function() {
+        if (! this.get("effective_readonly")) {
+            var show_value = formats.format_value(this.get('value'), this);
+            this.display_view(show_value);
+        } else {
+            var txt = this.get("value") || '';
+            this.$(".oe_form_text_content").text(txt);
+        }
+    },
+    get_editing_session: function(show_value) {
+        //We can create cache of EditSession, may be key as viewID
+        var mode = this.options.mode || 'xml';
+        var editingSession = new ace.EditSession(show_value);
+        editingSession.setMode("ace/mode/"+mode);
+        editingSession.setUndoManager(new ace.UndoManager());
+        editingSession.setUseWorker(false);
+        return editingSession;
+    },
+    display_view: function (show_value) {
+        var self = this;
+        var editingSession = this.get_editing_session(show_value);
+        this.aceEditor.on("blur", function() {
+            self.save_value(editingSession);
+        });
+        this.aceEditor.setSession(editingSession);
+    },
+    save_value: function(editingSession) {
+        if (editingSession.getUndoManager().hasUndo()) {
+            var value_ = editingSession.getValue();
+            this.set_value(value_);
+        }
+    },
+    focus: function() {
+        return this.aceEditor.focus();
+    },
+});
 
 /**
  * Registry of form fields, called by :js:`instance.web.FormView`.
@@ -1761,8 +1822,8 @@ core.form_widget_registry
     .add('timezone_mismatch', TimezoneMismatch)
     .add('label_selection', LabelSelection)
     .add('upgrade_boolean', UpgradeBoolean)
-    .add('upgrade_radio', UpgradeRadio);
-
+    .add('upgrade_radio', UpgradeRadio)
+    .add('ace', AceEditor);
 
 /**
  * Registry of widgets usable in the form view that can substitute to any possible

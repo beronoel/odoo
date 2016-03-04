@@ -6,7 +6,6 @@ var Class = require('web.Class');
 var core = require('web.core');
 var Widget = require('web.Widget');
 var base = require('web_editor.base');
-var ace_call = require('website.ace_call');
 var website = require('website.website');
 
 var _t = core._t;
@@ -21,7 +20,9 @@ var Ace = Widget.extend({
         'click a[data-action=ace]': 'launchAce',
     },
     launchAce: function (e) {
-        ace_call.load();
+        if (!window.ace) {
+            $(qweb.render("LoadAce")).appendTo($("head"));
+        }
 
         if (e) {
             e.preventDefault();
@@ -104,6 +105,7 @@ var ViewEditor = Widget.extend({
             $editor.width(width);
             self.aceEditor.resize();
             self.$el.width(width);
+            
         }
         function storeEditorWidth() {
             window.localStorage.setItem('ace_editor_width', self.$el.width());
@@ -216,6 +218,7 @@ var ViewEditor = Widget.extend({
             var editingSession = self.buffers[viewId] = new ace.EditSession(result[0].arch);
             editingSession.setMode("ace/mode/xml");
             editingSession.setUndoManager(new ace.UndoManager());
+            editingSession.setUseWorker(false);
             editingSession.on("change", function () {
                 setTimeout(function () {
                     var $option = self.$('#ace-view-list').find('[value='+viewId+']');

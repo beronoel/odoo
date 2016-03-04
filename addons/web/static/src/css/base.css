@@ -1,4 +1,4 @@
-@charset "UTF-8";
+@charset "utf-8";
 @font-face {
   font-family: "mnmliconsRegular";
   src: url("/web/static/src/font/mnmliconsv21-webfont.eot") format("eot");
@@ -2084,6 +2084,10 @@
   background: -o-linear-gradient(135deg, #4c85c2, #284d7d);
   background: -webkit-gradient(linear, left top, right bottom, from(#4c85c2), to(#284d7d));
   background: -ms-linear-gradient(top, #4c85c2, #284d7d);
+}
+.openerp .oe_form .ace-view-editor {
+  height: 300px;
+  padding: 0 1em;
 }
 .openerp .oe_form .oe_form_field_one2many > .oe_view_manager .oe_list_pager_single_page {
   display: none;
