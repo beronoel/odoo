@@ -1,6 +1,7 @@
 odoo.define('web.form_widgets', function (require) {
 "use strict";
 
+var ajax = require('web.ajax');
 var core = require('web.core');
 var crash_manager = require('web.crash_manager');
 var data = require('web.data');
@@ -1729,13 +1730,18 @@ var UpgradeRadio = FieldRadio.extend(AbstractFieldUpgrade, {
 
 var AceEditor = common.AbstractField.extend(common.ReinitializeFieldMixin, {
     template: "AceEditor",
-    init: function() {
-        this._super.apply(this, arguments);
-        var mode = this.options.mode || 'xml';
-        var mode_to_load = mode == 'xml' ? 'mode_xml' : 'mode_python';
-        if (!window.ace) {
-            $(QWeb.render("LoadAce", {'mode': mode_to_load})).appendTo($("head"));
+    willStart: function() {
+        var result = this._super();
+        if (!window.ace && !this.loadJS_def) {
+            this.loadJS_def = ajax.loadJS('/web/static/lib/ace/ace.js').then(function () {
+                return $.when(ajax.loadJS('/web/static/lib/ace/mode-python.js'),
+                    ajax.loadJS('/web/static/lib/ace/mode-xml.js'),
+                    ajax.loadJS('/web/static/lib/ace/theme-monokai.js'));
+            });
         }
+        return $.when(this.loadJS_def).then(function () {
+            return  result;
+        });
     },
     initialize_content: function () {
         if (! this.get("effective_readonly")) {

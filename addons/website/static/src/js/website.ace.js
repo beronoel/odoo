@@ -20,19 +20,26 @@ var Ace = Widget.extend({
         'click a[data-action=ace]': 'launchAce',
     },
     launchAce: function (e) {
-        if (!window.ace) {
-            $(qweb.render("LoadAce")).appendTo($("head"));
+        var self = this;
+        if (!window.ace && !this.loadJS_def) {
+            this.loadJS_def = ajax.loadJS('/web/static/lib/ace/ace.js').then(function () {
+                return $.when(ajax.loadJS('/web/static/lib/ace/mode-xml.js'),
+                    ajax.loadJS('/web/static/lib/ace/theme-monokai.js'));
+            });
         }
 
         if (e) {
             e.preventDefault();
         }
-        if (this.globalEditor) {
-            this.globalEditor.open();
-        } else {
-            this.globalEditor = new ViewEditor(this);
-            this.globalEditor.appendTo($(document.body));
-        }
+
+        return $.when(this.loadJS_def).then(function () {
+            if (self.globalEditor) {
+                self.globalEditor.open();
+            } else {
+                self.globalEditor = new ViewEditor(self);
+                self.globalEditor.appendTo($(document.body));
+            }
+        });
     },
 });
 
@@ -105,7 +112,6 @@ var ViewEditor = Widget.extend({
             $editor.width(width);
             self.aceEditor.resize();
             self.$el.width(width);
-            
         }
         function storeEditorWidth() {
             window.localStorage.setItem('ace_editor_width', self.$el.width());
