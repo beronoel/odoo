@@ -297,14 +297,22 @@ def load_actions_from_ir_values(key, key2, models, meta):
     Values = request.session.model('ir.values')
     actions = Values.get(key, key2, models, meta, request.context)
 
-    return [(id, name, clean_action(action))
+    return [(id, name, prepare_action(action))
             for id, name, action in actions]
 
-def clean_action(action):
-    action.setdefault('flags', {})
+def prepare_action(action):
     action_type = action.setdefault('type', 'ir.actions.act_window_close')
+    action.setdefault('flags', {})
     if action_type == 'ir.actions.act_window':
         return fix_view_modes(action)
+    elif action_type == 'ir.actions.server':
+        # directly run the server action and return its resulting action, if any
+        return_action = request.session.model('ir.actions.server').run(
+            [action['id']], request.context)
+        if return_action:
+            return_action['no_cache'] = True
+            return prepare_action(return_action)
+        return False
     return action
 
 # I think generate_views,fix_view_modes should go into js ActionManager
@@ -885,7 +893,7 @@ class DataSet(http.Controller):
     def call_button(self, model, method, args, domain_id=None, context_id=None):
         action = self._call_kw(model, method, args, {})
         if isinstance(action, dict) and action.get('type') != '':
-            return clean_action(action)
+            return prepare_action(action)
         return False
 
     @http.route('/web/dataset/exec_workflow', type='json', auth="user")
@@ -1105,7 +1113,6 @@ class Action(http.Controller):
     @http.route('/web/action/load', type='json', auth="user")
     def load(self, action_id, additional_context=None):
         Actions = request.session.model('ir.actions.actions')
-        value = False
         try:
             action_id = int(action_id)
         except ValueError:
@@ -1126,17 +1133,9 @@ class Action(http.Controller):
                 ctx.update(additional_context)
             action = request.session.model(action_type).read([action_id], False, ctx)
             if action:
-                value = clean_action(action[0])
-        return value
+                return prepare_action(action[0])
 
-    @http.route('/web/action/run', type='json', auth="user")
-    def run(self, action_id):
-        return_action = request.session.model('ir.actions.server').run(
-            [action_id], request.context)
-        if return_action:
-            return clean_action(return_action)
-        else:
-            return False
+        return False
 
 class Export(http.Controller):
 
