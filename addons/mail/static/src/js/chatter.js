@@ -307,6 +307,7 @@ var Chatter = form_common.AbstractField.extend({
                 .addClass($container.attr("class"))
                 .unwrap();
         }
+        this.$el.removeClass("o_form_field");
 
         // Move the follower's widget (if any) inside the chatter
         this.followers = this.field_manager.fields.message_follower_ids;
