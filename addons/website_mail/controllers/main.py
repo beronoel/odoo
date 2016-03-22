@@ -65,6 +65,9 @@ def _message_post_helper(res_model='', res_id=None, message='', token='', token_
             res = res.sudo()
         else:
             raise NotFound()
+    # only keep the kwargs that are fields of mail.message to avoid warning
+    kw = dict((key, val) for (key, val) in kw.iteritems() if key in request.env['mail.message']._fields)
+
     return res.with_context({'mail_create_nosubscribe': nosubscribe}).message_post(body=message,
                                                                                    message_type=kw.pop('message_type', False) or "comment",
                                                                                    subtype=kw.pop('subtype', False) or "mt_comment",
