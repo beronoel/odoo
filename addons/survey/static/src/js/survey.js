@@ -48,9 +48,8 @@ if(!the_form.length) {
 
     ready_with_locale.then(function(){
         var l10n = _t.database.parameters;
-        $(e.currentTarget).closest("div.date").datetimepicker({
-            pickTime: true,
-            useSeconds: true,
+        $('.input-group.date').datetimepicker({
+            pickTime: false,
             startDate: moment({ y: 1900 }),
             endDate: moment().add(200, "y"),
             calendarWeeks: true,
@@ -61,7 +60,7 @@ if(!the_form.length) {
                 down: 'fa fa-chevron-down'
             },
             language : moment.locale(),
-            format : time.strftime_to_moment_format(l10n.date_format + ' ' + l10n.time_format),
+            format : time.strftime_to_moment_format(l10n.date_format),
         });
     });
 
@@ -161,7 +160,9 @@ if(!the_form.length) {
             for (var i = 0; i < date_fields.length; i++) {
                 var el = date_fields[i];
                 var field_obj = _.findWhere(formData, {'name': el.name});
-                field_obj.value = formats.parse_value(field_obj.value, {"widget": 'datetime'});
+                if (field_obj.value){
+                    field_obj.value = formats.parse_value(field_obj.value, {"widget": 'date'});
+                }
             }
             $('.js_errzone').html("").hide();
         },
