@@ -14,10 +14,10 @@ Badge received are displayed on the user profile.
 """,
     'data': [
         'security/ir.model.access.csv',
-        'security/gamification_security.xml',
-        'wizard/grant_badge.xml',
-        'views/gamification.xml',
-        'views/hr_gamification.xml',
+        'security/hr_gamification_security.xml',
+        'wizard/gamification_badge_views.xml',
+        'views/gamification_views.xml',
+        'views/hr_gamification_templates.xml',
     ],
     'auto_install': True,
 }
