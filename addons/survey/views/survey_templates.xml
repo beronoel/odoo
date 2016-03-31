@@ -93,6 +93,7 @@
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/survey/static/src/js/survey.js" />
             <script type="text/javascript" src="/survey/static/src/js/tour_test_survey.js"></script>
+            <script type="text/javascript" src="/web/static/src/js/framework/formats.js"></script>
         </xpath>
     </template>
     <template id="survey" name="Survey">
@@ -176,7 +177,7 @@
 
     <template id="datetime" name="Datetime box">
         <div class='input-group date'>
-            <input type="text" class="form-control" data-date-format="YYYY-MM-DD hh:mm:ss" t-att-name="prefix" placeholder="YYYY-MM-DD hh:mm:ss" />
+            <input type="text" class="form-control" t-att-name="prefix"/>
             <span class="input-group-addon"><span class="fa fa-calendar"></span></span>
         </div>
     </template>

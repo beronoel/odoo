@@ -3,6 +3,13 @@ odoo.define('survey.survey', function (require) {
 
 var website = require('website.website');
 
+var ajax = require('web.ajax');
+var base = require('web_editor.base');
+var core = require('web.core');
+var time = require('web.time');
+var formats = require('web.formats');
+
+var _t = core._t;
 /*
  * This file is intended to add interactivity to survey forms rendered by
  * the website engine.
@@ -21,6 +28,7 @@ if(!the_form.length) {
     var scores_controller = the_form.attr("data-scores");
     var print_mode = false;
     var quiz_correction_mode = false;
+    var ready_with_locale = $.when(base.ready(), load_locale());
 
     // Printing mode: will disable all the controls in the form
     if (_.isUndefined(submit_controller)) {
@@ -33,16 +41,27 @@ if(!the_form.length) {
     if (! _.isUndefined(scores_controller)) {
         quiz_correction_mode = true;
     }
+    function load_locale(){
+            var url = "/web/webclient/locale/" + base.get_context().lang || 'en_US';
+            return ajax.loadJS(url);
+    }
 
-    $("div.input-group span.fa-calendar").on('click', function(e) {
+    ready_with_locale.then(function(){
+        var l10n = _t.database.parameters;
         $(e.currentTarget).closest("div.date").datetimepicker({
+            pickTime: true,
             useSeconds: true,
+            startDate: moment({ y: 1900 }),
+            endDate: moment().add(200, "y"),
+            calendarWeeks: true,
             icons : {
                 time: 'fa fa-clock-o',
                 date: 'fa fa-calendar',
                 up: 'fa fa-chevron-up',
                 down: 'fa fa-chevron-down'
             },
+            language : moment.locale(),
+            format : time.strftime_to_moment_format(l10n.date_format + ' ' + l10n.time_format),
         });
     });
 
@@ -88,7 +107,14 @@ if(!the_form.length) {
 
                         // prefill of text/number/date boxes
                         var input = the_form.find(".form-control[name=" + key + "]");
-                        input.val(value);
+
+                        if (input.attr('date')){
+                            var val = formats.format_value(value[0], {"widget": 'date'});
+                            input.val(val);
+                        }
+                        else{
+                            input.val(value);
+                        }
 
                         // special case for comments under multiple suggestions questions
                         if (_.string.endsWith(key, "_comment") &&
@@ -130,7 +156,13 @@ if(!the_form.length) {
         url: submit_controller,
         type: 'POST',                       // submission type
         dataType: 'json',                   // answer expected type
-        beforeSubmit: function(){           // hide previous errmsg before resubmitting
+        beforeSubmit: function(formData, $form, options){           // hide previous errmsg before resubmitting
+            var date_fields = $form.find('div.date > input.form-control');
+            for (var i = 0; i < date_fields.length; i++) {
+                var el = date_fields[i];
+                var field_obj = _.findWhere(formData, {'name': el.name});
+                field_obj.value = formats.parse_value(field_obj.value, {"widget": 'datetime'});
+            }
             $('.js_errzone').html("").hide();
         },
         success: function(response, status, xhr, wfe){ // submission attempt
@@ -162,7 +194,9 @@ if(!the_form.length) {
     // });
 
     // Launch prefilling
-    prefill();
+    ready_with_locale.then(function(){
+        prefill();
+    });
     if(quiz_correction_mode === true){
         display_scores();
     }
