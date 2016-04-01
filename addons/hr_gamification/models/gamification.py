@@ -1,45 +1,42 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from openerp.osv import fields, osv
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
-class hr_gamification_badge_user(osv.Model):
-    """User having received a badge"""
+class BadgeUser(models.Model):
+    """ User having received a badge"""
 
-    _name = 'gamification.badge.user'
-    _inherit = ['gamification.badge.user']
+    _inherit = 'gamification.badge.user'
 
-    _columns = {
-        'employee_id': fields.many2one("hr.employee", string='Employee'),
-    }
+    employee_id = fields.Many2one("hr.employee", string='Employee')
 
-    def _check_employee_related_user(self, cr, uid, ids, context=None):
-        for badge_user in self.browse(cr, uid, ids, context=context):
-            if badge_user.user_id and badge_user.employee_id:
-                if badge_user.employee_id not in badge_user.user_id.employee_ids:
-                    return False
-        return True
-
-    _constraints = [
-        (_check_employee_related_user, "The selected employee does not correspond to the selected user.", ['employee_id']),
-    ]
+    @api.constrains('employee_id')
+    def _check_employee_related_user(self):
+        for badge in self:
+            if badge.user_id and badge.employee_id:
+                if badge.employee_id not in badge.user_id.employee_ids:
+                    raise ValidationError(_('The selected employee does not correspond to the selected user.'))
 
 
-class gamification_badge(osv.Model):
-    _name = 'gamification.badge'
-    _inherit = ['gamification.badge']
+class Badge(models.Model):
 
-    def get_granted_employees(self, cr, uid, badge_ids, context=None):
-        if context is None:
-            context = {}
+    _inherit = 'gamification.badge'
 
-        employee_ids = []
-        badge_user_ids = self.pool.get('gamification.badge.user').search(cr, uid, [('badge_id', 'in', badge_ids), ('employee_id', '!=', False)], context=context)
-        for badge_user in self.pool.get('gamification.badge.user').browse(cr, uid, badge_user_ids, context):
-            employee_ids.append(badge_user.employee_id.id)
-        # remove duplicates
-        employee_ids = list(set(employee_ids))
+    granted_employees_count = fields.Integer('# of granted employees', compute='_compute_granted_employees_count')
+
+    @api.multi
+    def _compute_granted_employees_count(self):
+        badge_data = self.env['gamification.badge.user'].read_group([('badge_id', 'in', self.ids), ('employee_id', '!=', False)], ['badge_id'], ['badge_id'])
+        mapped_data = dict([(badge['badge_id'][0], badge['badge_id_count']) for badge in badge_data])
+        for badge in self:
+            badge.granted_employees_count = mapped_data.get(badge.id, 0)
+
+    @api.multi
+    def action_granted_employees(self):
+        self.ensure_one()
+        employee_ids = self.mapped('owner_ids.employee_id').ids
         return {
             'type': 'ir.actions.act_window',
             'name': 'Granted Employees',
@@ -48,13 +45,3 @@ class gamification_badge(osv.Model):
             'res_model': 'hr.employee',
             'domain': [('id', 'in', employee_ids)]
         }
-
-    def _get_granted_employees_count(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for badge in self.browse(cr, uid, ids, context=context):
-            res[badge.id] = self.pool.get('gamification.badge.user').search_count(cr, uid, [('badge_id', '=', badge.id), ('employee_id', '!=', False)], context=context)
-        return res
-
-    _columns = {
-        'granted_employees_count': fields.function(_get_granted_employees_count, type="integer")
-    }
