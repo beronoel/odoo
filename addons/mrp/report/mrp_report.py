@@ -4,38 +4,6 @@
 from openerp.osv import fields,osv
 
 
-class report_workcenter_load(osv.osv):
-    _name="report.workcenter.load"
-    _description="Work Center Load"
-    _auto = False
-    _log_access = False
-    _columns = {
-        'name': fields.char('Week', required=True),
-        'workcenter_id': fields.many2one('mrp.workcenter', 'Work Center', required=True),
-        'cycle': fields.float('Number of Cycles'),
-        'hour': fields.float('Number of Hours'),
-    }
-
-    def init(self, cr):
-        cr.execute("""
-            create or replace view report_workcenter_load as (
-                SELECT
-                    min(wl.id) as id,
-                    to_char(p.date_planned,'YYYY:mm:dd') as name,
-                    SUM(wl.hour) AS hour,
-                    SUM(wl.cycle) AS cycle,
-                    wl.workcenter_id as workcenter_id
-                FROM
-                    mrp_production_workcenter_line wl
-                    LEFT JOIN mrp_production p
-                        ON p.id = wl.production_id
-                GROUP BY
-                    wl.workcenter_id,
-                    to_char(p.date_planned,'YYYY:mm:dd')
-            )""")
-
-
-
 class report_mrp_inout(osv.osv):
     _name="report.mrp.inout"
     _description="Stock value variation"
