@@ -1820,16 +1820,15 @@ class stock_move(osv.osv):
     def _get_product_availability(self, cr, uid, ids, field_name, args, context=None):
         quant_obj = self.pool.get('stock.quant')
         res = dict.fromkeys(ids, False)
+        
         for move in self.browse(cr, uid, ids, context=context):
             if move.state == 'done':
                 res[move.id] = move.product_qty
             else:
-                sublocation_ids = self.pool.get('stock.location').search(cr, uid, [('id', 'child_of', [move.location_id.id])], context=context)
-                quant_ids = quant_obj.search(cr, uid, [('location_id', 'in', sublocation_ids), ('product_id', '=', move.product_id.id), ('reservation_id', '=', False)], context=context)
-                availability = 0
-                for quant in quant_obj.browse(cr, uid, quant_ids, context=context):
-                    availability += quant.qty
-                res[move.id] = min(move.product_qty, availability)
+                quants = quant_obj.read_group(cr, uid, [('location_id', 'child_of', move.location_id.id), ('product_id', '=', move.product_id.id), ('reservation_id', '=', False)], ['qty'], ['qty'], context=context)
+                #for quant in quant_obj.browse(cr, uid, quant_ids, context=context):
+                #    availability += quant.qty
+                res[move.id] = min(move.product_qty, quants and quants[0]['qty'] or 0)
         return res
 
     def _get_string_qty_information(self, cr, uid, ids, field_name, args, context=None):
