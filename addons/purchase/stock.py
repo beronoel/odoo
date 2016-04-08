@@ -68,6 +68,14 @@ class stock_warehouse(osv.osv):
         'buy_to_resupply': True,
     }
 
+    @api.model
+    @api.returns('stock.location.route', lambda value: value.id)
+    def _get_mto_route(self):
+        mto_route = super(stock_warehouse, self)._get_mto_route()
+        if not mto_route:
+            raise UserError(_('Can\'t find any generic Make To Order route.'))
+        return mto_route
+
     def _get_buy_pull_rule(self, cr, uid, warehouse, context=None):
         route_obj = self.pool.get('stock.location.route')
         data_obj = self.pool.get('ir.model.data')

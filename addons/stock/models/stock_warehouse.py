@@ -440,9 +440,15 @@ class Warehouse(models.Model):
         mto_route = self.env.ref('stock.route_warehouse0_mto', raise_if_not_found=False)
         if not mto_route:
             mto_route = self.env['stock.location.route'].search([('name', 'like', _('Make To Order'))], limit=1)
-        if not mto_route:
-            raise UserError(_('Can\'t find any generic Make To Order route.'))
         return mto_route
+
+    @api.model
+    def set_pull_mto_route(self):
+        mto_route = self.env.ref('stock.route_warehouse0_mto', raise_if_not_found=False)
+        if mto_route:
+            stock_warehouses = self.env['stock.warehouse'].search([('mto_pull_id.route_id', '=', False)])
+            for warehouse in stock_warehouses:
+                warehouse.mto_pull_id.route_id = mto_route
 
     def _get_inter_warehouse_route_values(self, supplier_warehouse):
         return {

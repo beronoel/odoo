@@ -101,15 +101,6 @@ watch your stock valuation, and track production lots (based on serial numbers).
 
 
         <!--
-             Procurement rules
-        -->
-        
-        <record id="route_warehouse0_mto" model='stock.location.route'>
-            <field name="name">Make To Order</field>
-            <field name="sequence">10</field>
-        </record>
-
-        <!--
     Properties
     -->
         <record forcecreate="True" id="property_stock_supplier" model="ir.property">

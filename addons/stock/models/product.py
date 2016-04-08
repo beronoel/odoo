@@ -357,6 +357,7 @@ class ProductTemplate(models.Model):
         digits_compute=dp.get_precision('Product Unit of Measure'))
     location_id = fields.Many2one('stock.location', 'Location')
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse')
+    product_route_count = fields.Boolean(compute='_compute_product_route_count', default=False)
     route_ids = fields.Many2many(
         'stock.location.route', 'stock_route_product', 'product_id', 'route_id', 'Routes',
         domain="[('product_selectable', '=', True)]",
@@ -369,6 +370,12 @@ class ProductTemplate(models.Model):
     route_from_categ_ids = fields.Many2many(
         relation="stock.location.route", string="Category Routes",
         related='categ_id.total_route_ids')
+
+    @api.depends('route_ids')
+    def _compute_product_route_count(self):
+        if self.env['stock.location.route'].search([('product_selectable', '=', True)]):
+            for product in self:
+                product.product_route_count = True
 
     def _compute_quantities(self):
         res = self._compute_quantities_dict()

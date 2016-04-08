@@ -127,7 +127,8 @@
                     <field name="tracking" widget="radio" attrs="{'invisible':[('type', 'in', ['service', 'digital'])]}" groups="stock.group_production_lot"/>
                 </div>
                 <field name="company_id" position="after">
-                    <field name="route_ids" widget="many2many_checkboxes" attrs="{'invisible':[('type', 'in', ['service', 'digital'])]}"/>
+                    <field name="product_route_count" invisible="1"/>
+                    <field name="route_ids" widget="many2many_checkboxes" attrs="{'invisible':['|', ('type', 'in', ['service', 'digital']),('product_route_count','=', False)]}"/>
                     <field name="route_from_categ_ids" widget="many2many_tags" readonly="1" attrs="{'invisible':[('route_from_categ_ids', '=', [])]}"/>
                 </field>
                  <group name="group_lots_and_weight" position="after">
