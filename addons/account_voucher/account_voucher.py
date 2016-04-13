@@ -40,6 +40,16 @@ class res_currency(osv.osv):
             res[context.get('voucher_special_currency')] = context.get('voucher_special_currency_rate')
         return res
 
+class account_move_line(osv.osv):
+    _inherit = "account.move.line"
+
+    def create(self, cr, uid, vals, context=None, check=True):
+        if context and context.get('voucher_company_currency_id'):
+            currency = self.pool['res.currency'].browse(cr, uid, context.get('voucher_company_currency_id'), context=context)
+            for key in ('credit', 'debit', 'tax_amount'):
+                if vals.get(key):
+                    vals[key] = currency.round(vals[key])
+        return super(account_move_line, self).create(cr, uid, vals, context, check)
 
 class account_voucher(osv.osv):
     def _check_paid(self, cr, uid, ids, name, args, context=None):
@@ -1250,10 +1260,12 @@ class account_voucher(osv.osv):
                 tot_line -= amount
                 move_line['credit'] = amount
 
+            move_line_context = dict(ctx)
             if voucher.tax_id and voucher.type in ('sale', 'purchase'):
                 move_line.update({
                     'account_tax_id': voucher.tax_id.id,
                 })
+                move_line_context.update({'voucher_company_currency_id': voucher.company_id.currency_id.id})
 
             # compute the amount in foreign currency
             foreign_currency_diff = 0.0
@@ -1274,7 +1286,7 @@ class account_voucher(osv.osv):
                     foreign_currency_diff = line.move_line_id.amount_residual_currency - abs(amount_currency)
 
             move_line['amount_currency'] = amount_currency
-            voucher_line = move_line_obj.create(cr, uid, move_line)
+            voucher_line = move_line_obj.create(cr, uid, move_line, context=move_line_context)
             rec_ids = [voucher_line, line.move_line_id.id]
 
             if not currency_obj.is_zero(cr, uid, voucher.company_id.currency_id, currency_rate_difference):
