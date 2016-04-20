@@ -138,7 +138,6 @@ var KanbanView = View.extend({
                     }));
                 } else {
                     new_ids = _.pluck(data.records, 'id');
-                    self.dataset._length = data.count;
                 }
                 self.dataset.alter_ids(new_ids);
                 self.data = data;
@@ -158,20 +157,17 @@ var KanbanView = View.extend({
 
     load_records: function (offset, dataset) {
         dataset = dataset || this.dataset;        
-        var query = dataset._model.query(this.fields_keys.concat(['__last_update']))
+        return dataset._model.query(this.fields_keys.concat(['__last_update']))
                 .limit(this.limit || false)
-                .offset(offset || 0);
-        return query.all()
-            .then(function (records) {
-                return query.count().then(function(count) {
+                .offset(offset || 0)
+                .all()
+                .then(function (records) {
                     return {
                         records: records,
                         is_empty: !records.length,
                         grouped: false,
-                        count: count,
                     };
-                })
-            });
+                });
     },
 
     load_groups: function (options) {
