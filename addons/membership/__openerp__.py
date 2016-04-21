@@ -36,6 +36,4 @@ invoice and send propositions for membership renewal.
         '../account/test/account_minimal_test.xml',
         'test/test_membership.yml'
     ],
-    'installable': True,
-    'auto_install': False,
 }
