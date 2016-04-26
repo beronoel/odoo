@@ -1178,6 +1178,18 @@ class AccountMoveLine(models.Model):
         if context.get('reconcile_date'):
             domain += ['|', ('reconciled', '=', False), '|', ('matched_debit_ids.create_date', '>', context['reconcile_date']), ('matched_credit_ids.create_date', '>', context['reconcile_date'])]
 
+        if context.get('account_tag_ilike_ids'):
+            tag_ids = self.env['account.account.tag']
+            for tag_ilike in context['account_tag_ilike_ids']:
+                tag_ids = tag_ids | self.env['account.account.tag'].search([('name', 'ilike', tag_ilike.text), ('applicability', '=', 'accounts')])
+            domain += [('account_id.tag_ids', 'in', tag_ids.ids)]
+
+        if context.get('analytic_tag_ilike_ids'):
+            tag_ids = self.env['account.analytic.tag']
+            for tag_ilike in context['analytic_tag_ilike_ids']:
+                tag_ids = tag_ids | self.env['account.analytic.tag'].search([('name', 'ilike', tag_ilike.text)])
+            domain += [('analytic_account_id.tag_ids', 'in', tag_ids.ids)]
+
         where_clause = ""
         where_clause_params = []
         tables = ''
