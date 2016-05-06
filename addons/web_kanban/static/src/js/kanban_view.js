@@ -186,7 +186,7 @@ var KanbanView = View.extend({
         if (this.fields_view.fields[group_by_field] === undefined) {
             fields_def = data_manager.load_fields(this.dataset).then(function (fields) {
                 self.fields = fields;
-            })
+            });
         }
 
         var load_groups_def = new Model(this.model, options.search_context, options.search_domain)
@@ -255,41 +255,66 @@ var KanbanView = View.extend({
                 return $.when(groups);
             }
         })
-        .then(function (groups) {
-            var undef_index = _.findIndex(groups, function (g) { return g.title === _t("Undefined");});
-            if (undef_index >= 1) {
-                var undef_group = groups[undef_index];
-                groups.splice(undef_index, 1);
-                groups.unshift(undef_group);
+        .then(function (all_groups) {
+            // If there is an 'Undefined' group, move it such that it is the first one
+            var undef_group = _.findWhere(all_groups, {title: _t("Undefined")});
+            if (undef_group) {
+                all_groups.splice(_.indexOf(all_groups, undef_group));
+                all_groups.unshift(undef_group);
             }
-            return groups;
-        })
-        .then(function (groups) {
-            // load records for each group
-            var is_empty = true;
-            return $.when.apply(null, _.map(groups, function (group) {
-                var def = $.when([]);
-                var dataset = new data.DataSetSearch(self, self.model,
-                    new data.CompoundContext(self.dataset.get_context(), group.model.context()), group.model.domain());
-                if (self.dataset._sort) {
-                    dataset.set_sort(self.dataset._sort);
-                }
-                if (group.attributes.length >= 1) {
-                    def = dataset.read_slice(self.fields_keys.concat(['__last_update']), { 'limit': self.limit });
-                }
-                return def.then(function (records) {
-                    self.dataset.ids.push.apply(self.dataset.ids, _.difference(dataset.ids, self.dataset.ids));
-                    group.records = records;
-                    group.dataset = dataset;
-                    is_empty = is_empty && !records.length;
-                    return group;
+            // Partition all_groups between empty and non-empty groups, and fetch non-empty groups only
+            var groups_partition = _.partition(all_groups, function (group) {
+                return group.attributes.length > 0;
+            });
+            var non_empty_groups = groups_partition[0];
+            var empty_groups = groups_partition[1];
+            // Gather non-empty groups into 5 chunks, to trigger at most 5 RPCs as we can perform
+            // up to 6 RPCs in parallel, and one is already used by the longpolling
+            var chunks = [];
+            var max_nb_chunks = 5;
+            var chunk_size = Math.floor(non_empty_groups.length / max_nb_chunks);
+            var nb_leftovers = non_empty_groups.length % max_nb_chunks;
+            for (var i = 0; i < max_nb_chunks && non_empty_groups.length > 0; i++) {
+                chunks.push(non_empty_groups.splice(0, chunk_size + (i < nb_leftovers ? 1 : 0)));
+            }
+            // Load records for each chunk
+            return $.when.apply(null, _.map(chunks, function (groups) {
+                return self.dataset.multi_read_slice({
+                    context: _.map(groups, function (group) {
+                        return new data.CompoundContext(self.dataset.get_context(), group.model.context());
+                    }),
+                    domain: _.map(groups, function (group) {
+                        return group.model.domain();
+                    }),
+                    fields: self.fields_keys.concat(['__last_update']),
+                    limit: self.limit,
+                }).then(function (results) {
+                    return _.map(groups, function (group, index) {
+                        var result = results[index];
+                        group.dataset = new data.DataSetSearch(self, self.dataset.model,
+                            new data.CompoundContext(self.dataset.get_context(), group.model.context()), group.model.domain());
+                        group.dataset.ids = _.pluck(result.records, 'id');
+                        group.dataset._length = result.length;
+                        group.records = result.records;
+                        return group;
+                    });
                 });
             })).then(function () {
+                var computed_groups = _.flatten(Array.prototype.slice.call(arguments, 0));
+                // Create empty dataset for each empty group and re-insert those groups such that
+                // the original group order is kept
+                _.each(empty_groups, function (group) {
+                    group.dataset = new data.DataSetSearch(self, self.dataset.model,
+                        new data.CompoundContext(self.dataset.get_context(), group.model.context()), group.model.domain());
+                    group.records = [];
+                    group.is_empty = true;
+                    computed_groups.splice(_.indexOf(all_groups, group), 0, group);
+                });
                 return {
-                    groups: Array.prototype.slice.call(arguments, 0),
-                    is_empty: is_empty,
+                    groups: computed_groups,
+                    is_empty: non_empty_groups.length,
                     grouped: true,
-                };
+                 };
             });
         });
         return $.when(load_groups_def, fields_def);
