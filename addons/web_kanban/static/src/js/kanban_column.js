@@ -47,6 +47,10 @@ var KanbanColumn = Widget.extend({
         this.folded = group_data.attributes.folded;
         this.fields = options.fields;
         this.values = group_data.values;
+        this.loaded = !group_data.lazy_loading;
+        if (this.folded && !this.loaded) {
+            console.warn("Unfolded columns can't be lazily loaded");
+        }
 
         this.quick_create = options.quick_create;
         this.grouped_by_m2o = options.grouped_by_m2o;
@@ -128,7 +132,11 @@ var KanbanColumn = Widget.extend({
             if (self.$el.hasClass('o_column_folded')) {
                 event.preventDefault();
                 self.folded = false;
-                self.update_column();
+                if (self.loaded) {
+                    self.update_column();
+                } else {
+                    self.trigger_up('kanban_load_more'); // load records before unfolding
+                }
             }
         });
     },

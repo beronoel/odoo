@@ -262,12 +262,17 @@ var KanbanView = View.extend({
                 all_groups.splice(_.indexOf(all_groups, undef_group));
                 all_groups.unshift(undef_group);
             }
-            // Partition all_groups between empty and non-empty groups, and fetch non-empty groups only
-            var groups_partition = _.partition(all_groups, function (group) {
+            // Partition all_groups between empty, non-empty folded and non-empty unfolded groups,
+            // and fetch non-empty groups only
+            var empty_groups_partition = _.partition(all_groups, function (group) {
                 return group.attributes.length > 0;
             });
-            var non_empty_groups = groups_partition[0];
-            var empty_groups = groups_partition[1];
+            var folded_groups_partiton = _.partition(empty_groups_partition[0], function (group) {
+                return !group.attributes.folded;
+            });
+            var non_empty_groups = folded_groups_partiton[0];
+            var non_empty_folded_groups = folded_groups_partiton[1];
+            var empty_groups = empty_groups_partition[1];
             // Gather non-empty groups into 5 chunks, to trigger at most 5 RPCs as we can perform
             // up to 6 RPCs in parallel, and one is already used by the longpolling
             var chunks = [];
@@ -301,13 +306,21 @@ var KanbanView = View.extend({
                 });
             })).then(function () {
                 var computed_groups = _.flatten(Array.prototype.slice.call(arguments, 0));
-                // Create empty dataset for each empty group and re-insert those groups such that
-                // the original group order is kept
+                // Create empty dataset for each empty or folded group and re-insert those groups
+                // such that the original group order is kept
                 _.each(empty_groups, function (group) {
                     group.dataset = new data.DataSetSearch(self, self.dataset.model,
                         new data.CompoundContext(self.dataset.get_context(), group.model.context()), group.model.domain());
                     group.records = [];
                     group.is_empty = true;
+                    computed_groups.splice(_.indexOf(all_groups, group), 0, group);
+                });
+                _.each(non_empty_folded_groups, function (group) {
+                    group.dataset = new data.DataSetSearch(self, self.dataset.model,
+                        new data.CompoundContext(self.dataset.get_context(), group.model.context()), group.model.domain());
+                    group.dataset._length = group.attributes.length;
+                    group.records = [];
+                    group.lazy_loading = true; // to load records at unfolding
                     computed_groups.splice(_.indexOf(all_groups, group), 0, group);
                 });
                 return {
@@ -762,13 +775,14 @@ var KanbanView = View.extend({
     load_more: function (event) {
         var self = this;
         var column = event.target;
-        var offset = column.offset + this.limit;
+        var offset = column.loaded ? column.offset + this.limit : 0;
         return this.load_records(offset, column.dataset).then(function (result) {
             _.each(result.records, function (r) {
                 column.add_record(r, {no_update: true});
                 self.dataset.add_ids([r.id]);
             });
-            column.offset += self.limit;
+            column.loaded = true;
+            column.offset = offset;
             column.remaining = Math.max(column.remaining - self.limit, 0);
             column.update_column();
             self.postprocess_m2m_tags(column.records.slice(column.offset));
