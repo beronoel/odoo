@@ -307,9 +307,6 @@ var FormView = View.extend(common.FieldManagerMixin, {
             return $.Deferred().reject();
         }
         this.datarecord = record;
-        this._actualize_mode();
-        this.set({ 'title' : record.id ? record.display_name : _t("New") });
-        this.update_pager();
 
         this.record_loaded = $.Deferred();
         _(this.fields).each(function (field, f) {
@@ -319,6 +316,9 @@ var FormView = View.extend(common.FieldManagerMixin, {
             field._inhibit_on_change_flag = false;
             set_values.push(result);
         });
+        this._actualize_mode(); // call after updating the fields as it may trigger a re-rendering
+        this.set({ 'title' : record.id ? record.display_name : _t("New") });
+        this.update_pager(); // the mode must be actualized before updating the pager
         return $.when.apply(null, set_values).then(function() {
             if (!record.id) {
                 // trigger onchanges
@@ -685,9 +685,7 @@ var FormView = View.extend(common.FieldManagerMixin, {
         var self = this;
         return $.when(this.has_been_loaded).then(function() {
             return self.can_be_discarded().then(function() {
-                return self.load_defaults().then(function() {
-                    self.to_edit_mode();
-                });
+                return self.load_defaults();
             });
         });
     },
