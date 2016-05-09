@@ -272,7 +272,7 @@ class product_attribute(osv.osv):
 
 class product_attribute_value(osv.osv):
     _name = "product.attribute.value"
-    _order = 'sequence'
+    _order = 'sequence,id'
     def _get_price_extra(self, cr, uid, ids, name, args, context=None):
         result = dict.fromkeys(ids, 0)
         if not context.get('active_id'):
