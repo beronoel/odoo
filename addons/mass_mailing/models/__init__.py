@@ -7,3 +7,4 @@ import mail_thread
 import res_config
 import mass_mailing_report
 import link_tracker
+import mass_mailing_list
