@@ -51,6 +51,10 @@
             <field name="default_code">MISC</field>
             <field name="image" type="base64" file="point_of_sale/static/img/product_product_49-image.jpg"/>
         </record>
+
+        <record id="product.product_uom_categ_unit" model="product.uom.categ">
+            <field name="groupable">True</field>
+        </record>
     </data>
 </odoo>
 

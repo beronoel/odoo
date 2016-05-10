@@ -20,3 +20,18 @@ class ProductTemplate(models.Model):
             if self.env['pos.session'].search_count([('state', '!=', 'closed')]):
                 raise UserError(_('You cannot delete a product saleable in point of sale while a session is still opened.'))
         return super(ProductTemplate, self).unlink()
+
+class ProductUomCateg(models.Model):
+    _inherit = 'product.uom.categ'
+
+    groupable = fields.Boolean(string='Group Products', help="Check if you want to group products of this category in Point of Sale")
+
+class ProductUom(models.Model):
+    _inherit = 'product.uom'
+
+    groupable = fields.Boolean(related='category_id.groupable')
+    is_unit = fields.Boolean(compute='_compute_is_unit')
+
+    def _compute_is_unit(self):
+        for unit in self.filtered(lambda unit: unit.category_id == self.env.ref('product.product_uom_categ_unit')):
+            unit.is_unit = True

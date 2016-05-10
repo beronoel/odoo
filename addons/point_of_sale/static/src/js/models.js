@@ -172,13 +172,9 @@ exports.PosModel = Backbone.Model.extend({
         context: function(self){ return { active_test: false }; },
         loaded: function(self,units){
             self.units = units;
-            var units_by_id = {};
-            for(var i = 0, len = units.length; i < len; i++){
-                units_by_id[units[i].id] = units[i];
-                units[i].groupable = ( units[i].category_id[0] === 1 );
-                units[i].is_unit   = ( units[i].id === 1 );
-            }
-            self.units_by_id = units_by_id;
+            _.each(units, function(unit){
+                self.units_by_id[unit.id] = unit;
+            });
         }
     },{
         model:  'res.partner',
