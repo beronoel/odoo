@@ -890,42 +890,6 @@ class StockMove(models.Model):
             raise UserError(_('You can only delete draft moves.'))
         return super(StockMove, self).unlink()
 
-    @api.returns('self')
-    @api.multi
-    def action_scrap(self, quantity, location_id, restrict_lot_id=False, restrict_partner_id=False):
-        """ Move the scrap/damaged product into scrap location. Returns scrapped lines. """
-        # quantity should be given in MOVE UOM TDE FIXME: actually solve this comment
-        if quantity <= 0:
-            raise UserError(_('Please provide a positive quantity to scrap.'))
-
-        Quant = self.env["stock.quant"]
-        scrap_moves = self.env['stock.move']
-        for move in self:
-            new_move = move.copy({
-                'location_id': move.location_dest_id.id if move.state == 'done' else move.location_id.id,
-                'product_uom_qty': quantity,
-                'state': move.state,
-                'scrapped': True,
-                'location_dest_id': location_id,
-                'restrict_lot_id': restrict_lot_id,
-                'restrict_partner_id': restrict_partner_id,
-            })
-            scrap_moves |= new_move
-            if move.picking_id:
-                move.picking_id.message_post(body=_("%s %s %s has been <b>moved to</b> scrap.") % (quantity, move.product_id.uom_id.name or '', move.product_id.name))
-
-            # We "flag" the quant from which we want to scrap the products. To do so:
-            #    - we select the quants related to the move we scrap from
-            #    - we reserve the quants with the scrapped move
-            # See self.action_done, et particularly how is defined the "preferred_domain" for clarification
-
-            if move.state == 'done' and new_move.location_id.usage not in ('supplier', 'inventory', 'production'):
-                # We use scrap_move data since a reservation makes sense for a move not already done
-                quants = Quant.quants_get_preferred_domain(quantity, new_move, domain=[('qty', '>', 0), ('history_ids', 'in', [move.id])])
-                Quant.quants_reserve(quants, new_move)
-        scrap_moves.action_done()
-        return scrap_moves
-
     @api.multi
     def split(self, qty, restrict_lot_id=False, restrict_partner_id=False):
         """ Splits qty from move move into a new move
