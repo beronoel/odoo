@@ -230,9 +230,10 @@ class xml_decl(osv.TransientModel):
                 poline_ids = POL.search(
                     cr, uid, [('invoice_lines', 'in', inv_line.id)], context=context)
                 if poline_ids:
-                    purchaseorder = POL.browse(cr, uid, poline_ids[0], context=context).order_id
+                    purchaseorderlines = POL.browse(cr, uid, poline_ids, context=context)
+                    location_id = purchaseorderlines.mapped('move_ids.location_id')[:1].id
                     region_id = warehouse_mod.get_regionid_from_locationid(
-                        cr, uid, purchaseorder.location_id.id, context=context)
+                        cr, uid, location_id, context=context)
                     if region_id:
                         exreg = region_mod.browse(cr, uid, region_id).code
             elif inv_line.invoice_id.type in ('out_invoice', 'out_refund'):
