@@ -118,6 +118,17 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
 
         return $.when(this._super(), main_view_loaded, this.search_view_loaded);
     },
+    destroy: function() {
+        if (this.switch_buttons) {
+            if (this.switch_buttons.$multi) {
+                this.switch_buttons.$multi.off();
+            }
+            if (this.switch_buttons.$mono) {
+                this.switch_buttons.$mono.off();
+            }
+        }
+        return this._super.apply(this, arguments);
+    },
     /**
      * Loads all missing field_views of views in this.views and the search view.
      *
@@ -324,7 +335,7 @@ var ViewManager = Widget.extend(ControlPanelMixin, {
                     $switch_buttons.filter('.o_cp_switch_' + view.type).tooltip();
                 });
                 // Add onclick event listener
-                $switch_buttons.filter('button').click(_.debounce(function(event) {
+                $switch_buttons.on('click', _.debounce(function(event) {
                     var view_type = $(event.target).data('view-type');
                     self.switch_mode(view_type);
                 }, 200, true));
