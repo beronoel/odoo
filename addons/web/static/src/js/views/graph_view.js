@@ -43,6 +43,12 @@ var GraphView = View.extend({
         });
         return $.when(this._super(), fields_def);
     },
+    destroy: function () {
+        if (this.$buttons) {
+            this.$buttons.find('button').off(); // remove jquery's tooltip() handlers
+        }
+        return this._super.apply(this, arguments);
+    },
     /**
      * Render the buttons according to the GraphView.buttons and
      * add listeners on it.

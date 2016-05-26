@@ -51,6 +51,12 @@ var View = Widget.extend({
         this.$el.toggleClass('o_cannot_create', !this.is_action_enabled('create'));
         return this._super().then(this.trigger.bind(this, 'view_loaded'));
     },
+    destroy: function() {
+        if (this.$buttons) {
+            this.$buttons.off();
+        }
+        return this._super.apply(this, arguments);
+    },
     /**
      * Fetches and executes the action identified by ``action_data``.
      *
