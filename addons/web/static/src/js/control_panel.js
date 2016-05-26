@@ -71,6 +71,10 @@ var ControlPanel = Widget.extend({
 
         return this._super();
     },
+    destroy: function() {
+        this._clear_breadcrumbs_handlers();
+        return this._super.apply(this, arguments);
+    },
     /**
      * @return {Object} the Bus the ControlPanel is listening on
      */
@@ -101,9 +105,11 @@ var ControlPanel = Widget.extend({
             });
             var new_cp_content = status.cp_content || {};
 
-            // Render the breadcrumbs
+            // Render the new breadcrumbs
             if (status.breadcrumbs) {
-                new_cp_content.$breadcrumbs = this._render_breadcrumbs(status.breadcrumbs);
+                this._clear_breadcrumbs_handlers();
+                this.$breadcrumbs = this._render_breadcrumbs(status.breadcrumbs);
+                new_cp_content.$breadcrumbs = this.$breadcrumbs;
             }
 
             // Detach control_panel old content and attach new elements
@@ -189,18 +195,26 @@ var ControlPanel = Widget.extend({
      * Private function that renders a breadcrumbs' li Jquery element
      */
     _render_breadcrumbs_li: function (bc, index, length) {
-        var self = this;
         var is_last = (index === length-1);
         var li_content = _.escape(bc.title.trim()) || data.noDisplayContent;
         var $bc = $('<li>')
             .append(is_last ? li_content : $('<a>').html(li_content))
             .toggleClass('active', is_last);
         if (!is_last) {
-            $bc.click(function () {
-                self.trigger("on_breadcrumb_click", bc.action, bc.index);
-            });
+            $bc.click(this.trigger.bind(this, "on_breadcrumb_click", bc.action, bc.index));
         }
         return $bc;
+    },
+    /**
+     * Private function that removes event handlers attached on the currently
+     * displayed breadcrumbs.
+     */
+    _clear_breadcrumbs_handlers: function () {
+        if (this.$breadcrumbs) {
+            _.each(this.$breadcrumbs, function ($bc) {
+                $bc.off();
+            });
+        }
     },
     /**
      * Private function that updates the SearchView's visibility and extend the
