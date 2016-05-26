@@ -7,8 +7,8 @@
           <strong>Delivery Orders</strong>
         </div>
         <div>
-          <t t-foreach="order.picking_ids" t-as="i">
-            <t t-set="report_url" t-value="'/report/pdf/stock.report_picking/%s' % i.id"/>
+          <t t-foreach="order.picking_ids.filtered(lambda picking: picking.picking_type_id.code != 'internal')" t-as="i">
+            <t t-set="report_url" t-value="'/report/pdf/stock.report_deliveryslip/%s' % i.id"/>
             <div id='picking_info'>
               <a t-att-href="report_url"><span class="fa fa-download"/></a>
               <a t-att-href="report_url"><span t-field="i.name"/></a>
@@ -31,4 +31,18 @@
       </t>
     </xpath>
   </template>
+
+  <template id="report_picking_portal" inherit_id="stock.report_picking">
+    <xpath expr="//tr[@t-foreach='pack_operation_ids']" position="attributes">
+        <attribute name="groups">base.group_portal</attribute>
+        <attribute name="t-foreach">pack_operation_ids.sudo()</attribute>
+    </xpath>
+  </template>
+  <template id="report_deliveryslip_portal" inherit_id="stock.report_deliveryslip">
+    <xpath expr="//t[@t-foreach='docs']" position="attributes">
+        <attribute name="groups">base.group_portal</attribute>
+        <attribute name="t-foreach">docs.sudo()</attribute>
+    </xpath>
+  </template>
 </odoo>
+
