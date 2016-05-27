@@ -60,8 +60,10 @@ return core.Class.extend({
             this.unactivate_tip(tip);
             tour.current_step = tour.current_step + 1;
             this.active_tooltips[tour_name] = tour.steps[tour.current_step];
+            // to do: update localstorage
         } else {
             console.log('tour completed', tour);
+            // to do: contact server, consume tour, remove from localstorage
         }
     },
 });
