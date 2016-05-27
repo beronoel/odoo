@@ -1570,6 +1570,10 @@ var FieldMany2ManyBinaryMultiFiles = AbstractManyField.extend(common.Reinitializ
         this.fileupload_id = _.uniqueId('oe_fileupload_temp');
         $(window).on(this.fileupload_id, _.bind(this.on_file_loaded, this));
     },
+    destroy: function () {
+        $(window).off(this.fileupload_id);
+        return this._super.apply(this, arguments);
+    },
     get_file_url: function(attachment) {
         return '/web/content/' + attachment.id + '?download=true';
     },
