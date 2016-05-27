@@ -13,11 +13,12 @@ Tour.include({
         }
     },
     observe: function () {
-        var check_tooltip = _.throttle(this.check_for_tooltip.bind(this), 100, {leading: false});
+        var check_tooltip = _.throttle(this.check_for_tooltip.bind(this), 500, {leading: false});
         var observer = new MutationObserver(check_tooltip);
         observer.observe(document.body, {
             childList: true,
-            characterData: true
+            subtree: true,
+            // characterData: true
         });
     }
 });

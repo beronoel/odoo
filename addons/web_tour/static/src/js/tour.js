@@ -9,21 +9,18 @@ function getCurrentStep(name) {
     return parseInt(window.localStorage.getItem(key)) || 0;
 }
 
+
 return core.Class.extend({
     init: function() {
-        this.active_tooltips = [];
+        this.active_tooltips = {};
         this.tours = {};
     },
     register: function() {
         var args = Array.prototype.slice.call(arguments);
+        var last_arg = args[args.length - 1];
         var name = args[0];
         var options = args.length === 2 ? {} : args[1];
-        var steps = args[args.length - 1];
-
-        if (!(steps instanceof Array)) {
-            steps = [steps];
-        }
-        _.each(steps, function (step) {step.tour = name; });
+        var steps = last_arg instanceof Array ? last_arg : [last_arg];
         var tour = {
             name: name,
             current_step: getCurrentStep(name),
@@ -31,38 +28,38 @@ return core.Class.extend({
             url: options.url,
         };
         this.tours[name] = tour;
-        this.active_tooltips.push(steps[tour.current_step]);
+        this.active_tooltips[name] = steps[tour.current_step];
     },
      check_for_tooltip: function() {
         var self = this;
-        _.each(this.active_tooltips, function (tip) {
-            console.log('checking for', tip);
+        _.each(this.active_tooltips, function (tip, tour) {
             var $trigger = $(tip.trigger).filter(':visible').first();
-            var triggered = $trigger.length && (tip.extra_trigger ? $(tip.extra_trigger).filter(':visible').length : true);
-            if (triggered && !tip.tip) {
-                console.log('tip activated', tip);
-                var _tip = new Tip(self, $trigger, tip);
-                tip.tip = _tip;
-                _tip.appendTo($trigger);
-                _tip.on('tip_consumed', self, self.consume_tip.bind(self, tip));
+            var extra_trigger = tip.extra_trigger ? $(tip.extra_trigger).filter(':visible').length : true;
+            var triggered = $trigger.length && extra_trigger;
+            if (triggered && !tip.widget) {
+                self.activate_tip(tip, tour, $trigger);
             }
-            if (!triggered && tip.tip) {
-                console.log('tip deactivated', tip);
-                tip.tip.destroy();
-                delete tip.tip;
+            if (!triggered && tip.widget) {
+                self.unactivate_tip(tip);
             }
         });
     },
-    consume_tip: function(tip) {
-        console.log('consumed', tip, this.tours);
-        this.active_tooltips = _.without(this.active_tooltips, tip);
-        var tour = this.tours[tip.tour];
+    activate_tip: function(tip, tour, $anchor) {
+        tip.widget = new Tip(this, $anchor, tip);
+        tip.widget.appendTo(document.body);
+        tip.widget.on('tip_consumed', this, this.consume_tip.bind(this, tip, tour));
+    },
+    unactivate_tip: function(tip) {
+        tip.widget.destroy();
+        delete tip.widget;
+    },
+    consume_tip: function(tip, tour_name) {
+        delete this.active_tooltips[tour_name];
+        var tour = this.tours[tour_name];
         if (tour.current_step < tour.steps.length - 1) {
-            tip.tip.destroy();
-            delete tip.tip;
+            this.unactivate_tip(tip);
             tour.current_step = tour.current_step + 1;
-            this.active_tooltips.push(tour.steps[tour.current_step]);
-            console.log('active step', tour.steps[tour.current_step]);
+            this.active_tooltips[tour_name] = tour.steps[tour.current_step];
         } else {
             console.log('tour completed', tour);
         }

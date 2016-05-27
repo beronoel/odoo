@@ -31,8 +31,7 @@ return Widget.extend({
     },
     to_info_mode: function() {
         this.$breathing.fadeOut(300);
-        this.$popover = this.$popover || this.$el.popover({
-            title: this.info.title,
+        this.$popover = this.$popover || this.$anchor.popover({
             content: this.info.content,
             html: true,
             animation: false,
@@ -42,8 +41,11 @@ return Widget.extend({
         this.$popover.popover('show');
     },
     to_bubble_mode: function () {
+        console.log('to bubble mode');
         this.$breathing.show();
-        this.$popover.popover('hide');
+        if (this.$popover) {
+            this.$popover.popover('hide');
+        }
     },
 });
 
