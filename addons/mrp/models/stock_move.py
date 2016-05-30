@@ -3,7 +3,7 @@
 
 import time
 
-from odoo import api, fields, models, _
+from odoo import api, exceptions, fields, models, _
 from odoo.tools import float_compare, DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons import decimal_precision as dp
 
@@ -116,6 +116,12 @@ class StockMove(models.Model):
         res = super(StockMove, self).action_assign(no_prepare=no_prepare)
         self.check_move_lots()
         return res
+
+    @api.multi
+    def action_cancel(self):
+        if any(move.quantity_done for move in self):
+            raise exceptions.UserError(_('You cannot cancel a move move having already consumed material'))
+        return super(StockMove, self).action_cancel()
 
     @api.multi
     def check_move_lots(self):

@@ -28,7 +28,7 @@
                                 <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                                 <field name="sequence" groups="base.group_no_one"/>
                             </group><group>
-                                <field name="wo_count" invisible="1"/>
+                                <field name="workorder_count" invisible="1"/>
                                 <field name="time_mode" widget="radio"/>
                                 <label for="time_mode_batch" attrs="{'invisible': [('time_mode','=','manual')]}"/>
                                 <div attrs="{'invisible': [('time_mode','=','manual')]}">
@@ -93,7 +93,7 @@
                         </group>
                         <notebook>
                             <page string="Work Center Operations">
-                                <field name="workorder_ids" string="Operation"/>
+                                <field name="operation_ids"/>
                             </page>
                             <page string="Notes">
                                 <field name="note"/>

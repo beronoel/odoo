@@ -89,8 +89,8 @@ class TestWorkOrderProcess(common.TransactionCase):
 
         workorders = production_table.workorder_ids
         self.assertEqual(workorders[0].state, 'ready', "First workorder state should be ready.")
-        self.assertEqual(workorders[1].state, 'pending', "Workorder state should be pending.")
-        self.assertEqual(workorders[2].state, 'pending', "Workorder state should be pending.")
+        self.assertEqual(workorders[1].state, 'pending')
+        self.assertEqual(workorders[2].state, 'pending')
 
         # --------------------------------------------------------------
         # Process cutting operation...
@@ -221,8 +221,8 @@ class TestWorkOrderProcess(common.TransactionCase):
 
         # Check current status of raw materials.
         for move in mo_custom_laptop.move_raw_ids:
-            self.assertEqual(move.product_uom_qty, 20, "Wrong consume quantity of raw material %s"% (move.product_id.name))
-            self.assertEqual(move.quantity_done, 0, "Wrong produced quantity on raw material %s"% (move.product_id.name))
+            self.assertEqual(move.product_uom_qty, 20, "Wrong consume quantity of raw material %s: %s instead of %s"% (move.product_id.name, move.product_uom_qty, 20))
+            self.assertEqual(move.quantity_done, 0, "Wrong produced quantity on raw material %s: %s instead of %s"% (move.product_id.name, move.quantity_done, 0))
 
         # -----------------
         # Start production
@@ -355,10 +355,10 @@ class TestWorkOrderProcess(common.TransactionCase):
         move_product_c = mo_custom_product.move_raw_ids.filtered(lambda x : x.product_id == product_C)
 
         # Check move correctly created or not.
-        self.assertEqual(move_product_b.product_uom_qty, 20 , "Wrong consume quantity of raw materials.")
-        self.assertEqual(move_product_b.product_uom.id, unit, "Wrong unit of measure in rawmaterial.")
-        self.assertEqual(move_product_c.product_uom_qty, 3000, "Wrong consume quantity of raw materials.")
-        self.assertEqual(move_product_c.product_uom.id, gm, "Wrong unit of measure in rawmaterial.")
+        self.assertEqual(move_product_b.product_uom_qty, 20 )
+        self.assertEqual(move_product_b.product_uom.id, unit)
+        self.assertEqual(move_product_c.product_uom_qty, 3000)
+        self.assertEqual(move_product_c.product_uom.id, gm)
 
         # Lot create for product B and product C
         # ---------------------------------------

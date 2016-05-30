@@ -17,14 +17,14 @@ class ProcurementRule(models.Model):
 class ProcurementOrder(models.Model):
     _inherit = 'procurement.order'
 
-    bom_id = fields.Many2one('mrp.bom', 'BoM', ondelete='cascade', select=True)
+    bom_id = fields.Many2one('mrp.bom', 'BoM', index=True, ondelete='cascade')
     production_id = fields.Many2one('mrp.production', 'Manufacturing Order')
 
     @api.multi
     def propagate_cancels(self):
-        to_propagate = self.filtered(lambda procurement: procurement.rule_id.action == 'manufacture' and procurement.production_id).mapped('production_id')
-        if to_propagate:
-            to_propagate.action_cancel()
+        cancel_man_orders = self.filtered(lambda procurement: procurement.rule_id.action == 'manufacture' and procurement.production_id).mapped('production_id')
+        if cancel_man_orders:
+            cancel_man_orders.action_cancel()
         return super(ProcurementOrder, self).propagate_cancels()
 
     @api.multi
@@ -32,7 +32,7 @@ class ProcurementOrder(models.Model):
         self.ensure_one()
         if self.rule_id and self.rule_id.action == 'manufacture':
             # make a manufacturing order for the procurement
-            return self.make_mo()[self.id]
+            return self.create_production_orders()[self.id]
         return super(ProcurementOrder, self)._run()
 
     @api.multi
@@ -43,15 +43,13 @@ class ProcurementOrder(models.Model):
         return super(ProcurementOrder, self)._check()
 
     @api.multi
-    def check_bom_exists(self):
-        """ Finds the bill of material for the product from procurement order.
-        @return: True or False
-        """
-        for procurement in self:
-            bom = self.env['mrp.bom']._bom_find(product=procurement.product_id)
-            if not bom:
-                return False
-        return True
+    def _get_matching_bom(self):
+        """ Finds the bill of material for the product from procurement order. """
+        if self.bom_id:
+            return self.bom_id
+        return self.env['mrp.bom'].with_context(
+            company_id=self.company_id.id, force_company=self.company_id.id
+        )._bom_find(product=self.product_id, picking_type=self.rule_id.picking_type_id)  # TDE FIXME: context bullshit
 
     def _get_date_planned(self):
         # TDE FIXME: dead code, was called in prepare mo vals
@@ -60,13 +58,7 @@ class ProcurementOrder(models.Model):
         date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
         return date_planned
 
-    def _prepare_mo_vals(self):
-        BoM = self.env['mrp.bom'].with_context(company_id=self.company_id.id, force_company=self.company_id.id)  # TDE FIXME: context bullshit
-        if self.bom_id:
-            bom = self.bom_id
-        else:
-            bom = BoM._bom_find(product=self.product_id,
-                                picking_type=self.rule_id.picking_type_id)
+    def _prepare_mo_vals(self, bom):
         return {
             'origin': self.origin,
             'product_id': self.product_id.id,
@@ -84,17 +76,16 @@ class ProcurementOrder(models.Model):
         }
 
     @api.multi
-    def make_mo(self):
-        """ Make Manufacturing(production) order from procurement
-        @return: New created Production Orders procurement wise
-        """
+    def create_production_orders(self):
+        """ Create production orders from procurements """
         res = {}
         Production = self.env['mrp.production']
         for procurement in self:
             ProductionSudo = Production.sudo().with_context(force_company=procurement.company_id.id)
-            if procurement.check_bom_exists():
+            bom = procurement._get_matching_bom()
+            if bom:
                 # create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
-                production = ProductionSudo.create(procurement._prepare_mo_vals())
+                production = ProductionSudo.create(procurement._prepare_mo_vals(bom))
                 res[procurement.id] = production.id
                 procurement.write({'production_id': production.id})
                 procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))

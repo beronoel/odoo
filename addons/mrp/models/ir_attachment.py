@@ -15,5 +15,5 @@ class IrAttachment(models.Model):
     _inherit = 'ir.attachment'
     _order = "priority desc"
 
-    #  TDE CLEANME: this should be removed, complicated without any gain
+    #  TDE FIXME: I really don't like having a priority on attachments. Maybe starring it.
     priority = fields.Selection(AVAILABLE_PRIORITIES, help="Gives the sequence order when displaying a list of tasks.")

@@ -17,8 +17,8 @@ class MrpRouting(models.Model):
         'Reference',
         copy=False, default=lambda self: _('New'), readonly=True)
     note = fields.Text('Description')
-    workorder_ids = fields.One2many(
-        'mrp.routing.workcenter', 'routing_id', 'Work Center Usage',
+    operation_ids = fields.One2many(
+        'mrp.routing.workcenter', 'routing_id', 'Operations',
         copy=True, oldname='workcenter_lines')
     location_id = fields.Many2one(
         'stock.location', 'Production Location',
@@ -33,7 +33,7 @@ class MrpRouting(models.Model):
     def create(self, vals):
         # TDE CLEANME: strange
         if 'code' not in vals or vals['code'] == _('New'):
-            vals['code'] = self.env['ir.sequence'].next_by_code('mrp.routing') or '/'
+            vals['code'] = self.env['ir.sequence'].next_by_code('mrp.routing') or _('New')
         return super(MrpRouting, self).create(vals)
 
 
@@ -42,8 +42,8 @@ class MrpRoutingWorkcenter(models.Model):
     _description = 'Work Center Usage'
     _order = 'sequence, id'
 
-    workcenter_id = fields.Many2one('mrp.workcenter', 'Work Center', required=True)
     name = fields.Char('Operation', required=True)
+    workcenter_id = fields.Many2one('mrp.workcenter', 'Work Center', required=True)
     sequence = fields.Integer(
         'Sequence', default=100,
         help="Gives the sequence order when displaying a list of routing Work Centers.")
@@ -67,8 +67,8 @@ class MrpRoutingWorkcenter(models.Model):
         'Manual Duration', default=60,
         help="Time in minutes")
     time_cycle = fields.Float('Duration', compute="_get_time_cycle")
-    # TDE CHECKME: be coherent in naming
-    wo_count = fields.Integer("# of Work Orders", compute="_wo_count")
+    # TDE FIXME: unnecessary, as used in views and strangely used (to hide manual if at least one order ?)
+    workorder_count = fields.Integer("# Work Orders", compute="_compute_workorder_count")
     batch = fields.Selection([
         ('no',  'Once all products are processed'),
         ('yes', 'Once a minimum number of products is processed')], string='Next Operation',
@@ -92,11 +92,10 @@ class MrpRoutingWorkcenter(models.Model):
                 operation.time_cycle = operation.time_cycle_manual
 
     @api.multi
-    def _wo_count(self):
-        # TDE CLEANME
-        result = self.env['mrp.workorder'].read_group([
+    def _compute_workorder_count(self):
+        data = self.env['mrp.workorder'].read_group([
             ('operation_id', 'in', self.ids),
             ('state', '=', 'done')], ['operation_id'], ['operation_id'])
-        mapped_data = dict([(op['operation_id'][0], op['operation_id_count']) for op in result])
+        count_data = dict((item['operation_id'][0], item['operation_id_count']) for item in data)
         for operation in self:
-            operation.wo_count = mapped_data.get(operation.id, 0)
+            operation.wo_count = count_data.get(operation.id, 0)
