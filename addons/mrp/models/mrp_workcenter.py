@@ -19,94 +19,114 @@ class MrpWorkcenter(models.Model):
         'Capacity', default=1.0, oldname='capacity_per_cycle',
         help="Number of pieces that can be produced in parallel.")
     sequence = fields.Integer(
-        'Sequence',
-        default=1, required=True,
+        'Sequence', default=1, required=True,
         help="Gives the sequence order when displaying a list of work centers.")
     color = fields.Integer('Color')
-    time_start = fields.Float(
-        'Time before prod.', help="Time in minutes for the setup.")
-    time_stop = fields.Float(
-        'Time after prod.', help="Time in minutes for the cleaning.")
-    resource_id = fields.Many2one(
-        'resource.resource', string='Resource',
-        ondelete='cascade', required=True)
-    order_ids = fields.One2many(
-        'mrp.workorder', 'workcenter_id', "Orders")
-    routing_line_ids = fields.One2many(
-        'mrp.routing.workcenter', 'workcenter_id', "Routing Lines")
-    # TDE CHECKME: naming to be more coherent
-    nb_orders = fields.Integer('Computed Orders', compute='_compute_orders')
-    count_ready_order = fields.Integer('Total Ready Orders', compute='_compute_orders')
-    count_progress_order = fields.Integer('Total Running Orders', compute='_compute_orders')
+    time_start = fields.Float('Time before prod.', help="Time in minutes for the setup.")
+    time_stop = fields.Float('Time after prod.', help="Time in minutes for the cleaning.")
+    resource_id = fields.Many2one('resource.resource', 'Resource', ondelete='cascade', required=True)
+    routing_line_ids = fields.One2many('mrp.routing.workcenter', 'workcenter_id', "Routing Lines")
+
+    order_ids = fields.One2many('mrp.workorder', 'workcenter_id', "Orders")
+    workorder_count = fields.Integer('# Work Orders', compute='_compute_workorder_count')
+    workorder_ready_count = fields.Integer('# Read Work Orders', compute='_compute_workorder_ready_count')
+    workorder_progress_count = fields.Integer('Total Running Orders', compute='_compute_workorder_progress_count')
+
+    time_ids = fields.One2many('mrp.workcenter.productivity', 'workcenter_id', 'Time Logs')
     working_state = fields.Selection([
         ('normal', 'Normal'),
         ('blocked', 'Blocked'),
-        ('done', 'In Progress')], string='Status',
-        default="normal", compute="_compute_working_state")  # TDE FIXME: store ?
+        ('done', 'In Progress')], 'Status', compute="_compute_working_state")  # TDE FIXME: store ?
+    blocked_time = fields.Float(
+        'Blocked Time', compute='_compute_blocked_time',
+        help='Blocked hours over the last month')
+    productive_time = fields.Float(
+        'Productive Time', compute='_compute_productive_time',
+        help='Productive hours over the last month')
     oee = fields.Float(compute='_compute_oee', help='Overall Equipment Efficiency, based on the last month')
-    blocked_time = fields.Float(compute='_compute_oee', help='Blocked Hours over the last month')
     oee_target = fields.Float(string='OEE Target', help="OEE Target in percentage", default=90)
-    # TDE CHECKME: naming
-    stat_perf = fields.Integer(compute='_compute_perf', help='Performance over the last month: (expected duration - real duration) / expected duration')
+    performance = fields.Integer('Performance', compute='_compute_performance', help='Performance over the last month')
 
-    @api.depends('order_ids')
-    def _compute_orders(self):
-        WorkcenterLine = self.env['mrp.workorder']
+    @api.depends('order_ids.workcenter_id', 'order_ids.state')
+    def _compute_workorder_count(self):
+        data = self.env['mrp.workorder'].read_group([('workcenter_id', 'in', self.ids), ('state', '!=', 'done')], ['workcenter_id'], ['workcenter_id'])
+        count_data = dict((item['workcenter_id'][0], item['workcenter_id_count']) for item in data)
         for workcenter in self:
-            workcenter.nb_orders = WorkcenterLine.search_count([('workcenter_id', '=', workcenter.id), ('state', '!=', 'done')])  #('state', 'in', ['pending', 'startworking'])
-            workcenter.count_ready_order = WorkcenterLine.search_count([('workcenter_id', '=', workcenter.id), ('state', '=', 'ready')])
-            workcenter.count_progress_order = WorkcenterLine.search_count([('workcenter_id', '=', workcenter.id), ('state', '=', 'progress')])
+            workcenter.workorder_count = count_data.get(workcenter.id, 0)
+
+    @api.depends('order_ids.workcenter_id', 'order_ids.state')
+    def _compute_workorder_ready_count(self):
+        data = self.env['mrp.workorder'].read_group([('workcenter_id', 'in', self.ids), ('state', '=', 'ready')], ['workcenter_id'], ['workcenter_id'])
+        count_data = dict((item['workcenter_id'][0], item['workcenter_id_count']) for item in data)
+        for workcenter in self:
+            workcenter.workorder_ready_count = count_data.get(workcenter.id, 0)
+
+    @api.depends('order_ids.workcenter_id', 'order_ids.state')
+    def _compute_workorder_progress_count(self):
+        data = self.env['mrp.workorder'].read_group([('workcenter_id', 'in', self.ids), ('state', '=', 'progress')], ['workcenter_id'], ['workcenter_id'])
+        count_data = dict((item['workcenter_id'][0], item['workcenter_id_count']) for item in data)
+        for workcenter in self:
+            workcenter.workorder_progress_count = count_data.get(workcenter.id, 0)
 
     @api.multi
+    @api.depends('time_ids.date_end', 'time_ids.loss_type')
     def _compute_working_state(self):
         for workcenter in self:
-            last = self.env['mrp.workcenter.productivity'].search([('workcenter_id', '=', workcenter.id)], limit=1)
-            if (not last) or (last[0].date_end):
+            time_log = self.env['mrp.workcenter.productivity'].search([('workcenter_id', '=', workcenter.id)], limit=1)
+            if not time_log or time_log.date_end:
                 workcenter.working_state = 'normal'
-            elif last[0].loss_type in ('productive', 'performance'):
+            elif time_log.loss_type in ('productive', 'performance'):
                 workcenter.working_state = 'done'
             else:
                 workcenter.working_state = 'blocked'
 
     @api.multi
-    def _compute_oee(self):
-        prod_obj = self.env['mrp.workcenter.productivity']
-        # TDE FIXME: please stop using custom formating
-        date = (datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-%d %H:%M:%S')
-        domain = [
-            ('date_start', '>=', date),
+    def _compute_blocked_time(self):
+        # TDE FIXME: productivity loss type should be only losses, probably count other time logs differently
+        data = self.env['mrp.workcenter.productivity'].read_group([
+            ('date_start', '>=', fields.Datetime.to_string(datetime.datetime.now() - relativedelta.relativedelta(months=1))),
             ('workcenter_id', 'in', self.ids),
-            ('date_end', '!=', False)
-        ]
-
-        wcs_block = prod_obj.read_group(domain+[('loss_type', '!=', 'productive')], ['duration', 'workcenter_id'], ['workcenter_id'], lazy=False)
-        wcs_productive = prod_obj.read_group(domain+[('loss_type', '=', 'productive')], ['duration', 'workcenter_id'], ['workcenter_id'], lazy=False)
-        wcs_block = dict(map(lambda x: (x['workcenter_id'][0], x['duration']), wcs_block))
-        wcs_productive = dict(map(lambda x: (x['workcenter_id'][0], x['duration']), wcs_productive))
+            ('date_end', '!=', False),
+            ('loss_type', '!=', 'productive')],
+            ['duration', 'workcenter_id'], ['workcenter_id'], lazy=False)
+        count_data = dict((item['workcenter_id'][0], item['duration']) for item in data)
         for workcenter in self:
-            workcenter.blocked_time = wcs_block.get(workcenter.id)
-            if wcs_productive.get(workcenter.id) and wcs_block.get(workcenter.id):
-                workcenter.oee = round(wcs_productive.get(workcenter.id, 0.0) * 100.0 / (wcs_productive.get(workcenter.id, 0.0) + wcs_block.get(workcenter.id)), 2)
-            else:
-                workcenter.oee = 0.0
+            workcenter.blocked_time = count_data.get(workcenter.id, 0.0)
 
     @api.multi
-    def _compute_perf(self):
-        prod_obj = self.env['mrp.workorder']
-        date = (datetime.datetime.now() - relativedelta.relativedelta(months=1)).strftime('%Y-%m-%d %H:%M:%S')
-        domain = [
-            ('date_start', '>=', date),
+    def _compute_productive_time(self):
+        # TDE FIXME: productivity loss type should be only losses, probably count other time logs differently
+        data = self.env['mrp.workcenter.productivity'].read_group([
+            ('date_start', '>=', fields.Datetime.to_string(datetime.datetime.now() - relativedelta.relativedelta(months=1))),
             ('workcenter_id', 'in', self.ids),
-            ('state', '=', 'done')
-        ]
-        wo = prod_obj.read_group(domain, ['duration', 'workcenter_id', 'delay'], ['workcenter_id'], lazy=False)
-        duration = dict(map(lambda x: (x['workcenter_id'][0], x['duration']), wo))
-        delay = dict(map(lambda x: (x['workcenter_id'][0], x['delay']), wo))
+            ('date_end', '!=', False),
+            ('loss_type', '=', 'productive')],
+            ['duration', 'workcenter_id'], ['workcenter_id'], lazy=False)
+        count_data = dict((item['workcenter_id'][0], item['duration']) for item in data)
         for workcenter in self:
-            if delay.get(workcenter.id, 0.0):
-                workcenter.stat_perf = 100 * (duration.get(workcenter.id, 0.0)-delay.get(workcenter.id, 0.0)) / delay.get(workcenter.id, 0.0)
+            workcenter.productive_time = count_data.get(workcenter.id, 0.0)
+
+    @api.depends('blocked_time', 'productive_time')
+    @api.one
+    def _compute_oee(self):
+        if self.productive_time:
+            self.oee = round(self.productive_time * 100.0 / (self.productive_time + self.blocked_time), 2)
+        else:
+            self.oee = 0.0
+
+    @api.multi
+    def _compute_performance(self):
+        wo_data = self.env['mrp.workorder'].read_group([
+            ('date_start', '>=', fields.Datetime.to_string(datetime.datetime.now() - relativedelta.relativedelta(months=1))),
+            ('workcenter_id', 'in', self.ids),
+            ('state', '=', 'done')], ['duration_expected', 'workcenter_id', 'duration'], ['workcenter_id'], lazy=False)
+        duration_expected = dict((data['workcenter_id'][0], data['duration_expected']) for data in wo_data.values())
+        duration = dict((data['workcenter_id'][0], data['duration']) for data in wo_data.values())
+        for workcenter in self:
+            if duration.get(workcenter.id):
+                workcenter.performance = 100 * duration_expected.get(workcenter.id, 0.0) / duration[workcenter.id]
             else:
-                workcenter.stat_perf = 0.0
+                workcenter.performance = 0.0
 
     @api.multi
     @api.constrains('capacity')
@@ -144,11 +164,8 @@ class MrpWorkcenterProductivity(models.Model):
     _description = "Workcenter Productivity Log"
     _order = "id desc"
 
-    workcenter_id = fields.Many2one(
-        'mrp.workcenter', "Workcenter",
-        required=True)
-    workorder_id = fields.Many2one(
-        'mrp.workorder', 'Work Order')
+    workcenter_id = fields.Many2one('mrp.workcenter', "Workcenter", required=True)
+    workorder_id = fields.Many2one('mrp.workorder', 'Work Order')
     user_id = fields.Many2one(
         'res.users', "User",
         default=lambda self: self.env.uid)
@@ -158,14 +175,14 @@ class MrpWorkcenterProductivity(models.Model):
     loss_type = fields.Selection(
         "Effectiveness", related='loss_id.loss_type', store=True)
     description = fields.Text('Description')
-    date_start = fields.Datetime('Start Date', default=fields.Datetime.now())
+    date_start = fields.Datetime('Start Date', default=fields.Datetime.now(), required=True)
     date_end = fields.Datetime('End Date')
     duration = fields.Float('Duration', compute='_compute_duration', store=True)
 
     @api.depends('date_end', 'date_start')
     def _compute_duration(self):
         for blocktime in self:
-            if blocktime.date_end and blocktime.date_start:
+            if blocktime.date_end:
                 diff = fields.Datetime.from_string(blocktime.date_end) - fields.Datetime.from_string(blocktime.date_start)
                 blocktime.duration = round(diff.total_seconds() / 60.0, 2)
             else:

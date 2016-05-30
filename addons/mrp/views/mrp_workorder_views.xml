@@ -83,9 +83,9 @@
                 <field name="date_planned_start"/>
                 <field name="workcenter_id" widget="selection"/>
                 <field name="production_id"/>
-                <field name="product"/>
-                <field name="qty"/>
-                <field name="uom"/>
+                <field name="product_id"/>
+                <field name="qty_production"/>
+                <field name="product_uom_id"/>
                 <field name="state"/>
             </tree>
         </field>
@@ -116,13 +116,13 @@
                 <div class="oe_button_box" name="button_box"/>
                 <group>
                     <group>
-                        <field name="product" string="To Produce"/>
+                        <field name="product_id" string="To Produce"/>
                         <label for="qty_produced" string="Quantity Produced"/>
                         <div class="o_row">
                             <field name="qty_produced"/> /
-                            <field name="qty"/>
-                            <field name="uom" widget="selection"/>
-                            <field name="availability" nolabel="1" widget="bullet_state" options="{'classes': {'assigned': 'success', 'waiting': 'danger'}}" attrs="{'invisible': [('state', '=', 'done')]}"/>
+                            <field name="qty_production"/>
+                            <field name="product_uom_id"/>
+                            <field name="production_availability" nolabel="1" widget="bullet_state" options="{'classes': {'assigned': 'success', 'waiting': 'danger'}}" attrs="{'invisible': [('state', '=', 'done')]}"/>
                         </div>
                         <field name="is_produced" invisible="1"/>
                     </group>
@@ -138,9 +138,9 @@
                 <page string="Current Production">
                     <group>
                         <group>
-                            <field name="qty_producing" string="Current Qty" attrs="{'readonly': [('has_tracking', '=', 'serial')]}"/>
-                            <field name="final_lot_id" context="{'default_product_id': product}" attrs="{'invisible': [('has_tracking', '=', 'none')]}" groups="stock.group_production_lot"/>
-                            <field name="has_tracking" invisible="1"/>
+                            <field name="qty_producing" string="Current Qty" attrs="{'readonly': [('product_tracking', '=', 'serial')]}"/>
+                            <field name="final_lot_id" context="{'default_product_id': product}" attrs="{'invisible': [('product_tracking', '=', 'none')]}" groups="stock.group_production_lot"/>
+                            <field name="product_tracking" invisible="1"/>
                         </group>
                     </group>
                     <field name="move_raw_ids" invisible="1"/>
@@ -160,9 +160,9 @@
                             <label for="date_planned_start" string="Planned Date"/>
                             <div class="o_row">
                                 from <field name="date_planned_start"/>
-                                <div attrs="{'invisible': [('date_planned_end', '=', False)]}">
+                                <div attrs="{'invisible': [('date_planned_finished', '=', False)]}">
                                     to
-                                    <field name="date_planned_end"/>
+                                    <field name="date_planned_finished"/>
                                 </div>
                             </div>
                             <label for="date_start" string="Effective Date"/>
@@ -175,15 +175,15 @@
                             </div>
                         </group>
                         <group>
-                            <label for="duration"/>
+                            <label for="duration_expected"/>
                             <div>
-                                <field name="duration" widget="float_time" class="oe_inline"/>
+                                <field name="duration_expected" widget="float_time" class="oe_inline"/>
                                 minutes
                             </div>
-                            <label for="delay"/>
+                            <label for="duration"/>
                             <div>
                                 <button style="pointer-events: none;" class="oe_inline label label-default">
-                                    <field name="delay" widget="mrp_time_counter"/>
+                                    <field name="duration" widget="mrp_time_counter"/>
                                 </button>
                             </div>
                         </group>
@@ -245,7 +245,7 @@
                 <filter string="Ready" name="ready" domain="[('state','=','ready')]"/>
                 <filter string="Pending" name="pending" domain="[('state','=','pending')]"/>
                 <filter string="Finished" name="finish" domain="[('state','=','done')]"/>
-                <filter string="Available" domain="[('availability','=', 'assigned')]"/>
+                <filter string="Available" domain="[('production_availability','=', 'assigned')]"/>
                 <separator/>
                 <filter string="Late" domain="['&amp;', ('date_planned_start','&lt;', current_date), ('state', '=', 'ready')]"
                     help="Production started late"/>
@@ -265,7 +265,7 @@
         <field name="name">mrp.production.work.order.calendar</field>
         <field name="model">mrp.workorder</field>
         <field name="arch" type="xml">
-            <calendar color="workcenter_id" date_stop="date_planned_end" date_start="date_planned_start" string="Operations">
+            <calendar color="workcenter_id" date_stop="date_planned_finished" date_start="date_planned_start" string="Operations">
                 <field name="workcenter_id"/>
                 <field name="production_id"/>
             </calendar>
@@ -278,7 +278,7 @@
         <field name="arch" type="xml">
             <graph string="Operations">
                 <field name="production_id"/>
-                <field name="delay_percent" type="measure"/>
+                <field name="duration_percent" type="measure"/>
             </graph>
         </field>
     </record>
@@ -290,8 +290,8 @@
             <pivot string="Operations">
                 <field name="date_start"/>
                 <field name="operation_id"/>
-                <field name="delay" type="measure"/>
                 <field name="duration" type="measure"/>
+                <field name="duration_expected" type="measure"/>
             </pivot>
         </field>
     </record>
@@ -301,7 +301,7 @@
         <field name="name">mrp.production.work.order.gantt.production</field>
         <field name="model">mrp.workorder</field>
         <field name="arch" type="xml">
-            <gantt date_stop="date_planned_end" date_start="date_planned_start" string="Operations" default_group_by="production_id">
+            <gantt date_stop="date_planned_finished" date_start="date_planned_start" string="Operations" default_group_by="production_id">
             </gantt>
         </field>
     </record>
@@ -310,7 +310,7 @@
         <field name="name">mrp.production.work.order.gantt.workcenter</field>
         <field name="model">mrp.workorder</field>
         <field name="arch" type="xml">
-            <gantt date_stop="date_planned_end" date_start="date_planned_start" string="Operations" default_group_by="workcenter_id">
+            <gantt date_stop="date_planned_finished" date_start="date_planned_start" string="Operations" default_group_by="workcenter_id">
             </gantt>
         </field>
     </record>
@@ -324,19 +324,19 @@
                 <field name="production_id"/>
                 <field name="state"/>
                 <field name="workcenter_id"/>
-                <field name="product"/>
-                <field name="qty"/>
-                <field name="uom"/>
+                <field name="product_id"/>
+                <field name="qty_production"/>
+                <field name="product_uom_id"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-class="oe_kanban_card oe_kanban_global_click">
                             <div class="oe_kanban_content">
                                 <div>
-                                    <span><strong><t t-esc="record.product.value"/></strong></span>
+                                    <span><strong><t t-esc="record.product_id.value"/></strong></span>
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-7 o_kanban_primary_left">
-                                        <span><t t-esc="record.qty.value"/> <t t-esc="record.uom.value"/></span>
+                                        <span><t t-esc="record.qty_production.value"/> <t t-esc="record.product_uom_id.value"/></span>
                                     </div>
                                     <div class="col-xs-5 o_kanban_primary_right">
                                         <span><t t-esc="record.production_id.value"/></span>

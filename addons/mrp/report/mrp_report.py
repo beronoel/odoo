@@ -21,7 +21,7 @@ class WorkCenterLoad(models.Model):
                 SELECT
                     min(wl.id) as id,
                     to_char(p.date_planned,'YYYY:mm:dd') as name,
-                    SUM(wl.duration) AS duration,
+                    SUM(wl.duration_expected) AS duration,
                     wl.workcenter_id as workcenter_id
                 FROM
                     mrp_workorder wl

@@ -21,7 +21,7 @@ class MrpProductionMessage(models.Model):
     product_id = fields.Many2one('product.product', string="Product")
     bom_id = fields.Many2one('mrp.bom', 'Bill of Material', domain="[('product_id', '=', product_id)]")
     workcenter_id = fields.Many2one('mrp.workcenter', string='Work Center')
-    valid_until = fields.Date(default=_default_valid_until, required=True)
+    valid_until = fields.Date('Validity Date', default=_default_valid_until, required=True)
     routing_id = fields.Many2one('mrp.routing', string='Routing')
 
     @api.depends('message')

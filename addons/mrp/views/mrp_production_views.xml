@@ -49,7 +49,7 @@
                     <button name="action_assign" attrs="{'invisible': [('availability', '=', 'assigned')]}" string="Check availability" type="object" class="oe_highlight"/>
                     <button name="button_plan" attrs="{'invisible': ['|', ('state', '!=', 'confirmed'), ('routing_id', '=', False)]}" type="object" string="Create Workorders" class="oe_highlight"/>
                     <button name="%(act_mrp_product_produce)d" attrs="{'invisible': ['|', ('state', 'not in', ('confirmed','progress')), ('routing_id', '!=', False)]}" string="Produce" type="action" class="oe_highlight"/>
-                    <button name="%(act_mrp_product_produce)d" attrs="{'invisible': ['|', '|', ('nb_orders', '=', 0), ('state', '=', 'done'), ('routing_id', '!=', False)]}" string="Produce" type="action"/>
+                    <button name="%(act_mrp_product_produce)d" attrs="{'invisible': ['|', '|', ('workorder_count', '=', 0), ('state', '=', 'done'), ('routing_id', '!=', False)]}" string="Produce" type="action"/>
                     <button name="post_inventory" string="Post Inventory" type="object" class="oe_highlight" attrs="{'invisible': [('post_visible', '=', False)]}"/>
                     <button name="action_cancel" type="object" string="Cancel" attrs="{'invisible': ['|', ('state', 'in', ('done','cancel')), ('check_to_done', '=', True)]}"/>
                     <button name="button_scrap" type="object" string="Scrap" attrs="{'invisible': [('state', 'in', ('cancel'))]}"/>
@@ -61,9 +61,9 @@
                     <field name="post_visible" invisible="1"/>
                     <field name="has_scrap_move" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
-                        <button name="%(action_mrp_workorder_production_specific)d" type="action" attrs="{'invisible': [('nb_orders', '=', 0)]}" class="oe_stat_button" icon="fa-play-circle-o">
+                        <button name="%(action_mrp_workorder_production_specific)d" type="action" attrs="{'invisible': [('workorder_count', '=', 0)]}" class="oe_stat_button" icon="fa-play-circle-o">
                             <div class="o_form_field o_stat_info">
-                                <span class="o_stat_value"><field name="nb_done" widget="statinfo" nolabel="1"/> / <field name="nb_orders" widget="statinfo" nolabel="1"/></span>
+                                <span class="o_stat_value"><field name="workorder_done_count" widget="statinfo" nolabel="1"/> / <field name="workorder_count" widget="statinfo" nolabel="1"/></span>
                                 <span class="o_stat_text">Work Orders</span>
                             </div>
                         </button>
@@ -262,7 +262,7 @@
                     <filter string="No Routing" domain="[('routing_id','=', False)]" name="norouting" groups="mrp.group_mrp_routings"/>
                     <field name="product_id"/>
                     <field name="product_id" string="Raw Material" filter_domain="[('move_raw_ids.product_id','ilike',self)]"/>
-                    <field name="name" string="Work Center" filter_domain="[('routing_id.workorder_ids.workcenter_id','ilike',self)]"/>
+                    <field name="name" string="Work Center" filter_domain="[('routing_id.operation_ids.workcenter_id','ilike',self)]"/>
                     <field name="routing_id" groups="mrp.group_mrp_routings"/>
                     <group expand="0" string="Group By...">
                         <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>

@@ -50,18 +50,22 @@ class TestProductCommon(common.SavepointCase):
         })
         Product = cls.env['product.product']
         cls.product_1 = Product.create({
-            'name': 'TestProduct 1',
+            'name': 'Table (uom_unit)',
             'uom_id': cls.uom_unit.id,
             'uom_po_id': cls.uom_unit.id})
         cls.product_2 = Product.create({
-            'name': 'TestProduct 2',
-            'uom_id': cls.uom_unit.id,
-            'uom_po_id': cls.uom_unit.id})
-        cls.product_3 = Product.create({
-            'name': 'TestProduct 3 (KTestUnit)',
-            'uom_id': cls.uom_kunit.id,
-            'uom_po_id': cls.uom_kunit.id})
-        cls.product_4 = Product.create({
-            'name': 'TestProduct 4 (mTestUnit)',
+            'name': 'Batten (uom_munit)',
             'uom_id': cls.uom_munit.id,
             'uom_po_id': cls.uom_munit.id})
+        cls.product_3 = Product.create({
+            'name': 'Table Legs (uom_unit)',
+            'uom_id': cls.uom_unit.id,
+            'uom_po_id': cls.uom_unit.id})
+        cls.product_4 = Product.create({
+            'name': 'Shelf Bracket (KTestUnit)',
+            'uom_id': cls.uom_kunit.id,
+            'uom_po_id': cls.uom_kunit.id})
+        cls.product_5 = Product.create({
+            'name': 'Rafter (uom_unit)',
+            'uom_id': cls.uom_unit.id,
+            'uom_po_id': cls.uom_unit.id})

@@ -124,8 +124,7 @@ class MrpBom(models.Model):
                 continue
             if bom_line.product_id.product_tmpl_id.id in done:
                 raise UserError(_('BoM "%s" contains a BoM line with a product recursion: "%s".') % (self.display_name, bom_line.product_id.display_name))
-            # This is very slow, can we improve that?
-            bom = self._bom_find(product=bom_line.product_id, picking_type=self.picking_type_id)
+            bom = bom_line.child_bom_id
             if not bom or bom.type != "phantom":
                 qty = quantity * bom_line.product_qty / self.product_qty
                 if method:
@@ -136,6 +135,30 @@ class MrpBom(models.Model):
                 qty2 = self.env['product.uom']._compute_qty(bom_line.product_uom_id.id, quantity * bom_line.product_qty / self.product_qty, bom.product_uom_id.id)
                 bom.explode(bom_line.product_id, qty2, original_quantity=original_quantity, method=method, method_wo=method_wo, done=done, result=kw)
         return True
+
+    def explode_new(self, quantity):
+        boms_explored = [(self, quantity)]
+        lines_explored = []
+        bom_lines = self.bom_line_ids
+        templates = self.env['product.template']
+        while bom_lines:
+            current_line = bom_lines[0]
+            bom_lines = bom_lines[1:]
+            line_quantity = quantity * current_line.product_qty / self.product_qty
+            if current_line._skip_bom_line(current_line.product_id):
+                continue
+            if current_line.product_id.product_tmpl_id in templates:
+                raise UserError(_('Recursion error !'))
+
+            bom = self._bom_find(product=current_line.product_id, picking_type=current_line.bom_id.picking_type_id)
+            if bom and bom.type == 'phantom':
+                converted_line_quantity = self.env['product.uom']._compute_qty_obj(current_line.product_uom_id, line_quantity, bom.product_uom_id)
+                boms_explored.append((bom, converted_line_quantity))
+                bom_lines = bom.bom_line_ids + bom_lines
+                templates |= current_line.product_id.product_tmpl_id
+            lines_explored.append((current_line, line_quantity))
+
+        return boms_explored, lines_explored
 
 
 class MrpBomLine(models.Model):
@@ -175,6 +198,8 @@ class MrpBomLine(models.Model):
     operation_id = fields.Many2one(
         'mrp.routing.workcenter', 'Consumed in Operation',
         help="The operation where the components are consumed, or the finished products created.")
+    child_bom_id = fields.Many2one(
+        'mrp.bom', 'Sub BoM', compute='_compute_child_bom_id')
     child_line_ids = fields.One2many(
         'mrp.bom.line', string="BOM lines of the referred bom",
         compute='_compute_child_line_ids')
@@ -187,17 +212,22 @@ class MrpBomLine(models.Model):
 
     @api.one
     @api.depends('product_id', 'bom_id')
+    def _compute_child_bom_id(self):
+        # JCO TODO: remove this and reimplement the report in a better way
+        if not self.product_id:
+            self.child_bom_id = False
+        else:
+            self.child_bom_id = self.env['mrp.bom']._bom_find(
+                product_tmpl=self.product_id.product_tmpl_id,
+                product=self.product_id,
+                picking_type=self.bom_id.picking_type_id)
+
+    @api.one
+    @api.depends('child_bom_id')
     def _compute_child_line_ids(self):
         """ If the BOM line refers to a BOM, return the ids of the child BOM lines """
         # JCO TODO: remove this and reimplement the report in a better way
-        if not self.product_id:
-            self.child_line_ids = False
-            return
-        bom = self.env['mrp.bom']._bom_find(
-            product_tmpl=self.product_id.product_tmpl_id,
-            product=self.product_id,
-            picking_type=self.bom_id.picking_type_id)
-        self.child_line_ids = bom.bom_line_ids.ids
+        self.child_line_ids = self.child_bom_id.bom_line_ids.ids
 
     @api.one
     @api.depends('product_id')

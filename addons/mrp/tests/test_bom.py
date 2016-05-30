@@ -32,3 +32,13 @@ class TestBoM(TestMrpCommon):
 
         # check production
         # self.assertEqual(production.state, 'done')
+
+    def test_explode(self):
+        res = self.bom_1.explode_new(3)
+        print '--------'
+        print res
+
+    def test_explode_from_order(self):
+        res = self.production_1.button_plan()
+        print '--------'
+        print res

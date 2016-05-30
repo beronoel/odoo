@@ -17,17 +17,47 @@ class MrpProductionWorkcenterLine(models.Model):
     name = fields.Char(
         'Work Order', required=True,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+
     workcenter_id = fields.Many2one(
         'mrp.workcenter', 'Work Center', required=True,
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    duration = fields.Float(
-        'Expected Duration', digits=(16, 2),
-        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
-        help="Expected duration in minutes")
+    working_state = fields.Selection(
+        'Workcenter Status', related='workcenter_id.working_state',
+        help='Technical: used in views only')
+
     production_id = fields.Many2one(
         'mrp.production', 'Manufacturing Order',
         index=True, ondelete='cascade', required=True, track_visibility='onchange',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+    product_id = fields.Many2one(
+        'product.product', 'Product',
+        related='production_id.product_id', readonly=True,
+        help='Technical: used in views only.')
+    product_uom_id = fields.Many2one(
+        'product.uom', 'Unit of Measure',
+        related='production_id.product_uom_id', readonly=True,
+        help='Technical: used in views only.')
+    production_availability = fields.Selection(
+        'Stock Availability', readonly=True,
+        related='production_id.availability', store=True,
+        help='Technical: used in views and domains only.')
+    production_state = fields.Selection(
+        'Production State', readonly=True,
+        related='production_id.state',
+        help='Technical: used in views only.')  # TDE FIXME: if you want to search on it, you have to store it
+    product_tracking = fields.Selection(
+        'Product Tracking', related='production_id.product_id.tracking',
+        help='Technical: used in views only.')
+    qty_production = fields.Float('Original Production Quantity', readonly=True, related='production_id.product_qty')
+    qty_produced = fields.Float(
+        'Quantity', default=0.0,
+        readonly=True,
+        help="The number of products already handled by this work order")  # TODO: decimal precision
+    qty_producing = fields.Float(
+        'Currently Produced Quantity', default=1.0,
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+    is_produced = fields.Boolean(compute='_compute_is_produced')
+
     state = fields.Selection([
         ('pending', 'Pending'),
         ('ready', 'Ready'),
@@ -38,7 +68,7 @@ class MrpProductionWorkcenterLine(models.Model):
     date_planned_start = fields.Datetime(
         'Scheduled Date Start',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    date_planned_end = fields.Datetime(
+    date_planned_finished = fields.Datetime(
         'Scheduled Date Finished',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     date_start = fields.Datetime(
@@ -47,21 +77,25 @@ class MrpProductionWorkcenterLine(models.Model):
     date_finished = fields.Datetime(
         'Effective End Date',
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-    delay = fields.Float(
-        'Real Duration', compute='_compute_delay',
+
+    duration_expected = fields.Float(
+        'Expected Duration', digits=(16, 2),
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]},
+        help="Expected duration (in minutes)")
+    duration = fields.Float(
+        'Real Duration', compute='_compute_duration',
         readonly=True, store=True)
-    delay_unit = fields.Float(
-        'Duration Per Unit', compute='_compute_delay',
+    duration_unit = fields.Float(
+        'Duration Per Unit', compute='_compute_duration',
         readonly=True, store=True)
-    delay_percent = fields.Integer(
-        'Duration Deviation (%)', compute='_compute_delay',
+    duration_percent = fields.Integer(
+        'Duration Deviation (%)', compute='_compute_duration',
         group_operator="avg", readonly=True, store=True)
-    qty_produced = fields.Float(
-        'Quantity', default=0.0,
-        readonly=True,
-        help="The number of products already handled by this work order")  # TODO: decimal precision
+
     operation_id = fields.Many2one(
         'mrp.routing.workcenter', 'Operation')  # Should be used differently as BoM can change in the meantime
+    worksheet = fields.Binary(
+        'Worksheet', related='operation_id.worksheet', readonly=True)
     move_raw_ids = fields.One2many(
         'stock.move', 'workorder_id', 'Moves')
     move_lot_ids = fields.One2many(
@@ -71,45 +105,32 @@ class MrpProductionWorkcenterLine(models.Model):
     active_move_lot_ids = fields.One2many(
         'stock.move.lots', 'workorder_id',
         domain=[('done_wo', '=', False)])
-    availability = fields.Selection(
-        'Stock Availability',
-        related='production_id.availability', store=True)
-    production_state = fields.Selection(
-        'Production State',
-        related='production_id.state', readonly=True)  # TDE FIXME: not store ?
-    product = fields.Many2one(
-        'product.product', 'Product',
-        readonly=True, related='production_id.product_id')  # should be product_id
-    has_tracking = fields.Selection(related='production_id.product_id.tracking')
-    qty = fields.Float('Qty', readonly=True, related='production_id.product_qty')
-    uom = fields.Many2one('product.uom', related='production_id.product_uom_id', string='Unit of Measure')  # TDE FIXME: learn how to name fields
+    final_lot_id = fields.Many2one(
+        'stock.production.lot', 'Current Lot', domain="[('product_id', '=', product)]")
 
     time_ids = fields.One2many(
-        'mrp.workcenter.productivity', 'workorder_id')  # TDE FIXME: renaming ?
-    worksheet = fields.Binary(
-        'Worksheet', related='operation_id.worksheet', readonly=True)
-    show_state = fields.Boolean(compute='_get_current_state')
-    production_messages = fields.Html(compute="_compute_production_messages")
-    final_lot_id = fields.Many2one('stock.production.lot', 'Current Lot', domain="[('product_id', '=', product)]")
-    qty_producing = fields.Float('Qty Producing', default=1.0, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+        'mrp.workcenter.productivity', 'workorder_id')
+    show_state = fields.Boolean(compute='_get_current_state')  # TDE: check use, probably to rename like in_production
+    production_messages = fields.Html('Workorder Message', compute='_compute_production_messages')
     next_work_order_id = fields.Many2one('mrp.workorder', "Next Work Order")
-    tracking = fields.Selection(related='product.tracking', readonly=True)
-    is_produced = fields.Boolean(compute='_is_produced')
-    working_state = fields.Selection(related='workcenter_id.working_state')
 
-    @api.multi
-    @api.depends('time_ids.date_end')
-    def _compute_delay(self):
-        for workorder in self:
-            duration = sum(workorder.time_ids.mapped('duration'))
-            workorder.delay = duration
-            workorder.delay_unit = round(duration / max(workorder.qty_produced, 1), 2)
-            if duration:
-                workorder.delay_percent = 100 * (workorder.duration - duration) / duration
-            else:
-                workorder.delay_percent = 0
+    @api.one
+    @api.depends('production_id.product_qty', 'qty_produced')
+    def _compute_is_produced(self):
+        self.is_produced = self.qty_produced >= self.production_id.product_qty
+
+    @api.one
+    @api.depends('time_ids.duration', 'qty_produced')
+    def _compute_duration(self):
+        self.duration = sum(self.time_ids.mapped('duration'))
+        self.duration_unit = round(self.duration / max(self.qty_produced, 1), 2)
+        if self.duration:
+            self.duration_percent = 100 * (self.duration_expected - self.duration) / self.duration
+        else:
+            self.duration_percent = 0
 
     def _get_current_state(self):
+        # TDE FIXME: weird
         for order in self:
             if order.time_ids.filtered(lambda x : (x.user_id.id == self.env.user.id) and (not x.date_end) and (x.loss_type in ('productive', 'performance'))):
                 order.show_state = True
@@ -128,86 +149,81 @@ class MrpProductionWorkcenterLine(models.Model):
             messages = ProductionMessage.search(domain).mapped('message')
             workorder.production_messages = "<br/>".join(messages) or False  # TDE FIXME: or False ? not necessary I think
 
-    @api.depends('qty', 'qty_produced')
-    def _is_produced(self):
-        for workorder in self:
-            if workorder.qty_produced >= workorder.qty:
-                workorder.is_produced = True
-
     @api.onchange('qty_producing')
     def _onchange_qty_producing(self):
-        moves = self.move_raw_ids.filtered(lambda x: (x.state not in ('done', 'cancel')) and (x.product_id.tracking != 'none') and (x.product_id.id != self.product.id))
+        """ Update stock.move.lot records, according to the new qty currently
+        produced. """
+        moves = self.move_raw_ids.filtered(lambda move: move.state not in ('done', 'cancel') and move.product_id.tracking != 'none' and move.product_id.id != self.production_id.product.id)
         for move in moves:
-            existing_move_lots = self.active_move_lot_ids.filtered(lambda x: (x.move_id.id == move.id))
-            qty = self.qty_producing / move.bom_line_id.bom_id.product_qty * move.bom_line_id.product_qty
+            move_lots = self.active_move_lot_ids.filtered(lambda move_lot: move_lot.move_id == move)
+            if not move_lots:
+                continue
+            new_qty = move.bom_line_id.product_qty * self.qty_producing / move.bom_line_id.bom_id.product_qty
             if move.product_id.tracking == 'lot':
-                if existing_move_lots:
-                    existing_move_lots[0].quantity = qty
+                move_lots[0].quantity = new_qty
             elif move.product_id.tracking == 'serial':
-                if existing_move_lots:
-                    #Create extra pseudo record
-                    sum_quantities = sum([x.quantity for x in existing_move_lots])
-                    if sum_quantities < qty:
-                        qty_todo = qty - sum_quantities
-                        while qty_todo > 0:
-                            self.active_move_lot_ids += self.env['stock.move.lots'].new({'move_id': move.id,
-                                                                                        'product_id': move.product_id.id,
-                                                                                        'lot_id': False,
-                                                                                        'quantity': min(1.0, qty_todo),
-                                                                                        'quantity_done': 0,
-                                                                                        'workorder_id': self.id,
-                                                                                        'done_wo': False})
-                            qty_todo -= 1
-                    elif qty < sum_quantities:
-                        qty_todo = sum_quantities - qty
-                        for movelot in existing_move_lots:
-                            if qty_todo <= 0:
-                                break
-                            if (movelot.quantity_done == 0) and (qty_todo - movelot.quantity > 0):
-                                qty_todo -= movelot.quantity
-                                self.active_move_lot_ids -= movelot
-                            else:
-                                movelot.quantity = movelot.quantity - qty_todo
-                                qty_todo = 0
+                # Create extra pseudo record
+                qty_todo = new_qty - sum(move_lots.mapped('quantity'))
+                if qty_todo > 0.0:  # TDE: float compare
+                    while qty_todo > 0:
+                        self.active_move_lot_ids += self.env['stock.move.lots'].new({
+                            'move_id': move.id,
+                            'product_id': move.product_id.id,
+                            'lot_id': False,
+                            'quantity': min(1.0, qty_todo),
+                            'quantity_done': 0,
+                            'workorder_id': self.id,
+                            'done_wo': False
+                        })
+                        qty_todo -= 1
+                elif qty_todo < 0.0:
+                    qty_todo = abs(qty_todo)
+                    for move_lot in move_lots:
+                        if qty_todo <= 0:
+                            break
+                        if move_lot.quantity_done == 0 and qty_todo > move_lot.quantity:
+                            qty_todo = qty_todo - move_lot.quantity
+                            self.active_move_lot_ids -= move_lot  # TDE: command ?
+                        else:
+                            move_lot.quantity = move_lot.quantity - qty_todo
+                            qty_todo = 0
 
     @api.multi
     def write(self, values):
-        if any([x.state == 'done' for x in self]) and values.get('date_planned_start') and values.get('date_planned_end'):
+        if ('date_planned_start' in values or 'date_planned_finished' in values) and any(workorder.state == 'done' for workorder in self):
             raise UserError(_('You can not change the finished work order.'))
         return super(MrpProductionWorkcenterLine, self).write(values)
 
     def _generate_lot_ids(self):
-        """
-            Generate stock move lots
-        """
+        """ Generate stock move lots """
         self.ensure_one()
-        move_lot_obj = self.env['stock.move.lots']
-        if self.move_raw_ids:
-            moves = self.move_raw_ids.filtered(lambda x: (x.state not in ('done', 'cancel')) and (x.product_id.tracking != 'none') and (x.product_id.id != self.product.id))
-            for move in moves:
-                qty = self.qty_producing / move.bom_line_id.bom_id.product_qty * move.bom_line_id.product_qty
-                if move.product_id.tracking=='serial':
-                    while float_compare(qty, 0.0, precision_rounding=move.product_uom.rounding) > 0:
-                        move_lot_obj.create({
-                            'move_id': move.id,
-                            'quantity': min(1,qty),
-                            'quantity_done': 0,
-                            'production_id': self.production_id.id,
-                            'workorder_id': self.id,
-                            'product_id': move.product_id.id,
-                            'done_wo': False,
-                        })
-                        qty -= 1
-                else:
-                    move_lot_obj.create({
+        MoveLot = self.env['stock.move.lots']
+        tracked_moves = self.move_raw_ids.filtered(
+            lambda move: move.state not in ('done', 'cancel') and move.product_id.tracking != 'none' and move.product_id != self.production_id.product_id)
+        for move in tracked_moves:
+            qty = self.qty_producing / move.bom_line_id.bom_id.product_qty * move.bom_line_id.product_qty
+            if move.product_id.tracking=='serial':
+                while float_compare(qty, 0.0, precision_rounding=move.product_uom.rounding) > 0:
+                    MoveLot.create({
                         'move_id': move.id,
-                        'quantity': qty,
+                        'quantity': min(1,qty),
                         'quantity_done': 0,
-                        'product_id': move.product_id.id,
                         'production_id': self.production_id.id,
                         'workorder_id': self.id,
+                        'product_id': move.product_id.id,
                         'done_wo': False,
-                        })
+                    })
+                    qty -= 1
+            else:
+                MoveLot.create({
+                    'move_id': move.id,
+                    'quantity': qty,
+                    'quantity_done': 0,
+                    'product_id': move.product_id.id,
+                    'production_id': self.production_id.id,
+                    'workorder_id': self.id,
+                    'done_wo': False,
+                    })
 
     @api.multi
     def record_production(self):
@@ -273,23 +289,23 @@ class MrpProductionWorkcenterLine(models.Model):
         self.qty_produced += self.qty_producing
 
         # Set a qty producing 
-        if self.qty_produced >= self.qty:
+        if self.qty_produced >= self.production_id.product_qty:
             self.qty_producing = 0
-        elif self.product.tracking == 'serial':
+        elif self.production_id.product_id.tracking == 'serial':
             self.qty_producing = 1.0
             self._generate_lot_ids()
         else:
-            self.qty_producing = self.qty - self.qty_produced
+            self.qty_producing = self.production_id.product_qty - self.qty_produced
             self._generate_lot_ids()
 
         self.final_lot_id = False
-        if self.qty_produced >= self.qty:
+        if self.qty_produced >= self.production_id.product_qty:
             self.button_finish()
 
     @api.multi
     def button_start(self):
         timeline = self.env['mrp.workcenter.productivity']
-        if self.delay < self.duration:
+        if self.duration < self.duration_expected:
             loss_id = self.env['mrp.workcenter.productivity.loss'].search([('loss_type','=','productive')], limit=1)
             if not len(loss_id):
                 raise UserError(_("You need to define at least one productivity loss in the category 'Productivity'. Create one from the Manufacturing app, menu: Configuration / Productivity Losses."))
@@ -322,6 +338,7 @@ class MrpProductionWorkcenterLine(models.Model):
 
     @api.multi
     def end_previous(self, doall=False):
+        # TDE CLEANME: help
         timeline_obj = self.env['mrp.workcenter.productivity']
         domain = [('workorder_id', 'in', self.ids), ('date_end', '=', False)]
         if not doall:
@@ -331,7 +348,7 @@ class MrpProductionWorkcenterLine(models.Model):
             if timeline.loss_type <> 'productive':
                 timeline.write({'date_end': fields.Datetime.now()})
             else:
-                maxdate = fields.Datetime.from_string(timeline.date_start) + relativedelta(minutes=wo.duration - wo.delay)
+                maxdate = fields.Datetime.from_string(timeline.date_start) + relativedelta(minutes=wo.duration_expected - wo.duration)
                 enddate = datetime.now()
                 if maxdate > enddate:
                     timeline.write({'date_end': enddate})
@@ -378,5 +395,6 @@ class MrpProductionWorkcenterLine(models.Model):
             'view_id': self.env.ref('stock.stock_scrap_form_view2').id,
             'type': 'ir.actions.act_window',
             'context': {'product_ids': self.production_id.move_raw_ids.mapped('product_id').ids + [self.product.id]},
+            # 'context': {'product_ids': self.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')).mapped('product_id').ids + [self.production_id.product_id.id]},
             'target': 'new',
         }

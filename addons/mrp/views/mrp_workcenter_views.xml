@@ -7,7 +7,7 @@
             <field name="res_model">mrp.production</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,gantt</field>
-            <field name="domain">[('routing_id', '!=', False),('routing_id.workorder_ids.workcenter_id','=', active_id)]</field>
+            <field name="domain">[('routing_id', '!=', False),('routing_id.operation_ids.workcenter_id','=', active_id)]</field>
         </record>
 
         <record id="action_work_orders" model="ir.actions.act_window">
@@ -116,7 +116,7 @@
                 <kanban class="oe_background_grey o_kanban_dashboard o_workcenter_kanban" create="0">
                     <field name="name"/>
                     <field name="color"/>
-                    <field name="nb_orders"/>
+                    <field name="workorder_count"/>
                     <field name="working_state"/>
                     <field name="oee_target"/>
                     <templates>
@@ -134,12 +134,12 @@
                                     <div class="row">
                                         <div class="col-xs-6 o_kanban_primary_left">
                                             <div class="btn-group" name="o_wo">
-                                            <t t-if="record.nb_orders.raw_value &gt; 0">
+                                            <t t-if="record.workorder_count.raw_value &gt; 0">
                                                 <button class="btn btn-primary" name="%(action_work_orders)d" type="action" context="{'search_default_ready': 1, 'search_default_progress': 1}">
                                                     <span>Work Orders</span>
                                                 </button>
                                             </t>
-                                            <t  t-if="record.nb_orders.raw_value &lt;= 0">
+                                            <t  t-if="record.workorder_count.raw_value &lt;= 0">
                                                 <button class="btn btn-warning" name="%(act_product_mrp_production_workcenter)d" type="action">
                                                     <span>Plan Orders</span>
                                                 </button>
@@ -147,24 +147,24 @@
                                             </div>
                                         </div>
                                         <div class="col-xs-6 o_kanban_primary_right">
-                                            <div class="row" t-if="record.count_ready_order.raw_value &gt; 0">
+                                            <div class="row" t-if="record.workorder_ready_count.raw_value &gt; 0">
                                                 <div class="col-xs-8">
                                                     <a name="%(action_work_orders)d" type="action" context="{'search_default_ready': 1}">
                                                         To Launch
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-4 text-right">
-                                                    <field name="count_ready_order"/>
+                                                    <field name="workorder_ready_count"/>
                                                 </div>
                                             </div>
-                                            <div class="row" t-if="record.count_progress_order.raw_value &gt; 0">
+                                            <div class="row" t-if="record.workorder_progress_count.raw_value &gt; 0">
                                                 <div class="col-xs-8">
                                                     <a name="%(action_work_orders)d" type="action" context="{'search_default_progress': 1}">
                                                         In Progress
                                                     </a>
                                                 </div>
                                                 <div class="col-xs-4 text-right">
-                                                    <field name="count_progress_order"/>
+                                                    <field name="workorder_progress_count"/>
                                                 </div>
                                             </div>
                                             <div class="row" t-if="record.oee.raw_value &gt; 0">
@@ -263,7 +263,7 @@
                             </button>
                             <button name="%(mrp_workorder_report)d" type="action" class="oe_stat_button" icon="fa-bar-chart" context="{'search_default_workcenter_id': active_id, 'search_default_thisyear': True}">
                                 <div class="o_form_field o_stat_info">
-                                    <span class="o_stat_value"><field name="stat_perf" widget="statinfo" nolabel="1"/>%</span>
+                                    <span class="o_stat_value"><field name="performance" widget="statinfo" nolabel="1"/>%</span>
                                     <span class="o_stat_text">Performance</span>
                                 </div>
                             </button>
