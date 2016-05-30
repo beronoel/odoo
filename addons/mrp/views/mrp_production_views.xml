@@ -103,7 +103,6 @@
                             <field name="user_id" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                             <field name="origin" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" attrs="{'readonly': [('has_moves', '=', True)]}"/>
-                            <field name="move_prod_id" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                         </group>
                     </group>
                     <notebook>

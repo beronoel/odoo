@@ -71,8 +71,8 @@ class ProcurementOrder(models.Model):
             'procurement_group_id': self.group_id.id,
             'propagate': self.rule_id.propagate,
             'picking_type_id': self.rule_id.picking_type_id.id or self.warehouse_id.manu_type_id.id,
-            'move_prod_id': self.move_dest_id.id,
             'company_id': self.company_id.id,
+            'procurement_ids': [(6, 0, [self.id])],
         }
 
     @api.multi
@@ -87,7 +87,7 @@ class ProcurementOrder(models.Model):
                 # create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
                 production = ProductionSudo.create(procurement._prepare_mo_vals(bom))
                 res[procurement.id] = production.id
-                procurement.write({'production_id': production.id})
+                
                 procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))
             else:
                 res[procurement.id] = False
