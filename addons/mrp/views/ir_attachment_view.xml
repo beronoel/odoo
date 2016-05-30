@@ -27,12 +27,14 @@
                                                 </div>
                                             </a>
                                         </div>
-                                        <div class="col-xs-5 o_kanban_primary_right text-center" style="margin-top: 10%;">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-8" style="margin: 7px;">
                                             <field name="name"/>
                                         </div>
-                                    </div>
-                                    <div class="oe_kanban_bottom_left" style="margin: 7px;">
-                                        <field name="priority" widget="priority"/>
+                                        <div class="col-xs-4 oe_kanban_bottom_right" style="margin: 7px;">
+                                            <field name="priority" widget="priority"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

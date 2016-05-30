@@ -6,7 +6,7 @@
             <field name="name">mrp.production.tree</field>
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
-                <tree decoration-bf="message_needaction==True" default_order="date_planned desc" decoration-info="state in ('draft','confirmed')" decoration-danger="date_planned&lt;current_date and state not in ('done','cancel')" decoration-muted="state in ('done','cancel')" string="Manufacturing Orders">
+                <tree decoration-bf="message_needaction==True" default_order="date_planned desc" decoration-info="state=='confirmed'" decoration-danger="date_planned&lt;current_date and state not in ('done','cancel')" decoration-muted="state in ('done','cancel')" string="Manufacturing Orders">
                     <field name="message_needaction" invisible="1"/>
                     <field name="name"/>
                     <field name="date_planned"/>
@@ -109,7 +109,7 @@
                     <notebook>
                         <page string="Consumed Materials">
                             <field name="move_raw_ids" options="{'reload_on_button': True}" context="{'default_location_id': location_src_id, 'default_location_dest_id': location_dest_id}">
-                                <tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-danger="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" >
+                                <tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-danger="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" create="0">
                                     <field name="product_id" on_change="onchange_product_id(product_id, location_id, location_dest_id)" required="1"/>
                                     <field name="product_uom" groups="product.group_uom"/>
                                     <field name="has_tracking" invisible="1"/>
@@ -128,7 +128,7 @@
                         </page>
                         <page string="Finished Products">
                             <field name="move_finished_ids" options="{'reload_on_button': True}" context="{'default_location_id': location_src_id, 'default_location_dest_id': location_dest_id}">
-                                <tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-danger="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty">
+                                <tree editable="bottom" delete="0" default_order="is_done desc,sequence" decoration-muted="is_done" decoration-danger="quantity_done&gt;product_uom_qty" decoration-success="quantity_done==product_uom_qty" create="0">
                                     <field name="product_id" on_change="onchange_product_id(product_id, location_id, location_dest_id)" required="1"/>
                                     <field name="product_uom" groups="product.group_uom"/>
                                     <field name="is_done" invisible="1"/>
@@ -254,9 +254,10 @@
                     <filter string="Planned" name="planned" domain="[('state','=','planned')]"/>
                     <filter string="In Progress" name="inprogress" domain="[('state','=','progress')]"
                         help="Manufacturing Orders which are currently in production."/>
-                    <filter string="Done" name="inprogress" domain="[('state','=','done')]"/>
+                    <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
+                    <filter string="Waiting" name="waiting" domain="[('availability', '=', 'waiting')]"/>
                     <separator/>
-                    <filter string="Late" domain="['&amp;', ('date_planned','&lt;', current_date), ('state', 'in', ('draft', 'confirmed', 'ready'))]"
+                    <filter string="Late" domain="['&amp;', ('date_planned', '&lt;', current_date), ('state', '=', 'confirmed')]"
                         name="late" help="Production started late"/>
                     <separator/>
                     <filter string="No Routing" domain="[('routing_id','=', False)]" name="norouting" groups="mrp.group_mrp_routings"/>
@@ -320,7 +321,7 @@
             <field name="res_model">mrp.production</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,pivot,graph</field>
-            <field name="domain">[('state','in',('ready','confirmed','in_production')), ('routing_id', '!=', False)]</field>
+            <field name="domain">[('state', '=', 'confirmed'), ('routing_id', '!=', False)]</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to start a new manufacturing order.

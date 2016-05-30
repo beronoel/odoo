@@ -163,6 +163,7 @@ class MrpWorkcenterProductivity(models.Model):
     _name = "mrp.workcenter.productivity"
     _description = "Workcenter Productivity Log"
     _order = "id desc"
+    _rec_name = "loss_id"
 
     workcenter_id = fields.Many2one('mrp.workcenter', "Workcenter", required=True)
     workorder_id = fields.Many2one('mrp.workorder', 'Work Order')
