@@ -354,8 +354,8 @@
             <field name="view_mode">kanban,form</field>
             <field name="search_view_id" ref="view_mrp_workcenter_search"/>
             <field name="help" type="html">
-              <p class="oe_view_nocontent_create">
-                Click to add a work center.
+              <p>
+                To create a new work center, Go to <b><i> Master Data/Work Centers. </i></b>
               </p><p>
                 Work Centers allow you to create and manage manufacturing
                 units. They consist of workers and/or machines, which are
@@ -370,6 +370,7 @@
             groups="group_mrp_routings"
             parent="menu_mrp_bom"
             sequence="100"/>
+
         <menuitem id="menu_mrp_dashboard"
             name="Dashboard"
             action="mrp_workcenter_kanban_action"

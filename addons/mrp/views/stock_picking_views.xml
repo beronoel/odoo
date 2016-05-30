@@ -74,7 +74,7 @@
                                         <span>New</span>
                                     </div>
                                     <div>
-                                        <a name="%(action_mrp_production_form)d" type="action">New Production Order</a>
+                                        <a name="%(action_mrp_production_form)d" type="action">Production Order</a>
                                     </div>
                                 </div>
                             </div>
