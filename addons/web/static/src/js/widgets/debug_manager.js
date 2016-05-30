@@ -249,20 +249,6 @@ DebugManager.include({
             flags: {action_buttons: true, headless: true}
         });
     },
-    get_view_fields: function () {
-        var self = this;
-        var model = this._action.res_model;
-        new Model(model).call('fields_get', {
-            attributes: ['string', 'searchable', 'required', 'readonly', 'type', 'store', 'sortable', 'relation', 'help']
-        }).done(function (fields) {
-            new Dialog(self, {
-                title: _.str.sprintf(_t("Fields of %s"), model),
-                $content: $(QWeb.render('WebClient.DebugManager.Action.Fields', {
-                    fields: fields
-                }))
-            }).open();
-        });
-    },
     manage_filters: function () {
         this.do_action({
             res_model: 'ir.filters',

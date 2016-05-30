@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+<t t-extend="WebClient.DebugDropdown">
+    <t t-jquery="li.oe_translate" t-operation="after">
+        <t t-if="view.fields_view.type == 'form' || view.fields_view.type == 'list' || view.fields_view.type == 'tree'">
+            <li class="o_add_field"><a href="#" data-action="add_field">Add field</a></li>
+            <li class="o_remove_field"><a href="#" data-action="remove_field">Remove field</a></li>
+            <!--li class="o_get_inherit_template"><a href="#" data-action="get_inherit_template">inherit</a></li-->
+        </t>
+    </t>
+</t>
+
+<t t-name="WebClient.DebugAddField">
+    <div>
+        <table border="0" cellpadding="0" cellspacing="0" class="oe_form_group" width="100%">
+            <tbody>
+                <tr class="oe_form_group_row">
+                    <td class="oe_form_group_cell oe_form_group_cell_label" style="width: 160px;">
+                        <label class=" oe_form_label oe_align_right">
+                            Field to add:
+                        </label>
+                    </td>
+                    <td class="oe_form_group_cell">
+                        <span class="oe_form_field oe_form_field_selection">
+                            <select name="missing_field" style="width: 324px;">
+                                <option value="false"></option>
+                                <t t-foreach="missing_fields" t-as="field_name">
+                                    <option t-att-value="field_name"><t t-esc="fields[field_name].string"/></option>
+                                </t>
+                            </select>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="oe_form_group_row">
+                    <td class="oe_form_group_cell oe_form_group_cell_label">
+                        <label class=" oe_form_label oe_align_right">
+                            Insert:
+                        </label>
+                    </td>
+                    <td class="oe_form_group_cell">
+                        <span class="oe_form_field oe_form_field_selection">
+                            <select name="position" style="width: 80px;">
+                                <option value="before">before</option>
+                                <option value="after">after</option>
+                            </select>
+                            <select name="view_field" style="width: 240px;">
+                                <t t-foreach="view_fields" t-as="field_name">
+                                    <option t-att-value="field_name"><t t-esc="fields[field_name].string"/></option>
+                                </t>
+                            </select>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="oe_form_group_row">
+                    <td class="oe_form_group_cell oe_form_group_cell_label"></td>
+                    <td class="oe_form_group_cell" style="padding-top: 20px;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</t>
+
+<t t-name="WebClient.DebugRemoveField">
+    <div>
+        <table border="0" cellpadding="0" cellspacing="0" class="oe_form_group" width="100%">
+            <tbody>
+                <tr class="oe_form_group_row">
+                    <td class="oe_form_group_cell oe_form_group_cell_label" style="width: 160px;">
+                        <label class=" oe_form_label oe_align_right">
+                            Field to remove:
+                        </label>
+                    </td>
+                    <td class="oe_form_group_cell">
+                        <span class="oe_form_field oe_form_field_selection">
+                            <select name="view_field" style="width: 324px;">
+                                <option value="false"></option>
+                                <t t-foreach="view_fields" t-as="field_name">
+                                    <option t-att-value="field_name"><t t-esc="fields[field_name].string"/></option>
+                                </t>
+                            </select>
+                        </span>
+                    </td>
+                </tr>
+                <tr class="oe_form_group_row">
+                    <td class="oe_form_group_cell oe_form_group_cell_label"></td>
+                    <td class="oe_form_group_cell" style="padding-top: 20px;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</t>
+
+</templates>

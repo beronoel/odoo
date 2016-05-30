@@ -100,7 +100,7 @@ var FormView = View.extend(common.FieldManagerMixin, {
         this.rendering_engine.set_tags_registry(this.tags_registry);
         this.rendering_engine.set_widgets_registry(this.widgets_registry);
         this.rendering_engine.set_fields_view(this.fields_view);
-        this.rendering_engine.render_to(this.$el);
+        this.rendering_engine.render_to(this.$el.empty());
 
         this.$el.on('mousedown.formBlur', function () {
             self.__clicked_inside = true;
