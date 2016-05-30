@@ -14,15 +14,14 @@ class Production(models.Model):
         """ Generates moves and work orders
         @return: Newly generated picking Id.
         """
-        # TDE FIXME: was action_confirm ??
+        # TDE FIXME: was action_confirm ?? -> refactored
         Move = self.env['stock.move']
-        picking_id = super(Production, self)._generate_moves()
+        res = super(Production, self)._generate_moves()
         UoM = self.env['product.uom']
         for production in self.filtered(lambda production: production.bom_id):
             source = production.product_id.property_stock_production.id
             for sub_product in production.bom_id.sub_products:
                 product_uom_factor = UoM._compute_qty_obj(production.product_uom_id, production.product_qty, production.bom_id.product_uom_id)
-                #TODO:production.product_uom_id._compute_qty(production.product_qty, production.bom_id.product_uom_id.id)
                 qty1 = sub_product.product_qty
                 qty1 *= product_uom_factor / production.bom_id.product_qty
                 data = {
@@ -33,7 +32,6 @@ class Production(models.Model):
                     'product_uom': sub_product.product_uom_id.id,
                     'location_id': source,
                     'location_dest_id': production.location_dest_id.id,
-                    'move_dest_id': production.move_prod_id.id,
                     'production_id': production.id,
                     'origin': production.name,
                     'unit_factor': qty1 / production.product_qty,
@@ -41,4 +39,4 @@ class Production(models.Model):
                 }
                 move = Move.create(data)
                 move.action_confirm()
-        return picking_id
+        return res

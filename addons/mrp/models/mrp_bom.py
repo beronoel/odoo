@@ -105,8 +105,8 @@ class MrpBom(models.Model):
             return False
         if picking_type:
             domain += ['|', ('picking_type_id', '=', picking_type.id), ('picking_type_id', '=', False)]
-        if self.env.context.get('company_id', company_id):
-            domain = domain + [('company_id', '=', self.env.context.get('company_id', company_id))]
+        if company_id or self.env.context.get('company_id'):
+            domain = domain + [('company_id', '=', company_id or self.env.context.get('company_id'))]
         # order to prioritize bom with product_id over the one without
         return self.search(domain, order='sequence, product_id', limit=1)
 
