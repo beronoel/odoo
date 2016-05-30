@@ -8,9 +8,11 @@
             <field name="arch" type="xml">
                 <tree string="Work Center">
                     <field name="sequence" widget="handle"/>
-                    <field name="name"/>
                     <field name="code"/>
+                    <field name="name"/>
+                    <field name="resource_type"/>
                     <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="active" invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -76,19 +78,6 @@
             <field name="view_mode">graph,pivot,tree,form,gantt</field>
         </record>
 
-        <record id="mrp_workcenter_view" model="ir.ui.view">
-            <field name="name">mrp.workcenter.tree</field>
-            <field name="model">mrp.workcenter</field>
-            <field name="arch" type="xml">
-                <tree string="Work Center">
-                    <field name="code"/>
-                    <field name="name"/>
-                    <field name="active" invisible="1"/>
-                    <field name="resource_type"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
-                </tree>
-            </field>
-        </record>
         <record id="mrp_workcenter_view" model="ir.ui.view">
             <field name="name">mrp.workcenter.form</field>
             <field name="model">mrp.workcenter</field>
