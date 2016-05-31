@@ -149,6 +149,22 @@
             </field>
         </record>
 
+        <record id="edit_project_simplified" model="ir.ui.view">
+            <field name="name">project.project.form.popup</field>
+            <field name="model">project.project</field>
+            <field name="arch" type="xml">
+                <form string="Project">
+                <sheet string="Project">
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Project Name"/>
+                        </h1>
+                    </div>
+                </sheet>
+                </form>
+            </field>
+        </record>
+
         <record id="view_project_project_filter" model="ir.ui.view">
             <field name="name">project.project.select</field>
             <field name="model">project.project</field>
@@ -190,6 +206,15 @@
             </field>
         </record>
 
+        <record id="open_create_project" model="ir.actions.act_window">
+            <field name="name">Create Project</field>
+            <field name="res_model">project.project</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="edit_project_simplified"/>
+            <field name="target">new</field>
+        </record>
+
         <record id="open_view_project_all" model="ir.actions.act_window">
             <field name="name">Projects</field>
             <field name="res_model">project.project</field>
@@ -197,6 +222,7 @@
             <field name="domain">[]</field>
             <field name="view_mode">kanban,form</field>
             <field name="search_view_id" ref="view_project_project_filter"/>
+            <field name="action_id" ref="open_create_project"/>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">
                     Create a new project.

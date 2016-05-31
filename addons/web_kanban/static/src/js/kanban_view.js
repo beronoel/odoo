@@ -321,7 +321,10 @@ var KanbanView = View.extend({
     render_buttons: function($node) {
         if (this.options.action_buttons !== false && this.is_action_enabled('create')) {
             this.$buttons = $(QWeb.render("KanbanView.buttons", {'widget': this}));
-            this.$buttons.on('click', 'button.o-kanban-button-new', this.add_record.bind(this));
+
+            var action_id = this.options.action.action_id[0];
+            var handler = action_id ? this.do_action.bind(this, action_id) : this.add_record.bind(this);
+            this.$buttons.on('click', 'button.o-kanban-button-new', handler);
             this.$buttons.appendTo($node);
         }
     },

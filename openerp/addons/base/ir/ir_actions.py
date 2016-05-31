@@ -310,6 +310,7 @@ class IrActionsActWindow(models.Model):
     auto_search = fields.Boolean(default=True)
     search_view = fields.Text(compute='_compute_search_view')
     multi = fields.Boolean(string='Restrict to lists', help="If checked and the action is bound to a model, it will only appear in the More menu on list views")
+    action_id = fields.Many2one('ir.actions.actions', string='Action')
 
     @api.v7
     def read(self, cr, uid, ids, fields=None, context=None, load='_classic_read'):
