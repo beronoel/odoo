@@ -174,5 +174,8 @@ class MrpWorkcenterProductivity(models.Model):
     @api.multi
     def button_block(self):
         self.ensure_one()
-        self.workcenter_id.order_ids.end_all()
+        if self.workcenter_id:
+            self.workcenter_id.order_ids.end_all()
+        elif self.workorder_id:
+            self.workorder_id.workcenter_id.order_ids.end_all()
         return {'type': 'ir.actions.client', 'tag': 'reload'}
