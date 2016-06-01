@@ -28,21 +28,21 @@ class MrpProduction(models.Model):
 
     @api.model
     def _get_default_location_src_id(self):
-        location_id = False
+        location = False
         if self._context.get('default_picking_type_id'):
-            location_id = self.env['stock.picking.type'].browse(self.env.context['default_picking_type_id']).default_location_src_id.id
-        if not location_id:
-            location_id = self.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
-        return location_id
+            location = self.env['stock.picking.type'].browse(self.env.context['default_picking_type_id']).default_location_src_id
+        if not location:
+            location = self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
+        return location and location.id or False
 
     @api.model
     def _get_default_location_dest_id(self):
-        location_id = False
+        location = False
         if self._context.get('default_picking_type_id'):
-            location_id = self.env['stock.picking.type'].browse(self.env.context['default_picking_type_id']).default_location_dest_id.id
-        if not location_id:
-            location_id = self.env.ref('stock.stock_location_stock', raise_if_not_found=False).id
-        return location_id
+            location = self.env['stock.picking.type'].browse(self.env.context['default_picking_type_id']).default_location_dest_id
+        if not location:
+            location = self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
+        return location and location.id or False
 
     name = fields.Char(
         'Reference',
