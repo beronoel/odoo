@@ -36,8 +36,8 @@
                                     <field name="time_mode_batch" class="oe_inline"/>
                                     work orders
                                 </div>
-                                <label for="time_cycle_manual" attrs="{'invisible': [('time_mode','=','auto'), ('wo_count','&gt;',0)]}" string="Default Duration"/>
-                                <div attrs="{'invisible': [('time_mode','=','auto'), ('wo_count','&gt;',0)]}">
+                                <label for="time_cycle_manual" attrs="{'invisible': [('time_mode','=','auto')]}" string="Default Duration"/>
+                                <div attrs="{'invisible': [('time_mode','=','auto')]}">
                                     <field name="time_cycle_manual" widget="float_time" class="oe_inline"/> minutes
                                 </div>
                             </group><group>
