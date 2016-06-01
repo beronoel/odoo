@@ -10,7 +10,9 @@ var qweb = require('qweb');
 var _ = require('_');
 var $ = require('$');
 
-var debug = $.deparam($.param.querystring()).debug !== undefined;
+var params = $.deparam($.param.querystring());
+var debug = 'debug' in params;
+var debug_assets = debug && (params.debug === 'assets');
 
 var _t = translation._t;
 var _lt = translation._lt;
@@ -168,6 +170,7 @@ $.async_when = function() {
 
 return {
     debug: debug,
+    debug_assets: debug_assets,
     qweb: qweb,
 
     // core classes and functions
