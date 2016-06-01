@@ -7,6 +7,7 @@ from openerp.osv import osv, fields
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp import SUPERUSER_ID
+from openerp import api
 
 class procurement_rule(osv.osv):
     _inherit = 'procurement.rule'
@@ -22,6 +23,17 @@ class procurement_order(osv.osv):
         'property_ids': fields.many2many('mrp.property', 'procurement_property_rel', 'procurement_id','property_id', 'Properties'),
         'production_id': fields.many2one('mrp.production', 'Manufacturing Order'),
     }
+
+    @api.cr_uid_context
+    def create(self, cr, uid, vals, context=None):
+        result = super(procurement_order, self).create(cr, uid, vals, context=context)
+        procurement = self.browse(cr, uid, result, context=context)
+        production = procurement.move_dest_id.production_id or procurement.move_dest_id.raw_material_production_id
+        if production:
+            procurement.message_post_with_view('mail.message_origin_link',
+                values={'self': procurement, 'origin': production},
+                subtype_id=self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, 'mail.mt_note'))
+        return result
 
     def propagate_cancels(self, cr, uid, ids, context=None):
         for procurement in self.browse(cr, uid, ids, context=context):
@@ -100,6 +112,10 @@ class procurement_order(osv.osv):
                 #create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
                 vals = self._prepare_mo_vals(cr, uid, procurement, context=context)
                 produce_id = production_obj.create(cr, SUPERUSER_ID, vals, context=dict(context, force_company=procurement.company_id.id))
+                mo = production_obj.browse(cr, uid, produce_id, context=context)
+                name = (procurement.group_id and (procurement.group_id.name + ":") or "") + (procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id and procurement.move_dest_id.raw_material_production_id.name or "")
+                message = _("This manufacturing order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (procurement.id, name)
+                mo.message_post(body=message)
                 res[procurement.id] = produce_id
                 self.write(cr, uid, [procurement.id], {'production_id': produce_id})
                 self.production_order_create_note(cr, uid, procurement, context=context)
