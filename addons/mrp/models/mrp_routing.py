@@ -77,18 +77,17 @@ class MrpRoutingWorkcenter(models.Model):
 
     @api.multi
     def _get_time_cycle(self):
-        # TDE CLEANME
-        results = self.env['mrp.workorder'].read_group([
-            ('operation_id', 'in', self.ids),
-            ('state', '=', 'done')], ['operation_id', 'delay', 'qty_produced'], ['operation_id'])
-        totals = dict(map(lambda x: (x['operation_id'][0], (x['delay'], x['qty_produced'])), results))
-        for operation in self:
-            if operation.time_mode == 'manual':
-                operation.time_cycle = operation.time_cycle_manual
-                continue
-            (delay, qty) = totals.get(operation.id, (operation.time_cycle_manual, 1))
-            if qty:
-                operation.time_cycle = delay / qty
+        manual_ops = self.filtered(lambda operation: operation.time_mode == 'manual')
+        for operation in manual_ops:
+            operation.time_cycle = operation.time_cycle_manual
+        for operation in self - manual_ops:
+            data = self.env['mrp.workorder'].read_group([
+                ('operation_id', '=', operation.id),
+                ('state', '=', 'done')], ['operation_id', 'delay', 'qty_produced'], ['operation_id'],
+                limit=operation.time_mode_batch)
+            count_data = dict((item['operation_id'][0], (item['delay'], item['qty_produced'])) for item in data)
+            if count_data.get(operation.id) and count_data[operation.id][1]:
+                operation.time_cycle = count_data[operation.id][0] / count_data[operation.id][1]
             else:
                 operation.time_cycle = operation.time_cycle_manual
 
