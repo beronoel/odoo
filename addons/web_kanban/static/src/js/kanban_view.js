@@ -70,6 +70,7 @@ var KanbanView = View.extend({
         this.grouped = undefined;
         this.group_by_field = undefined;
         this.default_group_by = this.fields_view.arch.attrs.default_group_by;
+        this.quick_create_on_add = this.fields_view.arch.attrs.quick_create_on_add;
         this.grouped_by_m2o = undefined;
         this.relation = undefined;
         this.is_empty = undefined;
@@ -322,13 +323,25 @@ var KanbanView = View.extend({
         if (this.options.action_buttons !== false && this.is_action_enabled('create')) {
             this.$buttons = $(QWeb.render("KanbanView.buttons", {'widget': this}));
 
+            // Hide 'create' button if no group (no columns)
             var groups = this.data.groups;
             if (groups && groups.length === 0) {
                 this.$buttons.find('.o-kanban-button-new').hide()
             }
 
+            var handler;
             var action_id = this.options.action.action_id[0];
-            var handler = action_id ? this.do_action.bind(this, action_id) : this.add_record.bind(this);
+            if (action_id){
+                // In case of an action is explicitly defined
+                handler = this.do_action.bind(this, action_id);
+            } else if (this.grouped && this.quick_create_on_add !== undefined) {
+                // Activate the quick create button in the first column
+                handler = this.widgets[0].add_quick_create.bind(this.widgets[0]);
+            } else {
+                // Default behavior (open form view)
+                handler = this.add_record.bind(this);
+            }
+
             this.$buttons.on('click', 'button.o-kanban-button-new', handler);
             this.$buttons.appendTo($node);
         }
