@@ -1194,7 +1194,7 @@ class AssetsBundle(object):
                 css_attachments = self.css()
                 if not self.css_errors:
                     for attachment in css_attachments:
-                        el = etree.fromstring('<link href="%s" rel="stylesheet"/>' % attachment.url)
+                        el = etree.fromstring('<link href="%s%s" rel="stylesheet"/>' % (qwebcontext.context.get('prepend_to_asset_bunde_url', ''), attachment.url))
                         response.append(self.env['ir.qweb'].render_node(el, qwebcontext))
                 else:
                     msg = '\n'.join(self.css_errors)
@@ -1202,7 +1202,7 @@ class AssetsBundle(object):
                     for style in self.stylesheets:
                         response.append(style.to_html())
             if js and self.javascripts:
-                el = etree.fromstring('<script %s type="text/javascript" src="%s"></script>' % (async and 'async="async"' or '', self.js().url))
+                el = etree.fromstring('<script %s type="text/javascript" src="%s%s"></script>' % (async and 'async="async"' or '', qwebcontext.context.get('prepend_to_asset_bunde_url', ''), self.js().url))
                 response.append(self.env['ir.qweb'].render_node(el, qwebcontext))
         response.extend(self.remains)
         return sep + sep.join(response)
