@@ -153,6 +153,12 @@ class Report(osv.Model):
         if not config['test_enable']:
             context = dict(context, commit_assetsbundle=True)
 
+        # We tell QWeb to prepend a path to proxy the asset's bundle URL. If there's a rule in the
+        # reverse proxy to dispatch the url beginning with the path to a gevent worker, this allows
+        # to print with a low number of workers and prevent possible locks of workers as wkhtmltopdf
+        # is known to open tcp connections and not to anything with them.
+        context = dict(context, prepend_to_asset_bunde_url="/report/proxy")
+
         if html is None:
             html = self.get_html(cr, uid, ids, report_name, data=data, context=context)
 

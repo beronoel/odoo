@@ -130,3 +130,7 @@ class ReportController(Controller):
     @route(['/report/check_wkhtmltopdf'], type='json', auth="user")
     def check_wkhtmltopdf(self):
         return request.registry['report']._check_wkhtmltopdf()
+
+    @route(['/report/proxy/<path:value>'], type='http', auth='user')
+    def report_proxy(self, value):
+        return request.registry['ir.http'].reroute(value[:15])
