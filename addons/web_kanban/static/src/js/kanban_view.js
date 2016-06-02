@@ -70,7 +70,7 @@ var KanbanView = View.extend({
         this.grouped = undefined;
         this.group_by_field = undefined;
         this.default_group_by = this.fields_view.arch.attrs.default_group_by;
-        this.quick_create_on_add = this.fields_view.arch.attrs.quick_create_on_add;
+        this.on_create = this.fields_view.arch.attrs.on_create;
         this.grouped_by_m2o = undefined;
         this.relation = undefined;
         this.is_empty = undefined;
@@ -332,18 +332,17 @@ var KanbanView = View.extend({
             }
 
             var handler = function () {
-                var action = self.options.action.action_id;
-                if (action) {
+                if (self.grouped && self.widgets.length && self.on_create === 'quick_create') {
+                    // Activate the quick create button in the first column
+                    self.widgets[0].add_quick_create();
+                } else if (self.on_create) {
                     // In case of an action is explicitly defined
                     var options = {
                         on_close: function () {
                             self.do_reload();
                         }
                     }
-                    self.do_action(action[0], options);
-                } else if (self.grouped && self.widgets.length && self.quick_create_on_add !== undefined) {
-                    // Activate the quick create button in the first column
-                    self.widgets[0].add_quick_create();
+                    self.do_action(self.on_create, options);
                 } else {
                     // Default behavior (open form view)
                     self.add_record();
