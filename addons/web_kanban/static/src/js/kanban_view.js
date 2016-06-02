@@ -320,26 +320,28 @@ var KanbanView = View.extend({
      * $node may be undefined, in which case the ListView inserts them into this.options.$buttons
      */
     render_buttons: function($node) {
+        var self = this;
         if (this.options.action_buttons !== false && this.is_action_enabled('create')) {
             this.$buttons = $(QWeb.render("KanbanView.buttons", {'widget': this}));
 
             // Hide 'create' button if no group (no columns)
             var groups = this.data.groups;
             if (groups && groups.length === 0) {
-                this.$buttons.find('.o-kanban-button-new').hide()
+                this.$buttons.find('.o-kanban-button-new').hide();
             }
 
-            var handler;
-            var action_id = this.options.action.action_id[0];
-            if (action_id){
-                // In case of an action is explicitly defined
-                handler = this.do_action.bind(this, action_id);
-            } else if (this.grouped && this.quick_create_on_add !== undefined) {
-                // Activate the quick create button in the first column
-                handler = this.widgets[0].add_quick_create.bind(this.widgets[0]);
-            } else {
-                // Default behavior (open form view)
-                handler = this.add_record.bind(this);
+            var handler = function () {
+                var action = self.options.action.action_id;
+                if (action) {
+                    // In case of an action is explicitly defined
+                    self.do_action(action[0]);
+                } else if (self.grouped && self.widgets.length && self.quick_create_on_add !== undefined) {
+                    // Activate the quick create button in the first column
+                    self.widgets[0].add_quick_create();
+                } else {
+                    // Default behavior (open form view)
+                    self.add_record();
+                }
             }
 
             this.$buttons.on('click', 'button.o-kanban-button-new', handler);
