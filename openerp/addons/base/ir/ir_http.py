@@ -69,6 +69,8 @@ class IrHttp(models.AbstractModel):
     _name = 'ir.http'
     _description = "HTTP routing"
 
+    rerouting_limit = 10
+
     def _get_converters(self):
         return {'model': ModelConverter, 'models': ModelsConverter, 'int': SignedIntConverter}
 
@@ -197,6 +199,21 @@ class IrHttp(models.AbstractModel):
                 arguments[name] = arg.sudo(request.uid)
                 if not arg.exists():
                     return self._handle_exception(werkzeug.exceptions.NotFound())
+
+    def reroute(self, path):
+        if not hasattr(request, 'rerouting'):
+            request.rerouting = [request.httprequest.path]
+        if path in request.rerouting:
+            raise Exception("Rerouting loop is forbidden")
+        request.rerouting.append(path)
+        if len(request.rerouting) > self.rerouting_limit:
+            raise Exception("Rerouting limit exceeded")
+        request.httprequest.environ['PATH_INFO'] = path
+        # void werkzeug cached_property. TODO: find a proper way to do this
+        for key in ('path', 'full_path', 'url', 'base_url'):
+            request.httprequest.__dict__.pop(key, None)
+
+        return self._dispatch()
 
     def routing_map(self):
         if not hasattr(self, '_routing_map'):

@@ -27,7 +27,6 @@ class RequestUID(object):
 class ir_http(orm.AbstractModel):
     _inherit = 'ir.http'
 
-    rerouting_limit = 10
     _geoip_resolver = None
 
     def _get_converters(self):
@@ -193,21 +192,6 @@ class ir_http(orm.AbstractModel):
         if request.website_enabled and cook_lang != request.lang and hasattr(resp, 'set_cookie'):
             resp.set_cookie('website_lang', request.lang)
         return resp
-
-    def reroute(self, path):
-        if not hasattr(request, 'rerouting'):
-            request.rerouting = [request.httprequest.path]
-        if path in request.rerouting:
-            raise Exception("Rerouting loop is forbidden")
-        request.rerouting.append(path)
-        if len(request.rerouting) > self.rerouting_limit:
-            raise Exception("Rerouting limit exceeded")
-        request.httprequest.environ['PATH_INFO'] = path
-        # void werkzeug cached_property. TODO: find a proper way to do this
-        for key in ('path', 'full_path', 'url', 'base_url'):
-            request.httprequest.__dict__.pop(key, None)
-
-        return self._dispatch()
 
     def _postprocess_args(self, arguments, rule):
         super(ir_http, self)._postprocess_args(arguments, rule)
