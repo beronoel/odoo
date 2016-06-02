@@ -158,7 +158,8 @@ var KanbanView = View.extend({
     },
 
     do_reload: function() {
-        this.do_search(this.search_domain, this.search_context, [this.group_by_field]);
+        var group_by = this.group_by_field ? [this.group_by_field] : [];
+        this.do_search(this.search_domain, this.search_context, group_by);
     },
 
     load_records: function (offset, dataset) {
@@ -334,7 +335,12 @@ var KanbanView = View.extend({
                 var action = self.options.action.action_id;
                 if (action) {
                     // In case of an action is explicitly defined
-                    self.do_action(action[0]);
+                    var options = {
+                        on_close: function () {
+                            self.do_reload();
+                        }
+                    }
+                    self.do_action(action[0], options);
                 } else if (self.grouped && self.widgets.length && self.quick_create_on_add !== undefined) {
                     // Activate the quick create button in the first column
                     self.widgets[0].add_quick_create();
