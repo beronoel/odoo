@@ -144,7 +144,7 @@ class MrpBom(models.Model):
         while bom_lines:
             current_line = bom_lines[0]
             bom_lines = bom_lines[1:]
-            line_quantity = quantity * current_line.product_qty / self.product_qty
+            line_quantity = quantity * current_line.product_qty / current_line.bom_id.product_qty
             if current_line._skip_bom_line(current_line.product_id):
                 continue
             if current_line.product_id.product_tmpl_id in templates:
@@ -156,7 +156,8 @@ class MrpBom(models.Model):
                 boms_explored.append((bom, converted_line_quantity))
                 bom_lines = bom.bom_line_ids + bom_lines
                 templates |= current_line.product_id.product_tmpl_id
-            lines_explored.append((current_line, line_quantity))
+            else:
+                lines_explored.append((current_line, line_quantity))
 
         return boms_explored, lines_explored
 

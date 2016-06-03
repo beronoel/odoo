@@ -175,8 +175,7 @@ class MrpProduction(models.Model):
                 order.availability = 'none'
                 continue
             if order.bom_id.ready_to_produce == 'all_available':
-                assigned_list = [x.state in ('assigned','done','cancel') for x in order.move_raw_ids]
-                order.availability = all(assigned_list) and 'assigned' or 'waiting'
+                order.availability = any(move.state not in ('assigned', 'done', 'cancel') for move in order.move_raw_ids) and 'waiting' or 'assigned'
             else:
                 # TODO: improve this check
                 partial_list = [x.partially_available and x.state in ('waiting', 'confirmed', 'assigned') for x in order.move_raw_ids]
@@ -366,7 +365,12 @@ class MrpProduction(models.Model):
         else:
             self._generate_raw_move(bom_line, quantity)
 
-
+    @api.multi
+    def action_assign(self):
+        for production in self:
+            move_to_assign = production.move_raw_ids.filtered(lambda x: x.state in ('confirmed', 'waiting', 'assigned'))
+            move_to_assign.action_assign()
+        return True
 
 
 
@@ -507,13 +511,6 @@ class MrpProduction(models.Model):
         self.write({'state': 'done', 'date_finished': fields.datetime.now()})
         self.env["procurement.order"].search([('production_id', 'in', self.ids)]).check()
         self.write({'state': 'done'})
-
-    @api.multi
-    def action_assign(self):
-        for production in self:
-            move_to_assign = production.move_raw_ids.filtered(lambda x: x.state in ('confirmed', 'waiting', 'assigned'))
-            move_to_assign.action_assign()
-        return True
 
     @api.multi
     def do_unreserve(self):
