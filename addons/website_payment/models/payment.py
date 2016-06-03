@@ -11,6 +11,8 @@ class PaymentAcquirer(models.Model):
     _name = 'payment.acquirer'
     _inherit = ['payment.acquirer','website.published.mixin']
 
+    is_cod = fields.Boolean()
+
 class PaymentTransaction(models.Model):
     _inherit = 'payment.transaction'
 
