@@ -756,6 +756,9 @@ class WebsiteSale(http.Controller):
                 'reference': Transaction.get_next_reference(order.name),
                 'sale_order_id': order.id,
             })
+            #transaction state should be in 'pending' state in case of prosessing COD(Collect on delivery) 
+            if tx.acquirer_id.is_cod:
+                tx.state = 'pending'
             request.session['sale_transaction_id'] = tx.id
 
         # update quotation
@@ -829,7 +832,7 @@ class WebsiteSale(http.Controller):
             return request.redirect('/shop')
 
         if (not order.amount_total and not tx) or tx.state in ['pending', 'done']:
-            if (not order.amount_total and not tx):
+            if (not order.amount_total and not tx) or tx.acquirer_id.is_cod:
                 # Orders are confirmed by payment transactions, but there is none for free orders,
                 # (e.g. free events), so confirm immediately
                 order.with_context(send_email=True).action_confirm()
