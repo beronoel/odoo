@@ -120,8 +120,8 @@ class MrpWorkcenter(models.Model):
             ('date_start', '>=', fields.Datetime.to_string(datetime.datetime.now() - relativedelta.relativedelta(months=1))),
             ('workcenter_id', 'in', self.ids),
             ('state', '=', 'done')], ['duration_expected', 'workcenter_id', 'duration'], ['workcenter_id'], lazy=False)
-        duration_expected = dict((data['workcenter_id'][0], data['duration_expected']) for data in wo_data.values())
-        duration = dict((data['workcenter_id'][0], data['duration']) for data in wo_data.values())
+        duration_expected = dict((data['workcenter_id'][0], data['duration_expected']) for data in wo_data)
+        duration = dict((data['workcenter_id'][0], data['duration']) for data in wo_data)
         for workcenter in self:
             if duration.get(workcenter.id):
                 workcenter.performance = 100 * duration_expected.get(workcenter.id, 0.0) / duration[workcenter.id]
