@@ -394,7 +394,7 @@ class MrpProductionWorkcenterLine(models.Model):
             'res_model': 'stock.scrap',
             'view_id': self.env.ref('stock.stock_scrap_form_view2').id,
             'type': 'ir.actions.act_window',
-            'context': {'product_ids': self.production_id.move_raw_ids.mapped('product_id').ids + [self.product.id]},
+            'context': {'product_ids': self.production_id.move_raw_ids.mapped('product_id').ids + [self.product_id.id]},
             # 'context': {'product_ids': self.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')).mapped('product_id').ids + [self.production_id.product_id.id]},
             'target': 'new',
         }

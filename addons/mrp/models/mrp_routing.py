@@ -83,9 +83,9 @@ class MrpRoutingWorkcenter(models.Model):
         for operation in self - manual_ops:
             data = self.env['mrp.workorder'].read_group([
                 ('operation_id', '=', operation.id),
-                ('state', '=', 'done')], ['operation_id', 'delay', 'qty_produced'], ['operation_id'],
+                ('state', '=', 'done')], ['operation_id', 'duration', 'qty_produced'], ['operation_id'],
                 limit=operation.time_mode_batch)
-            count_data = dict((item['operation_id'][0], (item['delay'], item['qty_produced'])) for item in data)
+            count_data = dict((item['operation_id'][0], (item['duration'], item['qty_produced'])) for item in data)
             if count_data.get(operation.id) and count_data[operation.id][1]:
                 operation.time_cycle = count_data[operation.id][0] / count_data[operation.id][1]
             else:
