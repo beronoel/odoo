@@ -153,7 +153,7 @@ class MrpProductionWorkcenterLine(models.Model):
     def _onchange_qty_producing(self):
         """ Update stock.move.lot records, according to the new qty currently
         produced. """
-        moves = self.move_raw_ids.filtered(lambda move: move.state not in ('done', 'cancel') and move.product_id.tracking != 'none' and move.product_id.id != self.production_id.product.id)
+        moves = self.move_raw_ids.filtered(lambda move: move.state not in ('done', 'cancel') and move.product_id.tracking != 'none' and move.product_id.id != self.production_id.product_id.id)
         for move in moves:
             move_lots = self.active_move_lot_ids.filtered(lambda move_lot: move_lot.move_id == move)
             if not move_lots:
