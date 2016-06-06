@@ -49,7 +49,7 @@ class MrpWorkcenter(models.Model):
 
     @api.depends('order_ids.workcenter_id', 'order_ids.state')
     def _compute_workorder_count(self):
-        data = self.env['mrp.workorder'].read_group([('workcenter_id', 'in', self.ids), ('state', '!=', 'done')], ['workcenter_id'], ['workcenter_id'])
+        data = self.env['mrp.workorder'].read_group([('workcenter_id', 'in', self.ids), ('state', 'not in', ('done', 'cancel'))], ['workcenter_id'], ['workcenter_id'])
         count_data = dict((item['workcenter_id'][0], item['workcenter_id_count']) for item in data)
         for workcenter in self:
             workcenter.workorder_count = count_data.get(workcenter.id, 0)
