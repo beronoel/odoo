@@ -328,7 +328,11 @@ var KanbanView = View.extend({
             // Hide 'create' button if no group (no columns)
             var groups = this.data.groups;
             if (groups && groups.length === 0) {
-                this.$buttons.find('.o-kanban-button-new').hide();
+                var $button_new = this.$buttons.find('.o-kanban-button-new');
+                $button_new.hide();
+                this.once('new_column_added', this, function () {
+                    $button_new.show();
+                });
             }
 
             var handler = function () {
@@ -758,6 +762,7 @@ var KanbanView = View.extend({
             var column = new KanbanColumn(self, group_data, options, record_options);
             column.insertBefore(self.$('.o_column_quick_create'));
             self.widgets.push(column);
+            self.trigger('new_column_added', column);
             self.trigger_up('scrollTo', {selector: '.o_column_quick_create'});
         });
     },
