@@ -346,8 +346,7 @@ class MrpProductionWorkcenterLine(models.Model):
         domain = [('workorder_id', 'in', self.ids), ('date_end', '=', False)]
         if not doall:
             domain.append(('user_id', '=', self.env.user.id))
-        
-        for timeline in timeline_obj.search(domain, limit=doall and None or 1):
+        for timeline in timeline_obj.search(domain,limit=not doall):
             wo = timeline.workorder_id
             if timeline.loss_type <> 'productive':
                 timeline.write({'date_end': fields.Datetime.now()})
