@@ -1,116 +1,137 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import exceptions
 from odoo.addons.mrp.tests.common import TestMrpCommon
 
 
 class TestBoM(TestMrpCommon):
 
-    def test_basic(self):
-        self.assertEqual(self.production_1.state, 'confirmed')
-
-        # produce product
-        produce_wizard = self.env['mrp.product.produce'].with_context({
-            'active_id': self.production_1.id,
-            'active_ids': [self.production_1.id],
-        }).create({
-            'product_qty': 1.0,
-        })
-        # produce_wizard.on_change_qty()
-        produce_wizard.do_produce()
-
-        # check production
-        # self.assertEqual(production.state, 'done')
-
     def test_explode(self):
-        res = self.bom_1.explode_new(3)
-        # print '--------'
-        # print res
+        boms, lines = self.bom_1.explode_new(self.product_4, 3)
+        self.assertEqual(set([bom[0].id for bom in boms]), set(self.bom_1.ids))
+        self.assertEqual(set([line[0].id for line in lines]), set(self.bom_1.bom_line_ids.ids))
 
-    def test_explode_from_order(self):
-        # reset quantities
-        self.env['stock.change.product.qty'].create({
-            'product_id': self.product_1.id,
-            'new_quantity': 0.0,
-            'location_id': self.warehouse_1.lot_stock_id.id,
-        }).change_product_qty()
+        boms, lines = self.bom_3.explode_new(self.product_6, 3)
+        self.assertEqual(set([bom[0].id for bom in boms]), set((self.bom_2 | self.bom_3).ids))
+        self.assertEqual(
+            set([line[0].id for line in lines]),
+            set((self.bom_2 | self.bom_3).mapped('bom_line_ids').filtered(lambda line: not line.child_bom_id or line.child_bom_id.type != 'phantom').ids))
 
-        (self.product_2 | self.product_4).write({
-            'tracking': 'lot',
+    def test_variants(self):
+        test_bom = self.env['mrp.bom'].create({
+            'product_id': self.product_7.id,
+            'product_tmpl_id': self.product_7.product_tmpl_id.id,
+            'product_uom_id': self.uom_unit.id,
+            'product_qty': 4.0,
+            'routing_id': self.routing_2.id,
+            'type': 'normal',
         })
-        # assign consume material
-        self.production_1.action_assign()
-        self.assertEqual(self.production_1.availability, 'waiting')
-
-        # check consume materials of manufacturing order
-        self.assertEqual(len(self.production_1.move_raw_ids), 3)
-        # for move in self.production_1.move_raw_ids:
-        #     print move.name, move.state, move.product_id, move.product_qty, move.product_uom_qty, move.unit_factor
-        product_2_consume_moves = self.production_1.move_raw_ids.filtered(lambda x: x.product_id == self.product_2)
-        product_4_consume_moves = self.production_1.move_raw_ids.filtered(lambda x: x.product_id == self.product_4)
-        product_5_consume_moves = self.production_1.move_raw_ids.filtered(lambda x: x.product_id == self.product_5)
-        self.assertEqual(product_2_consume_moves.product_uom_qty, 2.0)
-        self.assertEqual(product_4_consume_moves.product_uom_qty, 6.0)
-        self.assertEqual(product_5_consume_moves.product_uom_qty, 3.0)
-
-        # create required lots
-        lot_product_2 = self.env['stock.production.lot'].create({'product_id': self.product_2.id})
-        lot_product_4 = self.env['stock.production.lot'].create({'product_id': self.product_4.id})
-
-        # refuel stock
-        inventory = self.env['stock.inventory'].create({
-            'name': 'Inventory For Product C',
-            'filter': 'partial',
-            'line_ids': [(0, 0, {
-                'product_id': self.product_2.id,
-                'product_uom_id': self.product_2.uom_id.id,
-                'product_qty': 30,
-                'prod_lot_id': lot_product_2.id,
-                'location_id': self.ref('stock.stock_location_14')
-            }), (0, 0, {
-                'product_id': self.product_4.id,
-                'product_uom_id': self.product_5.uom_id.id,
-                'product_qty': 60,
-                'prod_lot_id': lot_product_4.id,
-                'location_id': self.ref('stock.stock_location_14')
-            }), (0, 0, {
-                'product_id': self.product_5.id,
-                'product_uom_id': self.product_5.uom_id.id,
-                'product_qty': 60,
-                'location_id': self.ref('stock.stock_location_14')
-            })]
+        test_bom_l1 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom.id,
+            'product_id': self.product_2.id,
+            'product_qty': 2,
         })
-        inventory.prepare_inventory()
-        inventory.action_done()
+        test_bom_l2 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom.id,
+            'product_id': self.product_3.id,
+            'product_qty': 2,
+            'attribute_value_ids': [(4, self.prod_attr1_v1.id)],
+        })
+        test_bom_l3 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom.id,
+            'product_id': self.product_4.id,
+            'product_qty': 2,
+            'attribute_value_ids': [(4, self.prod_attr1_v2.id)],
+        })
+        boms, lines = test_bom.explode_new(self.product_7, 4)
+        self.assertIn(test_bom, [b[0]for b in boms])
+        self.assertIn(test_bom_l1, [l[0] for l in lines])
+        self.assertNotIn(test_bom_l2, [l[0] for l in lines])
+        self.assertNotIn(test_bom_l3, [l[0] for l in lines])
 
-        # re-assign consume material
-        self.production_1.action_assign()
+        boms, lines = test_bom.explode_new(self.product_7_1, 4)
+        self.assertIn(test_bom, [b[0]for b in boms])
+        self.assertIn(test_bom_l1, [l[0] for l in lines])
+        self.assertIn(test_bom_l2, [l[0] for l in lines])
+        self.assertNotIn(test_bom_l3, [l[0] for l in lines])
 
-        # Check production order status after assign.
-        self.assertEqual(self.production_1.availability, 'assigned')
-        # Plan production order.
-        self.production_1.button_plan()
+        boms, lines = test_bom.explode_new(self.product_7_2, 4)
+        self.assertIn(test_bom, [b[0]for b in boms])
+        self.assertIn(test_bom_l1, [l[0] for l in lines])
+        self.assertNotIn(test_bom_l2, [l[0] for l in lines])
+        self.assertIn(test_bom_l3, [l[0] for l in lines])
 
-        # check workorders
+    def test_multi_level_variants(self):
+        tmp_picking_type = self.env['stock.picking.type'].create({
+            'name': 'Manufacturing',
+            'code': 'mrp_operation',
+            'sequence_id': self.env['ir.sequence'].search([('code', '=', 'mrp.production')], limit=1).id,
+        })
+        test_bom_1 = self.env['mrp.bom'].create({
+            'product_tmpl_id': self.product_5.product_tmpl_id.id,
+            'product_uom_id': self.product_5.uom_id.id,
+            'product_qty': 1.0,
+            'routing_id': self.routing_1.id,
+            'type': 'phantom'
+        })
+        test_bom_1_l1 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom_1.id,
+            'product_id': self.product_3.id,
+            'product_qty': 3,
+        })
 
-        workorders = self.production_1.workorder_ids
-        # for workorder in workorders:
-        #     print workorder.name, workorder.product_id, workorder.qty_producing
+        test_bom_2 = self.env['mrp.bom'].create({
+            'product_id': self.product_7.id,
+            'product_tmpl_id': self.product_7.product_tmpl_id.id,
+            'product_uom_id': self.uom_unit.id,
+            'product_qty': 4.0,
+            'routing_id': self.routing_2.id,
+            'type': 'normal',
+        })
+        test_bom_2_l1 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom_2.id,
+            'product_id': self.product_2.id,
+            'product_qty': 2,
+        })
+        test_bom_2_l2 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom_2.id,
+            'product_id': self.product_5.id,
+            'product_qty': 2,
+            'attribute_value_ids': [(4, self.prod_attr1_v1.id)],
+        })
+        test_bom_2_l3 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom_2.id,
+            'product_id': self.product_5.id,
+            'product_qty': 2,
+            'attribute_value_ids': [(4, self.prod_attr1_v2.id)],
+        })
+        test_bom_2_l4 = self.env['mrp.bom.line'].create({
+            'bom_id': test_bom_2.id,
+            'product_id': self.product_4.id,
+            'product_qty': 2,
+        })
 
-        # first machine (machine A)
-        # self.assertEqual(workorders[0].duration, 40)
-        workorders[0].button_start()
-        finished_lot = self.env['stock.production.lot'].create({'product_id': self.production_1.product_id.id})
-        workorders[0].write({'final_lot_id': finished_lot.id, 'qty_producing': 48})
+        # check product > product_tmpl
+        boms, lines = test_bom_2.explode_new(self.product_7_1, 4)
+        self.assertEqual(set((test_bom_2 | self.bom_2).ids), set([b[0].id for b in boms]))
+        self.assertEqual(set((test_bom_2_l1 | test_bom_2_l4 | self.bom_2.bom_line_ids).ids), set([l[0].id for l in lines]))
 
-        product_d_move_lot = workorders[0].active_move_lot_ids.filtered(lambda x: x.product_id == self.product_2)
-        product_d_move_lot.write({'lot_id': lot_product_2.id, 'quantity_done': 2})
-        workorders[0].record_production()
+        # check sequence priority
+        test_bom_1.write({'sequence': 1})
+        boms, lines = test_bom_2.explode_new(self.product_7_1, 4)
+        self.assertEqual(set((test_bom_2 | test_bom_1).ids), set([b[0].id for b in boms]))
+        self.assertEqual(set((test_bom_2_l1 | test_bom_2_l4 | test_bom_1.bom_line_ids).ids), set([l[0].id for l in lines]))
 
-        # Check machine B process....
-        # self.assertEqual(workorders[1].duration, 20, "Workorder duration does not match.")
-        workorders[1].button_start()
-        product_f_move_lot = workorders[1].active_move_lot_ids.filtered(lambda x: x.product_id == self.product_5)
-        product_f_move_lot.write({'lot_id': lot_product_4.id, 'quantity_done': 6})
-        workorders[1].record_production()
-        self.production_1.button_mark_done()
+        # check with another picking_type
+        test_bom_1.write({'picking_type_id': self.warehouse_1.manu_type_id.id})
+        self.bom_2.write({'picking_type_id': tmp_picking_type.id})
+        test_bom_2.write({'picking_type_id': tmp_picking_type.id})
+        boms, lines = test_bom_2.explode_new(self.product_7_1, 4)
+        self.assertEqual(set((test_bom_2 | self.bom_2).ids), set([b[0].id for b in boms]))
+        self.assertEqual(set((test_bom_2_l1 | test_bom_2_l4 | self.bom_2.bom_line_ids).ids), set([l[0].id for l in lines]))
+
+        # check recursion
+        test_bom_2_l3.write({'attribute_value_ids': [(6, 0, [self.prod_attr1_v1.id])]})
+        with self.assertRaises(exceptions.UserError):
+            test_bom_2.explode_new(self.product_7_1, 4)
