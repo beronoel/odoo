@@ -19,7 +19,7 @@ class TestInventory(TestStockCommon):
         self.assertEqual(len(inventory.line_ids), 1)
         self.assertEqual(inventory.line_ids.theoretical_qty, 50.0)
         self.assertEqual(inventory.line_ids.product_id, self.product_1)
-        self.assertEqual(inventory.line_ids.product_uom_id, self.uom_unit)
+        self.assertEqual(inventory.line_ids.product_uom_id, self.product_1.uom_id)
 
         # Update the line, set to 35
         inventory.line_ids.write({'product_qty': 35.0})
