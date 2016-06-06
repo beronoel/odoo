@@ -124,7 +124,7 @@ class MrpBom(models.Model):
                 continue
             if bom_line.product_id.product_tmpl_id.id in done:
                 raise UserError(_('BoM "%s" contains a BoM line with a product recursion: "%s".') % (self.display_name, bom_line.product_id.display_name))
-            bom = bom_line.child_bom_id
+            bom = self._bom_find(product=bom_line.product_id, picking_type=self.picking_type_id)
             if not bom or bom.type != "phantom":
                 qty = quantity * bom_line.product_qty / self.product_qty
                 if method:
@@ -136,30 +136,37 @@ class MrpBom(models.Model):
                 bom.explode(bom_line.product_id, qty2, original_quantity=original_quantity, method=method, method_wo=method_wo, done=done, result=kw)
         return True
 
-    def explode_new(self, quantity):
-        boms_explored = [(self, quantity)]
-        lines_explored = []
-        bom_lines = self.bom_line_ids
-        templates = self.env['product.template']
+    def explode_new(self, product, quantity):
+        # TDE TOCHECK: product: initially, is the product we want to explode (bom could have a template)
+        #      then in iterations: product from line
+        # TDE TOCHECK: picking_type_id should be the original one
+        # TDE TOCHECK: original_quantity to add -> quantity / original_quantity -> factor (produce 1 more -> how more I need)
+        boms_done = [(self, {'qty': quantity, 'product': product, 'original_qty': quantity})]
+        lines_done = []
+        templates_done = self.env['product.template']
+
+        bom_lines = [(bom_line, product) for bom_line in self.bom_line_ids]
         while bom_lines:
-            current_line = bom_lines[0]
+            current_line, current_product = bom_lines[0]
             bom_lines = bom_lines[1:]
-            line_quantity = quantity * current_line.product_qty / current_line.bom_id.product_qty
-            if current_line._skip_bom_line(current_line.product_id):
+
+            if current_line._skip_bom_line(current_product):
                 continue
-            if current_line.product_id.product_tmpl_id in templates:
+            if current_line.product_id.product_tmpl_id in templates_done:
                 raise UserError(_('Recursion error !'))
 
-            bom = self._bom_find(product=current_line.product_id, picking_type=current_line.bom_id.picking_type_id)
-            if bom and bom.type == 'phantom':
-                converted_line_quantity = self.env['product.uom']._compute_qty_obj(current_line.product_uom_id, line_quantity, bom.product_uom_id)
-                boms_explored.append((bom, converted_line_quantity))
-                bom_lines = bom.bom_line_ids + bom_lines
-                templates |= current_line.product_id.product_tmpl_id
-            else:
-                lines_explored.append((current_line, line_quantity))
+            line_quantity = quantity * current_line.product_qty / current_line.bom_id.product_qty
 
-        return boms_explored, lines_explored
+            bom = self._bom_find(product=current_line.product_id, picking_type=self.picking_type_id, company_id=self.company_id.id)
+            if bom.type == 'phantom':
+                converted_line_quantity = self.env['product.uom']._compute_qty_obj(current_line.product_uom_id, line_quantity, bom.product_uom_id)
+                bom_lines = [(line, current_line.product_id) for line in bom.bom_line_ids] + bom_lines
+                templates_done |= current_line.product_id.product_tmpl_id
+                boms_done.append((bom, {'qty': converted_line_quantity, 'product': current_product, 'original_qty': quantity}))
+            else:
+                lines_done.append((current_line, {'qty': line_quantity, 'product': current_product, 'original_qty': quantity}))
+
+        return boms_done, lines_done
 
 
 class MrpBomLine(models.Model):

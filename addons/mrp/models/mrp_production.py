@@ -260,8 +260,8 @@ class MrpProduction(models.Model):
             production._generate_finished_moves()
             factor = self.env['product.uom']._compute_qty(production.product_uom_id.id, production.product_qty, production.bom_id.product_uom_id.id)
             # production.bom_id.explode(production.product_id, factor, method=self._generate_raw_move)
-            explored_boms, explored_lines = production.bom_id.explode_new(factor)
-            production._generate_raw_moves(explored_lines)
+            boms, lines = production.bom_id.explode_new(production.product_id, factor)
+            production._generate_raw_moves(lines)
             # Check for all draft moves whether they are mto or not
             self._adjust_procure_method()
             self.move_raw_ids.action_confirm()
@@ -290,11 +290,11 @@ class MrpProduction(models.Model):
         move.action_confirm()
         return move
 
-    def _generate_raw_moves(self, explored_lines):
+    def _generate_raw_moves(self, exploded_lines):
         self.ensure_one()
         moves = self.env['stock.move']
-        for bom_line, quantity in explored_lines:
-            moves += self._generate_raw_move(bom_line, quantity)
+        for bom_line, line_data in exploded_lines:
+            moves += self._generate_raw_move(bom_line, line_data['qty'])
         return moves
 
     def _generate_raw_move(self, bom_line, quantity):
@@ -377,15 +377,15 @@ class MrpProduction(models.Model):
         for order in orders_to_plan:
             quantity = UoM._compute_qty_obj(order.product_uom_id, order.product_qty, order.bom_id.product_uom_id)
             # order.bom_id.explode(order.product_id, quantity, method_wo=order._workorders_create)
-            explored_boms, explored_lines = order.bom_id.explode_new(quantity)
-            order._generate_workorders(explored_boms)
+            boms, lines = order.bom_id.explode_new(order.product_id, quantity)
+            order._generate_workorders(boms)
         orders_to_plan.write({'state': 'planned'})
 
     @api.multi
-    def _generate_workorders(self, explored_boms):
+    def _generate_workorders(self, exploded_boms):
         workorders = self.env['mrp.workorder']
-        for bom, qty in explored_boms:
-            workorders += self._workorders_create(bom, qty)
+        for bom, bom_data in exploded_boms:
+            workorders += self._workorders_create(bom, bom_data['qty'])
         return workorders
 
     def _workorders_create(self, bom, qty):
