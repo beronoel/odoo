@@ -53,7 +53,7 @@
             parent="l10n_be.account_reports_be_statements_menu"
             action="action_intrastat_xml_declaration"
             id="l10n_be_intrastat_xml_declaration"
-            groups="account.group_account_manager"/>
+            groups="account_accountant.group_account_manager"/>
     </data>
 
 </openerp>

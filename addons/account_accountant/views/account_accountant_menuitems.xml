@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- From account/views/account_menu_item.xml -->
+    <record model="ir.ui.menu" id="account.menu_finance">
+        <field eval="[(4, ref('group_account_manager')), (4, ref('group_account_user'))]" name="groups_id"/>
+    </record>
+
+    <menuitem id="menu_finance_entries" name="Adviser" parent="menu_finance" sequence="4" groups="group_account_manager"/>
+    <menuitem id="menu_finance_reports" name="Reports" parent="menu_finance" sequence="5" groups="group_account_invoice"/>
+    <menuitem id="account_reports_business_intelligence_menu" name="Business Intelligence" parent="account.menu_finance_reports" sequence="5" groups="group_account_invoice"/>
+
+    <menuitem id="account_reports_management_menu" name="Management" parent="account.menu_finance_reports" sequence="4" groups="group_account_user"/>
+    <menuitem id="account_management_menu" name="Management" parent="account.menu_finance_configuration" sequence="3" groups="group_account_manager"/>
+    <menuitem id="menu_finance_legal_statement" name="PDF Reports" parent="account.menu_finance_reports" groups="group_account_user"/>
+    <menuitem id="menu_account_reports" name="Financial Reports" parent="menu_finance_configuration" groups="group_account_user"/>
+
+    <!-- From account/views/account_payment.xml -->
+    <menuitem action="action_account_payments" id="menu_action_account_payments_receivable" parent="menu_finance_receivables" sequence="20" groups="group_account_user"/>
+    <menuitem action="action_account_payments_payable" id="menu_action_account_payments_payable" parent="menu_finance_payables" sequence="20" groups="group_account_user"/>
+
+    <!-- From account/views/account_view.xml -->
+    <menuitem action="action_account_form" id="menu_action_account_form" parent="menu_finance_entries" sequence="20"/>
+    <menuitem action="action_account_moves_all_a" icon="STOCK_JUSTIFY_FILL" id="menu_action_account_moves_all" parent="account_accountant.menu_finance_entries" sequence="1" groups="base.group_no_one" />
+    <menuitem icon="STOCK_JUSTIFY_FILL" action="action_move_journal_line" id="menu_action_move_journal_line_form" parent="account_accountant.menu_finance_entries" groups="group_account_user" sequence="2"/>
+    <menuitem action="action_account_bank_journal_form" id="menu_action_account_bank_journal_form" parent="account_account_menu" groups="group_account_manager"/>
+    <menuitem action="action_account_journal_form" id="menu_action_account_journal_form" parent="account_account_menu" groups="group_account_manager"/>
+    <menuitem id="account_report_folder" name="Reports" parent="account_account_menu" groups="account_accountant.group_account_manager" sequence="4"/>
+    <menuitem action="action_payment_term_form" id="menu_action_payment_term_form" parent="account_management_menu" sequence="4"/>
+    <menuitem id="menu_account_financial_reports_tree" name="Account Reports" parent="menu_account_reports" action="action_account_financial_report_tree"/>
+    <menuitem id="menu_account_report_tree_hierarchy" name="Account Reports Hierarchy" parent="menu_account_reports" action="action_account_report_tree_hierarchy"/>
+
+    <!-- From account/views/account_analytic_view.xml -->
+    <menuitem name="Analytic Accounts" parent="menu_finance_entries" action="analytic.action_analytic_account_form" id="menu_action_analytic_account_tree2" sequence="30" groups="analytic.group_analytic_accounting"/>
+    <menuitem name="Analytic Entries" parent="menu_finance_entries" action="analytic.account_analytic_line_action_entries" id="menu_action_analytic_lines_tree" sequence="35" groups="analytic.group_analytic_accounting"/>
+
+</odoo>

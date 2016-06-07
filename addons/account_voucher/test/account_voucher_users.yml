@@ -27,4 +27,4 @@
   !record {model: res.users, id: res_users_account_voucher_manager}:
     groups_id:
       - base.group_partner_manager
-      - account.group_account_manager
+      - account_accountant.group_account_manager

@@ -135,7 +135,6 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_account_form" id="menu_action_account_form" parent="menu_finance_entries" sequence="20"/>
 
         <act_window
             id="act_account_partner_ledger_payable"
@@ -378,7 +377,6 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_account_bank_journal_form" id="menu_action_account_bank_journal_form" parent="account_account_menu" groups="group_account_manager"/>
 
         <record id="action_account_journal_form" model="ir.actions.act_window">
             <field name="name">Journals</field>
@@ -398,7 +396,6 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_account_journal_form" id="menu_action_account_journal_form" parent="account_account_menu" groups="group_account_manager"/>
 
         <act_window
            id="act_account_journal_2_account_bank_statement"
@@ -846,13 +843,6 @@
             </field>
         </record>
 
-        <menuitem
-            id="account_report_folder"
-            name="Reports"
-            parent="account_account_menu"
-            groups="account.group_account_manager"
-            sequence="4"/>
-
         <!-- Account Types -->
         <record id="view_account_type_search" model="ir.ui.view">
             <field name="name">account.account.type.search</field>
@@ -1222,7 +1212,6 @@
             <field name="view_id" ref="view_move_line_tree"/>
             <field name="view_mode">tree,form</field>
         </record>
-        <menuitem action="action_account_moves_all_a" icon="STOCK_JUSTIFY_FILL" id="menu_action_account_moves_all" parent="account.menu_finance_entries" sequence="1" groups="base.group_no_one" />
         <record id="action_account_moves_all_tree" model="ir.actions.act_window">
             <field name="name">Journal Items</field>
             <field name="res_model">account.move.line</field>
@@ -1389,13 +1378,6 @@
               </p>
             </field>
         </record>
-        <menuitem
-            icon="STOCK_JUSTIFY_FILL"
-            action="action_move_journal_line"
-            id="menu_action_move_journal_line_form"
-            parent="account.menu_finance_entries"
-            groups="group_account_user"
-            sequence="2"/>
 
         <record id="action_move_line_form" model="ir.actions.act_window">
             <field name="name">Entries</field>
@@ -1511,9 +1493,6 @@
             <field name="view_mode">tree,form</field>
             <field name="search_view_id" ref="view_payment_term_search"/>
         </record>
-
-        <menuitem action="action_payment_term_form"
-            id="menu_action_payment_term_form" parent="account_management_menu" sequence="4"/>
 
         <!-- Account Templates -->
 
@@ -1967,8 +1946,6 @@
             <field name="view_id" ref="view_account_financial_report_tree"/>
         </record>
 
-        <menuitem id="menu_account_financial_reports_tree" name="Account Reports" parent="menu_account_reports" action="action_account_financial_report_tree"/>
-
         <record id="view_account_report_tree_hierarchy" model="ir.ui.view">
             <field name="name">account.report.hierarchy</field>
             <field name="model">account.financial.report</field>
@@ -1990,8 +1967,6 @@
             <field name="view_id" ref="view_account_report_tree_hierarchy"/>
             <field name="domain">[('parent_id','=',False)]</field>
         </record>
-
-        <menuitem id="menu_account_report_tree_hierarchy" name="Account Reports Hierarchy" parent="menu_account_reports" action="action_account_report_tree_hierarchy"/>
 
     </data>
 </openerp>

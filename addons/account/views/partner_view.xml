@@ -185,7 +185,7 @@
                         <group string="Fiscal Information" name="fiscal_information">
                             <field name="property_account_position_id" options="{'no_create': True, 'no_open': True}"/>
                         </group>
-                        <group string="Accounting Entries" name="accounting_entries" groups="account.group_account_manager">
+                        <group string="Accounting Entries" name="accounting_entries" groups="account_accountant.group_account_manager">
                             <field name="property_account_receivable_id"/>
                             <field name="property_account_payable_id"/>
                         </group>

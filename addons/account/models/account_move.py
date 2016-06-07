@@ -177,7 +177,7 @@ class AccountMove(models.Model):
     def _check_lock_date(self):
         for move in self:
             lock_date = max(move.company_id.period_lock_date, move.company_id.fiscalyear_lock_date)
-            if self.user_has_groups('account.group_account_manager'):
+            if self.user_has_groups('account_accountant.group_account_manager'):
                 lock_date = move.company_id.fiscalyear_lock_date
             if move.date <= lock_date:
                 raise UserError(_("You cannot add/modify entries prior to and inclusive of the lock date %s. Check the company settings or ask someone with the 'Adviser' role") % (lock_date))

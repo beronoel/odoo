@@ -12,7 +12,7 @@ class AccountTestUsers(AccountingTestCase):
         self.main_partner = self.env.ref('base.main_partner')
         self.main_bank = self.env.ref('base.res_bank_1')
         res_users_account_user = self.env.ref('account.group_account_user')
-        res_users_account_manager = self.env.ref('account.group_account_manager')
+        res_users_account_manager = self.env.ref('account_accountant.group_account_manager')
         partner_manager = self.env.ref('base.group_partner_manager')
         self.tax_model = self.env['account.tax']
         self.account_model = self.env['account.account']

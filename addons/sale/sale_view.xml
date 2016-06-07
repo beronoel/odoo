@@ -17,7 +17,7 @@
             parent= "base.menu_sale_config"
             sequence= "1"
             name= "Sales"
-            groups= "base.group_sale_manager,base.group_sale_salesman,account.group_account_manager,account.group_account_user"/>
+            groups= "base.group_sale_manager,base.group_sale_salesman,account_accountant.group_account_manager,account.group_account_user"/>
 
         <record id="view_sale_order_calendar" model="ir.ui.view">
             <field name="name">sale.order.calendar</field>
