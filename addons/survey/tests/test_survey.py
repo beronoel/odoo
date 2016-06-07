@@ -204,14 +204,14 @@ class TestSurvey(TransactionCase):
             'partner_id': self.survey_user.partner_id.id,
             'user_input_line_ids': [(0, 0, {
                 'skipped': False, 'answer_type': 'free_text', 'value_free_text': "Test Answer",
-                'survey_id': self.survey1.id, 'page_id': self.page1, 'question_id': question.id})]})
+                'survey_id': self.survey1.id, 'question_id': question.id})]})
 
         input_public = self.UserInput.sudo(self.user_public).create({
             'survey_id': self.survey1.id,
             'partner_id': self.survey_user.partner_id.id,
             'user_input_line_ids': [(0, 0, {
                 'skipped': False, 'answer_type': 'free_text', 'value_free_text': "Test Answer",
-                'survey_id': self.survey1.id, 'page_id': self.page1, 'question_id': question.id})]})
+                'survey_id': self.survey1.id, 'question_id': question.id})]})
 
         answers = [input_portal.user_input_line_ids[0], input_public.user_input_line_ids[0]]
         expected_values = {'answer_type': 'free_text', 'value_free_text': "Test Answer"}

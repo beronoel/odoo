@@ -21,19 +21,17 @@ class SurveyMailComposeMessage(models.TransientModel):
         if context.get('model') == 'survey.survey':
             return context.get('res_id')
 
-    survey_id = fields.Many2one('survey.survey', 'Survey', default=default_survey_id, required=True)
+    survey_id = fields.Many2one('survey.survey', string='Survey', default=default_survey_id, required=True)
     public = fields.Selection([('public_link', 'Share the public web link to your audience.'),
                                 ('email_public_link', 'Send by email the public web link to your audience.'),
                                 ('email_private', 'Send private invitation to your audience (only one response per recipient and per invitation).')],
                                 string='Share options', default='public_link', required=True)
-    public_url = fields.Char(compute="_compute_survey_url", string="Public url", type="char")
-    public_url_html = fields.Char(compute="_compute_survey_url", string="Public HTML web link", type="char")
-    partner_ids = fields.Many2many('res.partner', 'survey_mail_compose_message_res_partner_rel',
-        'wizard_id', 'partner_id', 'Existing contacts')
-    attachment_ids = fields.Many2many('ir.attachment', 'survey_mail_compose_message_ir_attachments_rel',
-        'wizard_id', 'attachment_id', 'Attachments')
-    multi_email = fields.Text(string='List of emails', help="This list of emails of recipients will not converted in contacts.\
-        Emails separated by commas, semicolons or newline.")
+    public_url = fields.Char(compute="_compute_survey_url", string="Public url")
+    public_url_html = fields.Char(compute="_compute_survey_url", string="Public HTML web link")
+    partner_ids = fields.Many2many('res.partner', string='Existing contacts')
+    attachment_ids = fields.Many2many('ir.attachment', string='Attachments')
+    multi_email = fields.Text(string='List of emails', help="This list of emails of recipients will not be converted in contacts.\
+        Emails must be separated by commas, semicolons or newline.")
     date_deadline = fields.Date(string="Deadline to which the invitation to respond is valid",
         help="Deadline to which the invitation to respond for this survey is valid. If the field is empty,\
         the invitation is still valid.")
@@ -41,7 +39,7 @@ class SurveyMailComposeMessage(models.TransientModel):
     def _compute_survey_url(self):
         for wizard in self:
             wizard.public_url = wizard.survey_id.public_url
-            wizard.public_url_html = '<a href="%s">%s</a>' % (wizard.public_url, _("Click here to start survey"))
+            wizard.public_url_html = wizard.survey_id.public_url_html
 
     @api.model
     def default_get(self, fields):
@@ -69,16 +67,19 @@ class SurveyMailComposeMessage(models.TransientModel):
         emails_checked.sort()
         self.multi_email = '\n'.join(emails_checked)
 
-    @api.onchange('survey_id')
-    def onchange_survey_id(self):
-        """ Compute if the message is unread by the current user. """
-        if self.survey_id:
-            self.subject = self.survey_id.title
-            self.public_url = self.survey_id.public_url
-            self.public_url_html = '<a href="%s">%s</a>' % (self.survey_id.public_url, _("Click here to take survey"))
-        else:
-            self.public_url = _("Please select a survey")
-            self.public_url_html = _("Please select a survey")
+    # TODO tac : remove this never used stuff below?
+    # There is no way to change, the survey since it is read only as soon as it has and ID, and when does not have one, you don't have access to the button !
+
+    # @api.onchange('survey_id')
+    # def onchange_survey_id(self):
+    #     """ Compute if the message is unread by the current user. """
+    #     if self.survey_id:
+    #         self.subject = self.survey_id.title
+    #         self.public_url = self.survey_id.public_url
+    #         self.public_url_html = '<a href="%s">%s</a>' % (self.survey_id.public_url, _("Click here to take survey"))
+    #     else:
+    #         self.public_url = _("Please select a survey")
+    #         self.public_url_html = _("Please select a survey")
 
     #------------------------------------------------------
     # Wizard validation and send

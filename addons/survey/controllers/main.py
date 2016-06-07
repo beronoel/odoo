@@ -48,7 +48,7 @@ class WebsiteSurvey(http.Controller):
                 return request.website.render("survey.notopen")
         return None
 
-    # ROUTES HANDLERS #
+    ## ROUTES HANDLERS ##
 
     # Survey start
     @http.route(['/survey/start/<model("survey.survey"):survey>',
@@ -334,7 +334,7 @@ class WebsiteSurvey(http.Controller):
                     'question': question,
                     'input_summary': Survey.get_input_summary(question, current_filters),
                     'prepare_result': Survey.prepare_result(question, current_filters),
-                    'graph_data': self.get_graph_data(question, current_filters)
+                    'graph_data': self.get_graph_data(question, current_filters),
                 }
 
                 page_dict['question_ids'].append(question_dict)

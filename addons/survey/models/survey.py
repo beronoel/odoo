@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import datetime
@@ -24,7 +24,7 @@ class SurveyStage(models.Model):
     _order = 'sequence,id'
 
     name = fields.Char(required=True, translate=True)
-    sequence = fields.Integer(string="Sequence", default=1)
+    sequence = fields.Integer(default=1)
     closed = fields.Boolean(help="If closed, people won't be able to answer to surveys in this column.")
     fold = fields.Boolean(string="Folded in kanban view")
 
@@ -44,36 +44,43 @@ class Survey(models.Model):
     _rec_name = 'title'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
 
+    # Protected methods #
+    # TODO: remove method and use code directly
+    def _has_questions(self):
+        """ Ensure that this survey has at least one page with at least one
+        question. """
+        for survey in self:
+            if not survey.page_ids or not [page.question_ids
+                            for page in survey.page_ids if page.question_ids]:
+                return False
+        return True
+
     def _default_stage(self):
         return self.env['survey.stage'].search([], limit=1).id
 
-    # Model fields #
-
     title = fields.Char(required=True, translate=True)
-    page_ids = fields.One2many('survey.page', 'survey_id', 'Pages', copy=True)
+    page_ids = fields.One2many('survey.page', 'survey_id', string='Pages', copy=True)
     stage_id = fields.Many2one('survey.stage', string="Stage", default=_default_stage, ondelete="set null", copy=False)
-    auth_required = fields.Boolean('Login required',
+    auth_required = fields.Boolean(string='Login required',
         help="Users with a public link will be requested to login before taking part to the survey",
         oldname="authenticate")
-    users_can_go_back = fields.Boolean('Users can go back', help="If checked, users can go back to previous pages.")
+    users_can_go_back = fields.Boolean(string='Users can go back', help="If checked, users can go back to previous pages.")
     tot_sent_survey = fields.Integer(compute="_compute_survey_statistic", string="Number of sent surveys")
     tot_start_survey = fields.Integer(compute="_compute_survey_statistic", string="Number of started surveys")
     tot_comp_survey = fields.Integer(compute="_compute_survey_statistic", string="Number of completed surveys")
     description = fields.Html(translate=True, help="A long description of the purpose of the survey")
     color = fields.Integer('Color Index', default=0)
-    user_input_ids = fields.One2many('survey.user_input', 'survey_id', 'User responses', readonly=True)
+    user_input_ids = fields.One2many('survey.user_input', 'survey_id', string='User responses', readonly=True)
     designed = fields.Boolean(compute="_is_designed", string="Is designed?")
     public_url = fields.Char(compute="_compute_survey_url", string="Public link")
     public_url_html = fields.Char(compute="_compute_survey_url", string="Public link (html version)")
     print_url = fields.Char(compute="_compute_survey_url", string="Print link")
     result_url = fields.Char(compute="_compute_survey_url", string="Results link")
-    email_template_id = fields.Many2one('mail.template', 'Email Template', ondelete='set null')
-    thank_you_message = fields.Html('Thank you message', translate=True, help="This message will be displayed when survey is completed")
+    email_template_id = fields.Many2one('mail.template', string='Email Template', ondelete='set null')
+    thank_you_message = fields.Html(translate=True, help="This message will be displayed when survey is completed")
     quizz_mode = fields.Boolean()
     active = fields.Boolean(default=True)
     is_closed = fields.Boolean(related='stage_id.closed')
-
-    # Compute fields  #
 
     def _is_designed(self):
         for survey in self:
@@ -100,10 +107,9 @@ class Survey(models.Model):
         """ Computes a public URL for the survey """
         base_url = '/' if self.env.context.get('relative_url') else self.env['ir.config_parameter'].get_param('web.base.url')
         for survey in self:
-            make_url = lambda type: urljoin(base_url, "survey/%s/%s" % (type, slug(survey)))
-            survey.public_url = make_url("start")
-            survey.print_url = make_url("print")
-            survey.result_url = make_url("results")
+            survey.public_url = urljoin(base_url, "survey/start/%s" % (slug(survey)))
+            survey.print_url = urljoin(base_url, "survey/print/%s" % (slug(survey)))
+            survey.result_url = urljoin(base_url, "survey/results/%s" % (slug(survey)))
             survey.public_url_html = '<a href="%s">%s</a>' % (survey.public_url, _("Click here to start survey"))
 
     @api.multi
@@ -182,7 +188,6 @@ class Survey(models.Model):
         '''
         self.ensure_one()
         if filters:
-            InputLine = self.env['survey.user_input_line']
             domain_filter, choice = [], []
             for filter in filters:
                 row_id, answer_id = filter['row_id'], filter['answer_id']
@@ -194,7 +199,7 @@ class Survey(models.Model):
                 domain_filter.insert(0, ('value_suggested.id', 'in', choice))
             else:
                 domain_filter = domain_filter[1:]
-            input_lines = InputLine.search(domain_filter)
+            input_lines = self.env['survey.user_input_line'].search(domain_filter)
             filtered_input_ids = [input.user_input_id.id for input in input_lines]
         else:
             filtered_input_ids = []
@@ -302,17 +307,6 @@ class Survey(models.Model):
             result['skipped'] = result['total_inputs'] - result['answered']
         return result
 
-    # Protected methods #
-
-    def _has_questions(self):
-        """ Ensure that this survey has at least one page with at least one
-        question. """
-        for survey in self:
-            if not survey.page_ids or not [page.question_ids
-                            for page in survey.page_ids if page.question_ids]:
-                return False
-        return True
-
     # Actions
 
     @api.multi
@@ -364,7 +358,7 @@ class Survey(models.Model):
         ''' Open the website page with the survey printable view '''
         self.ensure_one()
         token = self.env.context.get('survey_token')
-        trail = "/%s" % token if token else ""
+        trail = "/" + token if token else ""
         return {
             'type': 'ir.actions.act_url',
             'name': "Print Survey",
@@ -433,6 +427,7 @@ class SurveyQuestion(models.Model):
 
     Each question can have one of more suggested answers (eg. in case of
     dropdown choices, multi-answer checkboxes, radio buttons...).'''
+
     _name = 'survey.question'
     _description = 'Survey Question'
     _rec_name = 'question'
@@ -453,7 +448,8 @@ class SurveyQuestion(models.Model):
         oldname='descriptive_text')
 
     # Answer
-    type = fields.Selection([('free_text', 'Multiple Lines Text Box'),
+    type = fields.Selection([
+            ('free_text', 'Multiple Lines Text Box'),
             ('textbox', 'Single Line Text Box'),
             ('numerical_box', 'Numerical Value'),
             ('datetime', 'Date and Time'),
@@ -462,8 +458,8 @@ class SurveyQuestion(models.Model):
             ('matrix', 'Matrix')], string='Type of Question', default='free_text', required=True)
     matrix_subtype = fields.Selection([('simple', 'One choice per row'),
         ('multiple', 'Multiple choices per row')], string='Matrix Type', default='simple')
-    labels_ids = fields.One2many('survey.label', 'question_id', 'Types of answers', oldname='answer_choice_ids', copy=True)
-    labels_ids_2 = fields.One2many('survey.label', 'question_id_2', 'Rows of the Matrix', copy=True)
+    labels_ids = fields.One2many('survey.label', 'question_id', string='Types of answers', oldname='answer_choice_ids', copy=True)
+    labels_ids_2 = fields.One2many('survey.label', 'question_id_2', string='Rows of the Matrix', copy=True)
     # labels are used for proposed choices
     # if question.type == simple choice | multiple choice
     #                    -> only labels_ids is used
@@ -486,7 +482,7 @@ class SurveyQuestion(models.Model):
     # Comments
     comments_allowed = fields.Boolean(string='Show Comments Field',
         oldname="allow_comment")
-    comments_message = fields.Char(translate=True, default=lambda self: _("If other, please specify:"))
+    comments_message = fields.Char(string="Comment Message", translate=True, default=lambda self: _("If other, please specify:"))
     comment_count_as_answer = fields.Boolean(string='Comment Field is an Answer Choice',
         oldname='make_comment_field')
 
@@ -508,7 +504,7 @@ class SurveyQuestion(models.Model):
     constr_error_msg = fields.Char("Error message",
         oldname='req_error_msg', translate=True, default=lambda self: _("This question requires an answer."))
     user_input_line_ids = fields.One2many('survey.user_input_line',
-                                           'question_id', 'Answers',
+                                           'question_id', string='Answers',
                                            domain=[('skipped', '=', False)])
 
     _sql_constraints = [
@@ -521,8 +517,9 @@ class SurveyQuestion(models.Model):
 
     @api.onchange('validation_email')
     def onchange_validation_email(self):
-        for question in self:
-            question.validation_required = not self.validation_email
+        if self.validation_email:
+                self.validation_required = False
+
     # Validation methods
 
     @api.multi
@@ -689,6 +686,7 @@ class SurveyQuestion(models.Model):
 
 class SurveyLabel(models.Model):
     ''' A suggested answer for a question '''
+
     _name = 'survey.label'
     _rec_name = 'value'
     _order = 'sequence,id'
@@ -709,6 +707,7 @@ class SurveyLabel(models.Model):
 
 class SurveyUserInput(models.Model):
     ''' Metadata for a set of one user's answers to a particular survey '''
+
     _name = "survey.user_input"
     _rec_name = 'date_create'
     _description = 'Survey User Input'
@@ -757,13 +756,13 @@ class SurveyUserInput(models.Model):
     def do_clean_emptys(self, automatic=False):
         ''' Remove empty user inputs that have been created manually
             (used as a cronjob declared in data/survey_cron.xml) '''
-        date_create = fields.Datetime.to_string(datetime.datetime.now() - datetime.timedelta(hours=1))
+        an_hour_ago = fields.Datetime.to_string(datetime.datetime.now() - datetime.timedelta(hours=1))
         self.search([('type', '=', 'manually'), ('state', '=', 'new'),
-                    ('date_create', '<', date_create)]).unlink()
+                    ('date_create', '<', an_hour_ago)]).unlink()
 
     @api.multi
-    def action_survey_resent(self):
-        ''' Sent again the invitation '''
+    def action_survey_resend(self):
+        ''' Send again the invitation '''
         self.ensure_one()
         local_context = {
             'survey_resent_token': True,
@@ -803,11 +802,8 @@ class SurveyUserInputLine(models.Model):
 
     user_input_id = fields.Many2one('survey.user_input', string='User Input', ondelete='cascade', required=True)
     question_id = fields.Many2one('survey.question', string='Question', ondelete='restrict', required=True)
-    # page_id is not stored related field but new api try to write page_id in DB when create input line with page_id
-    # due this behaviour some test cases broken (survey.question has no write access for portal/portal user)
-    # meanwhile make page_id as readonly
-    page_id = fields.Many2one(related='question_id.page_id', relation='survey.page', string="Page", readonly=True)
-    survey_id = fields.Many2one(related='user_input_id.survey_id', relation="survey.survey", string='Survey', store=True)
+    page_id = fields.Many2one(related='question_id.page_id', string="Page")
+    survey_id = fields.Many2one(related='user_input_id.survey_id', string='Survey', store=True)
     date_create = fields.Datetime(string='Create Date', default=fields.Datetime.now, required=True)
     skipped = fields.Boolean('Skipped')
     answer_type = fields.Selection([('text', 'Text'),
@@ -827,23 +823,23 @@ class SurveyUserInputLine(models.Model):
     @api.constrains('skipped', 'answer_type')
     def _answered_or_skipped(self):
         for uil in self:
-            if uil.skipped == bool(uil.answer_type):
-                raise ValidationError('A question cannot be unanswered and skipped')
+            if not uil.skipped != bool(uil.answer_type):
+                raise ValidationError(_('A question cannot be unanswered and skipped'))
 
     @api.constrains('answer_type')
     def _check_answer_type(self):
         for uil in self:
             fields_type = {
                 'text': bool(uil.value_text),
-                'number': bool(uil.value_number),
+                'number': (bool(uil.value_number) or uil.value_number == 0),
                 'date': bool(uil.value_date),
                 'free_text': bool(uil.value_free_text),
                 'suggestion': bool(uil.value_suggested)
             }
             if not fields_type.get(uil.answer_type, True):
-                raise ValidationError('The answer must be in the right type')
+                raise ValidationError(_('The answer must be in the right type'))
 
-    def __get_mark(self, value_suggested):
+    def _get_mark(self, value_suggested):
         label = self.env['survey.label'].browse(int(value_suggested))
         mark = label.quizz_mark if label.exists() else 0.0
         return mark
@@ -852,14 +848,14 @@ class SurveyUserInputLine(models.Model):
     def create(self, vals):
         value_suggested = vals.get('value_suggested')
         if value_suggested:
-            vals.update({'quizz_mark': self.__get_mark(value_suggested)})
+            vals.update({'quizz_mark': self._get_mark(value_suggested)})
         return super(SurveyUserInputLine, self).create(vals)
 
     @api.multi
     def write(self, vals):
         value_suggested = vals.get('value_suggested')
         if value_suggested:
-            vals.update({'quizz_mark': self.__get_mark(value_suggested)})
+            vals.update({'quizz_mark': self._get_mark(value_suggested)})
         return super(SurveyUserInputLine, self).write(vals)
 
     @api.model
@@ -881,7 +877,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False,
         }
@@ -903,7 +898,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
@@ -925,7 +919,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
@@ -947,7 +940,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
@@ -969,7 +961,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
@@ -999,7 +990,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
@@ -1029,7 +1019,6 @@ class SurveyUserInputLine(models.Model):
         vals = {
             'user_input_id': user_input_id,
             'question_id': question.id,
-            'page_id': question.page_id.id,
             'survey_id': question.survey_id.id,
             'skipped': False
         }
