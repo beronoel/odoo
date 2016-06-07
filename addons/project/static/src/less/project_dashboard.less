@@ -3,6 +3,9 @@
     .o_kanban_record {
         .o-flex-display();
         position: relative;
+        &:hover .o_project_kanban_manage {
+            display: block;
+        }
     }
 
     .o_project_kanban_main {
@@ -23,6 +26,7 @@
         .o_project_kanban_manage {
             .o-position-absolute(@bottom: 0, @left: 0);
             padding: @odoo-horizontal-padding/2 @odoo-horizontal-padding;
+            display: none;
         }
         .o_kanban_card_manage_pane .o_kanban_card_manage_title {
             margin: 0;
