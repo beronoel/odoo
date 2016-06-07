@@ -9,38 +9,60 @@ class StockScrap(models.Model):
     _name = 'stock.scrap'
     _order = 'id desc'
 
-    name = fields.Char(required=True, readonly=True, copy=False, default=lambda self: _('New'), states={'done': [('readonly', True)]}, string="Reference")
-    product_id = fields.Many2one('product.product', 'Product', states={'done': [('readonly', True)]}, required=True)
-    product_uom_id = fields.Many2one('product.uom', string='Unit of Measure', states={'done': [('readonly', True)]}, required=True)
-    lot_id = fields.Many2one('stock.production.lot', 'Lot', states={'done': [('readonly', True)]}, domain="[('product_id', '=', product_id)]")
-    package_id = fields.Many2one('stock.quant.package', 'Package', states={'done': [('readonly', True)]})
-    owner_id = fields.Many2one('res.partner', 'Owner', states={'done': [('readonly', True)]})
-    picking_id = fields.Many2one('stock.picking', 'Picking', states={'done': [('readonly', True)]})
-    location_id = fields.Many2one('stock.location', 'Location', states={'done': [('readonly', True)]}, required=True, domain="[('usage', '=', 'internal')]")
-    scrap_location_id = fields.Many2one('stock.location', domain="[('scrap_location', '=', True)]", states={'done': [('readonly', True)]}, string="Scrap Location", default=(lambda x: x.env['stock.location'].search([('scrap_location', '=', True)], limit=1)))
-    scrap_qty = fields.Float('Quantity', states={'done': [('readonly', True)]}, required=True, default=1.0)
-    state = fields.Selection([('draft', 'Draft'), ('done', 'Done')], default="draft")
-    move_id = fields.Many2one('stock.move', 'Stock Move', readonly=True)
-    tracking = fields.Selection(related="product_id.tracking")
-    origin = fields.Char(string='Source Document')
-    date_expected = fields.Datetime(string='Expected Date', default=fields.Datetime.now)
-
     @api.model
     def default_get(self, fields):
-        rec = super(StockScrap, self).default_get(fields)
-        context = dict(self._context or {})
-        if context.get('active_model') == 'stock.picking':
-            if context.get('active_id'):
-                picking = self.env['stock.picking'].browse(context['active_id'])
-                rec.update({
-                            'picking_id': picking.id,
-                            'origin': picking.name,
-                            'location_id': (picking.state == 'done') and picking.location_dest_id.id,
-                            })
-        elif not context.get('active_model'):
-            location_id = self.env.ref('stock.stock_location_stock').id
-            rec.update({'location_id': location_id})
-        return rec
+        res = super(StockScrap, self).default_get(fields)
+        if self._context.get('active_model') == 'stock.picking' and self._context.get('active_id'):
+            picking = self.env['stock.picking'].browse(self._context['active_id'])
+            res.update({
+                'picking_id': picking.id,
+                'origin': picking.name,
+                'location_id': (picking.state == 'done') and picking.location_dest_id.id,
+            })
+        elif not self._context.get('active_model'):
+            res['location_id'] = self.env.ref('stock.stock_location_stock').id
+        return res
+
+    def _get_default_scrap_location_id(self):
+        return self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
+
+    name = fields.Char(
+        'Reference',  default=lambda self: _('New'),
+        copy=False, readonly=True, required=True,
+        states={'done': [('readonly', True)]})
+    origin = fields.Char(string='Source Document')
+    product_id = fields.Many2one(
+        'product.product', 'Product',
+        required=True, states={'done': [('readonly', True)]})
+    product_uom_id = fields.Many2one(
+        'product.uom', 'Unit of Measure',
+        required=True, states={'done': [('readonly', True)]})
+    tracking = fields.Selection('Product Tracking', readonly=True, related="product_id.tracking")
+    lot_id = fields.Many2one(
+        'stock.production.lot', 'Lot',
+        states={'done': [('readonly', True)]}, domain="[('product_id', '=', product_id)]")
+    package_id = fields.Many2one(
+        'stock.quant.package', 'Package',
+        states={'done': [('readonly', True)]})
+    owner_id = fields.Many2one('res.partner', 'Owner', states={'done': [('readonly', True)]})
+    move_id = fields.Many2one('stock.move', 'Scrap Move', readonly=True)
+    picking_id = fields.Many2one('stock.picking', 'Picking', states={'done': [('readonly', True)]})
+    location_id = fields.Many2one(
+        'stock.location', 'Location', domain="[('usage', '=', 'internal')]",
+        required=True, states={'done': [('readonly', True)]})
+    scrap_location_id = fields.Many2one(
+        'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
+        domain="[('scrap_location', '=', True)]", states={'done': [('readonly', True)]})
+    scrap_qty = fields.Float('Quantity', default=1.0, required=True, states={'done': [('readonly', True)]})
+    state = fields.Selection([
+        ('draft', 'Draft'),
+        ('done', 'Done')], string='Status', default="draft")
+    date_expected = fields.Datetime('Expected Date', default=fields.Datetime.now)
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id:
+            self.product_uom_id = self.product_id.uom_id.id
 
     @api.model
     def create(self, vals):
@@ -50,13 +72,27 @@ class StockScrap(models.Model):
         scrap.do_scrap()
         return scrap
 
-    @api.onchange('product_id')
-    def onchange_product_id(self):
-        if self.product_id:
-            self.product_uom_id = self.product_id.uom_id.id
+    @api.multi
+    def do_scrap(self):
+        for scrap in self:
+            move = self.env['stock.move'].create(scrap._prepare_move_values())
+            quants = self.env['stock.quant'].quants_get_preferred_domain(
+                move.product_qty, move,
+                domain=[
+                    ('qty', '>', 0),
+                    ('lot_id', '=', self.lot_id.id),
+                    ('package_id', '=', self.package_id.id)],
+                preferred_domain_list=scrap._get_preferred_domain())
+            if any([not x[0] for x in quants]):
+                raise UserError(_('You cannot scrap a move without having available stock for %s. You can correct it with an inventory adjustment.') % move.product_id.name)
+            self.env['stock.quant'].quants_reserve(quants, move)
+            move.action_done()
+            scrap.write({'move_id': move.id, 'state': 'done'})
+        return True
 
-    def _prepare_move(self):
-        vals = {'name': self.name,
+    def _prepare_move_values(self):
+        return {
+            'name': self.name,
             'origin': self.origin,
             'product_id': self.product_id.id,
             'product_uom': self.product_uom_id.id,
@@ -66,45 +102,24 @@ class StockScrap(models.Model):
             'location_dest_id': self.scrap_location_id.id,
             'restrict_lot_id': self.lot_id.id,
             'restrict_partner_id': self.owner_id.id,
-            'picking_id': self.picking_id.id,}
-        return vals
+            'picking_id': self.picking_id.id
+        }
 
     def _get_preferred_domain(self):
-        self.ensure_one()
-        preferred_domain_list=[]
-        if self.picking_id:
-            dest_loc = self.picking_id.location_dest_id.id
-            if self.picking_id.state == 'done':
-                preferred_domain = [('history_ids', 'in', self.picking_id.move_lines.filtered(lambda x: x.state == 'done')).ids]
-                preferred_domain2 = [('history_ids', 'not in', self.picking_id.move_lines.filtered(lambda x: x.state == 'done')).ids]
-                preferred_domain_list = [preferred_domain, preferred_domain2]
-            else:
-                preferred_domain = [('reservation_id', 'in', self.picking_id.move_lines.ids)]
-                preferred_domain2 = [('reservation_id', '=', False)]
-                preferred_domain3 = ['&', ('reservation_id', 'not in', self.picking_id.move_lines.ids), ('reservation_id', '!=', False)]
-                preferred_domain_list = [preferred_domain, preferred_domain2, preferred_domain3]
-        return preferred_domain_list
+        if not self.picking_id:
+            return []
+        if self.picking_id.state == 'done':
+            preferred_domain = [('history_ids', 'in', self.picking_id.move_lines.filtered(lambda x: x.state == 'done')).ids]
+            preferred_domain2 = [('history_ids', 'not in', self.picking_id.move_lines.filtered(lambda x: x.state == 'done')).ids]
+            return [preferred_domain, preferred_domain2]
+        else:
+            preferred_domain = [('reservation_id', 'in', self.picking_id.move_lines.ids)]
+            preferred_domain2 = [('reservation_id', '=', False)]
+            preferred_domain3 = ['&', ('reservation_id', 'not in', self.picking_id.move_lines.ids), ('reservation_id', '!=', False)]
+            return [preferred_domain, preferred_domain2, preferred_domain3]
 
     @api.multi
-    def do_scrap(self):
-        self.ensure_one()
-        StockMove = self.env['stock.move']
-        vals = self._prepare_move()
-        move = StockMove.create(vals)
-        domain = [('qty', '>', 0), ('lot_id', '=', self.lot_id.id), 
-                  ('package_id', '=', self.package_id.id)]
-        preferred_domain_list = self._get_preferred_domain()
-        quants = self.env['stock.quant'].quants_get_preferred_domain(move.product_qty, move, domain=domain, preferred_domain_list=preferred_domain_list)
-        if any([not x[0] for x in quants]):
-            raise UserError(_('You can only scrap something that is in stock in the system.  Maybe you forgot to enter something in the system or you need to correct with an Inventory Adjustment first'))
-        self.env['stock.quant'].quants_reserve(quants, move)
-        move.action_done()
-        self.write({'move_id': move.id, 'state': 'done'})
-        return True
-
-    @api.multi
-    def button_stock_picking(self):
-        self.ensure_one()
+    def action_get_stock_picking(self):
         return {
             'name': _('Stock Operations'),
             'view_type': 'form',
@@ -116,12 +131,11 @@ class StockScrap(models.Model):
         }
 
     @api.multi
-    def button_stock_move(self):
-        self.ensure_one()
+    def action_get_stock_move(self):
         action = self.env.ref('stock.stock_move_action').read([])[0]
         action['domain'] = [('id', '=', self.move_id.id)]
         return action
 
     @api.multi
-    def button_done(self):
+    def action_done(self):
         return {'type': 'ir.actions.act_window_close'}

@@ -29,11 +29,11 @@
                     </header>
                     <sheet>
                         <div class="oe_button_box" name="button_box">
-                            <button class="oe_stat_button" name="button_stock_picking"
+                            <button class="oe_stat_button" name="action_get_stock_picking"
                                     string="Stock Operation" type="object"
                                     attrs="{'invisible':[('picking_id','=',False)]}" icon="fa-cogs"/>
                             <field name="picking_id" invisible="1"/>
-                            <button class="oe_stat_button" name="button_stock_move"
+                            <button class="oe_stat_button" name="action_get_stock_move"
                                     string="Inventory Move" type="object"
                                     attrs="{'invisible':[('move_id','=',False)]}" icon="fa-arrows-v"/>
                             <field name="move_id" invisible="1"/>
@@ -125,7 +125,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="button_done" string="Done" type="object" class="btn-primary"/>
+                        <button name="action_done" string="Done" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-default" special="cancel" />
                     </footer>
                 </form>
