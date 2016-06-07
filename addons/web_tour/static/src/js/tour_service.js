@@ -15,7 +15,7 @@ return $.when($.get('/web_tour/static/src/xml/tip.xml'), session.is_bound).then(
     var tour = new TourManager(session.web_tours);
 
     // Use a MutationObserver to detect DOM changes
-    var untracked_classnames = ['o_tooltip', 'o_breathing'];
+    var untracked_classnames = ["o_tooltip", "o_tooltip_content"];
     var check_tooltip = _.throttle(function (records) {
         var update = _.find(records, function (record) {
             var record_class = record.target.className;

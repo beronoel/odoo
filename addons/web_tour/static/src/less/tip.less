@@ -1,92 +1,201 @@
-@o-tip-background-color: #875a7b;
 
 .o_tooltip {
-    .o_breathing {
-        position: absolute;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        z-index: @zindex-modal+1;
-        background-color: @o-tip-background-color;
-        .animation-duration(0.5s);
-        .animation-timing-function(ease-in);
-        .animation-iteration-count(infinite);
-        .animation-direction(alternate);
+    @o-tip-background-color: lighten(@odoo-brand-primary, 5%);
+    @o-tip-size: 26px;
+    @o-tip-border-width: 2px;
+
+    @o-arrow-length: floor(@o-tip-size * 0.5);
+    @o-arrow-width: floor(@o-tip-size * 0.8);
+    @o-arrow-integration: floor(@o-tip-size * 0.1);
+
+    @o-anim-duration-in: 300ms;
+    @o-size-anim-duration-in: floor(@o-anim-duration-in * 3 / 4);
+    @o-size-anim-delay-in: floor(@o-anim-duration-in / 4);
+    @o-radius-anim-duration-in: floor(@o-anim-duration-in / 2);
+    @o-radius-anim-delay-in: floor(@o-anim-duration-in * 0);
+    @o-bg-color-duration-in: floor(@o-anim-duration-in * 1);
+    @o-bg-color-delay-in: floor(@o-anim-duration-in * 0);
+    @o-arrow-duration-in: floor(@o-anim-duration-in / 2);
+    @o-arrow-delay-in: floor(@o-anim-duration-in * 0);
+    @o-arrow-white-duration-in: floor(@o-anim-duration-in * 1);
+    @o-arrow-white-delay-in: floor(@o-anim-duration-in * 0);
+
+    @o-anim-duration-out: 200ms;
+    @o-size-anim-duration-out: floor(@o-anim-duration-out * 2 / 3);
+    @o-size-anim-delay-out: floor(@o-anim-duration-out * 0);
+    @o-radius-anim-duration-out: floor(@o-anim-duration-out * 2 / 3);
+    @o-radius-anim-delay-out: floor(@o-anim-duration-out / 3);
+    @o-bg-color-duration-out: floor(@o-anim-duration-out * 1);
+    @o-bg-color-delay-out: floor(@o-anim-duration-out * 0);
+    @o-arrow-duration-out: floor(@o-anim-duration-out / 2);
+    @o-arrow-delay-out: floor(@o-anim-duration-out / 2);
+
+    box-sizing: content-box;
+    position: absolute;
+    width: @o-tip-size;
+    height: @o-tip-size;
+    border: @o-tip-border-width solid @odoo-brand-primary;
+    border-radius: 50%;
+    z-index: @zindex-modal+1;
+    background-color: @o-tip-background-color;
+    box-shadow: 0 0 2px 0 @odoo-brand-lightsecondary;
+
+    transition: width @o-size-anim-duration-out ease @o-size-anim-delay-out, height @o-size-anim-duration-out ease @o-size-anim-delay-out, margin @o-size-anim-duration-out ease @o-size-anim-delay-out, border-radius @o-radius-anim-duration-out ease @o-radius-anim-delay-out, background-color @o-bg-color-duration-out ease @o-bg-color-delay-out;
+
+    &.o_animated {
+        .o-animation(move-bottom-top, 500ms, ease-in, 0ms, infinite, alternate);
         &.right, &.left {
             .animation-name(move-left-right);
         }
-        &.top, &.bottom {
-            .animation-name(move-bottom-top);
-        }
+    }
 
-        &::after {
-            content: '';
-            width: 0;
-            height: 0;
-        }
-        &.right::after {
-           .o-position-absolute(@left: -4px, @top: 5px);
-            border-right: 10px solid @o-tip-background-color;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-        }
-        &.top::after {
-            .o-position-absolute(@bottom: -4px, @left: 5px);
-            border-top: 10px solid @o-tip-background-color;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-        }
-        &.left::after {
-            .o-position-absolute(@right: -4px, @bottom: 5px);
-            border-left: 10px solid @o-tip-background-color;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-        }
-        &.bottom::after {
-           .o-position-absolute(@top: -4px, @right: 5px);
-            border-bottom: 10px solid @o-tip-background-color;
-            border-right: 10px solid transparent;
-            border-left: 10px solid transparent;
-        }
+    &::before {
+        content: "";
+        border: 0 solid rgba(0, 0, 0, 0);
+        transition: all @o-arrow-duration-out ease @o-arrow-delay-out;
+    }
+    &.right::before {
+        .o-position-absolute(@left: -@o-arrow-length+@o-arrow-integration, @top: (@o-tip-size - @o-arrow-width) / 2);
+        border-width: @o-arrow-width/2 @o-arrow-length @o-arrow-width/2 0;
+        border-right-color: @o-tip-background-color;
+    }
+    &.top::before {
+        .o-position-absolute(@bottom: -@o-arrow-length+@o-arrow-integration, @left: (@o-tip-size - @o-arrow-width) / 2);
+        border-width: @o-arrow-length @o-arrow-width/2 0 @o-arrow-width/2;
+        border-top-color: @o-tip-background-color;
+    }
+    &.left::before {
+        .o-position-absolute(@right: -@o-arrow-length+@o-arrow-integration, @top: (@o-tip-size - @o-arrow-width) / 2);
+        border-width: @o-arrow-width/2 0 @o-arrow-width/2 @o-arrow-length;
+        border-left-color: @o-tip-background-color;
+    }
+    &.bottom::before {
+        .o-position-absolute(@top: -@o-arrow-length+@o-arrow-integration, @left: (@o-tip-size - @o-arrow-width) / 2);
+        border-width: 0 @o-arrow-width/2 @o-arrow-length @o-arrow-width/2;
+        border-bottom-color: @o-tip-background-color;
+    }
 
-        &::before {
-            .o-position-absolute(@top: 10px, @left: 10px);
-            content: '?';
-            width: 10px;
-            height: 10px;
-            font-size: 18px;
-            font-weight: 800;
-            line-height: 0.6;
-            color: lightgray;
-            border-radius: 50%;
+    &::after {
+        @square-size: @o-tip-size*sqrt(2)/2;
+        @square-pos: (@o-tip-size - @square-size)/2;
+        .o-position-absolute(@square-pos, @square-pos, @square-pos, @square-pos);
+        content: "?";
+        line-height: @square-size;
+        text-align: center;
+        font-size: @square-size;
+        font-weight: 800;
+        border-color: @o-tip-background-color;
+        color: lightgray;
+        transition: margin @o-size-anim-duration-out ease @o-size-anim-delay-out;
+    }
+
+    > .o_tooltip_overlay {
+        display: none;
+        .o-position-absolute(0, 0, 0, 0);
+        margin: -@o-tip-border-width;
+        z-index: -1;
+    }
+    > .o_tooltip_content {
+        padding: 8px 15px;
+        visibility: hidden;
+        transition: visibility 0s ease 0s;
+        color: black;
+
+        .o_skip_tour {
+            display: inline-block;
+            margin-top: 5px;
+            cursor: pointer;
+            color: gray;
+            &:hover {
+                color: darken(gray, 20%);
+            }
         }
     }
 
-    .popover {
-        border: 2px solid @odoo-brand-primary;
-        &.right > .arrow {
-            border-right-color: @odoo-brand-primary;
-            left: -13px;
+    &.active {
+        border-radius: 0;
+        background-color: white;
+
+        transition: width @o-size-anim-duration-in ease @o-size-anim-delay-in, height @o-size-anim-duration-in ease @o-size-anim-delay-in, margin @o-size-anim-duration-in ease @o-size-anim-delay-in, border-radius @o-radius-anim-duration-in ease @o-radius-anim-delay-in, background-color @o-bg-color-duration-in ease @o-bg-color-delay-in;
+
+        &::before {
+            transition: all @o-arrow-duration-in ease @o-arrow-delay-in;
+        }
+        &::after {
+            content: "";
+            border: 0 solid rgba(0, 0, 0, 0);
+        }
+
+        > .o_tooltip_overlay {
+            display: block;
+        }
+        > .o_tooltip_content {
+            visibility: visible;
+            transition: visibility 0s ease @o-anim-duration-in;
+        }
+
+        &.right {
+            &::before {
+                left: -@o-arrow-length;
+                border-right-color: @odoo-brand-primary;
+            }
             &::after {
-                border-left-width: 2px;
+                .o-position-absolute(@left: -@o-arrow-length+@o-tip-border-width*2, @top: (@o-tip-size - @o-arrow-width) / 2);
+                border-width: @o-arrow-width/2 @o-arrow-length @o-arrow-width/2 0;
+                border-right-color: white;
+                transition: border-right-color @o-arrow-white-duration-in ease @o-arrow-white-delay-in;
             }
         }
-        &.bottom > .arrow {
-            border-bottom-color: @odoo-brand-primary;
-            top: -13px;
+        &.top {
+            &::before {
+                bottom: -@o-arrow-length;
+                border-top-color: @odoo-brand-primary;
+            }
             &::after {
-                border-top-width: 2px;
+                .o-position-absolute(@bottom: -@o-arrow-length+@o-tip-border-width*2, @left: (@o-tip-size - @o-arrow-width) / 2);
+                border-width: @o-arrow-length @o-arrow-width/2 0 @o-arrow-width/2;
+                border-top-color: white;
+                transition: border-top-color @o-arrow-white-duration-in ease @o-arrow-white-delay-in;
             }
         }
-        .popover-content {
-            color: black;
-            text-align: justify;
-            .o_skip_tour {
-                display: inline-block;
-                margin-top: 5px;
-                cursor: pointer;
-                color: gray;
+        &.left {
+            &::before {
+                right: -@o-arrow-length;
+                border-left-color: @odoo-brand-primary;
             }
-       }
+            &::after {
+                .o-position-absolute(@right: -@o-arrow-length+@o-tip-border-width*2, @top: (@o-tip-size - @o-arrow-width) / 2);
+                border-width: @o-arrow-width/2 0 @o-arrow-width/2 @o-arrow-length;
+                border-left-color: white;
+                transition: border-left-color @o-arrow-white-duration-in ease @o-arrow-white-delay-in;
+            }
+        }
+        &.bottom {
+            &::before {
+                top: -@o-arrow-length;
+                border-bottom-color: @odoo-brand-primary;
+            }
+            &::after {
+                .o-position-absolute(@top: -@o-arrow-length+@o-tip-border-width*2, @left: (@o-tip-size - @o-arrow-width) / 2);
+                border-width: 0 @o-arrow-width/2 @o-arrow-length @o-arrow-width/2;
+                border-bottom-color: white;
+                transition: border-bottom-color @o-arrow-white-duration-in ease @o-arrow-white-delay-in;
+            }
+        }
+    }
+
+    &.inverse {
+        &.left, &.right {
+            &::before, &.active::after {
+                top: auto;
+                bottom: (@o-tip-size - @o-arrow-width) / 2;
+            }
+        }
+        &.top, &.bottom {
+            &::before, &.active::after {
+                left: auto;
+                right: (@o-tip-size - @o-arrow-width) / 2;
+            }
+        }
     }
 }
