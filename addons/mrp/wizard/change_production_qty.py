@@ -11,6 +11,7 @@ class ChangeProductionQty(models.TransientModel):
     _description = 'Change Quantity of Products'
 
     # TDE FIXME: add production_id field
+    mo_id = fields.Many2one('mrp.production', 'Manufacturing Order', required=True)
     product_qty = fields.Float(
         'Product Qty',
         digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
@@ -18,8 +19,10 @@ class ChangeProductionQty(models.TransientModel):
     @api.model
     def default_get(self, fields):
         res = super(ChangeProductionQty, self).default_get(fields)
-        if 'product_qty' in fields and not res.get('product_qty'):
-            res['product_qty'] = self.env['mrp.production'].browse(self._context['active_id']).product_qty
+        if 'mo_id' in fields and not res.get('mo_id') and self._context.get('active_model') == 'mrp.production' and self._context.get('active_id'):
+            res['mo_id'] = self._context['active_id']
+        if 'product_qty' in fields and not res.get('product_qty') and res.get('mo_id'):
+            res['product_qty'] = self.env['mrp.production'].browse(res.get['mo_id']).product_qty
         return res
 
     @api.model
@@ -34,21 +37,19 @@ class ChangeProductionQty(models.TransientModel):
 
     @api.multi
     def change_prod_qty(self):
-        record_id = self._context and self._context.get('active_id', False)
-        assert record_id, _('Active Id not found')
         MrpBom = self.env['mrp.bom']
-        MrpProduction = self.env['mrp.production']
-        for wizard_qty in self:
-            production = MrpProduction.browse(record_id)
+        for wizard in self:
+            production = wizard.mo_id
             produced = sum(production.move_finished_ids.mapped('quantity_done'))
-            if wizard_qty.product_qty < produced:
+            if wizard.product_qty < produced:
                 raise UserError(_("You have already produced %d qty , Please give update quantity more then %d ")%(produced, produced))
-            production.write({'product_qty': wizard_qty.product_qty})
+            production.write({'product_qty': wizard.product_qty})
             #production.action_compute()
             #TODO: Do we still need to change the quantity of a production order?
             production_move = production.move_finished_ids.filtered(lambda x : x.state not in ('done', 'cancel') and production.product_id.id == x.product_id.id)
             for move in production.move_raw_ids:
                 bom_point = production.bom_id
+                # TDE FIXME: this is not the place to do that kind of computation, please
                 if not bom_point:
                     bom_point = MrpBom._bom_find(product=production.product_id, picking_type=production.picking_type_id)
                     if not bom_point:

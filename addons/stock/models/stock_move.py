@@ -310,7 +310,6 @@ class StockMove(models.Model):
             pickings.message_track(pickings.fields_get(['state']), initial_values)
         return res
 
-
     # Misc tools
     # ------------------------------------------------------------
 
@@ -341,7 +340,17 @@ class StockMove(models.Model):
         return ancestors
     find_move_ancestors = get_ancestors
 
+    def _filter_closed_moves(self):
+        """ Helper methods when having to avoid working on moves that are
+        already done or canceled. In a lot of cases you may handle a batch
+        of stock moves, some being already done / canceled, other being still
+        under computation. Instead of having to use filtered everywhere and
+        forgot some of them, use this tool instead. """
+        return self.filtered(lambda move: move.state not in ('done', 'cancel'))
 
+
+    # Main actions
+    # ------------------------------------------------------------
 
     @api.multi
     def do_unreserve(self):

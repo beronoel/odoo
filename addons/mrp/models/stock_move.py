@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import time
-
 from odoo import api, exceptions, fields, models, _
-from odoo.tools import float_compare, DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import float_compare
 from odoo.addons import decimal_precision as dp
 
 
@@ -168,15 +166,12 @@ class StockMove(models.Model):
 
     @api.multi
     def move_validate(self):
-        '''
-            Functions as an action_done (better to put this logic in action_done itself later on)
-        '''
+        ''' Validate moves based on a production order. '''
+        moves = self._filter_closed_moves()
         quant_obj = self.env['stock.quant']
         moves_todo = self.env['stock.move']
         uom_obj = self.env['product.uom']
-        for move in self:
-            if move.state in ('done', 'cancel'):
-                continue
+        for move in moves:
             rounding = move.product_uom.rounding
             if float_compare(move.quantity_done, 0.0, precision_rounding=rounding) <= 0:
                 continue
@@ -209,11 +204,16 @@ class StockMove(models.Model):
                         quants = quant_obj.quants_get_preferred_domain(qty, move, lot_id=movelot.lot_id.id, domain=main_domain, preferred_domain_list=preferred_domain_list)
                         self.env['stock.quant'].quants_move(quants, move, move.location_dest_id, lot_id = movelot.lot_id.id)
             move.quants_unreserve()
-            move.write({'state': 'done', 'date': time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)})
             # Next move in production order
             if move.move_dest_id:
                 move.move_dest_id.action_assign()
         return moves_todo
+
+    @api.multi
+    def action_done(self):
+        production_moves = self.filtered(lambda move: move.production_id or move.raw_material_production_id)
+        production_moves.move_validate()
+        return super(StockMove, self-production_moves).action_done()
 
     @api.multi
     def split_move_lot(self):
