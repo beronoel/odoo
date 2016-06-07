@@ -13,7 +13,7 @@ class StockScrap(models.Model):
     product_id = fields.Many2one('product.product', 'Product', states={'done': [('readonly', True)]}, required=True)
     product_uom_id = fields.Many2one('product.uom', string='Unit of Measure', states={'done': [('readonly', True)]}, required=True)
     lot_id = fields.Many2one('stock.production.lot', 'Lot', states={'done': [('readonly', True)]}, domain="[('product_id', '=', product_id)]")
-    package_id = fields.Many2one('stock.production.lot', 'Lot', states={'done': [('readonly', True)]})
+    package_id = fields.Many2one('stock.quant.package', 'Package', states={'done': [('readonly', True)]})
     owner_id = fields.Many2one('res.partner', 'Owner', states={'done': [('readonly', True)]})
     picking_id = fields.Many2one('stock.picking', 'Picking', states={'done': [('readonly', True)]})
     location_id = fields.Many2one('stock.location', 'Location', states={'done': [('readonly', True)]}, required=True, domain="[('usage', '=', 'internal')]")
