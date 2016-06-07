@@ -7,16 +7,51 @@ from odoo import api, fields, models
 class StockScrap(models.Model):
     _inherit = 'stock.scrap'
 
-    production_id = fields.Many2one('mrp.production', 'Manufacturing Order', 
-                                    states={'done': [('readonly', True)]})
-    workorder_id = fields.Many2one('mrp.workorder', 
-                                   states={'done': [('readonly', True)]}) #Not to restrict/prefer quants, but informative
+    production_id = fields.Many2one(
+        'mrp.production', 'Manufacturing Order',
+        states={'done': [('readonly', True)]})
+    workorder_id = fields.Many2one(
+        'mrp.workorder', 'Work Order',
+        states={'done': [('readonly', True)]},
+        help='Not to restruct or prefer quants, but informative.')
 
-    def _prepare_move(self):
+    @api.onchange('workorder_id')
+    def _onchange_workorder_id(self):
+        self.production_id = self.workorder_id.production_id.id,
+        self.location_id = self.workorder_id.production_id.location_src_id.id
+
+    @api.onchange('production_id')
+    def _onchange_production_id(self):
+        self.origin = self.production_id.name
+        if not self.location_id:
+            self.location_id = self.production_id.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')) and self.production_id.location_src_id.id or self.production_id.location_dest_id.id,
+
+    def _get_default_values_from_onchanges(self, vals):
+        res = dict(vals)
+        _onchanges = [
+            ('workorder_id', '_onchange_workorder_id', ['production_id', 'location_id']),
+            ('production_id', '_onchange_production_id', ['origin', 'location_id'])
+        ]
+        for field_name, method_name, result_field_name in _onchanges:
+            if field_name not in res:
+                continue
+            scrap = self.new(res)
+            getattr(scrap, method_name)()
+            scrap_values = scrap._convert_to_write(scrap._cache)
+            for field in [f for f in result_field_name if f in scrap_values]:
+                res[field] = scrap_values[field]
+        return res
+
+    @api.model
+    def create(self, vals):
+        vals = self._get_default_values_from_onchanges(vals)
+        return super(StockScrap, self).create(vals)
+
+    def _prepare_move_values(self):
         self.ensure_one()
-        vals = super(StockScrap, self)._prepare_move()
+        vals = super(StockScrap, self)._prepare_move_values()
         if self.production_id:
-            if self.product_id in self.production_id.move_finished_ids.mapped('product_id').ids:
+            if self.product_id in self.production_id.move_finished_ids.mapped('product_id'):
                 vals['production_id'] = self.production_id.id
             else:
                 vals['raw_material_production_id'] = self.production_id.id
@@ -28,32 +63,9 @@ class StockScrap(models.Model):
                 preferred_domain = [('reservation_id', 'in', self.production_id.move_raw_ids.ids)]
                 preferred_domain2 = [('reservation_id', '=', False)]
                 preferred_domain3 = ['&', ('reservation_id', 'not in', self.production_id.move_raw_ids.ids), ('reservation_id', '!=', False)]
-                preferred_domain_list = [preferred_domain, preferred_domain2, preferred_domain3]
+                return [preferred_domain, preferred_domain2, preferred_domain3]
             elif self.product_id in self.production_id.move_finished_ids.mapped('product_id'):
                 preferred_domain = [('history_ids', 'in', self.production_id.move_finished_ids.ids)]
                 preferred_domain2 = [('history_ids', 'not in', self.production_id.move_finished_ids.ids)]
-                preferred_domain_list = [preferred_domain, preferred_domain2]
-        else:
-            preferred_domain_list = super(StockScrap, self)._get_preferred_domain()
-        return preferred_domain_list
-
-    @api.model
-    def default_get(self, fields):
-        rec = super(StockScrap, self).default_get(fields)
-        context = dict(self._context or {})
-        if context.get('active_model') == 'mrp.production' and context.get('active_id'):
-            production = self.env['mrp.production'].browse(context['active_id'])
-            rec.update({
-                        'production_id': production.id,
-                        'origin': production.name,
-                        'location_id': production.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')) and production.location_src_id.id or production.location_dest_id.id,
-                        })
-        elif context.get('active_model') == 'mrp.workorder' and context.get('active_id'):
-            workorder = self.env['mrp.workorder'].browse(context['active_id'])
-            rec.update({
-                        'production_id': workorder.production_id.id,
-                        'workorder_id': workorder.id,
-                        'origin': workorder.production_id.name,
-                        'location_id': workorder.production_id.location_src_id.id,
-                        })
-        return rec
+                return [preferred_domain, preferred_domain2]
+        return super(StockScrap, self)._get_preferred_domain()
