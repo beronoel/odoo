@@ -192,7 +192,7 @@
                                             <a name="%(act_mrp_block_workcenter)d" type="action" class="oe_kanban_status oe_kanban_status_green"
                                                 title="Work orders in progress. Click to block work center."
                                                 attrs="{'invisible': [('working_state','in',('normal','blocked'))]}"/>
-                                        </div> 
+                                        </div>
                                     </div>
                                 </div><div class="container o_kanban_card_manage_pane o_invisible">
                                     <div class="row">

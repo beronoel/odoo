@@ -165,7 +165,7 @@ class MrpWorkcenterProductivity(models.Model):
     _order = "id desc"
     _rec_name = "loss_id"
 
-    workcenter_id = fields.Many2one('mrp.workcenter', "Workcenter", required=True)
+    workcenter_id = fields.Many2one('mrp.workcenter', "Work Center", required=True)
     workorder_id = fields.Many2one('mrp.workorder', 'Work Order')
     user_id = fields.Many2one(
         'res.users', "User",
@@ -192,8 +192,5 @@ class MrpWorkcenterProductivity(models.Model):
     @api.multi
     def button_block(self):
         self.ensure_one()
-        if self.workcenter_id:
-            self.workcenter_id.order_ids.end_all()
-        elif self.workorder_id:
-            self.workorder_id.workcenter_id.order_ids.end_all()
+        self.workcenter_id.order_ids.end_all()
         return {'type': 'ir.actions.client', 'tag': 'reload'}
