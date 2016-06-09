@@ -66,12 +66,13 @@ var WebClient = Widget.extend({
                     return $.when();
                 }
             }).then(function () {
+                var def;
                 if (self.client_options.action) {
-                    self.do_action(self.client_options.action);
                     delete(self.client_options.action);
+                    def = self.do_action(self.client_options.action);
                 }
-                core.bus.trigger('web_client_ready');
-            });
+                return $.when(def);
+            }).then(core.bus.trigger.bind(core.bus, 'web_client_ready'));
     },
     bind_events: function() {
         var self = this;
