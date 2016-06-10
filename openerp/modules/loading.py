@@ -371,6 +371,18 @@ def load_modules(db, force_demo=False, status=None, update_module=False):
 
         cr.commit()
 
+        if tools.config.get('uninstall'):
+            modulenames = tools.config.pop('uninstall').split(',')
+            irmodule = registry['ir.module.module']
+            uninstall_ids = irmodule.search(cr, SUPERUSER_ID, [('name', 'in', modulenames), ('state', '=', 'installed')])
+            uninstall_ids += irmodule.downstream_dependencies(cr, SUPERUSER_ID, uninstall_ids)
+            if uninstall_ids:
+                update_module = True
+                _logger.info('Uninstalling modules (including all dependencies installed) %s', irmodule.browse(cr, SUPERUSER_ID, uninstall_ids).mapped('name'))
+                cr.execute("update ir_module_module set state=%s where id in %s and state=%s", ('to remove', (tuple(uninstall_ids)), 'installed'))
+            else:
+                _logger.info('Module(s) not installed %s', modulenames)
+
         # STEP 5: Uninstall modules to remove
         if update_module:
             # Remove records referenced from ir_model_data for modules to be
