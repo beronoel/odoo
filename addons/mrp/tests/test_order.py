@@ -20,7 +20,7 @@ class TestMrpOrder(TestMrpCommon):
             'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
         })
         man_order.action_cancel()
-        self.assertEqual(man_order.state, 'cancel')
+        self.assertEqual(man_order.state, 'cancel', "Production order should be in cancel state.")
         man_order.unlink()
 
     def test_access_rights_user(self):
@@ -34,7 +34,7 @@ class TestMrpOrder(TestMrpCommon):
             'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
         })
         man_order.action_cancel()
-        self.assertEqual(man_order.state, 'cancel')
+        self.assertEqual(man_order.state, 'cancel', "Production order should be in cancel state.")
         man_order.unlink()
 
     def test_basic(self):
@@ -69,7 +69,7 @@ class TestMrpOrder(TestMrpCommon):
             'location_src_id': self.location_1.id,
             'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
         })
-        self.assertEqual(man_order.state, 'confirmed')
+        self.assertEqual(man_order.state, 'confirmed', "Production order should be in confirmed state.")
 
         # check production move
         production_move = man_order.move_finished_ids
@@ -148,7 +148,7 @@ class TestMrpOrder(TestMrpCommon):
 
         # man_order.button_mark_done()
         man_order.button_mark_done()
-        self.assertEqual(man_order.state, 'done')
+        self.assertEqual(man_order.state, 'done', "Production order should be in done state.")
 
     def test_explode_from_order(self):
         #
@@ -161,6 +161,16 @@ class TestMrpOrder(TestMrpCommon):
         # To produce 1 Unit of Sticks (p4)
         # - 2 Dozen of Sticks (p4) -> need 8
         # - 3 Dozen of Stones (p3) -> need 12
+
+        # Update capacity, start time, stop time, and time efficiency.
+        # ------------------------------------------------------------
+        self.workcenter_1.write({'capacity': 1, 'time_start': 0, 'time_stop': 0, 'time_efficiency': 100})
+
+        # Set manual time cycle 20 and 10.
+        # --------------------------------
+        self.operation_1.write({'time_cycle_manual': 20})
+        (self.operation_2 | self.operation_3).write({'time_cycle_manual': 10})
+
         man_order = self.env['mrp.production'].create({
             'name': 'MO-Test',
             'product_id': self.product_6.id,
@@ -181,22 +191,23 @@ class TestMrpOrder(TestMrpCommon):
         })
         # assign consume material
         man_order.action_assign()
-        self.assertEqual(man_order.availability, 'waiting')
+        self.assertEqual(man_order.availability, 'waiting', "Production order should be in waiting state.")
 
         # check consume materials of manufacturing order
-        # for move in man_order.move_raw_ids:
-        #     print move.name, move.state, move.product_id, move.product_id.name, move.product_qty, move.product_uom_qty, move.unit_factor
-        self.assertEqual(len(man_order.move_raw_ids), 4)
+        self.assertEqual(len(man_order.move_raw_ids), 4, "Consume material lines are not generated proper.")
         product_2_consume_moves = man_order.move_raw_ids.filtered(lambda x: x.product_id == self.product_2)
         product_3_consume_moves = man_order.move_raw_ids.filtered(lambda x: x.product_id == self.product_3)
         product_4_consume_moves = man_order.move_raw_ids.filtered(lambda x: x.product_id == self.product_4)
         product_5_consume_moves = man_order.move_raw_ids.filtered(lambda x: x.product_id == self.product_5)
-        self.assertEqual(product_2_consume_moves.product_uom_qty, 24.0)
-        self.assertEqual(product_3_consume_moves.product_uom_qty, 12.0)
-        self.assertEqual(len(product_4_consume_moves), 2)
-        for product_4_move in product_4_consume_moves:
-            self.assertIn(product_4_move.product_uom_qty, [8.0, 16.0])
-        self.assertFalse(product_5_consume_moves)
+        consume_qty_2 = product_2_consume_moves.product_uom_qty
+        self.assertEqual(consume_qty_2, 24.0, "Consume material quantity of Wood should be 24 instead of %s" % str(consume_qty_2))
+        consume_qty_3 = product_3_consume_moves.product_uom_qty
+        self.assertEqual(consume_qty_3, 12.0, "Consume material quantity of Stone should be 12 instead of %s" % str(consume_qty_3))
+        self.assertEqual(len(product_4_consume_moves), 2, "Consume move are not generated proper.")
+        for consume_moves in product_4_consume_moves:
+            consume_qty_4 = consume_moves.product_uom_qty
+            self.assertIn(consume_qty_4, [8.0, 16.0], "Consume material quantity of Stick should be 8 or 16 instead of %s" % str(consume_qty_4))
+        self.assertFalse(product_5_consume_moves, "Move should not create for phantom bom")
 
         # create required lots
         lot_product_2 = self.env['stock.production.lot'].create({'product_id': self.product_2.id})
@@ -232,7 +243,7 @@ class TestMrpOrder(TestMrpCommon):
         man_order.action_assign()
 
         # Check production order status after assign.
-        self.assertEqual(man_order.availability, 'assigned')
+        self.assertEqual(man_order.availability, 'assigned', "Production order should be in assigned state.")
         # Plan production order.
         man_order.button_plan()
 
@@ -247,56 +258,76 @@ class TestMrpOrder(TestMrpCommon):
         door_wo_1 = man_order.workorder_ids.filtered(lambda wo: wo.operation_id == self.operation_2)
         door_wo_2 = man_order.workorder_ids.filtered(lambda wo: wo.operation_id == self.operation_3)
         for workorder in workorders:
-            # print workorder.name, workorder.product_id, workorder.qty_producing, workorder.state, workorder.operation_id, workorder.workcenter_id, workorder.next_work_order_id
-            # self.assertEqual(workorder.operation_id)
-            self.assertEqual(workorder.workcenter_id, self.workcenter_1)
-        self.assertEqual(kit_wo.state, 'ready')
-        self.assertEqual(door_wo_1.state, 'ready')
-        self.assertEqual(door_wo_2.state, 'pending')
+            self.assertEqual(workorder.workcenter_id, self.workcenter_1, "Workcenter does not match.")
+        self.assertEqual(kit_wo.state, 'ready', "Workorder should be in ready state.")
+        self.assertEqual(door_wo_1.state, 'ready', "Workorder should be in ready state.")
+        self.assertEqual(door_wo_2.state, 'pending', "Workorder should be in pending state.")
+        self.assertEqual(kit_wo.duration_expected, 80, "Workorder duration should be 80 instead of %s." % str(kit_wo.duration_expected))
+        self.assertEqual(door_wo_1.duration_expected, 20, "Workorder duration should be 20 instead of %s." % str(door_wo_1.duration_expected))
+        self.assertEqual(door_wo_2.duration_expected, 20, "Workorder duration should be 20 instead of %s." % str(door_wo_2.duration_expected))
 
         # subbom: kit for stone tools
         kit_wo.button_start()
         finished_lot = self.env['stock.production.lot'].create({'product_id': man_order.product_id.id})
-        kit_wo.record_production()
         kit_wo.write({
             'final_lot_id': finished_lot.id,
             'qty_producing': 48
         })
-        self.assertEqual(kit_wo.state, 'done')
+        kit_wo.record_production()
+
+        self.assertEqual(kit_wo.state, 'done', "Workorder should be in done state.")
 
         # first operation of main bom
         finished_lot = self.env['stock.production.lot'].create({'product_id': man_order.product_id.id})
-        door_wo_1.record_production()
         door_wo_1.write({
             'final_lot_id': finished_lot.id,
             'qty_producing': 48
         })
-        self.assertEqual(door_wo_1.state, 'done')
-        self.assertEqual(door_wo_2.state, 'ready')
+        door_wo_1.record_production()
+        self.assertEqual(door_wo_1.state, 'done', "Workorder should be in done state.")
 
         # second operation of main bom
-        finished_lot = self.env['stock.production.lot'].create({'product_id': man_order.product_id.id})
+        self.assertEqual(door_wo_2.state, 'ready', "Workorder should be in ready state.")
         door_wo_2.record_production()
-        door_wo_2.write({
-            'final_lot_id': finished_lot.id,
-            'qty_producing': 48
+        self.assertEqual(door_wo_2.state, 'done', "Workorder should be in done state.")
+
+    def test_production_avialability(self):
+        """
+            Test availability of production order.
+        """
+        self.bom_3.bom_line_ids.filtered(lambda x: x.product_id == self.product_5).unlink()
+        self.bom_3.bom_line_ids.filtered(lambda x: x.product_id == self.product_4).unlink()
+
+        production_2 = self.env['mrp.production'].create({
+            'name': 'MO-Test001',
+            'product_id': self.product_6.id,
+            'product_qty': 5.0,
+            'bom_id': self.bom_3.id,
+            'product_uom_id': self.product_6.uom_id.id,
         })
-        self.assertEqual(door_wo_2.state, 'done')
+        production_2.action_assign()
 
-        # # first machine (machine A)
-        # # self.assertEqual(workorders[0].duration, 40)
-        # workorders[0].button_start()
-        # finished_lot = self.env['stock.production.lot'].create({'product_id': man_order.product_id.id})
-        # workorders[0].write({'final_lot_id': finished_lot.id, 'qty_producing': 48})
+        # check sub product availability state is waiting
+        self.assertEqual(production_2.availability, 'waiting', 'Production order should be availability for waiting state')
 
-        # product_d_move_lot = workorders[0].active_move_lot_ids.filtered(lambda x: x.product_id == self.product_2)
-        # product_d_move_lot.write({'lot_id': lot_product_2.id, 'quantity_done': 2})
-        # workorders[0].record_production()
+        # Update Inventory
+        inventory_wizard = self.env['stock.change.product.qty'].create({
+            'product_id': self.product_2.id,
+            'new_quantity': 2.0,
+        })
+        inventory_wizard.change_product_qty()
 
-        # # Check machine B process....
-        # # self.assertEqual(workorders[1].duration, 20, "Workorder duration does not match.")
-        # workorders[1].button_start()
-        # product_f_move_lot = workorders[1].active_move_lot_ids.filtered(lambda x: x.product_id == self.product_5)
-        # product_f_move_lot.write({'lot_id': lot_product_4.id, 'quantity_done': 6})
-        # workorders[1].record_production()
-        # man_order.button_mark_done()
+        production_2.action_assign()
+        # check sub product availability state is partially available
+        self.assertEqual(production_2.availability, 'partially_available', 'Production order should be availability for partially available state')
+
+        # Update Inventory
+        inventory_wizard = self.env['stock.change.product.qty'].create({
+            'product_id': self.product_2.id,
+            'new_quantity': 5.0,
+        })
+        inventory_wizard.change_product_qty()
+
+        production_2.action_assign()
+        # check sub product availability state is assigned
+        self.assertEqual(production_2.availability, 'assigned', 'Production order should be availability for assigned state')

@@ -1,4 +1,5 @@
 odoo.define('mrp.mrp_state', function (require) {
+"use strict";
 
 var core = require('web.core');
 var common = require('web.form_common');
@@ -48,7 +49,7 @@ var TimeCounter = common.AbstractField.extend(common.ReinitializeWidgetMixin, co
                     duration += data.date_end ? self.get_date_difference(data.date_start, data.date_end) : self.get_date_difference(time.auto_str_to_date(data.date_start), current_date);
                 });
                 function time_counter() {
-                    if (self.field_manager.datarecord.show_state) {
+                    if (self.field_manager.datarecord.user_state) {
                         duration += 1000;
                         timer = setTimeout(function() {
                             time_counter();

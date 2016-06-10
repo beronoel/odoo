@@ -100,15 +100,15 @@
                 <button name="button_finish" type="object" string="Finish Order" attrs="{'invisible': ['|', ('state', '!=', 'progress'), ('is_produced', '=', False)]}" class="btn-info"/>
                 <button name="button_start" type="object" string="Start Working" attrs="{'invisible': ['|', ('working_state', '=', 'blocked'), ('state', '!=', 'pending')]}"/>
                 <button name="button_start" type="object" string="Start Working" attrs="{'invisible': ['|', ('working_state', '=', 'blocked'), ('state', '!=', 'ready')]}" class="btn-success"/>
-                <button name="record_production" type="object" string="Done" class="btn-success" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', '!=', 'progress'), ('show_state', '=', False)]}"/>
-                <button name="button_pending" type="object" string="Pause" class="btn-warning" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', 'in', ('done', 'pending', 'ready', 'cancel')), ('show_state', '=', False)]}"/>
-                <button name="%(act_mrp_block_workcenter_wo)d" type="action" context="{'default_workcenter_id': workcenter_id}" string="Block" class="btn-danger" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', 'in', ('done', 'pending', 'ready', 'cancel')), ('show_state', '=', False)]}"/>
+                <button name="record_production" type="object" string="Done" class="btn-success" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', '!=', 'progress'), ('user_state', '=', False)]}"/>
+                <button name="button_pending" type="object" string="Pause" class="btn-warning" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', 'in', ('done', 'pending', 'ready', 'cancel')), ('user_state', '=', False)]}"/>
+                <button name="%(act_mrp_block_workcenter_wo)d" type="action" context="{'default_workcenter_id': workcenter_id}" string="Block" class="btn-danger" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('state', 'in', ('done', 'pending', 'ready', 'cancel')), ('user_state', '=', False)]}"/>
                 <button name="button_unblock" type="object" string="Unblock" class="btn-danger" attrs="{'invisible': [('working_state', '!=', 'blocked')]}"/>
-                <button name="button_start" type="object" string="Continue Production" class="btn-warning" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('show_state', '=', True), ('state', 'in', ('done', 'pending', 'ready', 'cancel'))]}"></button>
+                <button name="button_start" type="object" string="Continue Production" class="btn-warning" attrs="{'invisible': ['|', '|', ('working_state', '=', 'blocked'), ('user_state', '=', True), ('state', 'in', ('done', 'pending', 'ready', 'cancel'))]}"></button>
                 <button name="button_start" type="object" string="Continue Production" attrs="{'invisible': ['|', '|', ('production_state', '=', 'done'), ('working_state', '=', 'blocked'), ('state', '!=', 'done')]}"/>
                 <button name="button_scrap" type="object" string="Scrap" attrs="{'invisible': [('state', 'in', ('confirmed', 'cancel'))]}"/>
                 <field name="state" widget="statusbar" statusbar_visible="pending,ready,progress,done"/>
-                <field name="show_state" invisible="1"/>
+                <field name="user_state" invisible="1"/>
                 <field name="working_state" invisible="1"/>
                 <field name="production_state" invisible="1"/>
             </header>
@@ -138,7 +138,7 @@
                 <page string="Current Production">
                     <group>
                         <group>
-                            <field name="qty_producing" string="Current Qty" attrs="{'readonly': [('product_tracking', '=', 'serial')]}"/>
+                            <field name="qty_producing" string="Current Qty" attrs="{'readonly': ['|', ('product_tracking', '=', 'serial'), ('state', 'in', ('done', 'cancel'))]}"/>
                             <field name="final_lot_id" context="{'default_product_id': product_id}" attrs="{'invisible': [('product_tracking', '=', 'none')]}" groups="stock.group_production_lot"/>
                             <field name="product_tracking" invisible="1"/>
                         </group>
@@ -188,7 +188,6 @@
                             </div>
                         </group>
                     </group>
-                    <field name="show_state" invisible="1"/>
                     <group>
                         <field name="time_ids" readonly="1" nolabel="1">
                             <tree>
