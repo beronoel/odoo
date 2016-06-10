@@ -106,11 +106,12 @@ class MrpProductionWorkcenterLine(models.Model):
         'stock.move.lots', 'workorder_id',
         domain=[('done_wo', '=', False)])
     final_lot_id = fields.Many2one(
-        'stock.production.lot', 'Current Lot', domain="[('product_id', '=', product_id)]")
+        'stock.production.lot', 'Current Lot', domain="[('product_id', '=', product_id)]",
+        states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
 
     time_ids = fields.One2many(
         'mrp.workcenter.productivity', 'workorder_id')
-    show_state = fields.Boolean(compute='_get_current_state')  # TDE: check use, probably to rename like in_production
+    user_state = fields.Boolean(compute='_get_current_state', help="Technical field indicating whether the current user is working. ")
     production_messages = fields.Html('Workorder Message', compute='_compute_production_messages')
     next_work_order_id = fields.Many2one('mrp.workorder', "Next Work Order")
 
@@ -130,12 +131,12 @@ class MrpProductionWorkcenterLine(models.Model):
             self.duration_percent = 0
 
     def _get_current_state(self):
-        # TDE FIXME: weird
+        """ Checks whether the current user is working """
         for order in self:
             if order.time_ids.filtered(lambda x : (x.user_id.id == self.env.user.id) and (not x.date_end) and (x.loss_type in ('productive', 'performance'))):
-                order.show_state = True
+                order.user_state = True
             else:
-                order.show_state = False
+                order.user_state = False
 
     @api.depends('production_id', 'workcenter_id', 'production_id.bom_id')
     def _compute_production_messages(self):
@@ -147,7 +148,7 @@ class MrpProductionWorkcenterLine(models.Model):
                 ('valid_until', '>=', fields.Date.today())
             ]
             messages = ProductionMessage.search(domain).mapped('message')
-            workorder.production_messages = "<br/>".join(messages) or False  # TDE FIXME: or False ? not necessary I think
+            workorder.production_messages = "<br/>".join(messages)
 
     @api.onchange('qty_producing')
     def _onchange_qty_producing(self):
@@ -339,14 +340,14 @@ class MrpProductionWorkcenterLine(models.Model):
     @api.multi
     def end_previous(self, doall=False):
         """
-        @param: doall:  
+        @param: doall:  This will close all open time lines on the open work orders when doall = True, otherwise
+        only the one of the current user
         """
-        # TDE CLEANME: help
         timeline_obj = self.env['mrp.workcenter.productivity']
         domain = [('workorder_id', 'in', self.ids), ('date_end', '=', False)]
         if not doall:
             domain.append(('user_id', '=', self.env.user.id))
-        for timeline in timeline_obj.search(domain,limit=not doall):
+        for timeline in timeline_obj.search(domain, limit=doall and None or 1):
             wo = timeline.workorder_id
             if timeline.loss_type <> 'productive':
                 timeline.write({'date_end': fields.Datetime.now()})
@@ -360,7 +361,7 @@ class MrpProductionWorkcenterLine(models.Model):
                     timeline.write({'date_end': enddate})
                 else:
                     timeline.write({'date_end': maxdate})
-                    loss_id = self.env['mrp.workcenter.productivity.loss'].search([('loss_type','=','performance')], limit=1)
+                    loss_id = self.env['mrp.workcenter.productivity.loss'].search([('loss_type', '=', 'performance')], limit=1)
                     if not len(loss_id):
                         raise UserError(_("You need to define at least one unactive productivity loss in the category 'Performance'. Create one from the Manufacturing app, menu: Configuration / Productivity Losses."))
                     timeline.copy({'date_start': maxdate, 'date_end': enddate, 'loss_id': loss_id.id})

@@ -120,15 +120,9 @@ class StockScrap(models.Model):
 
     @api.multi
     def action_get_stock_picking(self):
-        return {
-            'name': _('Stock Operations'),
-            'view_type': 'form',
-            'view_mode': 'tree',
-            'res_model': 'stock.picking',
-            'view_id': False,
-            'type': 'ir.actions.act_window',
-            'domain': [('id', '=', self.picking_id.id)],
-        }
+        action = self.env.ref('stock.action_picking_tree_all').read([])[0]
+        action['domain'] = [('id', '=', self.picking_id.id)]
+        return action
 
     @api.multi
     def action_get_stock_move(self):
