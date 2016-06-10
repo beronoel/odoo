@@ -18,6 +18,7 @@ from openerp.modules.registry import RegistryManager
 from openerp.service import security
 
 from . import global_, database, model
+from . import models
 
 logger = logging.getLogger(__name__)
 
@@ -79,14 +80,6 @@ class Rpc2(http.Controller):
         return werkzeug.wrappers.Response(response, mimetype=req.mimetype)
 
     def dispatch(self, db, method, params):
-        if method.startswith(('system.', 'rpc.')):
-            raise NameError("System methods not supported")
-        # FIXME: introspection ("system") methods
-        #   - system.listMethods()
-        #   - system.methodHelp(method)
-        #   - system.methodSignature(method)
-        #   - system.multicall(callspecs)
-
         path = method.split('.')
         if not db:
             if len(path) != 1:
