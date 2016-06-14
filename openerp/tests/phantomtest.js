@@ -2,6 +2,7 @@
 // jshint evil: true, loopfunc: true
 
 var system = require('system');
+var local_storage = require('web.local_storage');
 var HOST = '127.0.0.1';
 
 function waitFor (condition, callback, timeout, timeoutMessageCallback) {
@@ -112,7 +113,7 @@ function PhantomTest() {
             } else {
                 console.log('loaded', url, status);
                 // clear localstorage leftovers
-                self.page.evaluate(function () { localStorage.clear() });
+                self.page.evaluate(function () { local_storage.clear() });
                 // process ready
                 waitFor(function() {
                     console.log("PhantomTest.run: wait for condition:", ready);
