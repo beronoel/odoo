@@ -59,6 +59,7 @@ class ProcurementOrder(models.Model):
         return date_planned
 
     def _prepare_mo_vals(self, bom):
+        self.ensure_one()
         return {
             'origin': self.origin,
             'product_id': self.product_id.id,
