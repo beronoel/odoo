@@ -299,6 +299,45 @@ class sale_order_line(osv.osv):
                     break
         return is_available
 
+    def product_id_change(self, cr, uid, ids, pricelist, product, qty=0,
+                          uom=False, qty_uos=0, uos=False, name='', partner_id=False,
+                          lang=False, update_tax=True, date_order=False, packaging=False,
+                          fiscal_position=False, flag=False, context=None):
+        context = context or {}
+        warning = {}
+
+        res = super(sale_order_line, self).product_id_change(
+            cr, uid, ids, pricelist, product, qty=qty,
+            uom=uom, qty_uos=qty_uos, uos=uos, name=name, partner_id=partner_id,
+            lang=lang, update_tax=update_tax, date_order=date_order, packaging=packaging,
+            fiscal_position=fiscal_position, flag=flag, context=context)
+
+        if not product:
+            res['value'].update({'product_packaging': False})
+            return res
+
+        # update of result obtained in super function
+        product_obj = self.pool['product.product'].browse(cr, uid, product, context=context)
+        res['value'].update({
+            'product_tmpl_id': product_obj.product_tmpl_id.id,
+            'delay': product_obj.sale_delay or 0.0,
+        })
+
+        # Calling product_packaging_change function after updating UoM
+        res_packing = self.product_packaging_change(cr, uid, ids, pricelist, product, qty, uom,
+                                                    partner_id, packaging, context=context)
+        res['value'].update(res_packing.get('value', {}))
+        warning_msgs = res_packing.get('warning') and res_packing['warning']['message'] or ''
+
+        # update of warning messages
+        if warning_msgs:
+            warning = {
+                'title': _('Configuration Error!'),
+                'message': warning_msgs,
+            }
+        res.update({'warning': warning})
+        return res
+
     def product_id_change_with_wh(self, cr, uid, ids, pricelist, product, qty=0,
             uom=False, qty_uos=0, uos=False, name='', partner_id=False,
             lang=False, update_tax=True, date_order=False, packaging=False, fiscal_position=False, flag=False, warehouse_id=False, context=None):
@@ -312,7 +351,6 @@ class sale_order_line(osv.osv):
             lang=lang, update_tax=update_tax, date_order=date_order, packaging=packaging, fiscal_position=fiscal_position, flag=flag, context=context)
 
         if not product:
-            res['value'].update({'product_packaging': False})
             return res
 
         # set product uom in context to get virtual stock in current uom
@@ -323,14 +361,9 @@ class sale_order_line(osv.osv):
             # fallback on selected
             context = dict(context, uom=uom)
 
-        #update of result obtained in super function
         product_obj = product_obj.browse(cr, uid, product, context=context)
-        res['value'].update({'product_tmpl_id': product_obj.product_tmpl_id.id, 'delay': (product_obj.sale_delay or 0.0)})
 
-        # Calling product_packaging_change function after updating UoM
-        res_packing = self.product_packaging_change(cr, uid, ids, pricelist, product, qty, uom, partner_id, packaging, context=context)
-        res['value'].update(res_packing.get('value', {}))
-        warning_msgs = res_packing.get('warning') and res_packing['warning']['message'] or ''
+        warning_msgs = res.get('warning') and res['warning']['message'] or ''
 
         if product_obj.type == 'product':
             #determine if the product needs further check for stock availibility
