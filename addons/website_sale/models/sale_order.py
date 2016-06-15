@@ -64,14 +64,12 @@ class SaleOrder(models.Model):
 
         values = {
             'product_id': product_id,
-            'name': product.display_name,
+            'name': product.description_sale or product.name,
             'product_uom_qty': qty,
             'order_id': order_id,
             'product_uom': product.uom_id.id,
             'price_unit': product.price,
         }
-        if product.description_sale:
-            values['name'] += '\n %s' % (product.description_sale)
         return values
 
     @api.multi
