@@ -51,6 +51,12 @@ class ProcurementOrder(models.Model):
             company_id=self.company_id.id, force_company=self.company_id.id
         )._bom_find(product=self.product_id, picking_type=self.rule_id.picking_type_id)  # TDE FIXME: context bullshit
 
+    def _get_date_planned(self):
+        format_date_planned = fields.Datetime.from_string(self.date_planned)
+        date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
+        date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
+        return date_planned
+
     def _prepare_mo_vals(self, bom):
         self.ensure_one()
         return {
