@@ -6,7 +6,7 @@ from openerp.tools.translate import _
 
 class website_payment(http.Controller):
     @http.route(['/my/payment_method'], type='http', auth="user", website=True)
-    def payment_method(self):
+    def payment_method(self, **kwargs):
         acquirers = list(request.env['payment.acquirer'].search([('website_published', '=', True), ('registration_view_template_id', '!=', False)]))
         partner = request.env.user.partner_id
         payment_tokens = partner.payment_token_ids
@@ -15,9 +15,17 @@ class website_payment(http.Controller):
             'pms': payment_tokens,
             'acquirers': acquirers
         }
+        render_context = {
+            'return_url': '/my/payment_method',
+            'json': False,
+            'submit_class': 'btn btn-primary btn-sm mb8 mt8 pull-right',
+            'bootstrap_formatting': True,
+            'error': {},
+            'error_message': [],
+        }
         for acquirer in acquirers:
-            acquirer.form = acquirer.sudo()._registration_render(request.env.user.partner_id.id, {'error': {}, 'error_message': [], 'return_url': '/my/payment_method', 'json': False, 'bootstrap_formatting': True})
-        return request.render("website_payment.pay_methods", values)
+            acquirer.form = acquirer.sudo()._registration_render(request.env.user.partner_id.id, render_context)[0]
+        return request.website.render("website_payment.pay_methods", values)
 
     @http.route(['/website_payment/delete/'], methods=['POST'], type='http', auth="user", website=True)
     def delete(self, delete_pm_id=None):
