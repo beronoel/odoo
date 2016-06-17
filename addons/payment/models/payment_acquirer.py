@@ -108,6 +108,7 @@ class PaymentAcquirer(osv.Model):
         'module_state': fields.related('module_id', 'state', type='char', string='Installation State'),
         'description': fields.html('Description'),
         'journal_id': fields.many2one('account.journal', 'Accounting Journal', help="Account journal used for automatic payment reconciliation."),
+        'country_ids' : fields.many2many('res.country', 'payment_country_rel', 'payment_id', 'country_id', 'Countries', help="This payment gateway is available for selected countries"),
     }
 
     image = openerp.fields.Binary("Image", attachment=True,
