@@ -6,4 +6,4 @@ class Website(models.Model):
 
     @api.model
     def payment_acquirers(self):
-        return list(self.env['payment.acquirer'].sudo().search([('website_published', '=', True)]))
+        return list(self.env['payment.acquirer'].sudo().search([('website_published', '=', True),('is_cod', '=', False)]))

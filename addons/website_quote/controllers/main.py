@@ -65,22 +65,12 @@ class sale_quote(http.Controller):
 
         if order.require_payment or values['need_payment']:
             payment_obj = request.registry.get('payment.acquirer')
-            acquirer_ids = payment_obj.search(request.cr, SUPERUSER_ID, [('website_published', '=', True), ('company_id', '=', order.company_id.id)], context=request.context)
-            values['acquirers'] = list(payment_obj.browse(request.cr, token and SUPERUSER_ID or request.uid, acquirer_ids, context=request.context))
             render_ctx = dict(request.context, submit_class='btn btn-primary', submit_txt=_('Pay & Confirm'))
-            for acquirer in values['acquirers']:
-                acquirer.button = payment_obj.render(
-                    request.cr, SUPERUSER_ID, acquirer.id,
-                    '/',
-                    order.amount_total,
-                    order.pricelist_id.currency_id.id,
-                    values={
-                        'return_url': '/quote/%s/%s' % (order_id, token) if token else '/quote/%s' % order_id,
-                        'type': 'form',
-                        'alias_usage': _('If we store your payment information on our server, subscription payments will be made automatically.'),
-                        'partner_id': order.partner_id.id,
-                    },
-                    context=render_ctx)
+            button_values = dict(return_url='/quote/%s/%s' % (order_id, token) if token else '/quote/%s' % order_id,
+                                 type='form',
+                                 alias_usage=_('If we store your payment information on our server, subscription payments will be made automatically.'),
+                                 partner_id=order.partner_id.id)
+            values['acquirers'] = payment_obj._get_acquirer_buttons(request.cr, SUPERUSER_ID, order, button_values, context=render_ctx)
         return request.website.render('website_quote.so_quotation', values)
 
     @http.route(['/quote/accept'], type='json', auth="public", website=True)
