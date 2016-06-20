@@ -13,9 +13,9 @@ class MrpProduction(models.Model):
     """ Manufacturing Orders """
     _name = 'mrp.production'
     _description = 'Manufacturing Order'
-    _date_name = 'date_planned'
+    _date_name = 'date_planned_start'
     _inherit = ['mail.thread', 'ir.needaction_mixin']
-    _order = 'date_planned asc,id'
+    _order = 'date_planned_start asc,id'
 
     @api.model
     def _get_default_picking_type(self):
@@ -81,9 +81,13 @@ class MrpProduction(models.Model):
         readonly=True,  required=True,
         states={'confirmed': [('readonly', False)]},
         help="Location where the system will stock the finished products.")
-    date_planned = fields.Datetime(
-        'Expected Date', copy=False, default=fields.Datetime.now,
+    date_planned_start = fields.Datetime(
+        'Expected Start Date', copy=False, default=fields.Datetime.now,
         index=True, required=True, readonly=True,
+        states={'confirmed': [('readonly', False)]}, oldname="date_planned")
+    date_planned_finished = fields.Datetime(
+        'Expected End Date', copy=False, default=fields.Datetime.now,
+        index=True, readonly=True,
         states={'confirmed': [('readonly', False)]})
     date_start = fields.Datetime('Start Date', copy=False, index=True, readonly=True)
     date_finished = fields.Datetime('End Date', copy=False, index=True, readonly=True)
@@ -273,8 +277,8 @@ class MrpProduction(models.Model):
         procurement = procs and procs[0]
         data = {
             'name': self.name,
-            'date': self.date_planned,
-            'date_expected': self.date_planned,
+            'date': self.date_planned_start,
+            'date_expected': self.date_planned_start,
             'product_id': self.product_id.id,
             'product_uom': self.product_uom_id.id,
             'product_uom_qty': self.product_qty,
@@ -315,7 +319,7 @@ class MrpProduction(models.Model):
 
         data = {
             'name': self.name,
-            'date': self.date_planned,
+            'date': self.date_planned_start,
             'bom_line_id': bom_line.id,
             'product_id': bom_line.product_id.id,
             'product_uom_qty': quantity,
