@@ -237,6 +237,9 @@ class MaintenanceRequest(models.Model):
             return 'maintenance.mt_req_status'
         return super(MaintenanceRequest, self)._track_subtype(init_values)
 
+    def _get_default_team_id(self):
+        return self.env.ref('maintenance.equipment_team_maintenance', raise_if_not_found=False)
+
     name = fields.Char('Subjects', required=True)
     description = fields.Text('Description')
     request_date = fields.Date('Request Date', track_visibility='onchange', default=fields.Date.context_today)
@@ -253,7 +256,7 @@ class MaintenanceRequest(models.Model):
     archive = fields.Boolean(default=False, help="Set archive to true to hide the maintenance request without deleting it.")
     maintenance_type = fields.Selection([('corrective', 'Corrective'), ('preventive', 'Preventive')], string='Maintenance Type', default="corrective")
     schedule_date = fields.Datetime('Scheduled Date')
-    maintenance_team_id = fields.Many2one('maintenance.team', string='Team', required=True)
+    maintenance_team_id = fields.Many2one('maintenance.team', string='Team', required=True, default=_get_default_team_id)
     duration = fields.Float(help="Duration in minutes and seconds.")
 
     @api.multi

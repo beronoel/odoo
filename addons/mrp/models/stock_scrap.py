@@ -17,45 +17,13 @@ class StockScrap(models.Model):
 
     @api.onchange('workorder_id')
     def _onchange_workorder_id(self):
-        self.production_id = self.workorder_id.production_id.id,
-        self.location_id = self.workorder_id.production_id.location_src_id.id
+        if self.workorder_id:
+            self.location_id = self.workorder_id.production_id.location_src_id.id
 
     @api.onchange('production_id')
     def _onchange_production_id(self):
-        self.origin = self.production_id.name
-        if not self.location_id:
-            self.location_id = self.production_id.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')) and self.production_id.location_src_id.id or self.production_id.location_dest_id.id,
-
-    def _get_default_values_from_onchanges(self, vals):
-        res = dict(vals)
-        _onchanges = [
-            ('workorder_id', '_onchange_workorder_id', ['production_id', 'location_id']),
-            ('production_id', '_onchange_production_id', ['origin', 'location_id'])
-        ]
-        for field_name, method_name, result_field_name in _onchanges:
-            if field_name not in res:
-                continue
-            scrap = self.new(res)
-            getattr(scrap, method_name)()
-            scrap_values = scrap._convert_to_write(scrap._cache)
-            for field in [f for f in result_field_name if f in scrap_values]:
-                res[field] = scrap_values[field]
-        return res
-
-    @api.model
-    def create(self, vals):
-        vals = self._get_default_values_from_onchanges(vals)
-        return super(StockScrap, self).create(vals)
-
-    def _prepare_move_values(self):
-        self.ensure_one()
-        vals = super(StockScrap, self)._prepare_move_values()
         if self.production_id:
-            if self.product_id in self.production_id.move_finished_ids.mapped('product_id'):
-                vals['production_id'] = self.production_id.id
-            else:
-                vals['raw_material_production_id'] = self.production_id.id
-        return vals
+            self.location_id = self.production_id.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')) and self.production_id.location_src_id.id or self.production_id.location_dest_id.id,
 
     def _get_preferred_domain(self):
         if self.production_id:
@@ -69,3 +37,6 @@ class StockScrap(models.Model):
                 preferred_domain2 = [('history_ids', 'not in', self.production_id.move_finished_ids.ids)]
                 return [preferred_domain, preferred_domain2]
         return super(StockScrap, self)._get_preferred_domain()
+
+    def _get_origin_moves(self):
+        return super(StockScrap, self)._get_origin_moves() or self.production_id and self.production_id.move_raw_ids.filtered(lambda x: x.product_id == self.product_id)

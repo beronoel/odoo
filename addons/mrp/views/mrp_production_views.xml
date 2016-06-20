@@ -6,10 +6,10 @@
             <field name="name">mrp.production.tree</field>
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
-                <tree decoration-bf="message_needaction==True" default_order="date_planned desc" decoration-info="state=='confirmed'" decoration-danger="date_planned&lt;current_date and state not in ('done','cancel')" decoration-muted="state in ('done','cancel')" string="Manufacturing Orders">
+                <tree decoration-bf="message_needaction==True" default_order="date_planned_start desc" decoration-info="state=='confirmed'" decoration-danger="date_planned_start&lt;current_date and state not in ('done','cancel')" decoration-muted="state in ('done','cancel')" string="Manufacturing Orders">
                     <field name="message_needaction" invisible="1"/>
                     <field name="name"/>
-                    <field name="date_planned"/>
+                    <field name="date_planned_start"/>
                     <field name="product_id"/>
                     <field name="product_qty" sum="Total Qty" string="Quantity"/>
                     <field name="product_uom_id" string="Unit of Measure" options="{'no_open':True,'no_create':True}" groups="product.group_uom"/>
@@ -68,7 +68,12 @@
                             </div>
                         </button>
                         <button name="%(action_mrp_production_moves)d" type="action" string="Inventory Moves" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('progress', 'done'))]}"/>
-                        <button class="oe_stat_button" name="action_see_move_scrap" string="Scraps" type="object" icon="fa-arrows-v" attrs="{'invisible': [('has_scrap_move', '=', False)]}"/>
+                        <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="fa-arrows-v" attrs="{'invisible': [('has_scrap_move', '=', False)]}">
+                            <div class="o_form_field o_stat_info">
+                                <span class="o_stat_value"><field name="scrap_count"/></span>
+                                <span class="o_stat_text">Scraps</span>
+                            </div>
+                        </button>
                         <field name="workorder_ids" invisible="1"/>
                     </div>
                     <div class="oe_title">
@@ -99,7 +104,12 @@
                             <field name="routing_id" groups="mrp.group_mrp_routings"/>
                         </group>
                         <group>
-                            <field name="date_planned" attrs="{'readonly': [('has_moves', '=', True)]}"/>
+                            <label for="date_planned_start_wo" string="Expected Date"/>
+                            <div name="date_planned" class="o_row">
+                                <field name="date_planned_start" attrs="{'readonly': [('move_raw_ids', '!=', [])]}"/>
+                                <label string="to" attrs="{'invisible': [('date_planned_finished', '=', False)]}"/>
+                                <field name="date_planned_finished" attrs="{'readonly': [('move_raw_ids', '!=', [])]}"/>
+                            </div>
                             <field name="user_id" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                             <field name="origin" attrs="{'readonly': [('has_moves', '=', True)]}"/>
                             <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" attrs="{'readonly': [('has_moves', '=', True)]}"/>
@@ -175,7 +185,7 @@
                     <field name="product_id"/>
                     <field name="product_qty"/>
                      <field name="product_uom_id" options="{'no_open':True,'no_create':True}"/>
-                    <field name="date_planned"/>
+                    <field name="date_planned_start"/>
                     <field name="state"/>
                     <templates>
                         <t t-name="kanban-box">
@@ -190,7 +200,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-xs-6 text-muted">
-                                        <span><t t-esc="record.name.value"/> <t t-esc="record.date_planned.value and record.date_planned.value.split(' ')[0] or False"/></span>
+                                        <span><t t-esc="record.name.value"/> <t t-esc="record.date_planned_start.value and record.date_planned_start.value.split(' ')[0] or False"/></span>
                                     </div>
                                     <div class="col-xs-6">
                                         <span t-attf-class="pull-right text-right label #{['draft', 'cancel'].indexOf(record.state.raw_value) > -1 ? 'label-default' : ['none'].indexOf(record.state.raw_value) > -1 ? 'label-danger' : ['confirmed'].indexOf(record.state.raw_value) > -1 ? 'label-warning' : ['done'].indexOf(record.state.raw_value) > -1 ? 'label-success' : 'label-primary'}"><t t-esc="record.state.value"/></span>
@@ -207,7 +217,7 @@
             <field name="model">mrp.production</field>
             <field eval="2" name="priority"/>
             <field name="arch" type="xml">
-                <calendar color="routing_id" date_start="date_planned" string="Manufacturing Orders">
+                <calendar color="routing_id" date_start="date_planned_start" string="Manufacturing Orders">
                     <field name="name"/>
                     <field name="product_id"/>
                     <field name="product_qty"/>
@@ -227,7 +237,7 @@
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
                 <pivot string="Manufacturing Orders">
-                    <field name="date_planned" type="row"/>
+                    <field name="date_planned_start" type="row"/>
                 </pivot>
             </field>
         </record>
@@ -236,7 +246,7 @@
             <field name="model">mrp.production</field>
             <field name="arch" type="xml">
                 <graph string="Manufacturing Orders">
-                    <field name="date_planned"/>
+                    <field name="date_planned_start"/>
                 </graph>
             </field>
         </record>
@@ -256,7 +266,7 @@
                     <filter string="Done" name="done" domain="[('state', '=', 'done')]"/>
                     <filter string="Waiting" name="waiting" domain="[('availability', '=', 'waiting')]"/>
                     <separator/>
-                    <filter string="Late" domain="['&amp;', ('date_planned', '&lt;', current_date), ('state', '=', 'confirmed')]"
+                    <filter string="Late" domain="['&amp;', ('date_planned_start', '&lt;', current_date), ('state', '=', 'confirmed')]"
                         name="late" help="Production started late"/>
                     <separator/>
                     <filter string="No Routing" domain="[('routing_id','=', False)]" name="norouting" groups="mrp.group_mrp_routings"/>
@@ -268,7 +278,7 @@
                         <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
                         <filter string="Routing" domain="[]" context="{'group_by':'routing_id'}"/>
                         <filter string="Status" domain="[]" context="{'group_by':'state'}"/>
-                        <filter string="Scheduled Month" domain="[]" context="{'group_by':'date_planned'}" help="Scheduled Date by Month"/>
+                        <filter string="Scheduled Month" domain="[]" context="{'group_by':'date_planned_start'}" help="Scheduled Date by Month"/>
                     </group>
                </search>
             </field>

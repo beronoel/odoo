@@ -1,5 +1,4 @@
 odoo.define('mrp.mrp_state', function (require) {
-"use strict";
 
 var core = require('web.core');
 var common = require('web.form_common');

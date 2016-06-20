@@ -20,7 +20,7 @@ class WorkCenterLoad(models.Model):
             create or replace view report_workcenter_load as (
                 SELECT
                     min(wl.id) as id,
-                    to_char(p.date_planned,'YYYY:mm:dd') as name,
+                    to_char(p.date_planned_start,'YYYY:mm:dd') as name,
                     SUM(wl.duration_expected) AS duration,
                     wl.workcenter_id as workcenter_id
                 FROM
@@ -29,7 +29,7 @@ class WorkCenterLoad(models.Model):
                         ON p.id = wl.production_id
                 GROUP BY
                     wl.workcenter_id,
-                    to_char(p.date_planned,'YYYY:mm:dd')
+                    to_char(p.date_planned_start,'YYYY:mm:dd')
             )""")
 
 

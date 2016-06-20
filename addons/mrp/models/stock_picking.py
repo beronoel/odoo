@@ -21,4 +21,4 @@ class StockPickingType(models.Model):
             if picking.code == 'mrp_operation':
                 picking.count_mo_waiting = MrpProduction.search_count([('availability', '=', 'waiting')])
                 picking.count_mo_todo = MrpProduction.search_count([('state', 'in', ('confirmed', 'planned', 'progress'))])
-                picking.count_mo_late = MrpProduction.search_count(['&', ('date_planned', '<', datetime.now().strftime('%Y-%m-%d')), ('state', '=', 'confirmed')])
+                picking.count_mo_late = MrpProduction.search_count(['&', ('date_planned_start', '<', datetime.now().strftime('%Y-%m-%d')), ('state', '=', 'confirmed')])

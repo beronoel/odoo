@@ -9,22 +9,11 @@ class StockScrap(models.Model):
     _name = 'stock.scrap'
     _order = 'id desc'
 
-    @api.model
-    def default_get(self, fields):
-        res = super(StockScrap, self).default_get(fields)
-        if self._context.get('active_model') == 'stock.picking' and self._context.get('active_id'):
-            picking = self.env['stock.picking'].browse(self._context['active_id'])
-            res.update({
-                'picking_id': picking.id,
-                'origin': picking.name,
-                'location_id': (picking.state == 'done') and picking.location_dest_id.id,
-            })
-        elif not self._context.get('active_model'):
-            res['location_id'] = self.env.ref('stock.stock_location_stock').id
-        return res
-
     def _get_default_scrap_location_id(self):
         return self.env['stock.location'].search([('scrap_location', '=', True)], limit=1).id
+
+    def _get_default_location_id(self):
+        return self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
 
     name = fields.Char(
         'Reference',  default=lambda self: _('New'),
@@ -49,7 +38,7 @@ class StockScrap(models.Model):
     picking_id = fields.Many2one('stock.picking', 'Picking', states={'done': [('readonly', True)]})
     location_id = fields.Many2one(
         'stock.location', 'Location', domain="[('usage', '=', 'internal')]",
-        required=True, states={'done': [('readonly', True)]})
+        required=True, states={'done': [('readonly', True)]}, default=_get_default_location_id)
     scrap_location_id = fields.Many2one(
         'stock.location', 'Scrap Location', default=_get_default_scrap_location_id,
         domain="[('scrap_location', '=', True)]", states={'done': [('readonly', True)]})
@@ -58,6 +47,11 @@ class StockScrap(models.Model):
         ('draft', 'Draft'),
         ('done', 'Done')], string='Status', default="draft")
     date_expected = fields.Datetime('Expected Date', default=fields.Datetime.now)
+
+    @api.onchange('picking_id')
+    def _onchange_picking_id(self):
+        if self.picking_id:
+            self.location_id = (self.picking_id.state == 'done') and self.picking_id.location_dest_id.id or self.picking_id.location_id.id
 
     @api.onchange('product_id')
     def onchange_product_id(self):
@@ -72,9 +66,13 @@ class StockScrap(models.Model):
         scrap.do_scrap()
         return scrap
 
+    def _get_origin_moves(self):
+        return self.picking_id and self.picking_id.move_lines.filtered(lambda x: x.product_id == self.product_id)
+
     @api.multi
     def do_scrap(self):
         for scrap in self:
+            moves = scrap._get_origin_moves() or self.env['stock.move']
             move = self.env['stock.move'].create(scrap._prepare_move_values())
             quants = self.env['stock.quant'].quants_get_preferred_domain(
                 move.product_qty, move,
@@ -88,6 +86,7 @@ class StockScrap(models.Model):
             self.env['stock.quant'].quants_reserve(quants, move)
             move.action_done()
             scrap.write({'move_id': move.id, 'state': 'done'})
+            moves.recalculate_move_state()
         return True
 
     def _prepare_move_values(self):

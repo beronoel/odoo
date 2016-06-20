@@ -22,6 +22,30 @@
         </field>
     </record>
 
+    <record id="mrp_message_view_form2" model="ir.ui.view">
+        <field name="name">mrp.message.view.form2</field>
+        <field name="model">mrp.message</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Message">
+                <group>
+                    <group>
+                        <field name="product_id" required="True"/>
+                        <field name="valid_until"/>
+                    </group>
+                    <group>
+                        <field name="bom_id"/>
+                        <field name="workcenter_id"/>
+                    </group>
+                </group>
+                <field name="message" widget="html" editor_height="450px"/>
+                <footer class="oe_edit_only">
+                    <button name="dummy" type="object" string="Save" class="oe_highlight"/>
+                    <button string="Discard" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
     <record id="mrp_message_view_tree" model="ir.ui.view">
         <field name="name">mrp.message.view.tree</field>
         <field name="model">mrp.message</field>

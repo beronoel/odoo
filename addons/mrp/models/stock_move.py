@@ -211,7 +211,7 @@ class StockMove(models.Model):
 
     @api.multi
     def action_done(self):
-        production_moves = self.filtered(lambda move: move.production_id or move.raw_material_production_id)
+        production_moves = self.filtered(lambda move: (move.production_id or move.raw_material_production_id) and not move.scrapped)
         production_moves.move_validate()
         return super(StockMove, self-production_moves).action_done()
 

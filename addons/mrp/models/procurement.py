@@ -32,7 +32,7 @@ class ProcurementOrder(models.Model):
         self.ensure_one()
         if self.rule_id and self.rule_id.action == 'manufacture':
             # make a manufacturing order for the procurement
-            return self.create_production_orders()[self.id]
+            return self.make_mo()[self.id]
         return super(ProcurementOrder, self)._run()
 
     @api.multi
@@ -51,6 +51,12 @@ class ProcurementOrder(models.Model):
             company_id=self.company_id.id, force_company=self.company_id.id
         )._bom_find(product=self.product_id, picking_type=self.rule_id.picking_type_id)  # TDE FIXME: context bullshit
 
+    def _get_date_planned(self):
+        format_date_planned = fields.Datetime.from_string(self.date_planned)
+        date_planned = format_date_planned - relativedelta(days=self.product_id.produce_delay or 0.0)
+        date_planned = date_planned - relativedelta(days=self.company_id.manufacturing_lead)
+        return date_planned
+
     def _prepare_mo_vals(self, bom):
         self.ensure_one()
         return {
@@ -61,7 +67,8 @@ class ProcurementOrder(models.Model):
             'location_src_id': self.rule_id.location_src_id.id or self.location_id.id,
             'location_dest_id': self.location_id.id,
             'bom_id': bom.id,
-            'date_planned': self.date_planned,
+            'date_planned_start': fields.Datetime.to_string(self._get_date_planned()),
+            'date_planned_finished': self.date_planned,
             'procurement_group_id': self.group_id.id,
             'propagate': self.rule_id.propagate,
             'picking_type_id': self.rule_id.picking_type_id.id or self.warehouse_id.manu_type_id.id,
@@ -70,7 +77,7 @@ class ProcurementOrder(models.Model):
         }
 
     @api.multi
-    def create_production_orders(self):
+    def make_mo(self):
         """ Create production orders from procurements """
         res = {}
         Production = self.env['mrp.production']

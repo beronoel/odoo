@@ -33,3 +33,7 @@ class MrpProductionMessage(models.Model):
     def onchange_product_id(self):
         if self.product_id:
             self.bom_id = self.env['mrp.bom']._bom_find(product=self.product_id)
+
+    @api.multi
+    def dummy(self):
+        return True

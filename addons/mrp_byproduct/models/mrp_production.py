@@ -26,7 +26,7 @@ class Production(models.Model):
                 qty1 *= product_uom_factor / production.bom_id.product_qty
                 data = {
                     'name': 'PROD:%s' % production.name,
-                    'date': production.date_planned,
+                    'date': production.date_planned_start,
                     'product_id': sub_product.product_id.id,
                     'product_uom_qty': qty1,
                     'product_uom': sub_product.product_uom_id.id,

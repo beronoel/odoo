@@ -65,7 +65,7 @@ class TestMrpOrder(TestMrpCommon):
             'product_uom_id': self.product_4.uom_id.id,
             'product_qty': test_quantity,
             'bom_id': self.bom_1.id,
-            'date_planned': test_date_planned,
+            'date_planned_start': test_date_planned,
             'location_src_id': self.location_1.id,
             'location_dest_id': self.warehouse_1.wh_output_stock_loc_id.id,
         })
