@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from openerp import http
+from openerp import http, _
 from openerp.exceptions import AccessError
 from openerp.http import request
 
@@ -43,7 +43,7 @@ class website_account(website_account):
     #
 
     @http.route(['/my/quotes', '/my/quotes/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_quotes(self, page=1, date_begin=None, date_end=None, **kw):
+    def portal_my_quotes(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         SaleOrder = request.env['sale.order']
@@ -52,6 +52,12 @@ class website_account(website_account):
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('state', 'in', ['sent', 'cancel'])
         ]
+
+        sorting_pairs = {
+            'date': {'label': _('Order Date'), 'order': 'date_order desc'},
+            'name': {'label': _('Name'), 'order': 'name'},
+        }
+        order = sorting_pairs.get(sortby, sorting_pairs['date'])['order']
 
         archive_groups = self._get_archive_groups('sale.order', domain)
         if date_begin and date_end:
@@ -62,25 +68,27 @@ class website_account(website_account):
         # make pager
         pager = request.website.pager(
             url="/my/quotes",
-            url_args={'date_begin': date_begin, 'date_end': date_end},
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby},
             total=quotation_count,
             page=page,
             step=self._items_per_page
         )
         # search the count to display, according to the pager data
-        quotations = SaleOrder.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        quotations = SaleOrder.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'date': date_begin,
             'quotations': quotations,
             'pager': pager,
+            'sorting_pairs': sorting_pairs,
+            'sortby': sortby,
             'archive_groups': archive_groups,
             'default_url': '/my/quotes',
         })
         return request.website.render("website_portal_sale.portal_my_quotations", values)
 
     @http.route(['/my/orders', '/my/orders/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_orders(self, page=1, date_begin=None, date_end=None, **kw):
+    def portal_my_orders(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         SaleOrder = request.env['sale.order']
@@ -89,6 +97,13 @@ class website_account(website_account):
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('state', 'in', ['sale', 'done'])
         ]
+
+        sorting_pairs = {
+            'date': {'label': _('Order Date'), 'order': 'date_order desc'},
+            'name': {'label': _('Name'), 'order': 'name'},
+        }
+        order = sorting_pairs.get(sortby, sorting_pairs['date'])['order']
+
         archive_groups = self._get_archive_groups('sale.order', domain)
         if date_begin and date_end:
             domain += [('create_date', '>=', date_begin), ('create_date', '<', date_end)]
@@ -98,18 +113,20 @@ class website_account(website_account):
         # pager
         pager = request.website.pager(
             url="/my/orders",
-            url_args={'date_begin': date_begin, 'date_end': date_end},
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby},
             total=order_count,
             page=page,
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        orders = SaleOrder.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        orders = SaleOrder.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
 
         values.update({
             'date': date_begin,
             'orders': orders,
             'page_name': 'order',
+            'sorting_pairs': sorting_pairs,
+            'sortby': sortby,
             'pager': pager,
             'archive_groups': archive_groups,
             'default_url': '/my/orders',
@@ -135,7 +152,7 @@ class website_account(website_account):
     #
 
     @http.route(['/my/invoices', '/my/invoices/page/<int:page>'], type='http', auth="user", website=True)
-    def portal_my_invoices(self, page=1, date_begin=None, date_end=None, **kw):
+    def portal_my_invoices(self, page=1, date_begin=None, date_end=None, sortby=None, **kw):
         values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         AccountInvoice = request.env['account.invoice']
@@ -144,6 +161,15 @@ class website_account(website_account):
             ('message_partner_ids', 'child_of', [partner.commercial_partner_id.id]),
             ('state', 'in', ['open', 'paid', 'cancelled'])
         ]
+
+        sorting_pairs = {
+            'date': {'label': _('Invoice Date'), 'order': 'date_invoice desc'},
+            'duedate': {'label': _('Due Date'), 'order': 'date_due desc'},
+            'name': {'label': _('Name'), 'order': 'name'},
+            'state': {'label': _('Status'), 'order': 'state'},
+        }
+        order = sorting_pairs.get(sortby, sorting_pairs['date'])['order']
+
         archive_groups = self._get_archive_groups('account.invoice', domain)
         if date_begin and date_end:
             domain += [('create_date', '>=', date_begin), ('create_date', '<', date_end)]
@@ -153,17 +179,19 @@ class website_account(website_account):
         # pager
         pager = request.website.pager(
             url="/my/invoices",
-            url_args={'date_begin': date_begin, 'date_end': date_end},
+            url_args={'date_begin': date_begin, 'date_end': date_end, 'sortby': sortby},
             total=invoice_count,
             page=page,
             step=self._items_per_page
         )
         # content according to pager and archive selected
-        invoices = AccountInvoice.search(domain, limit=self._items_per_page, offset=pager['offset'])
+        invoices = AccountInvoice.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
         values.update({
             'date': date_begin,
             'invoices': invoices,
             'page_name': 'invoice',
+            'sorting_pairs': sorting_pairs,
+            'sortby': sortby,
             'pager': pager,
             'archive_groups': archive_groups,
             'default_url': '/my/invoices',

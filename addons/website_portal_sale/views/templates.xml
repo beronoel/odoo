@@ -61,9 +61,31 @@
         </xpath>
     </template>
 
+    <template id="sorting" name="Sorting">
+        <div class='btn-group' t-if="sorting_pairs">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <!-- If No sortby then default string will be first order key -> label -->
+                <span class="fa fa-sort fa-lg" /> <span t-esc="sorting_pairs.get(sortby, {}).get('label', sorting_pairs.get(sorting_pairs.keys()[0], {}).get('label'))"/>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li t-foreach="sorting_pairs" t-as="option" t-att-class="sortby == option and 'active'">
+                    <a t-att-href="default_url + '?' + keep_query('date_begin', 'date_end', sortby=option)">
+                        <span t-esc="sorting_pairs.get(option, {}).get('label')"/>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </template>
+
     <template id="portal_my_quotations" name="My Quotations">
       <t t-call="website_portal.portal_layout">
-        <h3 class="page-header">Your Quotes</h3>
+        <div class="page-header">
+            <span class="h3">Your Quotes</span>
+            <div class="pull-right">
+                <t t-call="website_portal_sale.sorting" />
+            </div>
+        </div>
         <t t-if="not quotations">
             <p>There are currently no quotes for your account.</p>
         </t>
@@ -72,6 +94,7 @@
                 <thead>
                   <tr class="active">
                       <th>Quotation #</th>
+                      <th>Order Date</th>
                       <th>Valid Until</th>
                       <th></th>
                       <th>Total</th>
@@ -82,6 +105,7 @@
                         <td>
                             <a t-attf-href="/my/orders/#{quotation.id}?#{keep_query()}"><t t-esc="quotation.name"/></a>
                         </td>
+                        <td><span t-field="quotation.date_order"/></td>
                         <td><span t-field="quotation.validity_date"/></td>
                         <td>
                           <t t-if="quotation.state == 'cancel'">
@@ -105,7 +129,12 @@
 
     <template id="portal_my_orders" name="My Sales Orders">
       <t t-call="website_portal.portal_layout">
-        <h3 class="page-header">Your Orders</h3>
+        <div class="page-header">
+            <span class="h3">Your Orders</span>
+            <div class="pull-right">
+                <t t-call="website_portal_sale.sorting" />
+            </div>
+        </div>
         <t t-if="not orders">
             <p>There are currently no orders for your account.</p>
         </t>
@@ -149,7 +178,12 @@
 
     <template id="portal_my_invoices" name="My Invoices and Payments">
       <t t-call="website_portal.portal_layout">
-        <h3 class="page-header">Your Invoices and Payments</h3>
+        <div class="page-header">
+            <span class="h3">Your Invoices and Payments</span>
+            <div class="pull-right">
+                <t t-call="website_portal_sale.sorting" />
+            </div>
+        </div>
         <t t-if="not invoices">
             <p>There are currently no invoices for your account.</p>
         </t>
