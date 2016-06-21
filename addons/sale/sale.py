@@ -268,6 +268,15 @@ class SaleOrder(models.Model):
         result = super(SaleOrder, self).create(vals)
         return result
 
+    @api.multi
+    def copy_data(self, default=None):
+        if default is None:
+            default = {}
+        default['order_line'] = []
+        for line in self.order_line:
+            if not line.is_downpayment:
+                default['order_line'].append((0, 0, line.copy_data()[0]))
+        return super(SaleOrder, self).copy_data(default)
 
     @api.multi
     def _prepare_invoice(self):
@@ -756,6 +765,7 @@ class SaleOrderLine(models.Model):
     company_id = fields.Many2one(related='order_id.company_id', string='Company', store=True, readonly=True)
     order_partner_id = fields.Many2one(related='order_id.partner_id', store=True, string='Customer')
     analytic_tag_ids = fields.Many2many('account.analytic.tag', string='Analytic Tags')
+    is_downpayment = fields.Boolean(string="Is a downpayment")
 
     state = fields.Selection([
         ('draft', 'Quotation'),
