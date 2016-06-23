@@ -507,7 +507,7 @@ class product_template(osv.osv):
         'list_price': fields.float('Sale Price', digits_compute=dp.get_precision('Product Price'), help="Base price to compute the customer price. Sometimes called the catalog price."),
         'lst_price' : fields.related('list_price', type="float", string='Public Price', digits_compute=dp.get_precision('Product Price')),
         'standard_price': fields.function(_compute_product_template_field, fnct_inv=_set_product_template_field, fnct_search=_search_by_standard_price, multi='_compute_product_template_field', type='float', string='Cost', digits_compute=dp.get_precision('Product Price'),
-                                          help="Cost of the product, in the default unit of measure of the product.", groups="base.group_user"),
+                                          help="The cost price is used for valuate stocks or to assess the price of manufacturing a product. The purchase orders are fetching the vendor prices.", groups="base.group_user"),
         'volume': fields.function(_compute_product_template_field, fnct_inv=_set_product_template_field, multi='_compute_product_template_field', type='float', string='Volume', help="The volume in m3.", store={
             _name: (lambda s,c,u,i,t: i, ['product_variant_ids'], 10),
             'product.product': (_get_template_id_from_product, ['product_tmpl_id', 'volume'], 10),
@@ -926,29 +926,33 @@ class product_product(osv.osv):
         return result
 
     def _select_seller(self, cr, uid, product_id, partner_id=False, quantity=0.0, date=time.strftime(DEFAULT_SERVER_DATE_FORMAT), uom_id=False, context=None):
-        if context is None:
-            context = {}
-        res = self.pool.get('product.supplierinfo').browse(cr, uid, [])
-        for seller in product_id.seller_ids:
-            # Set quantity in UoM of seller
-            quantity_uom_seller = quantity
-            if quantity_uom_seller and uom_id and uom_id != seller.product_uom:
-                quantity_uom_seller = uom_id._compute_qty_obj(uom_id, quantity_uom_seller, seller.product_uom)
 
-            if seller.date_start and seller.date_start > date:
-                continue
-            if seller.date_end and seller.date_end < date:
-                continue
-            if partner_id and seller.name not in [partner_id, partner_id.parent_id]:
-                continue
-            if quantity_uom_seller < seller.qty:
-                continue
-            if seller.product_id and seller.product_id != product_id:
-                continue
-
-            res |= seller
-            break
-        return res
+        def _find_seller(sellers):
+            res = self.pool['product.supplierinfo'].browse(cr, uid, [], context=context)
+            for seller in sellers:
+                # Set quantity in UoM of seller
+                quantity_uom_seller = quantity
+                if quantity_uom_seller and uom_id and uom_id != seller.product_uom:
+                    quantity_uom_seller = uom_id._compute_qty_obj(uom_id, quantity_uom_seller, seller.product_uom)
+    
+                if seller.date_start and seller.date_start > date:
+                    continue
+                if seller.date_end and seller.date_end < date:
+                    continue
+                if partner_id and seller.name not in [partner_id, partner_id.parent_id]:
+                    continue
+                if quantity_uom_seller < seller.qty:
+                    continue
+                if seller.product_id and seller.product_id != product_id:
+                    continue
+    
+                res |= seller
+                break
+            return res
+        seller = _find_seller(product_id.product_seller_ids)
+        if not seller:
+            seller = _find_seller(product_id.seller_ids)
+        return seller
 
     def _get_pricelist_items(self, cr, uid, ids, field_name, args, context=None):
         res = {}
@@ -991,6 +995,7 @@ class product_product(osv.osv):
         'volume': fields.float('Volume', help="The volume in m3."),
         'weight': fields.float('Weight', digits_compute=dp.get_precision('Stock Weight'), help="The weight of the contents in Kg, not including any packaging, etc."),
         'pricelist_item_ids': fields.function(_get_pricelist_items, type='many2many', relation='product.pricelist.item', string='Pricelist Items'),
+        'product_seller_ids': fields.one2many('product.supplierinfo', 'product_id', 'Vendors'),
     }
 
     _defaults = {
@@ -1267,12 +1272,18 @@ class product_supplierinfo(osv.osv):
             result[supplier_info.id]['qty'] = qty
         return result
 
+    def _compute_product_uom(self, cr, uid, ids, fields, arg, context=None):
+        result = {}
+        for supplier_info in self.browse(cr, uid, ids, context=context):
+            result[supplier_info.id] = supplier_info.product_id.uom_id.id if supplier_info.product_id else supplier_info.product_tmpl_id.uom_id.id
+        return result
+
     _columns = {
         'name': fields.many2one('res.partner', 'Vendor', required=True, domain=[('supplier', '=', True)], ondelete='cascade', help="Vendor of this product"),
         'product_name': fields.char('Vendor Product Name', help="This vendor's product name will be used when printing a request for quotation. Keep empty to use the internal one."),
         'product_code': fields.char('Vendor Product Code', help="This vendor's product code will be used when printing a request for quotation. Keep empty to use the internal one."),
         'sequence': fields.integer('Sequence', help="Assigns the priority to the list of product vendor."),
-        'product_uom': fields.related('product_tmpl_id', 'uom_po_id', type='many2one', relation='product.uom', string="Vendor Unit of Measure", readonly="1", help="This comes from the product form."),
+        'product_uom': fields.function(_compute_product_uom, type='many2one', relation='product.uom', string="Vendor Unit of Measure", help="This comes from the product form."),
         'min_qty': fields.float('Minimal Quantity', required=True, help="The minimal quantity to purchase from this vendor, expressed in the vendor Product Unit of Measure if not any, in the default unit of measure of the product otherwise."),
         'qty': fields.function(_calc_qty, store=True, type='float', string='Quantity', multi="qty", help="This is a quantity which is converted into Default Unit of Measure."),
         'price': fields.float('Price', required=True, digits_compute=dp.get_precision('Product Price'), help="The price to purchase a product"),

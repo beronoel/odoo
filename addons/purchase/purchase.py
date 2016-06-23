@@ -322,6 +322,7 @@ class PurchaseOrder(models.Model):
     def button_confirm(self):
         for order in self:
             order._add_supplier_to_product()
+            order._change_vendor_price()
             # Deal with double validation process
             if order.company_id.po_double_validation == 'one_step'\
                     or (order.company_id.po_double_validation == 'two_step'\
@@ -421,6 +422,14 @@ class PurchaseOrder(models.Model):
                     line.product_id.write(vals)
                 except AccessError:  # no write access rights -> just ignore
                     break
+
+    def _change_vendor_price(self):
+        # When creating an RFQ : If the price is changed in the RFQ, 
+        # the system will update the vendor price on the variant if there was a vendor price set,
+        # or on the template if there were no vendor price on the variant.
+        for line in self.order_line:
+            if line.vendor_id.price != line.price_unit:
+                line.vendor_id.write({'price': line.price_unit})
 
     @api.multi
     def action_view_picking(self):
@@ -583,6 +592,7 @@ class PurchaseOrderLine(models.Model):
     currency_id = fields.Many2one(related='order_id.currency_id', store=True, string='Currency', readonly=True)
     date_order = fields.Datetime(related='order_id.date_order', string='Order Date', readonly=True)
     procurement_ids = fields.One2many('procurement.order', 'purchase_line_id', string='Associated Procurements', copy=False)
+    vendor_id = fields.Many2one('product.supplierinfo', string='Vendor')
 
     @api.multi
     def _get_stock_move_price_unit(self):
@@ -752,6 +762,7 @@ class PurchaseOrderLine(models.Model):
         if seller and self.product_uom and seller.product_uom != self.product_uom:
             price_unit = self.env['product.uom']._compute_price(seller.product_uom.id, price_unit, to_uom_id=self.product_uom.id)
 
+        self.vendor_id = seller
         self.price_unit = price_unit
 
     def _suggest_quantity(self):

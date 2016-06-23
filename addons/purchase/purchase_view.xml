@@ -218,6 +218,7 @@
                                 <tree string="Purchase Order Lines" editable="bottom">
                                     <field name="product_id" context="{'partner_id': parent.partner_id}"/>
                                     <field name="name"/>
+                                    <field name="vendor_id" invisible="1"/>
                                     <field name="date_planned"/>
                                     <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
                                     <field name="account_analytic_id" context="{'default_partner_id':parent.partner_id}" groups="purchase.group_analytic_accounting"/>

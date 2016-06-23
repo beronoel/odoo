@@ -275,6 +275,8 @@
                                 </group>
                             </group>
                         </group>
+                        <separator string="Vendors"/>
+                        <field name="product_seller_ids"/>
                     </sheet>
                 </form>
             </field>
@@ -461,6 +463,9 @@
                 </field>
                 <field name="name" position="after">
                     <field name="product_tmpl_id" class="oe_inline" readonly="1" invisible="1" attrs="{'required': [('id', '!=', False)]}"/>
+                </field>
+                <field name="seller_ids" position="replace">
+                    <field name="product_seller_ids"/>
                 </field>
                 <field name="item_ids" position="replace">
                     <field name="pricelist_item_ids" widget="many2many">
