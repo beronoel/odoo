@@ -39,14 +39,13 @@ class SaleOrderLine(models.Model):
             if bom.type != 'phantom':
                 continue
             bom_delivered[bom.id] = False
-            product_uom_qty_bom = self.env['product.uom']._compute_qty_obj(self.product_uom, self.product_uom_qty, bom.product_uom)
-            bom_exploded = self.env['mrp.bom']._bom_explode(bom, self.product_id, product_uom_qty_bom)[0]
-            for bom_line in bom_exploded:
+            product_uom_qty_bom = self.env['product.uom']._compute_qty_obj(self.product_uom, self.product_uom_qty, bom.product_uom_id)
+            boms, lines = bom.explode_new(self.product_id, product_uom_qty_bom)
+            for bom_line, data in lines:
                 qty = 0.0
-                for move in self.procurement_ids.mapped('move_ids'):
-                    if move.state == 'done' and move.product_id.id == bom_line.get('product_id', False):
-                        qty += self.env['product.uom']._compute_qty(move.product_uom.id, move.product_uom_qty, bom_line['product_uom'])
-                if float_compare(qty, bom_line['product_qty'], precision_digits=precision) < 0:
+                for move in self.procurement_ids.mapped('move_ids').filtered(lambda x: x.state == 'done' and x.product_id == bom_line.product_id):
+                    qty += self.env['product.uom']._compute_qty(move.product_uom.id, move.product_uom_qty, bom_line.product_uom_id.id)
+                if float_compare(qty, data['qty'], precision_digits=precision) < 0:
                     bom_delivered[bom.id] = False
                     break
                 else:

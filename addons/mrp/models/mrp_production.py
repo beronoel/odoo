@@ -357,12 +357,12 @@ class MrpProduction(models.Model):
             product = move.product_id
             routes = product.route_ids + product.categ_id.route_ids
             # TODO: optimize with read_group?
-            pull = self.env['procurement.rule'].search([('route_id', 'in', [x.id for x in routes]), ('location_src_id', '=', move.location_id.id),
+            pull = self.env['procurement.rule'].search([('route_id', 'in', routes.ids), ('location_src_id', '=', move.location_id.id),
                                                         ('location_id', '=', move.location_dest_id.id)], limit=1)
             if pull and (pull.procure_method == 'make_to_order'):
                 move.procure_method = pull.procure_method
             elif not pull: # If there is no make_to_stock rule either
-                if mto_route and mto_route.id in [x.id for x in routes]:
+                if mto_route and mto_route.id in routes.ids:
                     move.procure_method = 'make_to_order'
 
     @api.multi
