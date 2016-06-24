@@ -51,6 +51,7 @@ return session.is_bound.then(function () {
                     childList: true,
                     subtree: true,
                 });
+                tour.update();
             });
         };
 

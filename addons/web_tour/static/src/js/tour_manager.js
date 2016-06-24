@@ -17,6 +17,68 @@ function getStepKey(name) {
 function getRunningKey() {
     return 'running_tour';
 }
+function getRunningDelayKey() {
+    return getRunningKey() + "_delay";
+}
+
+var RunningTourActionHelper = core.Class.extend({
+    init: function (tip_widget) {
+        this.tip_widget = tip_widget;
+    },
+    click: function (element) {
+        this._click(this._getActionValues(element));
+    },
+    text: function (text, element) {
+        this._text(this._getActionValues(element), text);
+    },
+    drag_and_drop: function (to, element) {
+        this._drag_and_drop(this._getActionValues(element), to);
+    },
+    auto: function (element) {
+        var values = this._getActionValues(element);
+        if (values.consume_event === "input") {
+            this._text(values);
+        } else {
+            this._click(values);
+        }
+    },
+    _getActionValues: function (element) {
+        var $element = element ? $(element) : this.tip_widget.$anchor;
+        var consume_event = element ? Tip.getConsumeEventType($element) : this.tip_widget.consume_event;
+        return {
+            $element: $element,
+            consume_event: consume_event,
+        };
+    },
+    _click: function (values) {
+        values.$element.mousedown().mouseup().click();
+    },
+    _text: function (values, text) {
+        this._click(values);
+
+        text = text || "Test";
+        if (values.consume_event === "input") {
+            values.$element.val(text).trigger("input");
+        } else {
+            values.$element.text(text);
+        }
+    },
+    _drag_and_drop: function (values, to) {
+        var $to = $(to || document.body);
+
+        var elementCenter = values.$element.offset();
+        elementCenter.left += values.$element.outerWidth()/2;
+        elementCenter.top += values.$element.outerHeight()/2;
+
+        var toCenter = $to.offset();
+        toCenter.left += $to.outerWidth()/2;
+        toCenter.top += $to.outerHeight()/2;
+
+        values.$element.trigger($.Event("mousedown", {which: 1, pageX: elementCenter.left, pageY: elementCenter.top}));
+        values.$element.trigger($.Event("mousemove", {which: 1, pageX: toCenter.left, pageY: toCenter.top}));
+        values.$element.trigger($.Event("mouseup", {which: 1, pageX: toCenter.left, pageY: toCenter.top}));
+    },
+});
 
 return core.Class.extend({
     init: function(consumed_tours) {
@@ -25,6 +87,7 @@ return core.Class.extend({
         this.tours = {};
         this.consumed_tours = consumed_tours || [];
         this.running_tour = local_storage.getItem(getRunningKey());
+        this.running_step_delay = parseInt(local_storage.getItem(getRunningDelayKey()), 10);
         this.TourModel = new Model('web_tour.tour');
         this.edition = (_.last(session.server_version_info) === 'e') ? 'enterprise' : 'community';
     },
@@ -43,7 +106,7 @@ return core.Class.extend({
         var last_arg = args[args.length - 1];
         var name = args[0];
         if (this.tours[name]) {
-            console.warn(_.str.sprintf(_t("Tour %s is already defined"), name));
+            console.warn(_.str.sprintf("Tour %s is already defined", name));
             return;
         }
         var options = args.length === 2 ? {} : args[1];
@@ -66,29 +129,36 @@ return core.Class.extend({
         }
         this.tours[name] = tour;
         if (name === this.running_tour || (!tour.test && !_.contains(this.consumed_tours, name))) {
-            this.active_tooltips[name] = steps[tour.current_step];
+            this._to_next_step(name, 0);
         }
     },
-    run: function(tour_name) {
+    run: function (tour_name, step_delay) {
         if (this.running_tour) {
-            console.warn(_.str.sprintf(_t("Killing tour %s"), tour_name));
+            console.warn(_.str.sprintf("Killing tour %s", tour_name));
             this._deactivate_tip(this.active_tooltips[tour_name]);
             this._consume_tour(tour_name);
             return;
         }
         var tour = this.tours[tour_name];
         if (!tour) {
-            console.warn(_.str.sprintf(_t("Unknown Tour %s"), name));
+            console.warn(_.str.sprintf("Unknown Tour %s", name));
             return;
         }
-        console.log(_.str.sprintf(_t("Running tour %s"), tour_name));
-        local_storage.setItem(getRunningKey(), tour_name);
+        console.log(_.str.sprintf("Running tour %s", tour_name));
+        this.running_tour = tour_name;
+        this.running_step_delay = step_delay || 0;
+        local_storage.setItem(getRunningKey(), this.running_tour);
+        local_storage.setItem(getRunningDelayKey(), this.running_step_delay);
         if (tour.url) {
             window.location = tour.url;
         }
-        this.running_tour = tour_name;
-        this.active_tooltips[tour_name] = tour.steps[0];
-        this._set_running_tour_timeout(tour_name, tour.steps[0]);
+
+        this._deactivate_tip(this.active_tooltips[tour_name]);
+
+        tour.current_step = 0;
+        local_storage.setItem(getStepKey(tour_name), tour.current_step);
+        this.active_tooltips[tour_name] = tour.steps[tour.current_step];
+        this._set_running_tour_timeout(tour_name, this.active_tooltips[tour_name]);
         this.update();
     },
     /**
@@ -131,56 +201,93 @@ return core.Class.extend({
             });
         }
         tip.widget = new Tip(this, tip_info);
-        tip.widget.on('tip_consumed', this, this._consume_tip.bind(this, tip, tour_name));
-        tip.widget.attach_to($anchor);
-
-        if (this.running_tour === tour_name) {
-            clearTimeout(this.running_tour_timeout);
-            if (tip.run) {
-                this._consume_tip(tip, tour_name);
-                tip.run.apply(tip);
-            }
+        if (this.running_tour !== tour_name) {
+            tip.widget.on('tip_consumed', this, this._consume_tip.bind(this, tip, tour_name));
         }
+        tip.widget.attach_to($anchor).then(this._to_next_running_step.bind(this, tip, tour_name));
     },
     _deactivate_tip: function(tip) {
-        if (tip.widget) {
+        if (tip && tip.widget) {
             tip.widget.destroy();
             delete tip.widget;
         }
     },
     _consume_tip: function(tip, tour_name) {
         this._deactivate_tip(tip);
-        var tour = this.tours[tour_name];
-        if (tour.current_step < tour.steps.length - 1) {
-            tour.current_step = tour.current_step + 1;
-            this.active_tooltips[tour_name] = tour.steps[tour.current_step];
-            local_storage.setItem(getStepKey(tour_name), tour.current_step);
-            if (this.running_tour === tour_name) {
+        this._to_next_step(tour_name);
+
+        var is_running = (this.running_tour === tour_name);
+        if (is_running) {
+            console.log(_.str.sprintf("Tour %s: step %s succeeded", tour_name, tip.trigger));
+        }
+
+        if (this.active_tooltips[tour_name]) {
+            local_storage.setItem(getStepKey(tour_name), this.tours[tour_name].current_step);
+            if (is_running) {
                 this._set_running_tour_timeout(tour_name, this.active_tooltips[tour_name]);
             }
         } else {
             this._consume_tour(tour_name);
         }
     },
-    _consume_tour: function(tour_name) {
+    _to_next_step: function (tour_name, inc) {
+        var tour = this.tours[tour_name];
+        tour.current_step += (inc !== undefined ? inc : 1);
+        if (this.running_tour !== tour_name) {
+            var index = _.findIndex(tour.steps.slice(tour.current_step), function (tip) {
+                return !tip.auto;
+            });
+            if (index >= 0) {
+                tour.current_step += index;
+            } else {
+                tour.current_step = tour.steps.length;
+            }
+        }
+        this.active_tooltips[tour_name] = tour.steps[tour.current_step];
+    },
+    _consume_tour: function (tour_name, error) {
         delete this.active_tooltips[tour_name];
         this.tours[tour_name].current_step = 0;
         local_storage.removeItem(getStepKey(tour_name));
         if (this.running_tour === tour_name) {
             local_storage.removeItem(getRunningKey());
+            local_storage.removeItem(getRunningDelayKey());
             this.running_tour = undefined;
+            this.running_step_delay = undefined;
             clearTimeout(this.running_tour_timeout);
+            if (error) {
+                console.log("error " + error); // phantomJS wait for message starting by error
+            } else {
+                console.log(_.str.sprintf("Tour %s succeeded", tour_name));
+                console.log("ok"); // phantomJS wait for exact message "ok"
+            }
         } else {
             this.TourModel.call('consume', [tour_name]);
         }
     },
     _set_running_tour_timeout: function(tour_name, step) {
-        if (!step.run) { return; } // don't set a timeout if the current step requires a manual action
         var self = this;
         this.running_tour_timeout = setTimeout(function() {
-            console.error(_.str.sprintf(_t("Tour %s failed at step %s"), tour_name, step.trigger));
-            self._consume_tour(tour_name);
-        }, RUNNING_TOUR_TIMEOUT);
+            self._consume_tour(tour_name, _.str.sprintf("Tour %s failed at step %s", tour_name, step.trigger));
+        }, RUNNING_TOUR_TIMEOUT + this.running_step_delay);
+    },
+    _to_next_running_step: function (tip, tour_name) {
+        if (this.running_tour !== tour_name) return;
+        clearTimeout(this.running_tour_timeout);
+
+        var action_helper = new RunningTourActionHelper(tip.widget);
+
+        _.delay((function () {
+            if (typeof tip.run === "function") {
+                tip.run.call(tip.widget, action_helper);
+            } else if (tip.run !== undefined) {
+                var m = tip.run.match(/^(click|text|drag_and_drop) *(?:\(? *["']?(.+)["']? *\)?)?$/);
+                action_helper[m[1]](m[2]);
+            } else {
+                action_helper.auto();
+            }
+            this._consume_tip(tip, tour_name);
+        }).bind(this), this.running_step_delay);
     },
 });
 
