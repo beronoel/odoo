@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+       <!--Email template -->
+        <record id="odoo_template" model="mail.template">
+            <field name="name">Newsletter</field>
+            <field name="subject">Newsletter</field>
+            <field name="model_id" ref="mass_mailing.model_mail_mass_mailing_contact"/>
+            <field name="use_default_to" eval="True"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+            <div style="width:100%;height:600px;background-color:#000000;">
+                <div class="snippet_row bg-color" style="padding:0px;width:600px;margin:40px auto;background: #e3e3e3 repeat top /100%">
+                    <table cellpadding="0" cellspacing="0" style="border-collapse:collapse" width="100%">
+                        <tbody>
+                            <tr>
+                                <td style="padding:10px 10px 10px 5px" valign="center" width="270">
+                                    <a style="text-decoration:none" href="http://www.example.com"><strong>My Company</strong></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>]]></field>
+        </record>
+
+    </data>
+</odoo>
