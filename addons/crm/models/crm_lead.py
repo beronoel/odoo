@@ -672,6 +672,8 @@ class Lead(FormatAddress, models.Model):
         domain = partner_match_domain
         if not include_lost:
             domain += ['&', ('active', '=', True), ('probability', '<', 100)]
+        else:
+            domain += ['&', ('active', '!=', None), '|', ('type', '=', 'opportunity'), '&', ('type', '=', 'lead'), ('active', '=', True)]
         return self.search(domain)
 
     @api.multi
