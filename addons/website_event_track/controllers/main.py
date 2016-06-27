@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import babel
 import collections
 import datetime
 import pytz
 
 from odoo import fields, http
 from odoo.http import request
-from odoo.tools import html_escape as escape, html2plaintext
+from odoo.tools import html_escape as escape, html2plaintext, posix_to_ldml
 
 
 class WebsiteEventTrackController(http.Controller):
@@ -18,8 +19,21 @@ class WebsiteEventTrackController(http.Controller):
         values = {'track': track, 'event': track.event_id, 'main_object': track}
         return request.website.render("website_event_track.track_view", values)
 
+    def _get_locale_time(self, dt_time, time_format, lang_code):
+        """ Get locale time (time_format) from datetime object
+
+            :param dt_time: datetime object
+            :param time_format: time format of the language
+            :param lang_code: language code (eg. en_US)
+        """
+        locale = babel.Locale.parse(lang_code)
+        pattern = posix_to_ldml(time_format, locale=locale)
+        return babel.dates.format_time(dt_time, format=pattern, locale=locale)
+
     def _prepare_calendar(self, event, event_track_ids):
         local_tz = pytz.timezone(event.date_tz or 'UTC')
+        lang_code = request.env.context.get('lang')
+        time_format = request.env['res.lang']._lang_get(lang_code).time_format
         locations = {}                  # { location: [track, start_date, end_date, rowspan]}
         dates = []                      # [ (date, {}) ]
         for track in event_track_ids:
@@ -34,7 +48,8 @@ class WebsiteEventTrackController(http.Controller):
 
             # New TR, align all events
             if forcetr or (start_date>dates[-1][0]) or not location:
-                dates.append((start_date, {}, bool(location)))
+                formatted_time = self._get_locale_time(start_date, time_format, lang_code)
+                dates.append((start_date, {}, bool(location), formatted_time))
                 for loc in locations.keys():
                     if locations[loc] and (locations[loc][-1][2] > start_date):
                         locations[loc][-1][3] += 1
@@ -62,9 +77,9 @@ class WebsiteEventTrackController(http.Controller):
             days_tracks[track.date[:10]].append(track)
 
         days = {}
-        days_tracks_count = {}
+        tracks_by_days = {}
         for day, tracks in days_tracks.iteritems():
-            days_tracks_count[day] = len(tracks)
+            tracks_by_days[day] = tracks
             days[day] = self._prepare_calendar(event, tracks)
 
         speakers = {}
@@ -75,7 +90,7 @@ class WebsiteEventTrackController(http.Controller):
         return request.website.render("website_event_track.agenda", {
             'event': event,
             'days': days,
-            'days_nbr': days_tracks_count,
+            'tracks_by_days': tracks_by_days,
             'speakers': speakers,
             'tag': tag
         })
