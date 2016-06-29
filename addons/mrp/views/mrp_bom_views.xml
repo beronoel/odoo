@@ -84,6 +84,7 @@
                     <field name="product_id" groups="product.group_product_variant"/>
                     <field name="product_qty"/>
                     <field name="product_uom_id" groups="product.group_uom"/>
+                    <field name="routing_id" groups="mrp.group_mrp_routings"/>
                 </tree>
             </field>
         </record>

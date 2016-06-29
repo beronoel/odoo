@@ -113,7 +113,14 @@
                 <field name="production_state" invisible="1"/>
             </header>
             <sheet>
-                <div class="oe_button_box" name="button_box"/>
+                <div class="oe_button_box" name="button_box">
+                    <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="fa-arrows-v" attrs="{'invisible': [('scrap_count', '=', 0)]}">
+                        <div class="o_form_field o_stat_info">
+                            <span class="o_stat_value"><field name="scrap_count"/></span>
+                            <span class="o_stat_text">Scraps</span>
+                        </div>
+                    </button>
+                </div>
                 <group>
                     <group>
                         <field name="product_id" string="To Produce"/>

@@ -1,4 +1,5 @@
 odoo.define('mrp.mrp_state', function (require) {
+"use strict";
 
 var core = require('web.core');
 var common = require('web.form_common');
@@ -20,15 +21,14 @@ var SetBulletStatus = common.AbstractField.extend(common.ReinitializeFieldMixin,
             if (this.get('value')){
                 var title = this.get('value') == 'waiting'? _t('Waiting Materials') : _t('Ready to produce');
                 this.$el.attr({'title': title, 'style': 'display:inline'});
-                this.$el
-                    .removeClass('text-success text-danger text-default')
+                this.$el.removeClass('text-success text-danger text-default');
                 this.$el.html($('<span>' + title + '</span>').addClass('label label-' + bullet_class));
             }
         }
     },
 });
 
-var TimeCounter = common.AbstractField.extend(common.ReinitializeWidgetMixin, common.ReinitializeFieldMixin, {
+var TimeCounter = common.AbstractField.extend(common.ReinitializeFieldMixin, {
     start: function() {
         this._super();
         var self = this;
@@ -36,29 +36,33 @@ var TimeCounter = common.AbstractField.extend(common.ReinitializeWidgetMixin, co
             self.render_value();
         });
     },
+    start_time_counter: function(){
+        var self = this;
+        this.timer = null;
+        if (this.field_manager.datarecord.user_state) {
+            this.duration += 1000;
+            this.timer = setTimeout(function() {
+                self.start_time_counter();
+            }, 1000);
+        } else {
+            clearTimeout(this.timer);
+        }
+        this.$el.html($('<span>' + moment.utc(this.duration).format("HH:mm:ss") + '</span>'));
+    },
     render_value: function() {
         this._super.apply(this, arguments);
         var self = this;
-        var timer, domain = [['workorder_id', '=', this.field_manager.datarecord.id], ['user_id', '=', self.session.uid]];
-        new Model('mrp.workcenter.productivity').call('search_read', [domain, []]).then(function(result) {
+        this.duration;
+        var productivity_domain = [['workorder_id', '=', this.field_manager.datarecord.id], ['user_id', '=', self.session.uid]];
+        new Model('mrp.workcenter.productivity').call('search_read', [productivity_domain, []]).then(function(result) {
             if (self.get("effective_readonly")) {
                 self.$el.removeClass('o_form_field_empty');
-                var current_date = new Date(), duration = 0;
+                var current_date = new Date();
+                self.duration = 0;
                 _.each(result, function(data) {
-                    duration += data.date_end ? self.get_date_difference(data.date_start, data.date_end) : self.get_date_difference(time.auto_str_to_date(data.date_start), current_date);
+                    self.duration += data.date_end ? self.get_date_difference(data.date_start, data.date_end) : self.get_date_difference(time.auto_str_to_date(data.date_start), current_date);
                 });
-                function time_counter() {
-                    if (self.field_manager.datarecord.user_state) {
-                        duration += 1000;
-                        timer = setTimeout(function() {
-                            time_counter();
-                        }, 1000);
-                    } else {
-                        clearTimeout(timer);
-                    }
-                    self.$el.html($('<span>' + moment.utc(duration).format("HH:mm:ss") + '</span>'));
-                }
-                time_counter();
+                self.start_time_counter();
             }
         });
     },

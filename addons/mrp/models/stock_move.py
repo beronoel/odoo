@@ -249,7 +249,7 @@ class StockMove(models.Model):
         return result
 
     @api.multi
-    def dummy(self):
+    def save(self):
         return True
 
     def _generate_raw_moves(self, exploded_lines):

@@ -35,5 +35,5 @@ class MrpProductionMessage(models.Model):
             self.bom_id = self.env['mrp.bom']._bom_find(product=self.product_id)
 
     @api.multi
-    def dummy(self):
+    def save(self):
         return True

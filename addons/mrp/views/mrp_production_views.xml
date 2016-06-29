@@ -59,7 +59,6 @@
                 </header>
                 <sheet>
                     <field name="post_visible" invisible="1"/>
-                    <field name="has_scrap_move" invisible="1"/>
                     <div class="oe_button_box" name="button_box">
                         <button name="%(action_mrp_workorder_production_specific)d" type="action" attrs="{'invisible': [('workorder_count', '=', 0)]}" class="oe_stat_button" icon="fa-play-circle-o">
                             <div class="o_form_field o_stat_info">
@@ -68,7 +67,7 @@
                             </div>
                         </button>
                         <button name="%(action_mrp_production_moves)d" type="action" string="Inventory Moves" class="oe_stat_button" icon="fa-arrows-v" attrs="{'invisible': [('state', 'not in', ('progress', 'done'))]}"/>
-                        <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="fa-arrows-v" attrs="{'invisible': [('has_scrap_move', '=', False)]}">
+                        <button class="oe_stat_button" name="action_see_move_scrap" type="object" icon="fa-arrows-v" attrs="{'invisible': [('scrap_count', '=', 0)]}">
                             <div class="o_form_field o_stat_info">
                                 <span class="o_stat_value"><field name="scrap_count"/></span>
                                 <span class="o_stat_text">Scraps</span>

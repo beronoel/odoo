@@ -38,5 +38,10 @@ class StockScrap(models.Model):
                 return [preferred_domain, preferred_domain2]
         return super(StockScrap, self)._get_preferred_domain()
 
+    def _prepare_move_values(self):
+        vals = super(StockScrap, self)._prepare_move_values()
+        vals.update({'production_id': False})
+        return vals
+
     def _get_origin_moves(self):
         return super(StockScrap, self)._get_origin_moves() or self.production_id and self.production_id.move_raw_ids.filtered(lambda x: x.product_id == self.product_id)

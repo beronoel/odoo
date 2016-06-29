@@ -112,12 +112,20 @@ class MrpProductionWorkcenterLine(models.Model):
     final_lot_id = fields.Many2one(
         'stock.production.lot', 'Current Lot', domain="[('product_id', '=', product_id)]",
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
-
     time_ids = fields.One2many(
         'mrp.workcenter.productivity', 'workorder_id')
     user_state = fields.Boolean(compute='_get_current_state', help="Technical field indicating whether the current user is working. ")
     production_messages = fields.Html('Workorder Message', compute='_compute_production_messages')
     next_work_order_id = fields.Many2one('mrp.workorder', "Next Work Order")
+    scrap_ids = fields.One2many('stock.scrap', 'workorder_id')
+    scrap_count = fields.Integer(compute='_compute_scrap_move_count', string='Scrap Move')
+
+    @api.multi
+    def _compute_scrap_move_count(self):
+        data = self.env['stock.scrap'].read_group([('workorder_id', 'in', self.ids)], ['workorder_id'], ['workorder_id'])
+        count_data = dict((item['workorder_id'][0], item['workorder_id_count']) for item in data)
+        for workorder in self:
+            workorder.scrap_count = count_data.get(workorder.id, 0)
 
     @api.one
     @api.depends('production_id.product_qty', 'qty_produced')
@@ -351,7 +359,8 @@ class MrpProductionWorkcenterLine(models.Model):
         domain = [('workorder_id', 'in', self.ids), ('date_end', '=', False)]
         if not doall:
             domain.append(('user_id', '=', self.env.user.id))
-        for timeline in timeline_obj.search(domain, limit=doall and None or 1):
+        limit=None if doall else 1
+        for timeline in timeline_obj.search(domain, limit=limit):
             wo = timeline.workorder_id
             if timeline.loss_type <> 'productive':
                 timeline.write({'date_end': fields.Datetime.now()})
@@ -409,3 +418,10 @@ class MrpProductionWorkcenterLine(models.Model):
             # 'context': {'product_ids': self.move_raw_ids.filtered(lambda x: x.state not in ('done', 'cancel')).mapped('product_id').ids + [self.production_id.product_id.id]},
             'target': 'new',
         }
+
+    @api.multi
+    def action_see_move_scrap(self):
+        self.ensure_one()
+        action = self.env.ref('stock.action_stock_scrap').read()[0]
+        action['domain'] = [('workorder_id', '=', self.id)]
+        return action
