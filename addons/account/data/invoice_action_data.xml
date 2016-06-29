@@ -16,38 +16,31 @@
             <field name="report_name">Invoice_${(object.number or '').replace('/','_')}_${object.state == 'draft' and 'draft' or ''}</field>
             <field name="lang">${object.partner_id.lang}</field>
             <field name="body_html"><![CDATA[
-% set access_action = object.get_access_action()
-% set access_url = access_action['type'] == 'ir.actions.act_url' and access_action['url'] or '/report/pdf/account.report_invoice/' + str(object.id)
-
-<p>Dear ${object.partner_id.name} 
-% if object.partner_id.parent_id:
-    (<i>${object.partner_id.parent_id.name}</i>)
-% endif
+<t t-set="access_action" t-value="record.get_access_action()"/>
+<t t-set="access_url" t-value="access_action['type'] == 'ir.actions.act_url' and access_action['url'] or '/report/pdf/account.report_invoice/' + str(record.id)"/>
+<p>Dear <t t-value="record.partner_id.name"/>
+<i t-if="record.partner_id.parent_id" t-esc="record.partner_id.parent_id.name"/>
 ,</p>
-<p>Here is your invoice <strong>${object.number}</strong>
-% if object.origin:
-(with reference: ${object.origin} )
-% endif
-amounting in <strong>${object.amount_total} ${object.currency_id.name}</strong>
-from ${object.company_id.name}.
+<p>Here is your invoice <strong t-esc="record.number"/>
+<t t-if="record.origin">
+(with reference: <t t-esc="record.origin"/>)
+</t>
+amounting in <strong t-esc="'%s %s' % (record.amount_total, record.currency_id.name)"/>
+from <t t-esc="record.company_id.name"/>.
 </p>
 
     <br/><br/>
     <center>
-      <a href="${access_url}" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">View Invoice</a>
+    <a t-att-href="access_url" style="background-color: #1abc9c; padding: 20px; text-decoration: none; color: #fff; border-radius: 5px; font-size: 16px;" class="o_default_snippet_text">View Invoice</a>
     </center>
     <br/><br/>
 
-% if object.state=='paid':
-    <p>This invoice is already paid.</p>
-% else:
-    <p>Please remit payment at your earliest convenience.</p>
-% endif
-
+<p t-if="record.state == 'paid'">This invoice is already paid.</p>
+<p t-if="not record.state == 'paid'">Please remit payment at your earliest convenience.</p>
 <p>Thank you,</p>
-% if object.user_id and object.user_id.signature:
-    ${object.user_id.signature | safe}
-% endif
+<t t-if="record.user_id and record.user_id.signature">
+    <t t-raw="record.user_id.signature"/>
+</t>
 ]]></field>
         </record>
 
@@ -70,11 +63,11 @@ from ${object.company_id.name}.
                             <tr>
                               <td valign="middle">
                                   <span style="font-size:20px; color:white; font-weight: bold;">
-                                      Invoice ${object.record_name}
+                                      Invoice <t t-esc="record.record_name"/>
                                   </span>
                               </td>
                               <td valign="middle" align="right">
-                                  <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${user.company_id.name}">
+                                  <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="user.company_id.name">
                               </td>
                             </tr>
                           </table>
@@ -86,9 +79,7 @@ from ${object.company_id.name}.
                         <td align="center" style="min-width: 590px;">
                           <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px;">
                             <tbody>
-                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
-                                ${object.body | safe}
-                              </td>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;" t-esc="record.body or safe"/>
                             </tbody>
                           </table>
                         </td>
@@ -100,18 +91,12 @@ from ${object.company_id.name}.
                           <table width="590" border="0" cellpadding="0" bgcolor="#a24689" style="min-width: 590px; background-color: rgb(162, 70, 137); padding: 20px;">
                             <tr>
                               <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
-                                ${user.company_id.name}<br/>
-                                ${user.company_id.phone or ''}
+                                <t t-esc="user.company_id.name"/><br/>
+                                <t t-esc="user.company_id.phone or ''"/>
                               </td>
                               <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
-                                % if user.company_id.email:
-                                <a href="mailto:${user.company_id.email}" style="text-decoration:none; color: white;">${user.company_id.email}</a><br/>
-                                % endif
-                                % if user.company_id.website:
-                                    <a href="${user.company_id.website}" style="text-decoration:none; color: white;">
-                                        ${user.company_id.website}
-                                    </a>
-                                % endif
+                                <a t-if="user.company_id.email" t-attf-href="mailto:#{user.company_id.email}" style="text-decoration:none; color: white;" t-esc="user.company_id.email"/><br/>
+                                <a t-if="user.company_id.website" t-att-href="user.company_id.website" style="text-decoration:none; color: white;" t-esc="user.company_id.website"/>
                               </td>
                             </tr>
                           </table>

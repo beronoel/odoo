@@ -60,87 +60,70 @@
             <field name="model_id" ref="mail.model_mail_message"/>
             <field name="auto_delete" eval="True"/>
             <field name="body_html"><![CDATA[
-% if ctx.get('button_access'):
-<div itemscope itemtype="http://schema.org/EmailMessage">
-    <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
-        <link itemprop="target" href="${ctx['button_access']['url']}"/>
-        <link itemprop="url" href="${ctx['button_access']['url']}"/>
-        <meta itemprop="name" content="View ${ctx['model_name']}"/>
+<t t-if="ctx.get('button_access')">
+    <div itemscope itemtype="http://schema.org/EmailMessage">
+        <div itemprop="potentialAction" itemscope itemtype="http://schema.org/ViewAction">
+            <link itemprop="target" t-att-href="ctx.get('button_access') and ctx.get('button_access')['url']"/>
+            <link itemprop="url" t-att-href="ctx.get('button_access') and ctx.get('button_access')['url']"/>
+            <meta itemprop="name" t-attf-content="View #{ctx.get('button_access') and ctx.get('model_name')}"/>
+        </div>
     </div>
-</div>
-% endif
-% if not ctx['is_discussion'] or not len(ctx['actions']) == 0 or ctx.get('button_access') or ctx.get('is_accessible'):
-<div summary="o_mail_notification">
-<table cellspacing="0" cellpadding="0" border="0" style="width: 100%; margin-top: 5px;">
-<tbody><tr>
-    <td valign="center">
-        % if ctx.get('button_access') or ctx.get('button_follow') or ctx.get('button_unfollow'):
-        <a href="${ctx['button_access']['url']}" style="padding: 8px 12px; font-size: 12px; text-decoration: none; color: #FFFFFF; text-decoration:none !important; font-weight: 400; background-color: #a24689; border: 0px solid #a24689; border-radius:3px">${ctx['button_access']['title']}</a>
-        % endif
-
-        % if ctx.get('button_follow'):
-        % if ctx.get('actions'):
-           |
-        % endif
-        <a href="${ctx['button_follow']['url']}" style="text-decoration:none; color: #a24689; text-decoration:none !important;">${ctx['button_follow']['title']}</a>
-        % elif ctx.get('button_unfollow'):
-        % if ctx.get('actions'):
-           |
-        % endif
-        <a href="${ctx['button_unfollow']['url']}" style="text-decoration:none; color: #a24689; text-decoration:none !important;">${ctx['button_unfollow']['title']}</a>
-        % endif
-
-        % if ctx.get('actions'):
-        % for action in ctx['actions']:
-        |
-        <a href="${action['url']}" style="text-decoration:none; color: #a24689; text-decoration:none !important;">${action['title']}</a>
-        % endfor
-        % endif
-    </td>
-    <td valign="center" align="right">
-        <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" alt="${user.company_id.name}">
-    </td>
-</tr>
-<tr>
-    <td colspan="2" style="text-align:center;">
-        <hr width="100%"
-            style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:10px 0;">
-        % if ctx.get('subtype') and ctx.get('subtype').internal:
-        <span style="background-color: #f2dede; padding: 5px;">
-            <strong>Internal note</strong>: replies are not sent to followers.
-        </span>
-        % endif
-    </td>
-</tr>
-</tbody></table>
-</div>
-% endif
-${object.body | safe}
-% if ctx.get('tracking'):
-    <ul>
-    % for tracking in ctx['tracking']
-        <li>${tracking[0]} : ${tracking[1]} -&gt; ${tracking[2]}</li>
-    % endfor
-    </ul>
-% endif
-
-% if ctx.get('signature'):
-    ${ctx['signature'] | safe}
-% endif
+</t>
+<t t-set="is_discussion" t-value="'is_discussion' in ctx and ctx.get('is_discussion')"/>
+<t t-set="action_length" t-value="'actions' in ctx and ctx.get('actions') == 0"/>
+<t t-if="not is_discussion or not action_length or ctx.get('is_accessible')">
+    <div summary="o_mail_notification">
+        <table cellspacing="0" cellpadding="0" border="0" style="width:100px; margin-top: 5px;">
+            <tbody><tr>
+            <td valign="center">
+                <a t-if="ctx.get('button_access') or ctx.get('button_follow') or ctx.get('button_unfollow')" t-att-href="ctx.get('button_access')['url']" style="padding: 8px 12px; font-size: 12px; text-decoration: none; color: #FFFFFF; text-decoration:none !important; font-weight: 400; background-color: #a24689; border: 0px solid #a24689; border-radius:3px" t-esc="ctx.get('button_access')['title']"/>
+                <t t-if="ctx.get('button_follow')">
+                    <t t-esc="'|' if ctx.get('actions') else ''"/>
+                    <a t-att-href="ctx.get('button_follow')['url']" style="text-decoration:none; color: #a24689;  text-decoration:none !important;" t-esc="ctx.get('button_follow')['title']"/>
+                </t>
+                <t t-if="ctx.get('button_unfollow')">
+                    <t t-esc="'|' if ctx.get('actions') else ''"/>
+                    <a t-att-href="ctx.get('button_unfollow')['url']" style="text-decoration:none; color: #a24689; text-decoration:none !important;" t-esc="ctx.get('button_unfollow')['title']"/>
+                </t>
+                <t t-if="ctx.get('actions')">
+                |
+                <a t-foreach="ctx['actions']" t-as="action" t-att-href="action['url']" style="text-decoration:none; color: #a24689; text-decoration:none !important;" t-esc="action['title']"/>
+                </t>
+            </td>
+            <td valign="center" align="right">
+                <img src="/logo.png" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="user.company_id.name">
+            </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:center;">
+                    <hr width="100%"
+                        style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin:10px 0;">
+                    <span t-if="ctx.get('subtype') and ctx.get('subtype').internal" style="background-color: #f2dede; padding: 5px;">
+                        <strong>Internal note</strong>: replies are not sent to followers.
+                    </span>
+                </td>
+            </tr>
+        </tbody></table>
+    </div>
+</t>
+<t t-raw="record.body or safe"/>
+<ul t-if="ctx.get('tracking')">
+    <li t-foreach="ctx.get('tracking')" t-as="tracking"><t t-esc="tracking[0]"/> : <t t-esc="tracking[1]"/> -&gt; <t t-esc="tracking[2]"/></li>
+</ul>
+<t t-if="ctx.get('signature')" t-raw="ctx.get('signature') or safe"/>
 <br/>
 <p style="color: #555555;">
     Sent by
-    % if ctx.get('website_url'):
-    <a href="${ctx['website_url']}" style="text-decoration:none; color: #a24689;">
-    % endif
-    ${ctx.get('company_name')}
-    % if ctx.get('website_url'):
+    <t t-if="ctx.get('website_url')">
+    <a t-att-href="ctx.get('website_url')" style="text-decoration:none;">
+    </t>
+    <t-esc="ctx.get('company_name')"/>
+    <t t-if="ctx.get('website_url')">
     </a>
-    % endif
+    </t>
     using
-    <a href="https://www.odoo.com" style="text-decoration:none; color: #a24689;">Odoo</a>.
-</p>
-]]></field>
+    <a href="https://www.odoo.com" style="text-decoration:none; color: #a24689;">Odoo</a>
+</p>]]></field>
         </record>
 
     </data>
