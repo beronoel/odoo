@@ -9,7 +9,7 @@ var Tip = require('web_tour.Tip');
 
 var _t = core._t;
 
-var RUNNING_TOUR_TIMEOUT = 3000;
+var RUNNING_TOUR_TIMEOUT = 5000;
 
 function getStepKey(name) {
     return 'tour_' + name + '_step';
@@ -128,8 +128,12 @@ return core.Class.extend({
             };
         }
         this.tours[name] = tour;
-        if (name === this.running_tour || (!tour.test && !_.contains(this.consumed_tours, name))) {
+        if (this.running_tour === name || (!tour.test && !_.contains(this.consumed_tours, name))) {
             this._to_next_step(name, 0);
+        }
+
+        if (!this.running_tour || this.running_tour === name) {
+            this.update(name);
         }
     },
     run: function (tour_name, step_delay) {
@@ -146,29 +150,38 @@ return core.Class.extend({
         }
         console.log(_.str.sprintf("Running tour %s", tour_name));
         this.running_tour = tour_name;
-        this.running_step_delay = step_delay || 0;
+        this.running_step_delay = step_delay || 250;
         local_storage.setItem(getRunningKey(), this.running_tour);
         local_storage.setItem(getRunningDelayKey(), this.running_step_delay);
-        if (tour.url) {
-            window.location = tour.url;
-        }
 
         this._deactivate_tip(this.active_tooltips[tour_name]);
 
         tour.current_step = 0;
         local_storage.setItem(getStepKey(tour_name), tour.current_step);
         this.active_tooltips[tour_name] = tour.steps[tour.current_step];
-        this._set_running_tour_timeout(tour_name, this.active_tooltips[tour_name]);
-        this.update();
+
+        if (tour.url) {
+            window.location.assign(tour.url);
+        } else {
+            this.update();
+        }
     },
     /**
-     * Checks for tooltips to activate (only from the running tour if there is one, from all
-     * active tours otherwise). Should be called each time the DOM changes.
+     * Checks for tooltips to activate (only from the running tour or specified tour if there
+     * is one, from all active tours otherwise). Should be called each time the DOM changes.
      */
-    update: function() {
-        this.in_modal = this.$body.hasClass('modal-open');
+    update: function (tour_name) {
         if (this.running_tour) {
-            this._check_for_tooltip(this.active_tooltips[this.running_tour], this.running_tour);
+            if (this.tours[this.running_tour] === undefined) return;
+            if (this.running_tour_timeout === undefined) {
+                this._set_running_tour_timeout(this.running_tour, this.active_tooltips[this.running_tour]);
+            }
+        }
+
+        this.in_modal = this.$body.hasClass('modal-open');
+        tour_name = this.running_tour || tour_name;
+        if (tour_name) {
+            this._check_for_tooltip(this.active_tooltips[tour_name], tour_name);
         } else {
             _.each(this.active_tooltips, this._check_for_tooltip.bind(this));
         }
@@ -250,11 +263,11 @@ return core.Class.extend({
         this.tours[tour_name].current_step = 0;
         local_storage.removeItem(getStepKey(tour_name));
         if (this.running_tour === tour_name) {
+            this._stop_running_tour_timeout();
             local_storage.removeItem(getRunningKey());
             local_storage.removeItem(getRunningDelayKey());
             this.running_tour = undefined;
             this.running_step_delay = undefined;
-            clearTimeout(this.running_tour_timeout);
             if (error) {
                 console.log("error " + error); // phantomJS wait for message starting by error
             } else {
@@ -265,18 +278,21 @@ return core.Class.extend({
             this.TourModel.call('consume', [tour_name]);
         }
     },
-    _set_running_tour_timeout: function(tour_name, step) {
-        var self = this;
-        this.running_tour_timeout = setTimeout(function() {
-            self._consume_tour(tour_name, _.str.sprintf("Tour %s failed at step %s", tour_name, step.trigger));
-        }, RUNNING_TOUR_TIMEOUT + this.running_step_delay);
+    _set_running_tour_timeout: function (tour_name, step) {
+        this._stop_running_tour_timeout();
+        this.running_tour_timeout = setTimeout((function() {
+            this._consume_tour(tour_name, _.str.sprintf("Tour %s failed at step %s", tour_name, step.trigger));
+        }).bind(this), RUNNING_TOUR_TIMEOUT + this.running_step_delay);
+    },
+    _stop_running_tour_timeout: function () {
+        clearTimeout(this.running_tour_timeout);
+        this.running_tour_timeout = undefined;
     },
     _to_next_running_step: function (tip, tour_name) {
         if (this.running_tour !== tour_name) return;
-        clearTimeout(this.running_tour_timeout);
+        this._stop_running_tour_timeout();
 
         var action_helper = new RunningTourActionHelper(tip.widget);
-
         _.delay((function () {
             if (typeof tip.run === "function") {
                 tip.run.call(tip.widget, action_helper);
