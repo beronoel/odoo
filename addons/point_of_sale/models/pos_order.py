@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import logging
+from datetime import timedelta
 from functools import partial
 
 import psycopg2
@@ -658,6 +659,75 @@ class PosOrder(models.Model):
             'context': self.env.context,
             'type': 'ir.actions.act_window',
             'target': 'current',
+        }
+
+
+    @api.model
+    def get_sale_details(self, date_start=False, date_stop=False):
+        """ Serialise the orders of the day information """
+        # start by default today 00:00:00
+        today = fields.Datetime.from_string(fields.Date.context_today(self))
+        if not date_start:
+            date_start = today
+
+        # stop by default today 23:59:59
+        # avoid a date_stop smaller than date_start
+        date_stop = max(date_stop or (today + timedelta(days=1, seconds=-1)), date_start)
+        date_start = fields.Datetime.to_string(date_start)
+        date_stop = fields.Datetime.to_string(date_stop)
+        orders = self.search([('date_order', '>', date_start), ('date_order', '<', date_stop), ('state', 'in', ['paid','invoiced','done'])])
+        user_currency = self.env.user.company_id.currency_id
+
+        total = 0.0
+        products_sold = {}
+        taxes = {}
+        for order in orders:
+            if user_currency != order.pricelist_id.currency_id:
+                total += order.pricelist_id.currency_id.compute(order.amount_total, user_currency)
+            else:
+                total += order.amount_total
+            currency = order.session_id.currency_id
+
+            for line in order.lines:
+                key = (line.product_id, line.price_unit, line.discount)
+                products_sold.setdefault(key, 0.0)
+                products_sold[key] += line.qty
+
+                if line.tax_ids_after_fiscal_position:
+                    line_taxes = line.tax_ids_after_fiscal_position.compute_all(line.price_unit * (1-(line.discount or 0.0)/100.0), currency, line.qty, product=line.product_id, partner=line.order_id.partner_id or False)
+                    for tax in line_taxes['taxes']:
+                        taxes.setdefault(tax['id'], {'name': tax['name'], 'total':0.0})
+                        taxes[tax['id']]['total'] += tax['amount']
+
+        st_line_ids = self.env["account.bank.statement.line"].search([('pos_statement_id', 'in', orders.ids)]).ids
+        if st_line_ids:
+            self.env.cr.execute("""
+                SELECT aj.name, sum(amount) total
+                FROM account_bank_statement_line AS absl,
+                     account_bank_statement AS abs,
+                     account_journal AS aj 
+                WHERE absl.statement_id = abs.id
+                    AND abs.journal_id = aj.id 
+                    AND absl.id IN %s 
+                GROUP BY aj.name
+            """, (tuple(st_line_ids),))
+            payments = self.env.cr.dictfetchall()
+        else:
+            payments = []
+
+        return {
+            'total_paid': user_currency.round(total),
+            'payments': payments,
+            'taxes': taxes.values(),
+            'products': [{
+                'product_id': product.id,
+                'product_name': product.name[:20],
+                'code': product.default_code,
+                'quantity': qty,
+                'price_unit': price_unit,
+                'discount': discount,
+                'uom': product.uom_id.name
+            } for (product, price_unit, discount), qty in products_sold.items()]
         }
 
 
