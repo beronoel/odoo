@@ -22,7 +22,7 @@ class MrpRouting(models.Model):
         copy=True, oldname='workcenter_lines')
     location_id = fields.Many2one(
         'stock.location', 'Production Location',
-        help="Keep empty if you produce at the location where the finished products are needed."
+        help="Keep empty if you produce at the location where you find the raw materials."
              "Set a location if you produce at a fixed location. This can be a partner location "
              "if you subcontract the manufacturing operations.")
     company_id = fields.Many2one(
@@ -50,9 +50,8 @@ class MrpRoutingWorkcenter(models.Model):
     routing_id = fields.Many2one(
         'mrp.routing', 'Parent Routing',
         index=True, ondelete='cascade', required=True,
-        help="Routings indicates all the Work Centers used and for how long. "
-             "If Routings is indicated then,the third tab of a production order "
-             "(Work Centers) will be automatically pre-completed.")
+        help="The routing contains all the Work Centers used and for how long. This will create work orders afterwards"
+        "which alters the execution of the manufacturing order. ")
     note = fields.Text('Description')
     company_id = fields.Many2one(
         'res.company', 'Company',
@@ -67,15 +66,16 @@ class MrpRoutingWorkcenter(models.Model):
         'Manual Duration', default=60,
         help="Time in minutes")
     time_cycle = fields.Float('Duration', compute="_get_time_cycle")
-    # TDE FIXME: unnecessary, as used in views and strangely used (to hide manual if at least one order ?)
     workorder_count = fields.Integer("# Work Orders", compute="_compute_workorder_count")
     batch = fields.Selection([
         ('no',  'Once all products are processed'),
         ('yes', 'Once a minimum number of products is processed')], string='Next Operation',
         default='no', required=True)
     batch_size = fields.Float('Quantity to Process', default=1.0)
+    workorder_ids = fields.One2many('mrp.workorder', 'operation_id', string="Work Orders")
 
     @api.multi
+    @api.depends('time_cycle_manual', 'time_mode', 'workorder_ids')
     def _get_time_cycle(self):
         manual_ops = self.filtered(lambda operation: operation.time_mode == 'manual')
         for operation in manual_ops:
@@ -98,4 +98,4 @@ class MrpRoutingWorkcenter(models.Model):
             ('state', '=', 'done')], ['operation_id'], ['operation_id'])
         count_data = dict((item['operation_id'][0], item['operation_id_count']) for item in data)
         for operation in self:
-            operation.wo_count = count_data.get(operation.id, 0)
+            operation.workorder_count = count_data.get(operation.id, 0)

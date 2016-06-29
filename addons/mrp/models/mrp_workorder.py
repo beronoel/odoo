@@ -7,6 +7,8 @@ from dateutil.relativedelta import relativedelta
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from odoo.tools import float_compare
+from odoo.addons import decimal_precision as dp
+
 
 
 class MrpProductionWorkcenterLine(models.Model):
@@ -44,7 +46,7 @@ class MrpProductionWorkcenterLine(models.Model):
     production_state = fields.Selection(
         'Production State', readonly=True,
         related='production_id.state',
-        help='Technical: used in views only.')  # TDE FIXME: if you want to search on it, you have to store it
+        help='Technical: used in views only.')
     product_tracking = fields.Selection(
         'Product Tracking', related='production_id.product_id.tracking',
         help='Technical: used in views only.')
@@ -52,9 +54,11 @@ class MrpProductionWorkcenterLine(models.Model):
     qty_produced = fields.Float(
         'Quantity', default=0.0,
         readonly=True,
-        help="The number of products already handled by this work order")  # TODO: decimal precision
+        digits_compute=dp.get_precision('Product Unit of Measure'),
+        help="The number of products already handled by this work order")
     qty_producing = fields.Float(
         'Currently Produced Quantity', default=1.0,
+        digits_compute=dp.get_precision('Product Unit of Measure'),
         states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
     is_produced = fields.Boolean(compute='_compute_is_produced')
 
@@ -124,7 +128,7 @@ class MrpProductionWorkcenterLine(models.Model):
     @api.depends('time_ids.duration', 'qty_produced')
     def _compute_duration(self):
         self.duration = sum(self.time_ids.mapped('duration'))
-        self.duration_unit = round(self.duration / max(self.qty_produced, 1), 2)
+        self.duration_unit = round(self.duration / max(self.qty_produced, 1), 2) #rounding 2 because it is a time
         if self.duration:
             self.duration_percent = 100 * (self.duration_expected - self.duration) / self.duration
         else:
@@ -184,7 +188,7 @@ class MrpProductionWorkcenterLine(models.Model):
                             break
                         if move_lot.quantity_done == 0 and qty_todo > move_lot.quantity:
                             qty_todo = qty_todo - move_lot.quantity
-                            self.active_move_lot_ids -= move_lot  # TDE: command ?
+                            self.active_move_lot_ids -= move_lot  # Difference operator
                         else:
                             move_lot.quantity = move_lot.quantity - qty_todo
                             qty_todo = 0

@@ -9,7 +9,7 @@ class StockProductionLot(models.Model):
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
-        # TDE FIXME: perf + usefull + wtf ?
+        """This name_search is done in order to be able to scan e.g. the chassis number instead of the vehicle number to identify the vehicle"""
         args = args or []
         domain = []
         if name:

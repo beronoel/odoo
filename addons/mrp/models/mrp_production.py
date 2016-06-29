@@ -42,10 +42,8 @@ class MrpProduction(models.Model):
             location = self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
         return location and location.id or False
 
-    # TDE FIXME: generates too much sequences + not updated with create behavior
     name = fields.Char(
-        'Reference', default=lambda self: self.env['ir.sequence'].next_by_code('mrp.production') or '/',
-        copy=False, readonly=True)
+        'Reference', copy=False, readonly=True, default=lambda x: _('New'))
     origin = fields.Char(
         'Source', copy=False,
         help="Reference of the document that generated this production order request.")
@@ -101,7 +99,7 @@ class MrpProduction(models.Model):
         readonly=True, related='bom_id.routing_id', store=True,
         help="The list of operations (list of work centers) to produce the finished product. The routing "
              "is mainly used to compute work center costs during operations and to plan future loads on "
-             "work centers based on production plannification.")
+             "work centers based on production planning.")
     move_raw_ids = fields.One2many(
         'stock.move', 'raw_material_production_id', 'Raw Materials', oldname='move_lines',
         copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
@@ -139,7 +137,8 @@ class MrpProduction(models.Model):
         default=lambda self: self.env['res.company']._company_default_get('mrp.production'),
         required=True)
 
-    check_to_done = fields.Boolean(compute="_get_produced_qty", string="Check Produced Qty")
+    check_to_done = fields.Boolean(compute="_get_produced_qty", string="Check Produced Qty", 
+        help="Technical Field to see if we can show 'Mark as Done' button")
     qty_produced = fields.Float(compute="_get_produced_qty", string="Quantity Produced")
     procurement_group_id = fields.Many2one(
         'procurement.group', 'Procurement Group',
@@ -180,7 +179,6 @@ class MrpProduction(models.Model):
             if order.bom_id.ready_to_produce == 'all_available':
                 order.availability = any(move.state not in ('assigned', 'done', 'cancel') for move in order.move_raw_ids) and 'waiting' or 'assigned'
             else:
-                # TODO: improve this check
                 partial_list = [x.partially_available and x.state in ('waiting', 'confirmed', 'assigned') for x in order.move_raw_ids]
                 assigned_list = [x.state in ('assigned', 'done', 'cancel') for x in order.move_raw_ids]
                 order.availability = (all(assigned_list) and 'assigned') or (any(partial_list) and 'partially_available') or 'waiting'
@@ -193,21 +191,20 @@ class MrpProduction(models.Model):
                 any(order.move_finished_ids.filtered(lambda x: (x.quantity_done) > 0 and (x.state not in ['done', 'cancel'])))
 
     @api.multi
+    @api.depends('workorder_ids.state', 'move_finished_ids')
     def _get_produced_qty(self):
         for production in self:
             done_moves = production.move_finished_ids.filtered(lambda x: x.state != 'cancel' and x.product_id.id == production.product_id.id)
             qty_produced = sum(done_moves.mapped('quantity_done'))
             wo_done = True
-            for wo in production.workorder_ids:
-                # TDE FIXME: use a real state on the WO instead of that kind of "will always be broken" statement
-                if any([((not x.date_end) and (x.loss_type in ('productive', 'performance'))) for x in wo.time_ids]):
-                    wo_done = False
-                    break
+            if any([x.state not in ('done', 'cancel') for x in production.workorder_ids]):
+                wo_done = False
             production.check_to_done = done_moves and (qty_produced >= production.product_qty) and (production.state not in ('done', 'cancel')) and wo_done
             production.qty_produced = qty_produced
         return True
 
     @api.multi
+    @api.depends('move_raw_ids')
     def _has_moves(self):
         for mo in self:
             mo.has_moves = any(mo.move_raw_ids)
@@ -253,8 +250,8 @@ class MrpProduction(models.Model):
 
     @api.model
     def create(self, values):
-        if not values.get('name', False):
-            values['name'] = self.env['ir.sequence'].next_by_code('mrp.production') or 'New'
+        if not values.get('name', False) or values['name'] == 'New':
+            values['name'] = self.env['ir.sequence'].next_by_code('mrp.production') or _('New')
         if not values.get('procurement_group_id'):
             values['procurement_group_id'] = self.env["procurement.group"].create({'name': values['name']}).id
         production = super(MrpProduction, self).create(values)

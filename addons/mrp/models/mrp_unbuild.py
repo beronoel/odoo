@@ -17,7 +17,7 @@ class MrpUnbuild(models.Model):
     def _get_default_location_dest_id(self):
         return self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
 
-    name = fields.Char('Reference', copy=False, readonly=True)
+    name = fields.Char('Reference', copy=False, readonly=True, default=lambda x: _('New'))
     product_id = fields.Many2one(
         'product.product', 'Product',
         required=True, states={'done': [('readonly', True)]})
@@ -29,7 +29,7 @@ class MrpUnbuild(models.Model):
         required=True, states={'done': [('readonly', True)]})
     bom_id = fields.Many2one(
         'mrp.bom', 'Bill of Material',
-        domain=[('product_tmpl_id', '=', 'product_id.product_tmpl_id')],
+        domain=[('product_tmpl_id', '=', 'product_id.product_tmpl_id')], #should be more specific
         required=True, states={'done': [('readonly', True)]})  # Add domain
     mo_id = fields.Many2one(
         'mrp.production', 'Manufacturing Order',

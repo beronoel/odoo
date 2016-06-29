@@ -47,19 +47,19 @@ class MrpBom(models.Model):
     sequence = fields.Integer('Sequence', help="Gives the sequence order when displaying a list of bills of material.")
     routing_id = fields.Many2one(
         'mrp.routing', 'Routing',
-        help="The list of operations (list of work centers) to produce the finished product. "
-             "The routing is mainly used to compute work center costs during operations and to "
-             "plan future loads on work centers based on production planning.")
+        help="The operations for producing this BoM.  When a routing is specified, the production orders will "
+             " be executed through work orders, otherwise everything is processed in the production order itself. ")
     ready_to_produce = fields.Selection([
         ('all_available', 'All components available'),
         ('asap', 'The components of 1st operation')], string='Manufacturing Readiness',
         default='asap', required=True)
-    operation_id = fields.Many2one('mrp.routing.workcenter', 'Produced at Operation')  # TDE: what is its use ?
+    operation_id = fields.Many2one('mrp.routing.workcenter', 'Consumed at Operation', 
+        help="This is the operation in which this material will be consumed.  If none is specified, it will be consumed in the last step. ")
     picking_type_id = fields.Many2one(
         'stock.picking.type', 'Picking Type', domain=[('code', '=', 'mrp_operation')],
         help="When a procurement has a ‘produce’ route with a picking type set, it will try to create "
-             "a Manufacturing Order for that product using a BOM of the same picking type. That allows "
-             "to define pull rules for products with different routing (different BOMs)")
+             "a Manufacturing Order for that product using a BoM of the same picking type. That allows "
+             "to define procurement rules which trigger different manufacturing orders with different BoMs. ")
     company_id = fields.Many2one(
         'res.company', 'Company',
         default=lambda self: self.env['res.company']._company_default_get('mrp.bom'),
@@ -136,7 +136,7 @@ class MrpBom(models.Model):
                 bom.explode(bom_line.product_id, qty2, original_quantity=original_quantity, method=method, method_wo=method_wo, done=done, result=kw)
         return True
 
-    def explode_new(self, product, quantity):
+    def explode_new(self, product, quantity, picking_type=False):
         # TDE TOCHECK: product: initially, is the product we want to explode (bom could have a template)
         #      then in iterations: product from line
         # TDE TOCHECK: picking_type_id should be the original one
@@ -145,9 +145,9 @@ class MrpBom(models.Model):
         lines_done = []
         templates_done = self.env['product.template']
 
-        bom_lines = [(bom_line, product) for bom_line in self.bom_line_ids]
+        bom_lines = [(bom_line, product, quantity) for bom_line in self.bom_line_ids]
         while bom_lines:
-            current_line, current_product = bom_lines[0]
+            current_line, current_product, current_qty = bom_lines[0]
             bom_lines = bom_lines[1:]
 
             if current_line._skip_bom_line(current_product):
@@ -155,12 +155,12 @@ class MrpBom(models.Model):
             if current_line.product_id.product_tmpl_id in templates_done:
                 raise UserError(_('Recursion error !'))
 
-            line_quantity = quantity * current_line.product_qty / current_line.bom_id.product_qty
+            line_quantity = current_qty * current_line.product_qty / current_line.bom_id.product_qty
 
             bom = self._bom_find(product=current_line.product_id, picking_type=self.picking_type_id, company_id=self.company_id.id)
             if bom.type == 'phantom':
                 converted_line_quantity = self.env['product.uom']._compute_qty_obj(current_line.product_uom_id, line_quantity, bom.product_uom_id)
-                bom_lines = [(line, current_line.product_id) for line in bom.bom_line_ids] + bom_lines
+                bom_lines = [(line, current_line.product_id, line_quantity) for line in bom.bom_line_ids] + bom_lines
                 templates_done |= current_line.product_id.product_tmpl_id
                 boms_done.append((bom, {'qty': converted_line_quantity, 'product': current_product, 'original_qty': quantity}))
             else:
