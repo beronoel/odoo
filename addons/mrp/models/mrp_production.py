@@ -500,8 +500,10 @@ class MrpProduction(models.Model):
     @api.multi
     def post_inventory(self):
         for order in self:
-            (order.move_raw_ids + order.move_finished_ids).action_done()
+            moves = order.move_raw_ids
+            order.move_raw_ids.action_done()
             order._post_inventory_update_quants()
+            order.move_finished_ids.action_done()
             order.action_assign()
         return True
 
