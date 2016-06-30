@@ -460,16 +460,22 @@ class MrpProduction(models.Model):
         self.write({'state': 'cancel'})
         return True
 
-    def _post_inventory_update_quants(self):
+    @api.multi
+    def post_inventory(self):
         for order in self:
-            moves_to_do = order.move_raw_ids.filtered(lambda m: m.state not in ('done', 'cancel') and m.quantity_done > 0.0)
-            moves_to_finish = order.move_finished_ids.filtered(lambda m: m.state not in ('done', 'cancel') and m.quantity_done > 0.0)
+            moves_to_do = order.move_raw_ids.move_validate()
+            #order.move_finished_ids.filtered(lambda x: x.state not in ('done','cancel')).move_validate()
+            order._cal_price(moves_to_do)
+            moves_to_finish = order.move_finished_ids.move_validate()
             for move in moves_to_finish:
-                # Group quants by lots
-                lot_quants, raw_lot_quants = defaultdict(lambda: self.env['stock.quant']), defaultdict(lambda: self.env['stock.quant'])
-                no_not_quants = self.env['stock.quant']
+                #Group quants by lots
+                lot_quants = {}
+                raw_lot_quants = {}
+                quants = self.env['stock.quant']
                 if move.has_tracking != 'none':
                     for quant in move.quant_ids:
+                        lot_quants.setdefault(quant.lot_id.id, self.env['stock.quant'])
+                        raw_lot_quants.setdefault(quant.lot_id.id, self.env['stock.quant'])
                         lot_quants[quant.lot_id.id] |= quant
                 for move_raw in moves_to_do:
                     if (move.has_tracking != 'none') and (move_raw.has_tracking != 'none'):
@@ -477,28 +483,14 @@ class MrpProduction(models.Model):
                             lots = move_raw.move_lot_ids.filtered(lambda x: x.lot_produced_id.id == lot).mapped('lot_id')
                             raw_lot_quants[lot] |= move_raw.quant_ids.filtered(lambda x: (x.lot_id in lots) and (x.qty > 0.0))
                     else:
-                        no_not_quants |= move_raw.quant_ids.filtered(lambda x: x.qty > 0.0)
+                        quants |= move_raw.quant_ids.filtered(lambda x: x.qty > 0.0)
                 if move.has_tracking != 'none':
                     for lot in lot_quants:
-                        lot_quants[lot].sudo().write({'consumed_quant_ids': [(6, 0, [x.id for x in raw_lot_quants[lot] | no_not_quants])]})
+                        lot_quants[lot].write({'consumed_quant_ids': [(6, 0, [x.id for x in raw_lot_quants[lot] | quants])]})
                 else:
-                    move.quant_ids.sudo().write({'consumed_quant_ids': [(6, 0, [x.id for x in no_not_quants])]})
-        (self.mapped('move_raw_ids') + self.mapped('move_finished_ids')).filtered(lambda m: m.state not in ('done', 'cancel') and m.quantity_done > 0.0).write({
-            'state': 'done',
-            'date': fields.Datetime.now(),
-        })
-        return True
-
-    @api.multi
-    def post_inventory(self):
-        for order in self:
-            moves = order.move_raw_ids
-            order.move_raw_ids.action_done()
-            order._post_inventory_update_quants()
-            order.move_finished_ids.action_done()
+                    move.quant_ids.write({'consumed_quant_ids': [(6, 0, [x.id for x in quants])]})
             order.action_assign()
         return True
-
     @api.multi
     def button_mark_done(self):
         self.ensure_one()
