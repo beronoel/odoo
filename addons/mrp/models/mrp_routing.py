@@ -64,7 +64,7 @@ class MrpRoutingWorkcenter(models.Model):
     time_mode_batch = fields.Integer('Based on', default=10)
     time_cycle_manual = fields.Float(
         'Manual Duration', default=60,
-        help="Time in minutes")
+        help="Time in minutes. Is the time used in manual mode, or the first time supposed in real time when there are not any work orders yet.")
     time_cycle = fields.Float('Duration', compute="_get_time_cycle")
     workorder_count = fields.Integer("# Work Orders", compute="_compute_workorder_count")
     batch = fields.Selection([
