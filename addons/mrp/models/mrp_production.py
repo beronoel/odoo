@@ -461,6 +461,10 @@ class MrpProduction(models.Model):
         return True
 
     @api.multi
+    def _cal_price(self, consumed_moves):
+        return True
+
+    @api.multi
     def post_inventory(self):
         for order in self:
             moves_to_do = order.move_raw_ids.move_validate()
