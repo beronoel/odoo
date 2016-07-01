@@ -207,6 +207,7 @@ class StockMove(models.Model):
             # Next move in production order
             if move.move_dest_id:
                 move.move_dest_id.action_assign()
+        moves_todo.write({'state': 'done', 'date': fields.Datetime.now()})
         return moves_todo
 
     @api.multi
