@@ -119,6 +119,13 @@ class MrpProductionWorkcenterLine(models.Model):
     next_work_order_id = fields.Many2one('mrp.workorder', "Next Work Order")
     scrap_ids = fields.One2many('stock.scrap', 'workorder_id')
     scrap_count = fields.Integer(compute='_compute_scrap_move_count', string='Scrap Move')
+    color = fields.Integer('Color', compute='_compute_color')
+    
+    @api.multi
+    def _compute_color(self):
+        late_orders = self.filtered(lambda x: x.production_id.date_planned_finished and x.date_planned_finished > x.production_id.date_planned_finished)
+        late_orders.color = 4
+        (self - late_orders).color = 2
 
     @api.multi
     def _compute_scrap_move_count(self):
