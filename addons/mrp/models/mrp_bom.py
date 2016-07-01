@@ -53,8 +53,6 @@ class MrpBom(models.Model):
         ('all_available', 'All components available'),
         ('asap', 'The components of 1st operation')], string='Manufacturing Readiness',
         default='asap', required=True)
-    operation_id = fields.Many2one('mrp.routing.workcenter', 'Consumed at Operation', 
-        help="This is the operation in which this material will be consumed.  If none is specified, it will be consumed in the last step. ")
     picking_type_id = fields.Many2one(
         'stock.picking.type', 'Picking Type', domain=[('code', '=', 'mrp_operation')],
         help="When a procurement has a ‘produce’ route with a picking type set, it will try to create "

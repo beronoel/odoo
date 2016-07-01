@@ -494,9 +494,9 @@ class MrpProduction(models.Model):
                         quants |= move_raw.quant_ids.filtered(lambda x: x.qty > 0.0)
                 if move.has_tracking != 'none':
                     for lot in lot_quants:
-                        lot_quants[lot].write({'consumed_quant_ids': [(6, 0, [x.id for x in raw_lot_quants[lot] | quants])]})
+                        lot_quants[lot].sudo().write({'consumed_quant_ids': [(6, 0, [x.id for x in raw_lot_quants[lot] | quants])]})
                 else:
-                    move.quant_ids.write({'consumed_quant_ids': [(6, 0, [x.id for x in quants])]})
+                    move.quant_ids.sudo().write({'consumed_quant_ids': [(6, 0, [x.id for x in quants])]})
             order.action_assign()
         return True
 
