@@ -38,8 +38,8 @@ class SaleOrderLine(models.Model):
         bom = self.env['mrp.bom']._bom_find(product=self.product_id)
         if bom and bom.type == 'phantom':
             bom_delivered[bom.id] = False
-            product_uom_qty_bom = self.env['product.uom']._compute_qty_obj(self.product_uom, self.product_uom_qty, bom.product_uom)
-            bom_exploded = self.env['mrp.bom']._bom_explode(bom, self.product_id, product_uom_qty_bom)[0]
+            product_uom_qty_bom = self.env['product.uom']._compute_qty_obj(self.product_uom, self.product_uom_qty, bom.product_uom_id)
+            bom_exploded = self.env['mrp.bom'].explode_new(bom, self.product_id, product_uom_qty_bom)[0]
             for bom_line in bom_exploded:
                 qty = 0.0
                 for move in self.procurement_ids.mapped('move_ids'):

@@ -253,6 +253,13 @@ class StockMove(models.Model):
     def save(self):
         return True
 
+    def _generate_raw_moves(self, exploded_lines):
+        self.ensure_one()
+        moves = self.env['stock.move']
+        for bom_line, line_data in exploded_lines:
+            moves += self._generate_move_phantom(bom_line, line_data['qty'])
+        return moves
+
     def _generate_move_phantom(self, bom_line, quantity, result=None):
         product = bom_line.product_id
         if product.type in ['product', 'consu']:
@@ -267,6 +274,7 @@ class StockMove(models.Model):
                 'split_from': self.id,  # Needed in order to keep sale connection, but will be removed by unlink
             }
             mid = self.copy(default=valdef)
+            return mid
 
     def _action_explode(self):
         """ Explodes pickings.
@@ -277,7 +285,8 @@ class StockMove(models.Model):
         if bom_point and bom_point.type == 'phantom':
             processed_ids = self - self
             factor = self.env['product.uom']._compute_qty(self.product_uom.id, self.product_uom_qty, bom_point.product_uom_id.id) / bom_point.product_qty
-            bom_point.sudo().explode(self.product_id, factor, method=self._generate_move_phantom)
+            boms, lines = bom_point.sudo().explode_new(self.product_id, factor)
+            self._generate_raw_moves(lines)
             to_explode_again_ids = self.search([('split_from', '=', self.id)])
             if to_explode_again_ids:
                 for new_move in to_explode_again_ids:
