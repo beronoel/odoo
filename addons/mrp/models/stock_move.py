@@ -17,8 +17,8 @@ class StockMoveLots(models.Model):
         'stock.production.lot', 'Lot',
         domain="[('product_id', '=', product_id)]")
     lot_produced_id = fields.Many2one('stock.production.lot', 'Finished Lot')
-    lot_produced_qty = fields.Float('Quantity Finished Product')  # TDE FIXME: glenglish
-    quantity = fields.Float('Quantity', default=1.0)  # TDE FIXME: naming
+    lot_produced_qty = fields.Float('Quantity Finished Product', help="Informative, not used in matching")
+    quantity = fields.Float('To Do', default=1.0)
     quantity_done = fields.Float('Done')
     product_id = fields.Many2one(
         'product.product', 'Product',
