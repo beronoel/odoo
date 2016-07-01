@@ -56,7 +56,6 @@
                             <group>
                                 <group>
                                     <field name="sequence"/>
-                                    <field name="operation_id" domain="[('routing_id', '=', routing_id)]" groups="mrp.group_mrp_routings"/>
                                 </group>
                                 <group>
                                     <field name="ready_to_produce" string="Manufacturing Readiness"/>
