@@ -116,7 +116,7 @@ class StockMove(models.Model):
              "The other possibility allows you to directly create a procurement on the source location (and thus ignore "
              "its current stock) to gather products. If we want to chain moves and have this one to wait for the previous,"
              "this second option should be chosen.")
-    scrapped = fields.Boolean('Scrapped', related='location_dest_id.scrap_location', readonly=True)
+    scrapped = fields.Boolean('Scrapped', related='location_dest_id.scrap_location', readonly=True, store=True)
     quant_ids = fields.Many2many('stock.quant', 'stock_quant_move_rel', 'move_id', 'quant_id', 'Moved Quants', copy=False)
     reserved_quant_ids = fields.One2many('stock.quant', 'reservation_id', 'Reserved quants')
     linked_move_operation_ids = fields.One2many(

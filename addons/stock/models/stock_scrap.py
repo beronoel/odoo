@@ -90,6 +90,7 @@ class StockScrap(models.Model):
         return True
 
     def _prepare_move_values(self):
+        self.ensure_one()
         return {
             'name': self.name,
             'origin': self.origin,

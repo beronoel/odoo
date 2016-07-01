@@ -147,7 +147,6 @@
                                     <field name="state" invisible="1"/>
                                     <field name="product_uom_qty" readonly="1" attrs="{'required': [('product_id', '!=', False)]}" string="To Produce"/>
                                     <field name="quantity_done" attrs="{'readonly': ['|', ('is_done', '=', True), ('has_tracking', 'in', ['lot','serial'])]}" string="Produced"/>
-
                                     <button name="split_move_lot" string="Register lots" type="object" icon="fa-list"
                                         attrs="{'invisible': [('has_tracking', 'not in', ['lot','serial'])]}"/>
                                 </tree>

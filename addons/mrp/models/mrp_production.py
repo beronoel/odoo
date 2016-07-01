@@ -100,10 +100,12 @@ class MrpProduction(models.Model):
              "work centers based on production planning.")
     move_raw_ids = fields.One2many(
         'stock.move', 'raw_material_production_id', 'Raw Materials', oldname='move_lines',
-        copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+        copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+        domain=[('scrapped', '=', False)])
     move_finished_ids = fields.One2many(
         'stock.move', 'production_id', 'Finished Products',
-        copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]})
+        copy=False, states={'done': [('readonly', True)], 'cancel': [('readonly', True)]}, 
+        domain=[('scrapped', '=', False)])
     workorder_ids = fields.One2many(
         'mrp.workorder', 'production_id', 'Work Orders',
         copy=False, oldname='workcenter_lines', readonly=True)
