@@ -43,14 +43,13 @@ class SaleOrderLine(models.Model):
             for bom_line, data in lines:
                 qty = 0.0
                 for move in self.procurement_ids.mapped('move_ids'):
-                    if move.state == 'done' and move.product_id.id == bom_line.get('product_id', False):
-                        qty += self.env['product.uom']._compute_qty(move.product_uom.id, move.product_uom_qty, bom_line['product_uom'])
+                    if move.state == 'done' and move.product_id.id == bom_line.product_id.id:
+                        qty += self.env['product.uom']._compute_qty(move.product_uom.id, move.product_uom_qty, bom_line.product_uom_id.id)
                 if float_compare(qty, data['qty'], precision_digits=precision) < 0:
                     bom_delivered[bom.id] = False
                     break
                 else:
                     bom_delivered[bom.id] = True
-            import pdb; pdb.set_trace()
         if bom_delivered and any(bom_delivered.values()):
             return self.product_uom_qty
         elif bom_delivered:

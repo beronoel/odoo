@@ -368,7 +368,6 @@ class TestSaleMrpFlow(common.TransactionCase):
         wiz = self.env[wiz_act['res_model']].browse(wiz_act['res_id'])
         wiz.process()
 
-        import pdb; pdb.set_trace()
         self.assertEqual(self.so.invoice_status, 'no', 'Sale MRP: so invoice_status should be "no" after partial delivery of a kit')
         del_qty = sum(sol.qty_delivered for sol in self.so.order_line)
         self.assertEqual(del_qty, 0.0, 'Sale MRP: delivered quantity should be zero after partial delivery of a kit')
