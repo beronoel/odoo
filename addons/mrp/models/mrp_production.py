@@ -264,7 +264,7 @@ class MrpProduction(models.Model):
             production._generate_finished_moves()
             factor = self.env['product.uom']._compute_qty(production.product_uom_id.id, production.product_qty, production.bom_id.product_uom_id.id)
             # production.bom_id.explode(production.product_id, factor, method=self._generate_raw_move)
-            boms, lines = production.bom_id.explode_new(production.product_id, factor)
+            boms, lines = production.bom_id.explode_new(production.product_id, factor, picking_type=production.bom_id.picking_type_id)
             production._generate_raw_moves(lines)
             # Check for all draft moves whether they are mto or not
             self._adjust_procure_method()
@@ -380,8 +380,7 @@ class MrpProduction(models.Model):
         UoM = self.env['product.uom']
         for order in orders_to_plan:
             quantity = UoM._compute_qty_obj(order.product_uom_id, order.product_qty, order.bom_id.product_uom_id)
-            # order.bom_id.explode(order.product_id, quantity, method_wo=order._workorders_create)
-            boms, lines = order.bom_id.explode_new(order.product_id, quantity)
+            boms, lines = order.bom_id.explode_new(order.product_id, quantity, picking_type=order.bom_id.picking_type_id)
             order._generate_workorders(boms)
         orders_to_plan.write({'state': 'planned'})
 

@@ -285,7 +285,7 @@ class StockMove(models.Model):
         if bom_point and bom_point.type == 'phantom':
             processed_ids = self - self
             factor = self.env['product.uom']._compute_qty(self.product_uom.id, self.product_uom_qty, bom_point.product_uom_id.id) / bom_point.product_qty
-            boms, lines = bom_point.sudo().explode_new(self.product_id, factor)
+            boms, lines = bom_point.sudo().explode_new(self.product_id, factor, picking_type=bom_point.picking_type_id)
             self._generate_raw_moves(lines)
             to_explode_again_ids = self.search([('split_from', '=', self.id)])
             if to_explode_again_ids:

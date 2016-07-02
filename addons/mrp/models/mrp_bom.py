@@ -137,7 +137,7 @@ class MrpBom(models.Model):
     def explode_new(self, product, quantity, picking_type=False):
         # TDE TOCHECK: product: initially, is the product we want to explode (bom could have a template)
         #      then in iterations: product from line
-        # TDE TOCHECK: picking_type_id should be the original one
+        # Pass picking_type as the original one wanted (as you could have boms with picking type False first and with afterwards)
         # TDE TOCHECK: original_quantity to add -> quantity / original_quantity -> factor (produce 1 more -> how more I need)
         boms_done = [(self, {'qty': quantity, 'product': product, 'original_qty': quantity})]
         lines_done = []
@@ -155,7 +155,7 @@ class MrpBom(models.Model):
 
             line_quantity = current_qty * current_line.product_qty / current_line.bom_id.product_qty
 
-            bom = self._bom_find(product=current_line.product_id, picking_type=self.picking_type_id, company_id=self.company_id.id)
+            bom = self._bom_find(product=current_line.product_id, picking_type=picking_type or self.picking_type_id, company_id=self.company_id.id)
             if bom.type == 'phantom':
                 converted_line_quantity = self.env['product.uom']._compute_qty_obj(current_line.product_uom_id, line_quantity, bom.product_uom_id)
                 bom_lines = [(line, current_line.product_id, line_quantity) for line in bom.bom_line_ids] + bom_lines

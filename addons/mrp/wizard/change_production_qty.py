@@ -58,7 +58,7 @@ class ChangeProductionQty(models.TransientModel):
                 if not bom_point:
                     raise UserError(_("Cannot find bill of material for this production."))
                 factor = (production.product_qty - production.qty_produced) * production.product_uom_id.factor / bom_point.product_uom_id.factor
-                boms, lines = production.bom_id.explode_new(production.product_id, factor)
+                boms, lines = production.bom_id.explode_new(production.product_id, factor, picking_type=production.bom_id.picking_type_id)
                 for line, line_data in lines:
                     production._update_raw_move(line, line_data['qty'])
             self._update_product_to_produce(production, production.product_qty - production.qty_produced)
