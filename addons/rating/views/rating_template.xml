@@ -116,22 +116,23 @@
             <div class="container">
                 <div clas="row">
                     <h1 class="text-center">Thanks! We appreciate your feedback.</h1>
-                    <h3 class="text-center text-muted mb32">Your rating has been submitted.</h3>
+                    <h4 class="text-center text-muted" style="margin-bottom: 32px;">Your rating has been submitted.</h4>
                     <div class="pull-left">
-                        <img t-attf-src='/rating/static/src/img/rating_#{rating}.png'/>
+                        <img t-attf-src='/rating/static/src/img/rating_#{rate}.png'/>
                     </div>
-                    <div class="pull-left mb32">
-                        you are <b t-esc="rate_name"></b>
-                        on our services on "<b t-esc="rate.res_name"></b>"
-                        by <b t-esc="rate.rated_partner_id.name"></b>.
+                    <div style="margin-left: 80px;">
+                        you are <b t-esc="rate_name"></b><br/>
+                        on our services on "<b t-esc="rating.res_name"></b>"<br/>
+                        <t t-if="rating.rated_partner_id">by <b t-esc="rating.rated_partner_id.name"></b>.</t>
                     </div>
-                    <p>
+                    <div class="clearfix"></div>
+                    <p style="margin-top:32px;">
                         Would be great if you can provide more informaion:
                     </p>
-                    <form class="form-horizontal" t-attf-action="/rating/#{token}/#{rating}/submit_feedback" method="post">
+                    <form class="form-horizontal" t-attf-action="/rating/#{token}/#{rate}/submit_feedback" method="post">
                         <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                        <textarea class="form-control" name="feedback" rows="6" t-esc="rating.feedback"></textarea>
-                        <button type="submit" class="btn btn-primary">Send Feedback</button>
+                        <textarea class="form-control" name="feedback" rows="8" t-esc="rating.feedback"></textarea>
+                        <button type="submit" class="btn btn-primary" style="margin-top:8px;">Send Feedback</button>
                     </form>
                 </div>
             </div>

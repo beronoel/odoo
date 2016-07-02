@@ -12,6 +12,8 @@ class Rating(http.Controller):
     def open_rating(self, token, rate, **kwargs):
         assert rate in (1, 5, 10), "Incorrect rating"
         rating = request.env['rating.rating'].sudo().search([('access_token', '=', token)])
+        if not rating:
+            return request.not_found()
         rate_names={
             5: _("not satisfied"),
             1: _("highly dissatisfied"),
@@ -19,8 +21,8 @@ class Rating(http.Controller):
         }
         rating.sudo().write({'rating': rate, 'consumed': True})
         return request.render('rating.rating_external_page_submit', {
-            'rating': rate, 'token': token,
-            'rate_name': rate_name[rate]
+            'rating': rating, 'token': token,
+            'rate_name': rate_names[rate], 'rate': rate
         })
         return request.not_found()
 
