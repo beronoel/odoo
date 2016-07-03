@@ -124,8 +124,10 @@ class MrpProductionWorkcenterLine(models.Model):
     @api.multi
     def _compute_color(self):
         late_orders = self.filtered(lambda x: x.production_id.date_planned_finished and x.date_planned_finished > x.production_id.date_planned_finished)
-        late_orders.color = 4
-        (self - late_orders).color = 2
+        for order in late_orders:
+            order.color = 4
+        for order in (self - late_orders):
+            order.color = 2
 
     @api.multi
     def _compute_scrap_move_count(self):
