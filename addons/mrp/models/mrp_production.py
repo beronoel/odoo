@@ -420,6 +420,7 @@ class MrpProduction(models.Model):
                 'duration_expected': duration_expected,
                 'state': len(workorders) == 0 and 'ready' or 'pending',
                 'qty_producing': quantity,
+                'capacity': operation.workcenter_id.capacity,
             })
             if workorders:
                 workorders[-1].next_work_order_id = workorder.id

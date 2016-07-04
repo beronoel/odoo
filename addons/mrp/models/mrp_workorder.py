@@ -120,7 +120,10 @@ class MrpProductionWorkcenterLine(models.Model):
     scrap_ids = fields.One2many('stock.scrap', 'workorder_id')
     scrap_count = fields.Integer(compute='_compute_scrap_move_count', string='Scrap Move')
     color = fields.Integer('Color', compute='_compute_color')
-    
+    capacity = fields.Float(
+        'Capacity', default=1.0,
+        help="Number of pieces that can be produced in parallel.")
+
     @api.multi
     @api.depends('date_planned_finished', 'production_id.date_planned_finished')
     def _compute_color(self):
