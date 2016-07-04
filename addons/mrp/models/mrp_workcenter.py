@@ -182,7 +182,7 @@ class MrpWorkcenterProductivity(models.Model):
         default=lambda self: self.env.uid)
     loss_id = fields.Many2one(
         'mrp.workcenter.productivity.loss', "Loss Reason",
-        required=True)
+        required=True, ondelete='restrict')
     loss_type = fields.Selection(
         "Effectiveness", related='loss_id.loss_type', store=True)
     description = fields.Text('Description')
