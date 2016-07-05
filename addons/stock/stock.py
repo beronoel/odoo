@@ -1664,7 +1664,9 @@ class stock_picking(models.Model):
                 if need_rereserve or not all_op_processed: 
                     moves_reassign = any(x.origin_returned_move_id or x.move_orig_ids for x in picking.move_lines if x.state not in ['done', 'cancel'])
                     if moves_reassign and (picking.location_id.usage not in ("supplier", "production", "inventory")):
-                        self.rereserve_quants(cr, uid, picking, move_ids=picking.move_lines.ids, context=context)
+                        ctx = dict(context)
+                        ctx['reserve_only_ops'] = True #unnecessary to assign other quants than those involved with pack operations as they will be unreserved anyways.
+                        self.rereserve_quants(cr, uid, picking, move_ids=picking.move_lines.ids, context=ctx)
                     self.do_recompute_remaining_quantities(cr, uid, [picking.id], context=context)
 
                 #split move lines if needed
@@ -2465,7 +2467,7 @@ class stock_move(osv.osv):
 
         for move in todo_moves:
             #then if the move isn't totally assigned, try to find quants without any specific domain
-            if move.state != 'assigned':
+            if (move.state != 'assigned') and not context.get("reserve_only_ops"):
                 qty_already_assigned = move.reserved_availability
                 qty = move.product_qty - qty_already_assigned
                 quants = quant_obj.quants_get_preferred_domain(cr, uid, qty, move, domain=main_domain[move.id], preferred_domain_list=[], context=context)
