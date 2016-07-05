@@ -14,6 +14,7 @@
                         <field name="group_uom" widget="radio"/>
                         <field name="group_costing_method" widget="radio"/>
                         <field name="module_purchase_requisition" widget="radio"/>
+                        <field name="module_account_3way_match" widget="radio"/>
                         <field name="group_manage_vendor_price" widget="radio"/>
                         <field name="group_warning_purchase" widget="radio"/>
                     </group>

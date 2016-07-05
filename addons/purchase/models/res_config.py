@@ -43,6 +43,10 @@ class PurchaseConfigSettings(models.TransientModel):
         ], "Dropshipping",
         help='\nCreates the dropship Route and add more complex tests\n'
              '-This installs the module stock_dropshipping.')
+    module_account_3way_match = fields.Selection([
+        (0, 'Based on maturity dates'),
+        (1, '3-way matching: purchase, receptions, bills')
+        ], "Bill Payments")
     group_manage_vendor_price = fields.Selection([
         (0, 'Manage vendor price on the product form'),
         (1, 'Allow using and importing vendor pricelists')
