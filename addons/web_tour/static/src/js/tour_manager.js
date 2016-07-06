@@ -248,7 +248,6 @@ return core.Class.extend({
         }
     },
     _consume_tip: function(tip, tour_name) {
-        this._deactivate_tip(tip);
         this._to_next_step(tour_name);
 
         var is_running = (this.running_tour === tour_name);
@@ -278,7 +277,11 @@ return core.Class.extend({
                 tour.current_step = tour.steps.length;
             }
         }
+        var old_widget = this.active_tooltips[tour_name] && this.active_tooltips[tour_name].widget;
         this.active_tooltips[tour_name] = tour.steps[tour.current_step];
+        if (old_widget) {
+            this.active_tooltips[tour_name].widget = old_widget;
+        }
     },
     _consume_tour: function (tour_name, error) {
         delete this.active_tooltips[tour_name];
