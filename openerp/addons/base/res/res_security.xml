@@ -17,7 +17,7 @@
             <field name="model_id" ref="model_res_company"/>
             <field eval="True" name="global"/>
             <!-- TODO: review this <field name="domain_force">['|', ('child_ids', 'child_of', [user.company_id.id]), ('parent_id', 'child_of', [user.company_id.id])]</field> -->
-            <field name="domain_force">[('id','child_of',[user.company_id.id])]</field>
+            <field name="domain_force">[('id','in',user.company_ids.ids)]</field>
         </record>
 
         <!-- Record Rule For User -->
