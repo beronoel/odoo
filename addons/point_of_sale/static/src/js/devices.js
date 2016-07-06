@@ -438,7 +438,7 @@ var ProxyDevice  = core.Class.extend(core.mixins.PropertiesMixin,{
 
     print_sale_details: function() { 
         var self = this;
-        new Model('pos.order').call('get_sale_details').then(function(result){
+        new Model('report.point_of_sale.report_saledetails').call('get_sale_details').then(function(result){
             var env = {
                 company: self.pos.company,
                 pos: self.pos,
