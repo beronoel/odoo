@@ -8,14 +8,7 @@ var _t = core._t;
 
 tour.register('crm_tour', {
     url: "/web",
-}, [{
-    trigger: "body > nav",
-    position: "bottom",
-    auto: true,
-    run: function (actions) {
-        actions.auto("#menu_more_container > a");
-    },
-}, {
+}, [tour.STEPS.MENU_MORE, {
     trigger: '.o_app[data-menu-xmlid="sales_team.menu_base_partner"], .oe_menu_toggler[data-menu-xmlid="sales_team.menu_base_partner"]',
     content: _t("Ready to boost you sales? Your <b>sales pipeline</b> can be found here, under this app."),
     position: 'bottom',
@@ -72,12 +65,8 @@ tour.register('crm_tour', {
     extra_trigger: '.o_opportunity_form',
     content: _t("Use the breadcrumbs to <b>go back to your sales pipeline</b>."),
     position: "bottom"
-}, {
-    trigger: ".o_main_navbar .o_menu_toggle",
-    content: _t('Click the <i>Home icon</i> to navigate across apps.'),
-    edition: "enterprise",
-    position: "bottom"
-}, {
+}, tour.STEPS.TOGGLE_APPSWITCHER,
+tour.STEPS.MENU_MORE, {
     trigger: '.o_app[data-menu-xmlid="base.menu_administration"], .oe_menu_toggler[data-menu-xmlid="base.menu_administration"]',
     content: _t("Configuration options are available in the Settings app."),
     position: "bottom"

@@ -8,14 +8,7 @@ var _t = core._t;
 
 tour.register('project_tour', {
     url: "/web",
-}, [{
-    trigger: "body > nav",
-    position: "bottom",
-    auto: true,
-    run: function (actions) {
-        actions.auto("#menu_more_container > a");
-    },
-}, {
+}, [tour.STEPS.MENU_MORE, {
     trigger: '.o_app[data-menu-xmlid="base.menu_main_pm"], .oe_menu_toggler[data-menu-xmlid="base.menu_main_pm"]',
     content: _t('Want a better way to <b>manage your projects</b>? <i>It starts here.</i>'),
     position: 'bottom',
@@ -94,12 +87,8 @@ tour.register('project_tour', {
     extra_trigger: '.o_form_project_tasks',
     content: _t("Click on layers in the path to easily <b>return to tasks</b>."),
     position: "bottom"
-}, {
-    trigger: ".o_main_navbar .o_menu_toggle",
-    content: _t('Click the <i>Home icon</i> to navigate across apps.'),
-    edition: "enterprise",
-    position: "bottom"
-}, {
+}, tour.STEPS.TOGGLE_APPSWITCHER,
+tour.STEPS.MENU_MORE, {
     trigger: '.o_app[data-menu-xmlid="base.menu_administration"], .oe_menu_toggler[data-menu-xmlid="base.menu_administration"]',
     content: _t("Configuration options are available in the Settings app."),
     position: "bottom"

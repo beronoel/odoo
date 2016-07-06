@@ -305,6 +305,28 @@ return core.Class.extend({
             this._consume_tip(tip, tour_name);
         }).bind(this), this.running_step_delay);
     },
+
+    /**
+     * Tour predefined steps
+     */
+    STEPS: {
+        MENU_MORE: {
+            edition: "community",
+            trigger: "body > nav",
+            position: "bottom",
+            auto: true,
+            run: function (actions) {
+                actions.auto("#menu_more_container > a");
+            },
+        },
+
+        TOGGLE_APPSWITCHER: {
+            edition: "enterprise",
+            trigger: ".o_main_navbar .o_menu_toggle",
+            content: _t('Click the <i>Home icon</i> to navigate across apps.'),
+            position: "bottom",
+        },
+    },
 });
 
 });
