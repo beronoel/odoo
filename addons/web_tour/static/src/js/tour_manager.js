@@ -161,16 +161,34 @@ return core.Class.extend({
         this.active_tooltips[tour_name] = tour.steps[tour.current_step];
 
         if (tour.url) {
+            var old_before = window.onbeforeunload;
+            var reload_timeout = _.delay((function () {
+                window.onbeforeunload = old_before;
+                this.play();
+                this.update();
+            }).bind(this), 1000);
+            window.onbeforeunload = function () {
+                clearTimeout(reload_timeout);
+            };
+            this.pause();
             window.location.assign(tour.url);
         } else {
             this.update();
         }
+    },
+    pause: function () {
+        this.paused = true;
+    },
+    play: function () {
+        this.paused = false;
     },
     /**
      * Checks for tooltips to activate (only from the running tour or specified tour if there
      * is one, from all active tours otherwise). Should be called each time the DOM changes.
      */
     update: function (tour_name) {
+        if (this.paused) return;
+
         if (this.running_tour) {
             if (this.tours[this.running_tour] === undefined) return;
             if (this.running_tour_timeout === undefined) {
