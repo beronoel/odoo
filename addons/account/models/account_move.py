@@ -412,8 +412,11 @@ class AccountMoveLine(models.Model):
     def _check_currency(self):
         for line in self:
             if line.account_id.currency_id:
-                if not line.currency_id or line.currency_id.id != line.account_id.currency_id.id:
-                    raise ValidationError(_('The selected account of your Journal Entry forces to provide a secondary currency. You should remove the secondary currency on the account.'))
+                if not line.journal_id.currency_id:
+                    if line.company_id.currency_id.id != line.account_id.currency_id.id:
+                        raise ValidationError(_('The selected account of your Journal Entry force to provide a secondary currency. You should  either remove the secondary currency on the account or match the currency of your journal with your account currency.'))
+                elif line.journal_id.currency_id.id != line.account_id.currency_id.id:
+                    raise ValidationError(_('The selected account of your Journal Entry force to provide a secondary currency. You should  either remove the secondary currency on the account or match the currency of your journal with your account currency.'))
 
     @api.multi
     @api.constrains('currency_id', 'amount_currency')
