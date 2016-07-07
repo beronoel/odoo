@@ -113,6 +113,16 @@
                     <t t-call="mail.ChatThread.MessageTracking"/>
                 </t>
                 <p t-if="options.display_subject &amp;&amp; message.display_subject" class="o_mail_subject">Subject: <t t-esc="message.subject"/></p>
+                <ul>
+                    <t t-foreach="message.customer_data" t-as="customer">
+                        <li>
+                            <i t-att-class="'fa fa-circle o_thread_message_mail_status_' + (customer[3])"/>
+                            <t t-esc="customer[1]"/>
+                            <t t-esc="customer[2]"/>
+                            <t t-esc="customer[3]"/>
+                        </li>
+                    </t>
+                </ul>
                 <t t-if="!(message.tracking_value_ids &amp;&amp; message.tracking_value_ids.length &gt; 0)">
                     <t t-raw="message.body"/>
                 </t>
