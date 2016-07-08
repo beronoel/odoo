@@ -250,6 +250,10 @@ class MrpProduction(models.Model):
             values['procurement_group_id'] = self.env["procurement.group"].create({'name': values['name']}).id
         production = super(MrpProduction, self).create(values)
         production._generate_moves()
+        procurement = self.env['procurement.order'].search([('move_dest_id', 'in', production.move_raw_ids.ids)])
+        procurement.message_post_with_view('mail.message_origin_link',
+                    values={'self': procurement, 'origin': production},
+                    subtype_id=self.env.ref('mail.mt_note').id)
         return production
 
     @api.multi

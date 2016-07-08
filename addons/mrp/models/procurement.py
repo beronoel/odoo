@@ -83,9 +83,10 @@ class ProcurementOrder(models.Model):
             if bom:
                 # create the MO as SUPERUSER because the current user may not have the rights to do it (mto product launched by a sale for example)
                 production = ProductionSudo.create(procurement._prepare_mo_vals(bom))
+                name = (procurement.group_id.name and (procurement.group_id.name + ":") or '') + (procurement.name != "/" and procurement.name or procurement.move_dest_id.raw_material_production_id.name)
+                message = _("This manufacturing order has been created from: <a href=# data-oe-model=procurement.order data-oe-id=%d>%s</a>") % (procurement.id, name)
+                production.message_post(body=message)
                 res[procurement.id] = production.id
-
-                procurement.message_post(body=_("Manufacturing Order <em>%s</em> created.") % (production.name))
             else:
                 res[procurement.id] = False
                 procurement.message_post(body=_("No BoM exists for this product!"))
