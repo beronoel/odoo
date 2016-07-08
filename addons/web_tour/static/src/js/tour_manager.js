@@ -189,6 +189,7 @@ return core.Class.extend({
     update: function (tour_name) {
         if (this.paused) return;
 
+        console.log("UPDATE");
         if (this.running_tour) {
             if (this.tours[this.running_tour] === undefined) return;
             if (this.running_tour_timeout === undefined) {
@@ -199,6 +200,7 @@ return core.Class.extend({
         this.in_modal = this.$body.hasClass('modal-open');
         tour_name = this.running_tour || tour_name;
         if (tour_name) {
+            console.log("CHECK");
             this._check_for_tooltip(this.active_tooltips[tour_name], tour_name);
         } else {
             _.each(this.active_tooltips, this._check_for_tooltip.bind(this));
@@ -209,6 +211,7 @@ return core.Class.extend({
         var extra_trigger = tip.extra_trigger ? $(tip.extra_trigger).filter(':visible').length : true;
         var triggered = $trigger.length && extra_trigger;
         if (triggered) {
+            console.log("TRIGGERED");
             if (!tip.widget) {
                 this._activate_tip(tip, tour_name, $trigger);
             } else {
@@ -219,6 +222,7 @@ return core.Class.extend({
         }
     },
     _activate_tip: function(tip, tour_name, $anchor) {
+        console.log("ACTIVATE");
         var tour = this.tours[tour_name];
         var tip_info = tip;
         if (tour.skip_link) {
@@ -299,6 +303,11 @@ return core.Class.extend({
     _set_running_tour_timeout: function (tour_name, step) {
         this._stop_running_tour_timeout();
         this.running_tour_timeout = setTimeout((function() {
+            console.log("TIP TRIGGER:", this.active_tooltips[tour_name].trigger);
+            console.log("TIP FOUND:", $(this.active_tooltips[tour_name].trigger).length);
+            console.log("TIP VISIBLE ?:", $(this.active_tooltips[tour_name].trigger).is(":visible"));
+            console.log("FULL DOM:", document.body.outerHTML);
+            console.log(this.active_tooltips[tour_name].trigger);
             this._consume_tour(tour_name, _.str.sprintf("Tour %s failed at step %s", tour_name, step.trigger));
         }).bind(this), RUNNING_TOUR_TIMEOUT + this.running_step_delay);
     },
