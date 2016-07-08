@@ -441,3 +441,9 @@ class MrpWorkorder(models.Model):
         action = self.env.ref('stock.action_stock_scrap').read()[0]
         action['domain'] = [('workorder_id', '=', self.id)]
         return action
+
+    @api.multi
+    def block_workcenter(self):
+        self.ensure_one()
+        action = self.env.ref('mrp.act_mrp_block_workcenter_wo').read()[0]
+        return action
