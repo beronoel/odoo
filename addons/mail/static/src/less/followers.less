@@ -1,15 +1,58 @@
+@o-followers-font-small: 0.8em;
+
 .o_followers {
     float: right;
     @media (max-width: @screen-xs-max) {
         display: none !important; // Hide the followers in mobile
     }
 
+    .dropdown-menu {
+        right: 0;
+        left: auto;
+        padding: 15px 10px;
+
+        li {
+            margin-bottom: 10px;
+        }
+    }
+
     .o_followers_actions {
         position: relative;
         float: right;
 
+        .dropdown-toggle {
+            opacity: 0.3;
+            color: @text-color;
+            font-size: @o-followers-font-small;
+
+            &:hover, &:focus {
+                opacity: 1;
+                color: black;
+                box-shadow: none;
+                background-color: transparent;
+            }
+            &[aria-expanded="true"] {
+                opacity: 1;
+            }
+        }
+
+        &:hover {
+            .dropdown-toggle {
+                opacity: 1;
+            }
+        }
+
         .o_followers_follow_button {
-            width: 120px;
+            width: 85px;
+            text-align: right;
+            padding-right: 0;
+            color: @text-color;
+            font-size: @o-followers-font-small;
+            font-weight: bold;
+
+            &:hover, &:focus {
+                background-color: transparent;
+            }
 
             .o_follow, .o_followers_unfollow, .o_followers_following {
                 display: none;
@@ -29,6 +72,19 @@
             &.o_followers_notfollow .o_follow {
                 display: inline;
             }
+
+            .fa {
+                font-size: @font-size-base;
+                float: left;
+            }
+
+            .fa-times {
+                color: @brand-warning;
+            }
+
+            .fa-check {
+                color: @odoo-brand-optional;
+            }
         }
 
         .o_subtype {
@@ -40,13 +96,23 @@
     .o_followers_title_box {
         position: relative;
         float: right;
-        margin-left: 5px;
-        > button {
-            width: 140px;
-        }
+        margin-left: 25px;
 
-        .o_followers_count {
-            padding-right: 5px;
+        .dropdown-toggle{
+            font-size: @o-followers-font-small;
+
+            .o_followers_count {
+                padding-right: 5px;
+                font-weight: bold;
+            }
+
+            > .fa {
+                font-size: @font-size-base;
+            }
+
+            &:hover, &:focus {
+                color: black;
+            }
         }
 
         .o_followers_list {
