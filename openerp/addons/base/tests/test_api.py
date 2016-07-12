@@ -337,7 +337,7 @@ class TestAPI(common.TransactionCase):
         # reading ONE partner should fetch them ALL
         partner = next(p for p in partners)
         partner.country_id
-        country_id_cache = self.env.cache[type(partners).country_id]
+        country_id_cache = type(partners).country_id.cache(self.env)
         self.assertItemsEqual(partners.ids, country_id_cache)
 
         # partners' countries are ready for prefetching
@@ -348,7 +348,7 @@ class TestAPI(common.TransactionCase):
         # reading ONE partner country should fetch ALL partners' countries
         country = next(p.country_id for p in partners if p.country_id)
         country.name
-        name_cache = self.env.cache[type(country).name]
+        name_cache = type(country).name.cache(self.env)
         self.assertItemsEqual(country_ids, name_cache)
 
     @mute_logger('openerp.models')

@@ -5785,7 +5785,8 @@ class BaseModel(object):
             the records of model ``self`` in cache that have no value for ``field``
             (:class:`Field` instance).
         """
-        ids = filter(None, self._prefetch[self._name] - set(self.env.cache[field]))
+        field_cache = field.cache(self.env)
+        ids = set(id for id in filter(None, self._prefetch[self._name]) if id not in field_cache)
         return self.browse(ids)
 
     @api.model
@@ -5831,11 +5832,7 @@ class BaseModel(object):
         for fname in fnames:
             spec += self._fields[fname].modified(self)
 
-        cached_fields = {
-            field
-            for env in self.env.all
-            for field in env.cache
-        }
+        cached_fields = self.env.cache
         # invalidate non-stored fields.function which are currently cached
         spec += [(f, None) for f in self.pool.pure_function_fields
                  if f in cached_fields]
@@ -6098,29 +6095,27 @@ class RecordCache(MutableMapping):
         """ Return whether `records[0]` has a value for ``field`` in cache. """
         if isinstance(field, basestring):
             field = self._recs._fields[field]
-        return self._recs.id in self._recs.env.cache[field]
+        return self._recs.id in field.cache(self._recs.env)
 
     def __contains__(self, field):
         """ Return whether `records[0]` has a regular value for ``field`` in cache. """
         if isinstance(field, basestring):
             field = self._recs._fields[field]
-        dummy = SpecialValue(None)
-        value = self._recs.env.cache[field].get(self._recs.id, dummy)
+        value = field.cache(self._recs.env).get(self._recs.id, SpecialValue(None))
         return not isinstance(value, SpecialValue)
 
     def get(self, field, default=None):
         """ Return the cached, regular value of ``field`` for `records[0]`, or ``default``. """
         if isinstance(field, basestring):
             field = self._recs._fields[field]
-        dummy = SpecialValue(None)
-        value = self._recs.env.cache[field].get(self._recs.id, dummy)
+        value = field.cache(self._recs.env).get(self._recs.id, SpecialValue(None))
         return default if isinstance(value, SpecialValue) else value
 
     def __getitem__(self, field):
         """ Return the cached value of ``field`` for `records[0]`. """
         if isinstance(field, basestring):
             field = self._recs._fields[field]
-        value = self._recs.env.cache[field][self._recs.id]
+        value = field.cache_get(self._recs)
         return value.get() if isinstance(value, SpecialValue) else value
 
     def __setitem__(self, field, value):
@@ -6128,17 +6123,18 @@ class RecordCache(MutableMapping):
         if isinstance(field, basestring):
             field = self._recs._fields[field]
         values = dict.fromkeys(self._recs._ids, value)
-        self._recs.env.cache[field].update(values)
+        field.cache(self._recs.env).update(values)
 
     def update(self, *args, **kwargs):
         """ Update the cache of all records in ``records``. If the argument is a
             ``SpecialValue``, update all fields (except "magic" columns).
         """
         if args and isinstance(args[0], SpecialValue):
+            env = self._recs.env
             values = dict.fromkeys(self._recs._ids, args[0])
             for name, field in self._recs._fields.iteritems():
                 if name != 'id':
-                    self._recs.env.cache[field].update(values)
+                    field.cache(env).update(values)
         else:
             return super(RecordCache, self).update(*args, **kwargs)
 
@@ -6146,16 +6142,14 @@ class RecordCache(MutableMapping):
         """ Remove the cached value of ``field`` for all ``records``. """
         if isinstance(field, basestring):
             field = self._recs._fields[field]
-        field_cache = self._recs.env.cache[field]
+        pop = field.cache(self._recs.env)
         for id in self._recs._ids:
-            field_cache.pop(id, None)
+            pop(id, None)
 
     def __iter__(self):
         """ Iterate over the field names with a regular value in cache. """
-        cache, id = self._recs.env.cache, self._recs.id
-        dummy = SpecialValue(None)
         for name, field in self._recs._fields.iteritems():
-            if name != 'id' and not isinstance(cache[field].get(id, dummy), SpecialValue):
+            if name != 'id' and self.__contains__(field):
                 yield name
 
     def __len__(self):

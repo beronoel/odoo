@@ -1041,16 +1041,43 @@ class Field(object):
             if path == 'id' and field.model_name == records._name:
                 target = records - protected
             elif path and env.in_onchange:
-                target = (target.browse(env.cache[field]) - protected).filtered(
+                target = (target.browse(field.cache(env)) - protected).filtered(
                     lambda rec: rec if path == 'id' else rec._mapped_cache(path) & records
                 )
             else:
-                target = target.browse(env.cache[field]) - protected
+                target = target.browse(field.cache(env)) - protected
 
             if target:
                 spec.append((field, target._ids))
 
         return spec
+
+    def invalidate(self, cache, record_ids):
+        if record_ids is None:
+            if self in cache:
+                del cache[self]
+        else:
+            for fcache in cache[self].itervalues():
+                pop = fcache.pop
+                for record_id in record_ids:
+                    pop(record_id, None)
+
+    def cache_key(self, env):
+        if self.compute or self.company_dependent:
+            return env
+        return (env.cr, env.uid)
+
+    def cache(self, env):
+        return env.cache[self][self.cache_key(env)]
+
+    def cache_get(self, record):
+        return self.cache(record.env)[record.id]
+
+    def cache_set(self, record, value):
+        self.cache(record.env)[record.id] = value
+
+    def cache_del(self, record):
+        self.cache(record.env).pop(record.id, None)
 
 
 class Boolean(Field):
@@ -1237,6 +1264,13 @@ class _String(Field):
         else:
             return value
     
+    def cache_key(self, env):
+        if self.compute or self.company_dependent:
+            return env
+        if self.translate:
+            return (env.cr, env.uid, env.lang)
+        return (env.cr, env.uid)
+
 
 class Char(_String):
     """ Basic string field, can be length-limited, usually displayed as a
