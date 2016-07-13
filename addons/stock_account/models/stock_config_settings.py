@@ -17,6 +17,12 @@ class StockConfigSettings(models.TransientModel):
         (1, 'Include landed costs in product costing computation')], "Landed Costs",
         help="""Install the module that allows to affect landed costs on pickings, and split them onto the different products.""")
 
+    @api.multi
+    def set_default_group_stock_inventory_valuation(self):
+        data = {0: 'manual_periodic', 1: 'real_time'}
+        res = self.env['ir.values'].set_default('product.category', 'property_valuation', data[self.group_stock_inventory_valuation])
+        return res
+
     @api.onchange('module_stock_landed_costs')
     def onchange_landed_costs(self):
         if self.module_stock_landed_costs:
