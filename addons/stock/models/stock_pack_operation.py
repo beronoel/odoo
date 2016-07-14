@@ -31,6 +31,7 @@ class PackOperation(models.Model):
         help='The stock operation where the packing has been made')
     product_id = fields.Many2one('product.product', 'Product', ondelete="cascade")
     product_uom_id = fields.Many2one('product.uom', 'Unit of Measure')
+    product_uom_categ_id = fields.Many2one(related='product_uom_id.category_id')
     product_qty = fields.Float('To Do', default=0.0, digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
     ordered_qty = fields.Float('Ordered Quantity', digits_compute=dp.get_precision('Product Unit of Measure'))
     qty_done = fields.Float('Done', default=0.0, digits_compute=dp.get_precision('Product Unit of Measure'))
@@ -134,10 +135,19 @@ class PackOperation(models.Model):
     @api.multi
     @api.onchange('product_id', 'product_uom_id')
     def onchange_product_id(self):
+        ProductUom = self.env['product.uom']
         if self.product_id:
             self.lots_visible = self.product_id.tracking != 'none'
             if not self.product_uom_id or self.product_uom_id.category_id != self.product_id.uom_id.category_id:
                 self.product_uom_id = self.product_id.uom_id.id
+
+            # if onchange is called explicitly in the code then we
+            # should not try to automatically convert the quantities
+            if hasattr(self, '_origin'):
+                self.product_qty = ProductUom._compute_qty_obj(self._origin.product_uom_id, self._origin.product_qty, self.product_uom_id)
+                self.ordered_qty = ProductUom._compute_qty_obj(self._origin.product_uom_id, self._origin.ordered_qty, self.product_uom_id)
+                self.qty_done = ProductUom._compute_qty_obj(self._origin.product_uom_id, self._origin.qty_done, self.product_uom_id)
+
             res = {'domain': {'product_uom_id': [('category_id', '=', self.product_uom_id.category_id.id)]}}
         else:
             res = {'domain': {'product_uom_id': []}}
