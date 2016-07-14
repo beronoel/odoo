@@ -397,12 +397,16 @@ actual arch.
         if self.pool._init and not self._context.get('load_all_views'):
             # Module init currently in progress, only consider views from
             # modules whose code is already loaded
-            conditions.extend([
-                '|',
-                ('model_ids.module', 'in', tuple(self.pool._init_modules)),
-                ('id', 'in', self._context.get('check_view_ids') or (0,)),
-            ])
-        views = self.search(conditions)
+            loaded_modules = tuple(self.pool._init_modules)
+            views = self.search(conditions + [('model_ids.module', 'in', loaded_modules)])
+
+            # and also explictly asked views
+            check_view_ids = list(set(self._context.get('check_view_ids') or []) - {view_id})
+            if check_view_ids:
+                views = self.search(conditions + [('id', 'in', check_view_ids + views.ids)])
+
+        else:
+            views = self.search(conditions)
 
         return [(view.arch, view.id)
                 for view in views.sudo()
