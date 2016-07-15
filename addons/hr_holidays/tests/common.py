@@ -20,14 +20,14 @@ class TestHrHolidaysBase(common.TransactionCase):
             'login': 'Armande',
             'alias_name': 'armande',
             'email': 'armande.hruser@example.com',
-            'groups_id': [(6, 0, [group_employee_id, self.ref('base.group_hr_user')])]
+            'groups_id': [(6, 0, [group_employee_id, self.ref('hr.group_hr_user')])]
         }).id
         self.user_hrmanager_id = Users.create({
             'name': 'Bastien HrManager',
             'login': 'bastien',
             'alias_name': 'bastien',
             'email': 'bastien.hrmanager@example.com',
-            'groups_id': [(6, 0, [group_employee_id, self.ref('base.group_hr_manager')])]
+            'groups_id': [(6, 0, [group_employee_id, self.ref('hr.group_hr_manager')])]
         }).id
         self.user_employee_id = Users.create({
             'name': 'David Employee',

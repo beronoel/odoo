@@ -106,7 +106,7 @@ class WebsiteBlog(http.Controller):
         if date_begin and date_end:
             domain += [("post_date", ">=", date_begin), ("post_date", "<=", date_end)]
 
-        if request.env.user.has_group('base.group_website_designer'):
+        if request.env.user.has_group('website.group_website_designer'):
             count_domain = domain + [("website_published", "=", True), ("post_date", "<=", fields.Datetime.now())]
             published_count = BlogPost.search_count(count_domain)
             unpublished_count = BlogPost.search_count(domain) - published_count
@@ -291,7 +291,7 @@ class WebsiteBlog(http.Controller):
 
     @http.route(['/blog/post_discussion'], type='json', auth="public", website=True)
     def post_discussion(self, blog_post_id, **post):
-        publish = request.env.user.has_group('base.group_website_publisher')
+        publish = request.env.user.has_group('website.group_website_publisher')
         message_id = self._blog_post_message(blog_post_id, post.get('comment'), **post)
         return self._get_discussion_detail([message_id], publish, **post)
 
@@ -318,7 +318,7 @@ class WebsiteBlog(http.Controller):
     def discussion(self, post_id=0, path=None, count=False, **post):
         domain = [('res_id', '=', int(post_id)), ('model', '=', 'blog.post'), ('path', '=', path)]
         #check current user belongs to website publisher group
-        publish = request.env.user.has_group('base.group_website_publisher')
+        publish = request.env.user.has_group('website.group_website_publisher')
         if not publish:
             domain.append(('website_published', '=', True))
         messages = request.env['mail.message'].sudo().search(domain, count=count)

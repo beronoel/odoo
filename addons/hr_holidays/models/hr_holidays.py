@@ -224,7 +224,7 @@ class Holidays(models.Model):
             or if he is an Hr Manager.
         """
         user = self.env.user
-        group_hr_manager = self.env.ref('base.group_hr_manager')
+        group_hr_manager = self.env.ref('hr.group_hr_manager')
         for holiday in self:
             if group_hr_manager in user.groups_id or holiday.employee_id and holiday.employee_id.user_id == user:
                 holiday.can_reset = True
@@ -332,7 +332,7 @@ class Holidays(models.Model):
         return res
 
     def _check_state_access_right(self, vals):
-        if vals.get('state') and vals['state'] not in ['draft', 'confirm', 'cancel'] and not self.env['res.users'].has_group('base.group_hr_user'):
+        if vals.get('state') and vals['state'] not in ['draft', 'confirm', 'cancel'] and not self.env['res.users'].has_group('hr.group_hr_user'):
             return False
         return True
 
@@ -522,7 +522,7 @@ class Holidays(models.Model):
             recipients. Indeed those will have specific action in their notification
             emails.
         """
-        group_hr_user = self.env.ref('base.group_hr_user')
+        group_hr_user = self.env.ref('hr.group_hr_user')
         for recipient in recipients:
             if recipient.id in done_ids:
                 continue
