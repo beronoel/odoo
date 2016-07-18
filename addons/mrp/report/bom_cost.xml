@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="mrp_bom_cost">
-        <div class="o_form_view">
-            <div class="page o_form_sheet_bg">
-                <div class="o_form_sheet">
-                    <t t-foreach="lines" t-as="line">
+        <t t-call="report.html_container">
+            <t t-foreach="lines" t-as="line">
+                <t t-call="report.internal_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
                         <t t-set="currency" t-value="line['currency']"/>
                         <table class="table table-condensed">
                             <thead>
@@ -38,18 +39,25 @@
                                     <td class="text-right">
                                         <span t-esc="bom_line['product_uom_qty']"/> <span t-esc="bom_line['product_uom'].name" groups="product.group_uom"/>
                                     </td>
-                                    <td class="text-right"><span t-esc="bom_line['price_unit']" t-esc-options='{"widget": "monetary", "display_currency": "currency"}'/></td>
-                                    <td class="text-right"><span t-esc="bom_line['total_price']" t-esc-options='{"widget": "monetary", "display_currency": "currency"}'/></td>
+                                    <td class="text-right">
+                                        <span t-esc="bom_line['price_unit']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-esc="bom_line['total_price']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th colspan="4" class="text-right">Total Cost of Raw Materials</th>
-                                    <th class="text-right"><t t-esc="line['total']" t-esc-options='{"widget": "monetary", "display_currency": "currency"}'/></th>
+                                    <th class="text-right">
+                                        <span t-esc="line['total']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </th>
                                 </tr>
                             </tbody>
                         </table>
-                    </t>
-                </div>
-            </div>
-        </div>
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
     </template>
 </odoo>
