@@ -129,111 +129,14 @@ $.summernote.eventHandler.modules.popover.update = function ($popover, oStyle, i
     $("span.o_table_handler, div.note-table").remove();
 };
 
-web_editor.Class.include({
-    start: function () {
-        var self = this;
-        $('[data-toggle="tooltip"]').tooltip();
-        if (location.search.indexOf("enable_editor") !== -1) {
-            this.on('rte:start', this, function () {
-                $("#choose_template").off("click").on("click", _.bind(self.on_choose_template, self));
-                $(".theme_thumbnail [data-snippet-theme]").off("click").on("click", _.bind(self.on_set_snippet_theme, self));
-                var $editable = $("#editable_area");
-                $editable.html($editable.prop("innerHTML").replace(/^<p[^>]*>\s*<\/p>$/, ''));
-            });
-            this.on("snippets:ready", this, _.bind(self.display_theme_from_html, self));
-        }
-        return this._super.apply(this, arguments);
-    },
-    display_theme_from_html: function () {
-        var theme = $("#editable_area [data-snippet-theme]").data("snippet-theme");
-        if (theme) {
-            $("#choose_template").show();
-            this.set_snippet_theme(theme);
-        } else {
-            $("#choose_template").hide();
-            this.on_choose_template();
-        }
-        var mailing_model = JSON.parse($.deparam(location.search).datarecord).mailing_model;
-        if (mailing_model) {
-            this.get_snippet_template( mailing_model );
-        }
-    },
-
-    on_choose_template: function (event) {
-        if (event) {
-            $("#choose_template").show();
-        }
-        var $editable = $("#editable_area");
-        $(".o_table_handler").remove();
-        $editable.add("#oe_snippets, #templates, .note-popover").toggleClass("hidden");
-        $("#choose_template").children().toggleClass("hidden");
-        $("body").trigger("resize");
-        $(window.top).trigger('resize');
-        setTimeout(function () {
-            $(".note-popover").toggleClass("hidden", $("#templates").is(":visible"));
-        },0);
-    },
-    on_set_snippet_template: function (event) {
-        var $editable = $("#editable_area");
-        this.rte.historyRecordUndo($editable);
-        $editable.html( $(event.target).closest(".theme_thumbnail").find(".js_content").html() );
-        $editable.add("#oe_snippets, #templates, .note-popover").toggleClass("hidden");
-        $("#choose_template").children().toggleClass("hidden");
-        setTimeout(function () {
-            $("body").trigger("resize");
-            $("body")[0].scrollTop = 0;
-        },0);
-        event.preventDefault();
-    },
-    on_set_snippet_theme: function (event) {
-        this.set_snippet_theme($(event.target).data("snippet-theme"));
-        this.on_choose_template(event);
-        event.preventDefault();
-    },
-    set_snippet_theme: function (theme) {
-        $("#oe_snippets .o_panel_body > div").addClass("hidden");
-        $("#oe_snippets .o_panel_body > div."+theme).removeClass("hidden");
-        $("#editable_area").trigger("content_changed");
-    },
-    get_snippet_template: function (mailing_model) {
-        var self = this;
-        var domain = [['model', '=', mailing_model]];
-        return new Model('mail.template').call('search_read', [domain]).then(function (datas) {
-            var $template = $("#templates > div:last").addClass("hidden");
-            var $tclone = $template.find("> div > div:first");
-            $tclone.siblings().remove();
-            _.each(datas, function (data) {
-                if (!data.body_html) {
-                    return;
-                }
-                $template.removeClass("hidden");
-                var $clone = $tclone.clone().removeClass("hidden");
-                $clone.find("p:first").html(data.name);
-                $clone.find(".template_preview").html(data.body_html);
-                $tclone.after($clone);
-            });
-
-            $(".js_template_set").off("click").on("click", _.bind(self.on_set_snippet_template, self));
-        });
-    }
-});
-
 snippets_editor.Class.include({
     _get_snippet_url: function () {
         return snippets_url;
     },
-    clean_for_save: function () {
-        this._super();
-        var $editable = $("#editable_area");
-        var theme = ($("#oe_snippets .o_panel_body > div:not(.hidden)").attr("class") || "").replace(/^\s*|\s*o_mail_block[^\s]+\s*|\s*oe_snippet\s*|\s*ui-draggable\s*|\s*$/g, '');
-        var $theme = $("#editable_area [data-snippet-theme]").removeAttr("data-snippet-theme").removeData("snippet-theme");
-        $editable.children().first().attr("data-snippet-theme", theme);
-        $editable.find(":not(br):hidden").remove();
-    },
 });
 
-var _set_value = window.top.odoo[callback+"_updown"];
 var odoo_top = window.top.odoo;
+var _set_value = odoo_top[callback+"_updown"];
 window.top.odoo[callback+"_updown"] = function (value, fields_values, field_name) {
     if (!window) {
         delete odoo_top[callback+"_updown"];
@@ -258,8 +161,6 @@ window.top.odoo[callback+"_updown"] = function (value, fields_values, field_name
             $editable.html(value);
 
             if (editor_enable) {
-                web_editor.editor_bar.display_theme_from_html();
-
                 if (value !== fields_values[field_name]) {
                     $editable.trigger("content_changed");
                 }
@@ -268,7 +169,6 @@ window.top.odoo[callback+"_updown"] = function (value, fields_values, field_name
     }
 
     if (fields_values.mailing_model && web_editor.editor_bar) {
-        web_editor.editor_bar.get_snippet_template(fields_values.mailing_model);
         if (value.indexOf('on_change_model_and_list') !== -1) {
             odoo_top[callback+"_downup"](_val);
         }
