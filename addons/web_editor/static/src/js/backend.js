@@ -248,7 +248,7 @@ var FieldTextHtml = widget.extend({
             attr.translatable = 1;
         }
         if (session.debug) {
-            attr.debug = 1;
+            attr.debug = session.debug;
         }
 
         attr.lang = attr.enable_editor ? 'en_US' : this.session.user_context.lang;
@@ -383,5 +383,10 @@ var FieldTextHtml = widget.extend({
 core.form_widget_registry
     .add('html', FieldTextHtmlSimple)
     .add('html_frame', FieldTextHtml);
+
+return {
+    'FieldTextHtmlSimple': FieldTextHtmlSimple,
+    'FieldTextHtml': FieldTextHtml,
+};
 
 });
