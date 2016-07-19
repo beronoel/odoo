@@ -332,3 +332,21 @@ class ComputeInverse(models.Model):
         self.counts['inverse'] += 1
         for record in self:
             record.foo = record.bar
+
+
+class ComputeCascade(models.Model):
+    _name = 'test_new_api.cascade'
+
+    foo = fields.Char()
+    bar = fields.Char(compute='_compute_bar')           # depends on foo
+    baz = fields.Char(compute='_compute_baz')           # depends on bar
+
+    @api.depends('foo')
+    def _compute_bar(self):
+        for record in self:
+            record.bar = "[%s]" % (record.foo or "")
+
+    @api.depends('bar')
+    def _compute_baz(self):
+        for record in self:
+            record.baz = "<%s>" % (record.bar or "")
