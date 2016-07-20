@@ -833,6 +833,9 @@ class AccountInvoice(models.Model):
                 'move_name': move.name,
             }
             inv.with_context(ctx).write(vals)
+            invoice = move.line_ids.mapped('invoice_id')
+            message = _("This account entry has been created from: <a href=# data-oe-model=account.invoice data-oe-id=%d>%s</a>") % (invoice.id, invoice.number)
+            move.message_post(body=message)
         return True
 
     @api.multi
