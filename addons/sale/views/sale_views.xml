@@ -409,6 +409,19 @@
                     <filter string="Quotations" name="draft" domain="[('state','=','draft')]"/>
                     <filter string="Quotations Sent" name="sent" domain="[('state','=','sent')]"/>
                     <filter string="Sales" name="sales" domain="[('state','in',('sale','done'))]"/>
+                    <separator/>
+                    <filter string="My Activities" name="my_activity"
+                            domain="[('activity_log_ids.create_uid', '=', uid)]"/>
+                    <filter string="Today Activities" name="today"
+                            domain="[('activity_log_ids.date_action', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Week Activities" name="this_week"
+                            domain="['&amp;', ('activity_log_ids.date_action', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                     ('activity_log_ids.date_action', '&lt;=', (context_today()+datetime.timedelta(days=7)).strftime('%Y-%m-%d'))
+                            ]"/>
+                    <filter string="Overdue Activities" name="overdue"
+                            domain="[('activity_log_ids.date_action', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                            help="Show all records which has next action date is before today"/>
+                    <separator/>
                 </xpath>
             </field>
         </record>
@@ -425,6 +438,19 @@
                     <separator/>
                     <filter string="To Invoice" domain="[('invoice_status','=','to invoice')]" />
                     <filter string="Upselling" domain="[('invoice_status','=','upselling')]" />
+                    <separator/>
+                    <filter string="My Activities" name="my_activity"
+                            domain="[('activity_log_ids.create_uid', '=', uid)]"/>
+                    <filter string="Today Activities" name="today"
+                            domain="[('activity_log_ids.date_action', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Week Activities" name="this_week"
+                            domain="['&amp;', ('activity_log_ids.date_action', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                     ('activity_log_ids.date_action', '&lt;=', (context_today()+datetime.timedelta(days=7)).strftime('%Y-%m-%d'))
+                            ]"/>
+                    <filter string="Overdue Activities" name="overdue"
+                            domain="[('activity_log_ids.date_action', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                            help="Show all records which has next action date is before today"/>
+                    <separator/>
                 </xpath>
             </field>
         </record>
