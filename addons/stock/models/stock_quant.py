@@ -599,6 +599,15 @@ class QuantPackage(models.Model):
             package.company_id = values['company_id']
             package.owner_id = values['owner_id']
 
+
+    @api.multi
+    def action_view_picking(self):
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+        pack_operations = self.env['stock.pack.operation'].search([('result_package_id', 'in', self.ids)])
+        pickings = pack_operations.mapped('picking_id')
+        action['domain'] = [('id', 'in', pickings.ids)]
+        return action
+
     @api.multi
     def name_get(self):
         return self._compute_complete_name().items()
