@@ -30,11 +30,7 @@ up a management by affair.
         'hr_dashboard.xml',
     ],
     'demo': [
-        'hr_timesheet_demo.yml',
-    ],
-    'test': [
-        'test/hr_timesheet_users.yml',
-        'test/worktask_entry_to_timesheetline_entry.yml',
+        'demo/hr_timesheet_demo.xml',
     ],
     'installable': True,
     'application': True,
