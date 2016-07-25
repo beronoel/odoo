@@ -55,6 +55,10 @@ class ActivityReport(models.Model):
                     "crm_lead" l
                 on
                     (m.res_id = l.id)
+                join
+                    "crm_activity" a
+                on
+                    (m.subtype_id = a.subtype_id)
                 WHERE
                     (m.model = 'crm.lead')
             )""")
