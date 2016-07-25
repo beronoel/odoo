@@ -4,6 +4,14 @@
     <xpath expr="//ul[@id='snippets_menu']" position="replace">
         <ul id="snippets_menu">
             <li class="active">
+                <a href="#email_designer_layout" class="scroll-link">
+                    <span class="fa-stack fa-lg">
+                        <i class="fa fa-square fa-stack-2x fa-inverse"></i>
+                        <i class="fa fa-list-alt fa-stack-1x" style="margin-top: 0.05em;"></i>
+                    </span>
+                </a>
+            </li>
+            <li>
                 <a href="#email_designer_default_headers" class="scroll-link">
                     <span class="fa-stack fa-lg">
                         <i class="fa fa-square fa-stack-2x fa-inverse"></i>
@@ -42,6 +50,27 @@
 
     <xpath expr="//div[@id='o_scroll']" position="replace">
         <div id="o_scroll">
+            <div id="email_designer_layout" class="o_panel">
+                <div class="o_panel_header">
+                    <span class="fa-stack">
+                        <i class="fa fa-list-alt fa-stack-1x"></i>
+                    </span> Choose a layout
+                </div>
+                <div class="o_panel_body">
+
+                    <div name="mon cul" class="odoo o_mail_block_header_center_logo">
+                        <div class="odoo o_layout" style="border:3px solid red;">
+                            <div class="oe_structure"></div>
+                        </div>
+                    </div>
+                    <div name="mon cul" class="odoo o_mail_block_header_center_logo">
+                        <div class="odoo o_layout" style="border:3px solid blue;">
+                            <div class="oe_structure"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
             <div id="email_designer_default_headers" class="o_panel">
                 <div class="o_panel_header">
                     <span class="fa-stack">

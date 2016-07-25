@@ -133,6 +133,21 @@ snippets_editor.Class.include({
     _get_snippet_url: function () {
         return snippets_url;
     },
+    compute_snippet_templates: function (html) {
+        this._super(html);
+        var self = this;
+        var $layouts = this.$('#email_designer_layout .o_panel_body > *');
+        $layouts.removeClass("oe_snippet_body");
+        $layouts.find('*').add($layouts).off();
+        $layouts.on('click', function (event) {
+            event.preventDefault();
+            var $html = $('#editable_area .o_layout > .oe_structure, #editable_area').last().contents();
+            var $layout = $(".o_layout", this).clone();
+            $layout.find('.oe_structure').html($html);
+            $('#editable_area').html($layout);
+        });
+    },
+
 });
 
 var odoo_top = window.top.odoo;
