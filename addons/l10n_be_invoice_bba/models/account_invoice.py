@@ -64,7 +64,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def generate_bbacomm(self, type, reference_type, partner_id, reference):
-        reference = reference or ''
+        reference = reference_type == 'bba' and reference or ''
         algorithm = False
         if partner_id:
             algorithm = self.env['res.partner'].browse(partner_id).out_inv_comm_algorithm
