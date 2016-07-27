@@ -232,7 +232,7 @@ class AccountMoveLine(models.Model):
     _description = "Journal Item"
     _order = "date desc, id desc"
 
-    @api.depends('debit', 'credit', 'amount_currency', 'currency_id', 'matched_debit_ids', 'matched_credit_ids', 'matched_debit_ids.amount', 'matched_credit_ids.amount', 'account_id.currency_id', 'move_id.state')
+    @api.depends('debit', 'credit', 'amount_currency', 'currency_id', 'matched_debit_ids', 'matched_credit_ids', 'matched_debit_ids.amount', 'matched_credit_ids.amount', 'account_id.currency_id', 'move_id.state', 'account_id.reconcile')
     def _amount_residual(self):
         """ Computes the residual amount of a move line from a reconciliable account in the company currency and the line's currency.
             This amount will be 0 for fully reconciled lines or lines from a non-reconciliable account, the original line amount
@@ -934,8 +934,9 @@ class AccountMoveLine(models.Model):
         """
         total_amount_currency = 0
         currency = False
-        aml_to_balance_currency = self.env['account.move.line']
+        aml_to_balance_currency = aml_id = self.env['account.move.line']
         maxdate = None
+        partial_rec_id = self.env['account.partial.reconcile']
         for aml in self:
             if aml.amount_residual_currency:
                 aml_to_balance_currency |= aml
@@ -949,6 +950,7 @@ class AccountMoveLine(models.Model):
             #eventually create journal entries to book the difference due to foreign currency's exchange rate that fluctuates
             partial_rec = aml.credit and aml.matched_debit_ids[0] or aml.matched_credit_ids[0]
             aml_id, partial_rec_id = partial_rec.with_context(skip_full_reconcile_check=True).create_exchange_rate_entry(aml_to_balance_currency, 0.0, total_amount_currency, currency, maxdate)
+        return aml_id, partial_rec_id
 
     @api.multi
     def remove_move_reconcile(self):
@@ -1338,7 +1340,7 @@ class AccountPartialReconcile(models.Model):
                     'currency_id': currency.id,
                 })
             move.post()
-        return line_to_reconcile.id, partial_rec.id
+        return line_to_reconcile, partial_rec
 
     @api.model
     def create(self, vals):

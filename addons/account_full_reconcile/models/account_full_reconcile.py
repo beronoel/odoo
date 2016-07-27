@@ -12,9 +12,13 @@ class AccountMoveLine(models.Model):
 
     @api.model
     def compute_full_after_batch_reconcile(self):
-        super(AccountMoveLine, self).compute_full_after_batch_reconcile()
+        aml_id, partial_rec_id = super(AccountMoveLine, self).compute_full_after_batch_reconcile()
         #check if the reconcilation is full
         partial_rec_set = self.env['account.partial.reconcile']
+        # if we have created an exchange rate entries, add it to the list so that it also get a matching number
+        if aml_id and partial_rec_id:
+            self |= aml_id
+            partial_rec_set |= partial_rec_id
         total_debit = 0
         total_credit = 0
         total_amount_currency = 0
@@ -26,7 +30,7 @@ class AccountMoveLine(models.Model):
                 currency = aml.currency_id
             if aml.currency_id and aml.currency_id == currency:
                 total_amount_currency += aml.amount_currency
-                partial_rec_set |= aml.matched_debit_ids | aml.matched_credit_ids
+            partial_rec_set |= aml.matched_debit_ids | aml.matched_credit_ids
         partial_rec_ids = [x.id for x in list(partial_rec_set)]
         #if the total debit and credit are equal, and the total amount in currency is 0, the reconciliation is full
         digits_rounding_precision = self[0].company_id.currency_id.rounding
