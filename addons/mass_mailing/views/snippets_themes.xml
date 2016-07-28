@@ -58,13 +58,16 @@
                 </div>
                 <div class="o_panel_body">
 
+                    <div name="Default" class="odoo o_mail_block_header_center_logo">
+                        <div class="odoo o_layout"></div>
+                    </div>
                     <div name="mon cul" class="odoo o_mail_block_header_center_logo">
-                        <div class="odoo o_layout" style="border:3px solid red;">
+                        <div class="odoo o_layout class_de_mon_cul" style="border:3px solid red;">
                             <div class="oe_structure"></div>
                         </div>
                     </div>
                     <div name="mon cul" class="odoo o_mail_block_header_center_logo">
-                        <div class="odoo o_layout" style="border:3px solid blue;">
+                        <div class="odoo o_layout class_de_mon_cul2" style="border:3px solid blue;">
                             <div class="oe_structure"></div>
                         </div>
                     </div>

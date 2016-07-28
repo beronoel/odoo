@@ -141,10 +141,23 @@ snippets_editor.Class.include({
         $layouts.find('*').add($layouts).off();
         $layouts.on('click', function (event) {
             event.preventDefault();
-            var $html = $('#editable_area .o_layout > .oe_structure, #editable_area').last().contents();
+            var $editable = $('#editable_area');
+            var $o_layout = $editable.find('.o_layout');
+            var $html = ($o_layout.length ? $o_layout.find('.oe_structure').first() : $editable).contents();
             var $layout = $(".o_layout", this).clone();
-            $layout.find('.oe_structure').html($html);
-            $('#editable_area').html($layout);
+
+            if ($o_layout.length) {
+                $('body').removeClass($o_layout.attr('class'));
+            }
+            $('body').addClass($layout.attr('class')).removeClass('odoo o_layout oe_snippet_body');
+
+            var $structure = $layout.find('.oe_structure');
+            if ($structure.length) {
+                $structure.html($html);
+                $('#editable_area').html($layout);
+            } else {
+                $('#editable_area').html($html);
+            }
         });
     },
 
