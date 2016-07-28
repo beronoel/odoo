@@ -10,6 +10,27 @@
     cursor: crosshair;
 }
 
+/* ======================== COLORS ====================== */
+
+.bg-alpha {
+    background-color: #fff !important;
+}
+.bg-beta {
+    background-color: #875a7b !important;
+    color: white !important;
+}
+.bg-gamma {
+    background-color: #e46f78 !important;
+    color: white !important;
+}
+.bg-delta {
+    background-color: #34c9a4 !important;
+    color: white !important;
+}
+.bg-epsilon {
+    background-color: #3d5d6b !important;
+    color: white !important;
+}
 .horizontal-padding {
     padding-left: 20px;
     padding-right: 20px;
@@ -18,9 +39,9 @@
     padding-top: 20px;
     padding-bottom: 20px;
 }
-.no-margin {
-    margin: 0;
-}
+
+/* ======================== TYPO ====================== */
+
 .display-1, .display-2, .display-3 {
     font-family: 'Helvetica';
     font-weight:300;
@@ -51,6 +72,11 @@ a, a:hover {
     text-align: center;
 }
 
+/* ======================== MISC ====================== */
+
+.no-margin {
+    margin: 0;
+}
 .table-styles {
     border-collapse:separate;
     font-family: 'Helvetica';
