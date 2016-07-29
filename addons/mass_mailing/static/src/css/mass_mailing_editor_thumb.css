@@ -2,8 +2,17 @@
 .oe_snippet.o_mail_block_header_center_logo .oe_snippet_thumbnail_img {
     background-image: url("/mass_mailing/static/src/img/blocks/block_header_center_logo.png");
 }
+.oe_snippet.o_mail_block_header_left_logo .oe_snippet_thumbnail_img {
+    background-image: url("/mass_mailing/static/src/img/blocks/block_header_left_logo.png");
+}
+.oe_snippet.o_mail_block_banner .oe_snippet_thumbnail_img {
+    background-image: url("/mass_mailing/static/src/img/blocks/block_banner.png");
+}
 .oe_snippet.o_mail_block_header_center_text .oe_snippet_thumbnail_img {
     background-image: url("/mass_mailing/static/src/img/blocks/block_header_center_text.png");
+}
+.oe_snippet.o_mail_block_header_left_text .oe_snippet_thumbnail_img {
+    background-image: url("/mass_mailing/static/src/img/blocks/block_header_left_text.png");
 }
 .oe_snippet.o_mail_block_header_social .oe_snippet_thumbnail_img {
     background-image: url("/mass_mailing/static/src/img/blocks/block_header_social.png");
@@ -30,11 +39,11 @@
     background-image: url("/mass_mailing/static/src/img/blocks/block_footer_tag_line.png");
 }
 .oe_snippet.o_mail_block_two_cols .oe_snippet_thumbnail_img{
-    background-image: url("/mass_mailing/static/src/img/blocks/block_two-column-img.png");
-}
-.oe_snippet.o_mail_block_two_cols_content .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_two-column.png");
 }
+/*.oe_snippet.o_mail_block_two_cols_content .oe_snippet_thumbnail_img{
+    background-image: url("/mass_mailing/static/src/img/blocks/block_two-column.png");
+}*/
 .oe_snippet.o_mail_block_title_text .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_title_text.png")
 }
@@ -65,18 +74,18 @@
 .oe_snippet.o_mail_block_profile .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_user.png")
 }
-.oe_snippet.o_mail_block_four_cols .oe_snippet_thumbnail_img{
+/*.oe_snippet.o_mail_block_four_cols .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_four_columns.png")
-}
+}*/
 .oe_snippet.o_mail_block_button .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_button.png")
 }
 .oe_snippet.o_mail_block_simple_text .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_simple_text.png")
 }
-.oe_snippet.o_mail_block_three_cols .oe_snippet_thumbnail_img{
+/*.oe_snippet.o_mail_block_three_cols .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_three_columns.png")
-}
+}*/
 .oe_snippet.o_mail_block_text_on_img .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_text_on_image.png")
 }

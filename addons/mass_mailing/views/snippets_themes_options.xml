@@ -42,7 +42,7 @@
     </div>
 
     <div data-js='colorpicker'
-        data-selector="div.snippet_row tr">
+        data-selector="div.snippet_row td">
         <li class="dropdown-submenu">
             <a tabindex="-1" href="#"><i class="fa fa-eyedropper"/>Background Colors</a>
             <ul class="dropdown-menu">
