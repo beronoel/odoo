@@ -53,13 +53,13 @@
 
                     <!-- Default Template -->
 
-                    <div name="Default" class="odoo o_mail_block_header_center_logo">
+                    <div name="Default" class="odoo o_mail_block_default_template">
                         <div class="odoo o_layout"></div>
                     </div>
 
                     <!-- Odoo Template -->
 
-                    <div name="Odoo Template" class="odoo o_mail_block_header_center_logo">
+                    <div name="Odoo Template" class="odoo o_mail_block_odoo_template">
                         <div class="odoo o_layout odoo_template" style="width:100%;background-color: #ededed;padding:30px 0;">
                             <div class="odoo_template_container" style="width:600px;margin:20px auto;">
                                 <div class="oe_structure"></div>
