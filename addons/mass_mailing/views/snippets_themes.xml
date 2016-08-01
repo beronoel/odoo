@@ -49,6 +49,9 @@
                         <i class="fa fa-paint-brush fa-stack-1x"></i>
                     </span> Choose Template
                 </div>
+
+                <!-- Templates -->
+
                 <div class="o_panel_body">
 
                     <!-- Default Template -->
@@ -110,42 +113,6 @@
                         </div>
                     </div>
 
-                    <div name="Banner" class="odoo o_mail_block_banner">
-                        <div class="odoo snippet_row">
-                            <div class="snippetbanner">
-                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
-                                    <tbody>
-                                      <tr>
-                                          <td width="100%" valign="top">
-                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/home/laptop_sale_desktop.jpg" style="height:auto;max-width:600px;width:600px;" alt="Your Logo" />
-                                          </td>
-                                      </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div name="Text Left" class="odoo o_mail_block_header_left_text">
-                        <div class="odoo snippet_row">
-                            <div class="snippet-general">
-                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
-                                    <tbody>
-                                        <tr>
-                                            <td width="100%" class="horizontal-padding vertical-padding">
-                                                &amp;nbsp;
-                                                <a t-att-href="(company_id.website) or '#'" class="display-1" style="margin-left:-6px;">
-                                                    My Company
-                                                </a>
-                                                &amp;nbsp;
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                     <div name="Logo - Social" class="odoo o_mail_block_header_social">
                         <div class="odoo snippet_row">
                             <div class="snippet-general">
@@ -194,6 +161,26 @@
                                             </table>
                                         </td>
                                     </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div name="Text Left" class="odoo o_mail_block_header_left_text">
+                        <div class="odoo snippet_row">
+                            <div class="snippet-general">
+                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                    <tbody>
+                                        <tr>
+                                            <td width="100%" class="horizontal-padding vertical-padding">
+                                                &amp;nbsp;
+                                                <a t-att-href="(company_id.website) or '#'" class="display-1" style="margin-left:-6px;">
+                                                    My Company
+                                                </a>
+                                                &amp;nbsp;
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -251,6 +238,32 @@
                         </div>
                     </div>
 
+                    <div name="Banner" class="odoo o_mail_block_banner">
+                        <div class="odoo snippet_row">
+                            <div class="snippetbanner">
+                                <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                    <tbody>
+                                      <tr>
+                                          <td width="100%" valign="top">
+                                                <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/home/laptop_sale_desktop.jpg" style="height:auto;max-width:600px;width:600px;" alt="Your Logo" />
+                                          </td>
+                                      </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div id="email_designer_default_body" class="o_panel">
+                <div class="o_panel_header">
+                    <span class="fa-stack">
+                        <i class="fa fa-clone fa-stack-1x"></i>
+                    </span> Body
+                    </div>
+                <div class="o_panel_body">
+
                     <div name="Button" class="odoo o_mail_block_button">
                         <div class="odoo snippet_row">
                             <div class="snippet-general">
@@ -266,16 +279,6 @@
                             </div>
                         </div>
                     </div>
-
-                </div>
-            </div>
-            <div id="email_designer_default_body" class="o_panel">
-                <div class="o_panel_header">
-                    <span class="fa-stack">
-                        <i class="fa fa-clone fa-stack-1x"></i>
-                    </span> Body
-                    </div>
-                <div class="o_panel_body">
 
                     <div name="Title Content" class="odoo o_mail_block_title_text">
                         <div class="odoo snippet_row">
@@ -374,58 +377,66 @@
                         </div>
                     </div>
 
-                    <!-- <div name="Event" class="odoo o_mail_block_event">
-                        <div class="odoo snippet_row" style="padding:0px;width:600px;margin:auto;color:#fff">
+                    <div name="Event" class="odoo o_mail_block_event">
+                        <div class="odoo snippet_row">
                             <div class="snippet-general">
-                                <table align="center" cellpadding="0" cellspacing="0" width="600">
+                                <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
                                     <tr>
-                                        <td style="width: 150px;height: 150px;padding: 0;margin: 0;background-color: rgb(77,107,187);text-align:center;vertical-align:middle;color:#FFFFFF">
-                                            <span style="display: block;font-size: 50px;line-height: 1;padding-top: 10px">21</span> <span style="display: block;font-size: 30px;line-height: 1">Jul</span> <span style="display: block;font-size: 16px;line-height: 1;color: #fff;font-weight: 600">ALL DAY</span>
+                                        <td style="width:25%;height: 150px;vertical-align:middle;" class="horizontal-padding vertical-padding bg-beta text-center">
+                                            <span class="display-1">21</span>
+                                            <span class="display-1">Jul</span>
+                                            <span style="display: block;font-weight: 600" class="display-3">
+                                                ALL DAY
+                                            </span>
                                         </td>
-                                        <td style="width: 150px;height: 150px;padding: 0px;margin: 0px;text-align: center;background-color: rgb(229,96,84)">
+                                        <td style="width:25%;height: 150px;" class="horizontal-padding vertical-padding text-center bg-delta">
                                             <div style="margin:27px auto">
                                                 &amp;nbsp;
                                                 <span class="odoo fa fa-calendar fa-5x"></span>
                                                 &amp;nbsp;
                                             </div>
                                         </td>
-                                        <td style="position: relative;text-align: left;background-color:#f5f5f5;color:#464646;vertical-align:top;width:298px;height:150px;min-width:255px" class="odoocol_mv bg-color">
-                                            <table style="width:100%;border-collapse:separate;background:inherit;color:inherit">
+                                        <td style="vertical-align:top;width:50%;height:150px;min-width:255px" class="col_mv">
+                                            <table style="width:100%;border-collapse:separate;">
                                                 <tr>
                                                     <td style="padding-top:20px;padding-left:20px;float:left" width="90%">
                                                         <div style="min-height:100px;text-align:left">
                                                             <p style="margin:0;font-size:18px">Your Event Name</p>
                                                             <p style="margin:0;font-size:14px">Description</p>
                                                         </div>
-                                                        <ul style="padding-left:0">
-                                                            <li style="display: table-cell;cursor: pointer;color: #1e1e1e;font-size: 11px;font-weight: 300;padding: 3px 30px;text-align: center"><a href="#" style="color:#1e1e1e">Link </a></li>
-                                                            <li style="display: table-cell;cursor: pointer;color: #1e1e1e;font-size: 11px;font-weight: 300;padding: 3px 30px;text-align: center"><a href="#" style="color:#1e1e1e">Info</a></li>
-                                                        </ul>
+                                                        <div style="padding-left:0">
+                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
+                                                                <a href="#" class="link-color">Link </a>
+                                                            </p>
+                                                            <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
+                                                                <a href="#" class="link-color">Info</a>
+                                                            </p>
+                                                        </div>
                                                     </td>
-                                                    <td style="width: 60px;vertical-align:middle;display: table-cell">
-                                                        <ul t-if="website" style="border-left:1px solid #e6e6e6;list-style-type:none;padding-left:16px">
+                                                    <td style="vertical-align:middle;">
+                                                        <div t-if="website" style="padding-left:16px">
                                                             <t t-if="website.social_facebook">
-                                                                <li style="width:33%;margin-left:0">
+                                                                <div style="width:33%;margin-left:0">
                                                                     <a t-att-href="website.social_facebook">
-                                                                      <span style="color: rgb(75,110,168);" class="odoo fa fa-facebook-square fa-2x"></span>
+                                                                      <span class="odoo fa fa-facebook-square fa-2x"></span>
                                                                     </a>
-                                                                </li>
+                                                                </div>
                                                             </t>
                                                             <t t-if="website.social_twitter">
-                                                                <li style="width:34%;margin-left:0">
+                                                                <div style="width:34%;margin-left:0">
                                                                     <a t-att-href="website.social_twitter">
-                                                                      <span style="color: rgb(75,110,168);" class="odoo fa fa-twitter-square fa-2x"></span>
+                                                                      <span class="odoo fa fa-twitter-square fa-2x"></span>
                                                                     </a>
-                                                                </li>
+                                                                </div>
                                                             </t>
                                                             <t t-if="website.social_googleplus">
-                                                                <li style="width:33%;margin-left:0">
+                                                                <div style="width:33%;margin-left:0">
                                                                     <a t-att-href="website.social_googleplus">
-                                                                      <span style="color: rgb(221,75,57);" class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                                      <span class="odoo fa fa-google-plus-square fa-2x"></span>
                                                                     </a>
-                                                                </li>
+                                                                </div>
                                                             </t>
-                                                        </ul>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             </table>
@@ -434,7 +445,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
 
                     <div name="User Profile" class="odoo o_mail_block_profile">
                         <div class="odoo snippet_row">
@@ -659,22 +670,22 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td style="background-color:#34c9a4;" class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding bg-delta">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
                                                             &amp;nbsp;
-                                                            <span class="fa fa-check fa-3x" style="color:#fff;"></span>
+                                                            <span class="fa fa-check fa-3x"></span>
                                                             &amp;nbsp;
                                                         </td>
                                                         <td style="padding-left:10px;">
-                                                            <p style="font-weight:bold;margin:0 0 3px 0;color:#fff;" class="display-3">Step 1:</p>
-                                                            <p style="margin:0;color:#fff;">Place Order</p>
+                                                            <p style="font-weight:bold;margin:0 0 3px 0;" class="display-3">Step 1:</p>
+                                                            <p style="margin:0;">Place Order</p>
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td style="background-color:#F9F8F8;" class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -689,7 +700,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td style="background-color:#F9F8F8;" class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -744,7 +755,7 @@
                                     <tbody>
                                         <tr>
                                             <td width="600" class="text-center horizontal-padding vertical-padding bg-beta">
-                                                <p class="display-2" style="color:#ffffff;margin:10px 0;">Apps That Help You Grow Your Business</p>
+                                                <p class="display-2" style="margin:10px 0;">Apps That Help You Grow Your Business</p>
                                             </td>
                                         </tr>
                                         <tr>
@@ -787,22 +798,22 @@
                                             <td style="text-align:center">
                                                 &amp;nbsp;
                                                 <t t-if="website.social_facebook">
-                                                    <a t-att-href="website.social_facebook">
+                                                    <a t-att-href="website.social_facebook" class="link-color">
                                                         <span class="odoo fa fa-facebook-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_googleplus">
-                                                    <a t-att-href="website.social_googleplus" style="padding-left:5px;">
+                                                    <a t-att-href="website.social_googleplus" style="padding-left:5px;" class="link-color">
                                                         <span class="odoo fa fa-google-plus-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_linkedin">
-                                                    <a t-att-href="website.social_linkedin" style="padding-left:5px;">
+                                                    <a t-att-href="website.social_linkedin" style="padding-left:5px;" class="link-color">
                                                         <span class="odoo fa fa-linkedin-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_twitter">
-                                                    <a t-att-href="website.social_twitter" style="padding-left:5px;">
+                                                    <a t-att-href="website.social_twitter" style="padding-left:5px;" class="link-color">
                                                         <span class="odoo fa fa-twitter-square fa-2x"></span>
                                                     </a>
                                                 </t>
@@ -812,7 +823,7 @@
                                         <tr>
                                             <td style="font-size:12px;text-align:center;padding:10px">
                                                 &amp;nbsp;
-                                                <a href="/unsubscribe_from_list" style="color:#464646">Unsubscribe</a> | <a href="/page/contactus" style="color:#464646">Contact</a>
+                                                <a href="/unsubscribe_from_list" class="link-color">Unsubscribe</a> | <a href="/page/contactus" class="link-color">Contact</a>
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
@@ -830,8 +841,8 @@
                                         <tr>
                                             <td class="horizontal-padding text-center" style="padding-top:10px;">
                                                 &amp;nbsp;
-                                                <a href="https://apps.odoo.com/unsubscribe_from_list" style="color:#34c9a4;text-align:center;">Unsubscribe</a>
-                                                <t t-if="website"> | <a href="/page/contactus" style="color:#34c9a4;text-align:center;">Contact</a> </t>
+                                                <a href="https://apps.odoo.com/unsubscribe_from_list" class="link-color text-center">Unsubscribe</a>
+                                                <t t-if="website"> | <a href="/page/contactus" class="link-color text-center">Contact</a> </t>
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
@@ -855,15 +866,15 @@
                                             <td valign="middle" align="right" style="font-size:12px;padding:10px;text-align:center">
                                                 &amp;nbsp;
                                                 <t t-if="website">
-                                                    <a href="/page/contactus" style="padding-right:3px;color:#464646">Contact Us</a> | 
+                                                    <a href="/page/contactus" style="padding-right:3px;" class="link-color">Contact Us</a> | 
                                                     <t t-if="website.social_facebook">
-                                                        <a t-att-href="website.social_facebook" style="padding-right:3px;color:#464646">Facebook</a> | 
+                                                        <a t-att-href="website.social_facebook" style="padding-right:3px;" class="link-color">Facebook</a> | 
                                                     </t>
                                                     <t t-if="website.social_twitter">
-                                                        <a t-att-href="website.social_twitter" style="padding-right:3px;color:#464646">Twitter</a> | 
+                                                        <a t-att-href="website.social_twitter" style="padding-right:3px;" class="link-color">Twitter</a> | 
                                                     </t>
                                                 </t>
-                                                <a href="https://apps.odoo.com/unsubscribe_from_list" style="color:#464646">Unsubscribe</a>
+                                                <a href="https://apps.odoo.com/unsubscribe_from_list" class="link-color">Unsubscribe</a>
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
