@@ -35,7 +35,7 @@
             <field name="inherit_id" ref="product.product_category_form_view"/>
             <field name="arch" type="xml">
                 <group name="first" position="after">
-                    <group name="account_property">
+                    <group name="account_property" attrs="{'invisible': [('type', '=', 'view')]}">
                         <group string="Account Properties">
                             <field name="property_account_income_categ_id" domain="[('internal_type','=','other'),('deprecated', '=', False)]"/>
                             <field name="property_account_expense_categ_id" domain="[('internal_type','=','other'),('deprecated', '=', False)]"/>

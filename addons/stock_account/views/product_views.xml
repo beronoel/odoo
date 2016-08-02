@@ -17,7 +17,7 @@
                 </group>
                 <group name="account_property" position="after">
                     <group>
-                        <group string="Inventory Valuation">
+                        <group string="Inventory Valuation" attrs="{'invisible': [('type', '=', 'view')]}">
                             <field name="property_cost_method" groups="stock_account.group_inventory_valuation"/>
                             <field name="property_valuation"/>
                         </group>
