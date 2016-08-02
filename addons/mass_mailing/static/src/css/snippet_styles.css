@@ -28,19 +28,15 @@
 }
 .display-1 {
     font-size: 30px;
-    color: #875a7b;
 }
 .display-2 {
     font-size: 25px;
-    color: #282f33;
 }
 .display-3 {
     font-size: 18px;
-    color: #282f33;
 }
 p, th, td {
     text-align:left;
-    color:#282f33;
     font-size:14px;
 }
 a, a:hover {

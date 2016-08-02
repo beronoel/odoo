@@ -56,24 +56,130 @@
 
                     <!-- Default Template -->
 
-                    <div name="Default" class="odoo o_mail_block_default_template">
-                        <div class="odoo o_layout"></div>
+                    <div name="Default" class="o_mail_block_default_template">
+                        <div class="o_layout"></div>
                     </div>
 
                     <!-- Odoo Template -->
 
-                    <div name="Odoo Template" class="odoo o_mail_block_odoo_template">
-                        <div class="odoo o_layout odoo_template" style="width:100%;background-color: #ededed;padding:30px 0;">
+                    <div name="Odoo Template" class="o_mail_block_odoo_template">
+                        <div class="o_layout odoo_template" style="width:100%;background-color: #ededed;padding:30px 0;">
                             <div class="odoo_template_container" style="width:600px;margin:20px auto;">
                                 <div class="oe_structure"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div name="mon cul" class="odoo o_mail_block_header_center_logo">
-                        <div class="odoo o_layout airmail_template" style="width:100%;background-color: #5a7787;">
-                            <div class="airmail_template_container" style="border:3px solid blue;width:600px;margin:0 auto;">
+                    <!-- Airmail Template -->
+
+                    <div name="Airmail Template" class="airmail o_mail_block_header_center_logo">
+                        <!-- Template Header -->
+                        <div class="o_layout airmail_template" style="width:100%;background-color: #ededed;">
+                            <div class="airmail_template_header" style="width:100%;background-color: #d05d68;">
+                                <div style="width:100%;">
+                                    <!-- Logo -->
+                                    <div class="odoo snippet_row">
+                                        <div>
+                                            <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                                <tbody>
+                                                  <tr>
+                                                      <td width="60%" align="left" style="padding:5px 0">
+                                                            &amp;nbsp;
+                                                            <a t-att-href="(company_id.website) or '#'">
+                                                                <img border="0" src="http://www.odoocdn.com/openerp_website/static/src/img/2016/logos/odoo_logo_small.png" style="height:auto;max-width:600px;width:70px;margin-left:-6px;" alt="Your Logo" />
+                                                            </a>
+                                                            &amp;nbsp;
+                                                      </td>
+                                                      <td width="40%" align="right" style="padding:8px 0">
+                                                            &amp;nbsp;
+                                                            <t t-if="website.social_facebook">
+                                                                <a t-att-href="website.social_facebook" style="padding-left:5px;float:right;color:#fff;">
+                                                                    <span class="odoo fa fa-facebook fa-2x" style="font-size:15px;"></span>
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="website.social_googleplus">
+                                                                <a t-att-href="website.social_googleplus" style="padding-left:5px;float:right;color:#fff;">
+                                                                    <span class="odoo fa fa-google-plus fa-2x" style="font-size:15px;"></span>
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="website.social_linkedin">
+                                                                <a t-att-href="website.social_linkedin" style="padding-left:5px;float:right;color:#fff;">
+                                                                    <span class="odoo fa fa-linkedin fa-2x" style="font-size:15px;"></span>
+                                                                </a>
+                                                            </t>
+                                                            <t t-if="website.social_twitter">
+                                                                <a t-att-href="website.social_twitter" style="padding-left:5px;float:right;color:#fff;">
+                                                                    <span class="odoo fa fa-twitter fa-2x" style="font-size:15px;"></span>
+                                                                </a>
+                                                            </t>
+                                                            &amp;nbsp;
+                                                      </td>
+                                                  </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Template Body -->
+                            <div class="airmail_template_container" style="width:600px;margin:30px auto;">
+                                <div class="odoo snippet_row">
+                                    <div class="snippetbanner">
+                                        <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                            <tbody>
+                                              <tr>
+                                                  <td width="100%" valign="top">
+                                                        <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/home/laptop_sale_desktop.jpg" style="height:auto;max-width:600px;width:600px;" alt="Your Logo" />
+                                                  </td>
+                                              </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                                 <div class="oe_structure"></div>
+                                <div class="odoo snippet_row">
+                                    <div class="snippet-general">
+                                        <table width="600" cellspacing="0" cellpadding="0" class="table-styles">
+                                            <tbody>
+                                                <tr>
+                                                    <td valign="middle" align="right" style="font-size:12px;padding:10px;text-align:center">
+                                                        &amp;nbsp;
+                                                        <t t-if="website">
+                                                            <a href="/page/contactus" style="padding-right:3px;" class="link-color">Contact Us</a> | 
+                                                            <t t-if="website.social_facebook">
+                                                                <a t-att-href="website.social_facebook" style="padding-right:3px;" class="link-color">Facebook</a> | 
+                                                            </t>
+                                                            <t t-if="website.social_twitter">
+                                                                <a t-att-href="website.social_twitter" style="padding-right:3px;" class="link-color">Twitter</a> | 
+                                                            </t>
+                                                        </t>
+                                                        <a href="https://apps.odoo.com/unsubscribe_from_list" class="link-color">Unsubscribe</a>
+                                                        &amp;nbsp;
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Template Footer -->
+                            <div class="airmail_template_footer" style="width:100%;background-color: #d05d68;">
+                                <div style="width:100%;">
+                                    <!-- Logo -->
+                                    <div class="odoo snippet_row">
+                                        <div>
+                                            <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                                <tbody>
+                                                  <tr>
+                                                      <td width="100%" align="left" style="padding:8px 0">
+                                                            <p class="text-center" style="color:#fff;">Your company here, all rights reserved 2013 © </p>
+                                                      </td>
+                                                  </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -93,8 +199,8 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div name="Left Logo" class="odoo o_mail_block_header_left_logo">
-                        <div class="odoo snippet_row">
+                    <div name="Left Logo" class="o_mail_block_header_left_logo">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
                                     <tbody>
@@ -113,8 +219,8 @@
                         </div>
                     </div>
 
-                    <div name="Logo - Social" class="odoo o_mail_block_header_social">
-                        <div class="odoo snippet_row">
+                    <div name="Logo - Social" class="o_mail_block_header_social">
+                        <div class="snippet_row">
                             <div class="snippet-general">
 
                                 <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
@@ -166,8 +272,8 @@
                         </div>
                     </div>
 
-                    <div name="Text Left" class="odoo o_mail_block_header_left_text">
-                        <div class="odoo snippet_row">
+                    <div name="Text Left" class="o_mail_block_header_left_text">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
                                     <tbody>
@@ -186,8 +292,8 @@
                         </div>
                     </div>
 
-                    <div name="Text - Social" class="odoo o_mail_block_header_text_social">
-                        <div class="odoo snippet_row">
+                    <div name="Text - Social" class="o_mail_block_header_text_social">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" width="600" cellspacing="0" cellpadding="0" border="0" class="table-styles">
                                     <tr>
@@ -238,8 +344,8 @@
                         </div>
                     </div>
 
-                    <div name="Banner" class="odoo o_mail_block_banner">
-                        <div class="odoo snippet_row">
+                    <div name="Banner" class="o_mail_block_banner">
+                        <div class="snippet_row">
                             <div class="snippetbanner">
                                 <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
                                     <tbody>
@@ -264,8 +370,8 @@
                     </div>
                 <div class="o_panel_body">
 
-                    <div name="Button" class="odoo o_mail_block_button">
-                        <div class="odoo snippet_row">
+                    <div name="Button" class="o_mail_block_button">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" style="text-align:center;" class="table-styles" width="600">
                                     <tr>
@@ -280,8 +386,8 @@
                         </div>
                     </div>
 
-                    <div name="Title Content" class="odoo o_mail_block_title_text">
-                        <div class="odoo snippet_row">
+                    <div name="Title Content" class="o_mail_block_title_text">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
                                     <tbody>
@@ -304,8 +410,8 @@
                         </div>
                     </div>
 
-                    <div name="Title - Subtitle" class="odoo o_mail_block_title_sub">
-                        <div class="odoo snippet_row">
+                    <div name="Title - Subtitle" class="o_mail_block_title_sub">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" width="600" cellspacing="0" cellpadding="0" class="table-styles">
                                     <tbody>
@@ -321,8 +427,8 @@
                         </div>
                     </div>
 
-                    <div name="Discount Coupon" class="odoo o_mail_block_discount2">
-                        <div class="odoo snippet_row">
+                    <div name="Discount Coupon" class="o_mail_block_discount2">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -344,8 +450,8 @@
                         </div>
                     </div>
 
-                    <div name="Discount Offer" class="odoo o_mail_block_discount1">
-                        <div class="odoo snippet_row">
+                    <div name="Discount Offer" class="o_mail_block_discount1">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
                                     <tbody>
@@ -377,8 +483,8 @@
                         </div>
                     </div>
 
-                    <div name="Event" class="odoo o_mail_block_event">
-                        <div class="odoo snippet_row">
+                    <div name="Event" class="o_mail_block_event">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
                                     <tr>
@@ -398,7 +504,7 @@
                                         </td>
                                         <td style="vertical-align:top;width:50%;height:150px;min-width:255px" class="col_mv">
                                             <table style="width:100%;border-collapse:separate;">
-                                                <tr>
+                                                <tr style="padding-right:5px;">
                                                     <td style="padding-top:20px;padding-left:20px;float:left" width="90%">
                                                         <div style="min-height:100px;text-align:left">
                                                             <p style="margin:0;font-size:18px">Your Event Name</p>
@@ -447,8 +553,8 @@
                         </div>
                     </div>
 
-                    <div name="User Profile" class="odoo o_mail_block_profile">
-                        <div class="odoo snippet_row">
+                    <div name="User Profile" class="o_mail_block_profile">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellpadding="0" cellspacing="0" width="600" class="table-styles">
                                     <tr>
@@ -474,8 +580,8 @@
                         </div>
                     </div>
 
-                    <div name="Content Table" class="odoo o_mail_block_table_content">
-                        <div class="odoo snippet_row">
+                    <div name="Content Table" class="o_mail_block_table_content">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -539,8 +645,8 @@
                         </div>
                     </div>
 
-                    <div name="Two Columns" class="odoo o_mail_block_two_cols">
-                        <div class="odoo snippet_row">
+                    <div name="Two Columns" class="o_mail_block_two_cols">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -573,8 +679,8 @@
                         </div>
                     </div>
 
-                    <div name="Image - Text" class="odoo o_mail_block_image_text">
-                        <div class="odoo snippet_row mv">
+                    <div name="Image - Text" class="o_mail_block_image_text">
+                        <div class="snippet_row mv">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -596,8 +702,8 @@
                         </div>
                     </div>
 
-                    <div name="Text - Image" class="odoo o_mail_block_image_text">
-                        <div class="odoo snippet_row mv">
+                    <div name="Text - Image" class="o_mail_block_image_text">
+                        <div class="snippet_row mv">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -619,8 +725,8 @@
                         </div>
                     </div>
 
-                    <div name="Image" class="odoo o_mail_block_image">
-                        <div class="odoo snippet_row">
+                    <div name="Image" class="o_mail_block_image">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -642,8 +748,8 @@
                         </div>
                     </div>
 
-                    <div name="Text Block" class="odoo o_mail_block_simple_text">
-                        <div class="odoo snippet_row">
+                    <div name="Text Block" class="o_mail_block_simple_text">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <tbody>
                                     <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
@@ -664,13 +770,13 @@
                         </div>
                     </div>
 
-                    <div name="Steps" class="odoo o_mail_block_steps">
-                        <div class="odoo snippet_row">
+                    <div name="Steps" class="o_mail_block_steps">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding bg-delta">
+                                            <td class="col_mv bg-color horizontal-padding vertical-padding bg-delta">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -685,7 +791,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="col_mv bg-color horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -700,7 +806,7 @@
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="col_mv bg-color horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -732,8 +838,8 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div name="Separator" class="odoo o_mail_block_footer_seprator">
-                        <div class="odoo snippet_row">
+                    <div name="Separator" class="o_mail_block_footer_seprator">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -748,8 +854,8 @@
                         </div>
                     </div>
 
-                    <div name="Tag Line" class="odoo o_mail_block_footer_tag_line">
-                        <div class="odoo snippet_row bg-color">
+                    <div name="Tag Line" class="o_mail_block_footer_tag_line">
+                        <div class="snippet_row bg-color">
                             <div class="snippet-general" bgcolor="#875a7b" style="background-color:#875a7b;width:600px;">
                                 <table class="table-styles" width="600" align="center" cellpadding="0" cellspacing="0">
                                     <tbody>
@@ -789,8 +895,8 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div t-if="website" name="Social + Text" class="odoo o_mail_block_footer_social">
-                        <div class="odoo snippet_row bg-color">
+                    <div t-if="website" name="Social + Text" class="o_mail_block_footer_social">
+                        <div class="snippet_row bg-color">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -833,8 +939,8 @@
                         </div>
                     </div>
 
-                    <div name="Text + Copyright" class="odoo o_mail_block_footer_copyright">
-                        <div class="odoo snippet_row">
+                    <div name="Text + Copyright" class="o_mail_block_footer_copyright">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -857,10 +963,10 @@
                         </div>
                     </div>
 
-                    <div name="Text Only" class="odoo o_mail_block_footer_text">
-                        <div class="odoo snippet_row">
+                    <div name="Text Only" class="o_mail_block_footer_text">
+                        <div class="snippet_row">
                             <div class="snippet-general">
-                                <table width="600" cellspacing="0" cellpadding="0" class="table-styles">
+                                <table align="center" width="600" cellspacing="0" cellpadding="0" class="table-styles">
                                     <tbody>
                                         <tr>
                                             <td valign="middle" align="right" style="font-size:12px;padding:10px;text-align:center">
