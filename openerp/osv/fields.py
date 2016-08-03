@@ -217,10 +217,10 @@ class _column(object):
         query = "UPDATE %s SET %s=%s WHERE id=%%s" % (record._table, name, setc)
         record._cr.execute(query, (setf(value), record.id))
 
-    def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, context=None):
-        ids = obj.search(cr, uid, args+self._domain+[(name, 'ilike', value)], offset, limit, context=context)
-        res = obj.read(cr, uid, ids, [name], context=context)
-        return [x[name] for x in res]
+    def search(self, model, args, name, value, offset=0, limit=None):
+        domain = args + self._domain + [(name, 'ilike', value)]
+        records = model.search(domain, offset=offset, limit=limit)
+        return [vals[name] for vals in records.read([name])]
 
     def as_display_name(self, cr, uid, obj, value, context=None):
         """Converts a field value to a suitable string representation for a record,
@@ -771,8 +771,9 @@ class many2one(_column):
             else:
                 cr.execute("UPDATE %s SET %s=NULL WHERE id=%%s" % (record._table, name), (record.id,))
 
-    def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, context=None):
-        return obj.pool[self._obj].search(cr, uid, args+self._domain+[('name', 'like', value)], offset, limit, context=context)
+    def search(self, model, args, name, value, offset=0, limit=None):
+        domain = args + self._domain + [('name', 'like', value)]
+        return model.env[self._obj].search(domain, offset=offset, limit=limit).ids
 
     @classmethod
     def _as_display_name(cls, field, cr, uid, obj, value, context=None):
@@ -879,9 +880,9 @@ class one2many(_column):
                     lines.write({self._fields_id: False})
         return result
 
-    def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, operator='like', context=None):
-        domain = self._domain(obj) if callable(self._domain) else self._domain
-        return obj.pool[self._obj].name_search(cr, uid, value, domain, operator, context=context,limit=limit)
+    def search(self, model, args, name, value, offset=0, limit=None, operator='ilike'):
+        domain = self._domain(model) if callable(self._domain) else self._domain
+        return model.env[self._obj].name_search(value, domain, operator, limit=limit)
 
     @classmethod
     def _as_display_name(cls, field, cr, uid, obj, value, context=None):
@@ -1080,8 +1081,9 @@ class many2many(_column):
     #
     # TODO: use a name_search
     #
-    def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, operator='like', context=None):
-        return obj.pool[self._obj].search(cr, uid, args+self._domain+[('name', operator, value)], offset, limit, context=context)
+    def search(self, model, args, name, value, offset=0, limit=None, operator='ilike'):
+        domain = args + self._domain + [('name', operator, value)]
+        return model.env[self._obj].search(domain, offset=offset, limit=limit)
 
     @classmethod
     def _as_display_name(cls, field, cr, uid, obj, value, context=None):
