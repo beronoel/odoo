@@ -206,9 +206,6 @@ class _column(object):
         ])
         return dict(base_items + truthy_items + self._args.items())
 
-    def restart(self):
-        pass
-
     def get(self, records, name, values=None):
         raise TypeError("Undefined method get() on field %s.%s." % (records._name, name))
 
@@ -221,24 +218,6 @@ class _column(object):
         domain = args + self._domain + [(name, 'ilike', value)]
         records = model.search(domain, offset=offset, limit=limit)
         return [vals[name] for vals in records.read([name])]
-
-    def as_display_name(self, cr, uid, obj, value, context=None):
-        """Converts a field value to a suitable string representation for a record,
-           e.g. when this field is used as ``rec_name``.
-
-           :param obj: the ``BaseModel`` instance this column belongs to 
-           :param value: a proper value as returned by :py:meth:`~openerp.orm.osv.BaseModel.read`
-                         for this column
-        """
-        # delegated to class method, so a column type A can delegate
-        # to a column type B. 
-        return self._as_display_name(self, cr, uid, obj, value, context=None)
-
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        # This needs to be a class method, in case a column type A as to delegate
-        # to a column type B.
-        return tools.ustr(value)
 
 # ---------------------------------------------------------
 # Simple fields
@@ -295,18 +274,6 @@ class reference(_column):
                 if not records.env[model].browse(int(res_id)).exists():
                     result[value['id']] = False
         return result
-
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        if value:
-            # reference fields have a 'model,id'-like value, that we need to convert
-            # to a real name
-            model_name, res_id = value.split(',')
-            if model_name in obj.pool and res_id:
-                model = obj.pool[model_name]
-                names = model.name_get(cr, uid, [int(res_id)], context=context)
-                return names[0][1] if names else False
-        return tools.ustr(value)
 
 # takes a string (encoded in utf8) and returns a string (encoded in utf8)
 def _symbol_set_char(self, symb):
@@ -577,11 +544,6 @@ class datetime(_column):
                               exc_info=True)
         return utc_timestamp
 
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        value = datetime.context_timestamp(cr, uid, DT.datetime.strptime(value, tools.DEFAULT_SERVER_DATETIME_FORMAT), context=context)
-        return tools.ustr(value.strftime(tools.DEFAULT_SERVER_DATETIME_FORMAT))
-
 class binary(_column):
     _type = 'binary'
     _classic_read = False
@@ -775,10 +737,6 @@ class many2one(_column):
         domain = args + self._domain + [('name', 'like', value)]
         return model.env[self._obj].search(domain, offset=offset, limit=limit).ids
 
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        return value[1] if isinstance(value, tuple) else tools.ustr(value) 
-
 
 class one2many(_column):
     _classic_read = False
@@ -883,10 +841,6 @@ class one2many(_column):
     def search(self, model, args, name, value, offset=0, limit=None, operator='ilike'):
         domain = self._domain(model) if callable(self._domain) else self._domain
         return model.env[self._obj].name_search(value, domain, operator, limit=limit)
-
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        raise NotImplementedError('One2Many columns should not be used as record name (_rec_name)') 
 
 #
 # Values: (0, 0,  { fields })    create
@@ -1084,10 +1038,6 @@ class many2many(_column):
     def search(self, model, args, name, value, offset=0, limit=None, operator='ilike'):
         domain = args + self._domain + [('name', operator, value)]
         return model.env[self._obj].search(domain, offset=offset, limit=limit)
-
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        raise NotImplementedError('Many2Many columns should not be used as record name (_rec_name)') 
 
 
 def get_nice_size(value):
@@ -1520,12 +1470,6 @@ class function(_column):
             context = {}
         if self._fnct_inv:
             self._fnct_inv(obj, cr, user, id, name, value, self._fnct_inv_arg, context)
-
-    @classmethod
-    def _as_display_name(cls, field, cr, uid, obj, value, context=None):
-        # Function fields are supposed to emulate a basic field type,
-        # so they can delegate to the basic type for record name rendering
-        return globals()[field._type]._as_display_name(field, cr, uid, obj, value, context=context)
 
 # ---------------------------------------------------------
 # Related fields

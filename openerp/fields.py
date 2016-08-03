@@ -1791,7 +1791,7 @@ class Many2one(_Relational):
         return value.name_get()[0][1] if value else ''
 
     def convert_to_display_name(self, value, record):
-        return ustr(value.display_name)
+        return ustr(value.display_name or '')
 
 
 class UnionUpdate(SpecialValue):
