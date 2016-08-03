@@ -66,9 +66,9 @@
 .oe_snippet.o_mail_block_discount2 .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_discount2.png")
 }
-/*.oe_snippet.o_mail_block_event .oe_snippet_thumbnail_img{
+.oe_snippet.o_mail_block_event .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_event.png")
-}*/
+}
 .oe_snippet.o_mail_block_image .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_image_text.png")
 }
@@ -84,9 +84,9 @@
 .oe_snippet.o_mail_block_simple_text .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_simple_text.png")
 }
-/*.oe_snippet.o_mail_block_three_cols .oe_snippet_thumbnail_img{
+.oe_snippet.o_mail_block_three_cols .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_three_columns.png")
-}*/
+}
 /*.oe_snippet.o_mail_block_text_on_img .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/blocks/block_text_on_image.png")
 }*/
@@ -101,4 +101,10 @@
 }
 .oe_snippet.o_mail_block_default_template .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/theme_imgs/default_template_thumb.png")
+}
+.oe_snippet.o_mail_block_airmail_template .oe_snippet_thumbnail_img{
+    background-image: url("/mass_mailing/static/src/img/theme_imgs/airmail_template_thumb.png")
+}
+.oe_snippet.o_mail_block_lemon_template .oe_snippet_thumbnail_img{
+    background-image: url("/mass_mailing/static/src/img/theme_imgs/lemon_template_thumb.png")
 }

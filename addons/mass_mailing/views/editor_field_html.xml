@@ -7,6 +7,7 @@
             <link rel="stylesheet" href="/mass_mailing/static/src/css/snippet_styles.css" type="text/css"/>
             <link rel="stylesheet" href="/mass_mailing/static/src/css/odoo_template.css" type="text/css"/>
             <link rel="stylesheet" href="/mass_mailing/static/src/css/airmail_template.css" type="text/css"/>
+            <link rel="stylesheet" href="/mass_mailing/static/src/css/lemon_template.css" type="text/css"/>
             <link rel="stylesheet" href="/mass_mailing/static/src/css/mass_mailing_editor_thumb.css" type="text/css"/>
             <script type="text/javascript" src="/mass_mailing/static/src/js/mass_mailing_editor.js"></script>
         </t>
