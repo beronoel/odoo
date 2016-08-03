@@ -181,6 +181,13 @@ if(!$('.o_website_quote').length) {
     $(window).on('resize', _.throttle(adapt_sidebar_position, 200, {leading: false}));
     adapt_sidebar_position();
 
+    $bs_sidebar.affix({
+        offset: {
+            top: 0,
+            bottom: $('body').outerHeight() - $('main').outerHeight(),
+        },
+    });
+
     function adapt_sidebar_position() {
         $bs_sidebar.css({
             position: "",
