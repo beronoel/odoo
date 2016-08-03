@@ -212,8 +212,10 @@ class _column(object):
     def get(self, records, name, values=None):
         raise TypeError("Undefined method get() on field %s.%s." % (records._name, name))
 
-    def set(self, cr, obj, id, name, value, user=None, context=None):
-        cr.execute('update '+obj._table+' set '+name+'='+self._symbol_set[0]+' where id=%s', (self._symbol_set[1](value), id))
+    def set(self, record, name, value):
+        setc, setf = self._symbol_set
+        query = "UPDATE %s SET %s=%s WHERE id=%%s" % (record._table, name, setc)
+        record._cr.execute(query, (setf(value), record.id))
 
     def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, context=None):
         ids = obj.search(cr, uid, args+self._domain+[(name, 'ilike', value)], offset, limit, context=context)
@@ -635,14 +637,15 @@ class binary(_column):
 
         return result
 
-    def set(self, cr, obj, id, name, value, user=None, context=None):
+    def set(self, record, name, value):
         assert self.attachment
         # retrieve the attachment that stores the value, and adapt it
-        att = obj.pool['ir.attachment'].browse(cr, SUPERUSER_ID, [], context).search([
-            ('res_model', '=', obj._name),
+        domain = [
+            ('res_model', '=', record._name),
             ('res_field', '=', name),
-            ('res_id', '=', id),
-        ])
+            ('res_id', '=', record.id),
+        ]
+        att = record.env['ir.attachment'].sudo().search(domain)
         with att.env.norecompute():
             if value:
                 if att:
@@ -650,9 +653,9 @@ class binary(_column):
                 else:
                     att.create({
                         'name': name,
-                        'res_model': obj._name,
+                        'res_model': record._name,
                         'res_field': name,
-                        'res_id': id,
+                        'res_id': record.id,
                         'type': 'binary',
                         'datas': value,
                     })
@@ -743,29 +746,30 @@ class many2one(_column):
         args['auto_join'] = self._auto_join
         return args
 
-    def set(self, cr, obj_src, id, field, values, user=None, context=None):
-        if not context:
-            context = {}
-        obj = obj_src.pool[self._obj]
-        self._table = obj._table
-        if type(values) == type([]):
-            for act in values:
+    def set(self, record, name, value):
+        comodel = record.env[self._obj]
+        cr = record._cr
+        if isinstance(value, list):
+            for act in value:
                 if act[0] == 0:
-                    id_new = obj.create(cr, act[2])
-                    cr.execute('update '+obj_src._table+' set '+field+'=%s where id=%s', (id_new, id))
+                    line = comodel.create(act[2])
+                    cr.execute("UPDATE %s SET %s=%%s WHERE id=%%s" % (record._table, name),
+                               (line.id, record.id))
                 elif act[0] == 1:
-                    obj.write(cr, [act[1]], act[2], context=context)
+                    comodel.browse(act[1]).write(act[2])
                 elif act[0] == 2:
-                    cr.execute('delete from '+self._table+' where id=%s', (act[1],))
-                elif act[0] == 3 or act[0] == 5:
-                    cr.execute('update '+obj_src._table+' set '+field+'=null where id=%s', (id,))
+                    cr.execute("DELETE FROM %s WHERE id=%%s" % comodel._table, (act[1],))
+                elif act[0] in (3, 5):
+                    cr.execute("UPDATE %s SET %s=NULL WHERE id=%%s" % (record._table, name),
+                               (record.id,))
                 elif act[0] == 4:
-                    cr.execute('update '+obj_src._table+' set '+field+'=%s where id=%s', (act[1], id))
+                    cr.execute("UPDATE %s SET %s=%%s WHERE id=%%s" % (record._table, name),
+                               (act[1], record.id))
         else:
-            if values:
-                cr.execute('update '+obj_src._table+' set '+field+'=%s where id=%s', (values, id))
+            if value:
+                cr.execute("UPDATE %s SET %s=%%s WHERE id=%%s" % (record._table, name), (value, record.id))
             else:
-                cr.execute('update '+obj_src._table+' set '+field+'=null where id=%s', (id,))
+                cr.execute("UPDATE %s SET %s=NULL WHERE id=%%s" % (record._table, name), (record.id,))
 
     def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, context=None):
         return obj.pool[self._obj].search(cr, uid, args+self._domain+[('name', 'like', value)], offset, limit, context=context)
@@ -821,59 +825,58 @@ class one2many(_column):
 
         return result
 
-    def set(self, cr, obj, id, field, values, user=None, context=None):
-        result = []
-        context = dict(context or {})
-        context.update(self._context)
-        if not values:
+    def set(self, record, name, value):
+        if not value:
             return
-        obj = obj.pool[self._obj]
-        rec = obj.browse(cr, user, [], context=context)
-        with rec.env.norecompute():
-            _table = obj._table
-            for act in values:
+        result = []
+        cr = record._cr
+        comodel = record.env[self._obj].with_context(**self._context)
+        with comodel.env.norecompute():
+            for act in value:
                 if act[0] == 0:
-                    act[2][self._fields_id] = id
-                    id_new = obj.create(cr, user, act[2], context=context)
-                    result += obj._store_get_values(cr, user, [id_new], act[2].keys(), context)
+                    act[2][self._fields_id] = record.id
+                    line = comodel.create(act[2])
+                    result += line._store_get_values(list(act[2]))
                 elif act[0] == 1:
-                    obj.write(cr, user, [act[1]], act[2], context=context)
+                    comodel.browse(act[1]).write(act[2])
                 elif act[0] == 2:
-                    obj.unlink(cr, user, [act[1]], context=context)
+                    comodel.browse(act[1]).unlink()
                 elif act[0] == 3:
-                    inverse_field = obj._fields.get(self._fields_id)
+                    inverse_field = comodel._fields.get(self._fields_id)
                     assert inverse_field, 'Trying to unlink the content of a o2m but the pointed model does not have a m2o'
                     # if the model has on delete cascade, just delete the row
                     if inverse_field.ondelete == "cascade":
-                        obj.unlink(cr, user, [act[1]], context=context)
+                        comodel.browse(act[1]).unlink()
                     else:
-                        cr.execute('update '+_table+' set '+self._fields_id+'=null where id=%s', (act[1],))
+                        cr.execute("UPDATE %s SET %s=NULL WHERE id=%%s" % (comodel._table, self._fields_id),
+                                   (act[1],))
                 elif act[0] == 4:
                     # check whether the given record is already linked
-                    rec = obj.browse(cr, SUPERUSER_ID, act[1], {'prefetch_fields': False})
-                    if int(rec[self._fields_id]) != id:
+                    line = comodel.browse(act[1])
+                    line_sudo = line.sudo().with_context(prefetch_fields=False)
+                    if int(line_sudo[self._fields_id]) != record.id:
                         # Must use write() to recompute parent_store structure if needed and check access rules
-                        obj.write(cr, user, [act[1]], {self._fields_id:id}, context=context or {})
+                        line.write({self._fields_id: record.id})
                 elif act[0] == 5:
-                    inverse_field = obj._fields.get(self._fields_id)
+                    inverse_field = comodel._fields.get(self._fields_id)
                     assert inverse_field, 'Trying to unlink the content of a o2m but the pointed model does not have a m2o'
                     # if the o2m has a static domain we must respect it when unlinking
-                    domain = self._domain(obj) if callable(self._domain) else self._domain
+                    domain = self._domain(comodel) if callable(self._domain) else self._domain
                     extra_domain = domain or []
-                    ids_to_unlink = obj.search(cr, user, [(self._fields_id,'=',id)] + extra_domain, context=context)
+                    lines = comodel.search([(self._fields_id, '=', record.id)] + extra_domain)
                     # If the model has cascade deletion, we delete the rows because it is the intended behavior,
                     # otherwise we only nullify the reverse foreign key column.
                     if inverse_field.ondelete == "cascade":
-                        obj.unlink(cr, user, ids_to_unlink, context=context)
+                        lines.unlink()
                     else:
-                        obj.write(cr, user, ids_to_unlink, {self._fields_id: False}, context=context)
+                        lines.write({self._fields_id: False})
                 elif act[0] == 6:
                     # Must use write() to recompute parent_store structure if needed
-                    obj.write(cr, user, act[2], {self._fields_id:id}, context=context or {})
-                    ids2 = act[2] or [0]
-                    cr.execute('select id from '+_table+' where '+self._fields_id+'=%s and id <> ALL (%s)', (id,ids2))
-                    ids3 = map(lambda x:x[0], cr.fetchall())
-                    obj.write(cr, user, ids3, {self._fields_id:False}, context=context or {})
+                    comodel.browse(act[2]).write({self._fields_id: record.id})
+                    cr.execute("SELECT id FROM %s WHERE %s=%%s AND id <> ALL(%%s)" % (comodel._table, self._fields_id),
+                               (record.id, act[2] or [0]))
+                    lines = comodel.browse([row[0] for row in cr.fetchall()])
+                    lines.write({self._fields_id: False})
         return result
 
     def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, operator='like', context=None):
@@ -1029,13 +1032,12 @@ class many2many(_column):
             res[row[1]].append(row[0])
         return res
 
-    def set(self, cr, model, id, name, values, user=None, context=None):
-        if not context:
-            context = {}
-        if not values:
+    def set(self, record, name, value):
+        if not value:
             return
-        rel, id1, id2 = self._sql_names(model)
-        obj = model.pool[self._obj]
+        cr = record._cr
+        rel, id1, id2 = self._sql_names(record)
+        comodel = record.env[self._obj]
 
         def link(ids):
             # beware of duplicates when inserting
@@ -1043,30 +1045,30 @@ class many2many(_column):
                         (SELECT %s, unnest(%s)) EXCEPT (SELECT {id1}, {id2} FROM {rel} WHERE {id1}=%s)
                     """.format(rel=rel, id1=id1, id2=id2)
             for sub_ids in cr.split_for_in_conditions(ids):
-                cr.execute(query, (id, list(sub_ids), id))
+                cr.execute(query, (record.id, list(sub_ids), record.id))
 
         def unlink_all():
             # remove all records for which user has access rights
-            clauses, params, tables = obj.pool.get('ir.rule').domain_get(cr, user, obj._name, context=context)
+            clauses, params, tables = comodel.env['ir.rule'].domain_get(comodel._name)
             cond = " AND ".join(clauses) if clauses else "1=1"
             query = """ DELETE FROM {rel} USING {tables}
                         WHERE {rel}.{id1}=%s AND {rel}.{id2}={table}.id AND {cond}
                     """.format(rel=rel, id1=id1, id2=id2,
-                               table=obj._table, tables=','.join(tables), cond=cond)
-            cr.execute(query, [id] + params)
+                               table=comodel._table, tables=','.join(tables), cond=cond)
+            cr.execute(query, [record.id] + params)
 
-        for act in values:
-            if not (isinstance(act, list) or isinstance(act, tuple)) or not act:
+        for act in value:
+            if not isinstance(act, (list, tuple)) or not act:
                 continue
             if act[0] == 0:
-                idnew = obj.create(cr, user, act[2], context=context)
-                cr.execute('insert into '+rel+' ('+id1+','+id2+') values (%s,%s)', (id, idnew))
+                line = comodel.create(act[2])
+                cr.execute("INSERT INTO %s(%s,%s) VALUES (%%s,%%s)" % (rel, id1, id2), (record.id, line.id))
             elif act[0] == 1:
-                obj.write(cr, user, [act[1]], act[2], context=context)
+                comodel.browse(act[1]).write(act[2])
             elif act[0] == 2:
-                obj.unlink(cr, user, [act[1]], context=context)
+                comodel.browse(act[1]).unlink()
             elif act[0] == 3:
-                cr.execute('delete from '+rel+' where ' + id1 + '=%s and '+ id2 + '=%s', (id, act[1]))
+                cr.execute("DELETE FROM %s WHERE %s=%%s AND %s=%%s" % (rel, id1, id2), (record.id, act[1]))
             elif act[0] == 4:
                 link([act[1]])
             elif act[0] == 5:

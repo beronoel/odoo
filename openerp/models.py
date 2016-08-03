@@ -4019,9 +4019,8 @@ class BaseModel(object):
         # call the 'set' method of fields which are not classic_write
         for name in sorted(upd_todo, key=lambda name: self._columns[name].priority):
             column = self._columns[name]
-            for id in self.ids:
-                result_store += column.set(self._cr, self._model, id, name, vals[name],
-                                           self._uid, context=rel_context) or []
+            for record in self.with_context(rel_context):
+                result_store += column.set(record, name, vals[name]) or []
 
         # for recomputing new-style fields
         self.modified(upd_todo)
@@ -4353,8 +4352,7 @@ class BaseModel(object):
             result_store = []
             for name in sorted(upd_todo, key=lambda name: self._columns[name].priority):
                 column = self._columns[name]
-                result_store += column.set(self._cr, self._model, id_new, name, vals[name],
-                                           self._uid, context=rel_context) or []
+                result_store += column.set(self.with_context(rel_context), name, vals[name]) or []
 
             # for recomputing new-style fields
             self.modified(upd_todo)
