@@ -209,11 +209,11 @@ class _column(object):
     def restart(self):
         pass
 
+    def get(self, records, name, values=None):
+        raise TypeError("Undefined method get() on field %s.%s." % (records._name, name))
+
     def set(self, cr, obj, id, name, value, user=None, context=None):
         cr.execute('update '+obj._table+' set '+name+'='+self._symbol_set[0]+' where id=%s', (self._symbol_set[1](value), id))
-
-    def get(self, cr, obj, ids, name, user=None, offset=0, context=None, values=None):
-        raise Exception(_('undefined get method !'))
 
     def search(self, cr, obj, args, name, value, offset=0, limit=None, uid=None, context=None):
         ids = obj.search(cr, uid, args+self._domain+[(name, 'ilike', value)], offset, limit, context=context)
@@ -283,14 +283,14 @@ class reference(_column):
         args['selection'] = self.selection
         return args
 
-    def get(self, cr, obj, ids, name, uid=None, context=None, values=None):
+    def get(self, records, name, values=None):
         result = {}
         # copy initial values fetched previously.
         for value in values:
             result[value['id']] = value[name]
             if value[name]:
                 model, res_id = value[name].split(',')
-                if not obj.pool[model].exists(cr, uid, [int(res_id)], context=context):
+                if not records.env[model].browse(int(res_id)).exists():
                     result[value['id']] = False
         return result
 
@@ -608,25 +608,24 @@ class binary(_column):
         args['attachment'] = self.attachment
         return args
 
-    def get(self, cr, obj, ids, name, user=None, context=None, values=None):
-        result = dict.fromkeys(ids, False)
+    def get(self, records, name, values=None):
+        result = dict.fromkeys(records.ids, False)
 
         if self.attachment:
             # values are stored in attachments, retrieve them
-            atts = obj.pool['ir.attachment'].browse(cr, SUPERUSER_ID, [], context)
             domain = [
-                ('res_model', '=', obj._name),
+                ('res_model', '=', records._name),
                 ('res_field', '=', name),
-                ('res_id', 'in', ids),
+                ('res_id', 'in', records.ids),
             ]
-            for att in atts.search(domain):
+            for att in records.env['ir.attachment'].sudo().search(domain):
                 # the 'bin_size' flag is handled by the field 'datas' itself
                 result[att.res_id] = att.datas
         else:
             # If client is requesting only the size of the field, we return it
             # instead of the content. Presumably a separate request will be done
             # to read the actual content if it's needed at some point.
-            context = context or {}
+            context = records._context
             if context.get('bin_size') or context.get('bin_size_%s' % name):
                 postprocess = lambda val: tools.human_size(long(val))
             else:
@@ -803,23 +802,22 @@ class one2many(_column):
         args['limit'] = self._limit
         return args
 
-    def get(self, cr, obj, ids, name, user=None, offset=0, context=None, values=None):
+    def get(self, records, name, values=None):
         if self._context:
-            context = dict(context or {})
-            context.update(self._context)
+            records = records.with_context(**self._context)
 
         # retrieve the records in the comodel
-        comodel = obj.pool[self._obj].browse(cr, user, [], context)
+        comodel = records.env[self._obj]
         inverse = self._fields_id
-        domain = self._domain(obj) if callable(self._domain) else self._domain
-        domain = domain + [(inverse, 'in', ids)]
-        records = comodel.search(domain, limit=self._limit)
+        domain = self._domain(records) if callable(self._domain) else self._domain
+        domain = domain + [(inverse, 'in', records.ids)]
+        lines = comodel.search(domain, limit=self._limit)
 
-        result = {id: [] for id in ids}
+        result = {id: [] for id in records.ids}
         # read the inverse of records without prefetching other fields on them
-        for record in records.with_context(prefetch_fields=False):
-            # record[inverse] may be a record or an integer
-            result[int(record[inverse])].append(record.id)
+        for line in lines.with_context(prefetch_fields=False):
+            # line[inverse] may be a record or an integer
+            result[int(line[inverse])].append(line.id)
 
         return result
 
@@ -977,7 +975,7 @@ class many2many(_column):
                 col2 = '%s_id' % dest_model._table
         return tbl, col1, col2
 
-    def _get_query_and_where_params(self, cr, model, ids, values, where_params):
+    def _get_query_and_where_params(self, records, values, where_params):
         """ Extracted from ``get`` to facilitate fine-tuning of the generated
             query. """
         query = """SELECT %(rel)s.%(id2)s, %(rel)s.%(id1)s
@@ -989,33 +987,22 @@ class many2many(_column):
                       %(limit)s
                    OFFSET %(offset)d
                 """ % values
-        return query, where_params + [tuple(ids)]
+        return query, where_params + [tuple(records.ids)]
 
-    def get(self, cr, model, ids, name, user=None, offset=0, context=None, values=None):
-        if not context:
-            context = {}
-        if not values:
-            values = {}
-        res = {}
-        if not ids:
-            return res
-        for id in ids:
-            res[id] = []
-        if offset:
-            _logger.warning(
-                "Specifying offset at a many2many.get() is deprecated and may"
-                " produce unpredictable results.")
-        obj = model.pool[self._obj]
-        rel, id1, id2 = self._sql_names(model)
+    def get(self, records, name, values=None):
+        if not records:
+            return {}
+        comodel = records.env[self._obj]
+        rel, id1, id2 = self._sql_names(records)
 
         # static domains are lists, and are evaluated both here and on client-side, while string
         # domains supposed by dynamic and evaluated on client-side only (thus ignored here)
         # FIXME: make this distinction explicit in API!
         domain = isinstance(self._domain, list) and self._domain or []
 
-        wquery = obj._where_calc(cr, user, domain, context=context)
-        obj._apply_ir_rules(cr, user, wquery, 'read', context=context)
-        order_by = obj._generate_order_by(cr, user, None, wquery, context=context)
+        wquery = comodel._where_calc(domain)
+        comodel._apply_ir_rules(wquery, 'read')
+        order_by = comodel._generate_order_by(None, wquery)
         from_c, where_c, where_params = wquery.get_sql()
         if not where_c:
             where_c = '1=1'
@@ -1026,22 +1013,20 @@ class many2many(_column):
 
         query_parts = {
             'rel': rel,
-            'from_c': from_c,
-            'tbl': obj._table,
             'id1': id1,
             'id2': id2,
+            'tbl': comodel._table,
+            'from_c': from_c,
             'where_c': where_c,
             'limit': limit_str,
+            'offset': 0,
             'order_by': order_by,
-            'offset': offset,
         }
-        query, where_params = self._get_query_and_where_params(cr, model, ids,
-                                                               query_parts,
-                                                               where_params)
-
-        cr.execute(query, where_params)
-        for r in cr.fetchall():
-            res[r[1]].append(r[0])
+        query, where_params = self._get_query_and_where_params(records, query_parts, where_params)
+        records._cr.execute(query, where_params)
+        res = {id: [] for id in records.ids}
+        for row in records._cr.fetchall():
+            res[row[1]].append(row[0])
         return res
 
     def set(self, cr, model, id, name, values, user=None, context=None):

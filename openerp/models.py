@@ -2270,13 +2270,14 @@ class BaseModel(object):
     @api.model_cr
     def _update_store(self, column, name):
         _logger.info("storing computed values of fields.function '%s'", name)
+        self = self.sudo()
         cr = self._cr
         setc, setf = column._symbol_set
         update_query = 'UPDATE "%s" SET "%s"=%s WHERE id=%%s' % (self._table, name, setc)
         cr.execute('SELECT id FROM "%s"' % self._table)
         ids = [row[0] for row in cr.fetchall()]
         for sub_ids in cr.split_for_in_conditions(ids, AUTOINIT_RECALCULATE_STORED_FIELDS):
-            res = column.get(cr, self._model, sub_ids, name, SUPERUSER_ID, {})
+            res = column.get(self.browse(sub_ids), name, {})
             for id, val in res.iteritems():
                 if column._multi:
                     val = val[name]
@@ -3456,7 +3457,7 @@ class BaseModel(object):
 
             for multi, fs in by_multi.iteritems():
                 if multi:
-                    res2 = self._columns[fs[0]].get(cr, self._model, ids, fs, user, context=context, values=result)
+                    res2 = self._columns[fs[0]].get(fetched, fs, result)
                     assert res2 is not None, \
                         'The function field "%s" on the "%s" model returned None\n' \
                         '(a dictionary was expected).' % (fs[0], self._name)
@@ -3469,7 +3470,7 @@ class BaseModel(object):
                                 vals[f] = multi_fields.get(f, [])
                 else:
                     for f in fs:
-                        res2 = self._columns[f].get(cr, self._model, ids, f, user, context=context, values=result)
+                        res2 = self._columns[f].get(fetched, f, result)
                         for vals in result:
                             if res2:
                                 vals[f] = res2[vals['id']]
@@ -4471,7 +4472,7 @@ class BaseModel(object):
             if key:
                 column = self._columns[names[0]]
                 # use admin user for accessing objects having rules defined on store fields
-                result = column.get(cr, self._model, self.ids, names, SUPERUSER_ID, context=self._context)
+                result = column.get(self.sudo(), names)
                 for id, vals in result.iteritems():
                     if field_dict:
                         for name in field_dict[id]:
@@ -4499,7 +4500,7 @@ class BaseModel(object):
                 for name in names:
                     column = self._columns[name]
                     # use admin user for accessing objects having rules defined on store fields
-                    result = column.get(cr, self._model, self.ids, name, SUPERUSER_ID, context=self._context)
+                    result = column.get(self.sudo(), name)
                     for rid in result.keys():
                         if rid in field_dict and name in field_dict[rid]:
                             result.pop(rid)
