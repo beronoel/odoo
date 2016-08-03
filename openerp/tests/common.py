@@ -347,15 +347,13 @@ class HttpCase(TransactionCase):
                     try:
                         # when errors occur the execution stack may be sent as a JSON
                         prefix = lline.index('error') + 6
-                        _logger.error("phantomjs: %s", pformat(json.loads(line[prefix:])))
+                        self.fail(pformat(json.loads(line[prefix:])))
                     except ValueError:
                         line_ = line.split('\n\n')
-                        _logger.error("phantomjs: %s", line_[0])
                         # The second part of the log is for debugging
                         if len(line_) > 1:
                             _logger.info("phantomjs: \n%s", line.split('\n\n', 1)[1])
-                        pass
-                    break
+                        self.fail(line_[0])
                 elif lline.startswith("warning"):
                     _logger.warn("phantomjs: %s", line)
                 else:
