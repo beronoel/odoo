@@ -978,6 +978,7 @@ class AccountBankStatementLine(models.Model):
             aml_obj.with_context(check_move_validity=False).create(aml_dict)
 
             move.post()
+            self.env['account.invoice'].search([('payment_move_line_ids', 'in', move.line_ids.ids)]).action_invoice_paid()
             #record the move name on the statement line to be able to retrieve it in case of unreconciliation
             self.write({'move_name': move.name})
             payment.write({'payment_reference': move.name})

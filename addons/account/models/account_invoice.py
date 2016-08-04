@@ -1067,6 +1067,7 @@ class AccountInvoice(models.Model):
             'writeoff_account_id': writeoff_acc and writeoff_acc.id or False,
         })
         payment.post()
+        self.action_invoice_paid()
 
     @api.multi
     def _track_subtype(self, init_values):
