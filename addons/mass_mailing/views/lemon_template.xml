@@ -10,21 +10,18 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <div style="width:100%;">
-                                        <div class="snippet_row">
-                                            <table align="center" width="600" cellspacing="0" cellpadding="0" class="table-styles">
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="horizontal-padding vertical-padding">
-                                                            <p class="display-1 text-center" style="margin:0;color:#000;">The offer of the month!</p>
-                                                            <p class="display-3 no-margin text-center" style="color:#fff;">Apps That Help You Grow Your Business!</p>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                    <div class="snippet_row">
+                                        <table align="center" width="600" cellspacing="0" cellpadding="0" class="table-styles">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="horizontal-padding vertical-padding">
+                                                        <p class="display-1 text-center" style="margin:0;color:#000;">The offer of the month!</p>
+                                                        <p class="display-3 no-margin text-center" style="color:#fff;">Apps That Help You Grow Your Business!</p>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    
                                 </td>
                             </tr>
                         </tbody>
@@ -94,11 +91,11 @@
                                         <div class="snippetbanner">
                                             <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
                                                 <tbody>
-                                                  <tr>
-                                                      <td width="100%" valign="top">
+                                                    <tr>
+                                                        <td width="100%" valign="top">
                                                             <img src="http://www.odoocdn.com/openerp_website/static/src/img/content/hr_holidays_01.jpg" style="height:auto;max-width:600px;width:600px;" alt="Your Logo" />
-                                                      </td>
-                                                  </tr>
+                                                        </td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>

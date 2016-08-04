@@ -108,3 +108,6 @@
 .oe_snippet.o_mail_block_lemon_template .oe_snippet_thumbnail_img{
     background-image: url("/mass_mailing/static/src/img/theme_imgs/lemon_template_thumb.png")
 }
+.oe_snippet.o_mail_block_tech_template .oe_snippet_thumbnail_img{
+    background-image: url("/mass_mailing/static/src/img/theme_imgs/tech_template_thumb.png")
+}

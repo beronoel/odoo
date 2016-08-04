@@ -10,15 +10,6 @@
     cursor: crosshair;
 }
 
-.horizontal-padding {
-    padding-left: 20px;
-    padding-right: 20px;
-}
-.vertical-padding {
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
 /* ======================== TYPO ====================== */
 
 .display-1, .display-2, .display-3, p, th, td, a, .table-styles {
@@ -48,6 +39,14 @@ a, a:hover {
 
 /* ======================== MISC ====================== */
 
+.horizontal-padding {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.vertical-padding {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
 .no-margin {
     margin: 0;
 }
@@ -58,15 +57,6 @@ a, a:hover {
     width:600px;
     margin:10px auto;
     color:#464646;
-}
-.separator {
-    height: 1px;
-    background-color: #e3e3e3;
-}
-.banner {
-    width:600px;
-    margin:0 auto;
-    padding:0;
 }
 .newsletter-btn {
     -webkit-user-select: none;
@@ -81,4 +71,16 @@ a, a:hover {
     text-align: center;
     cursor: pointer;
     background-color: #34c9a4;
+}
+
+/* ======================== SNIPPETS ====================== */
+
+.separator {
+    height: 1px;
+    background-color: #e3e3e3;
+}
+.banner {
+    width:600px;
+    margin:0 auto;
+    padding:0;
 }

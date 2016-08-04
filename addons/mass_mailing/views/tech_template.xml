@@ -9,7 +9,7 @@
                         <tr>
                             <td>
                                 <!-- Template Header -->
-                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_header bg-black">
+                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_header">
                                     <tbody>
                                         <tr>
                                             <td>
@@ -26,15 +26,6 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <!-- Template Banner -->
-                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_header2 bg-black">
-                                    <tbody>
-                                        <tr>
-                                            <td>
                                                 <div class="snippet_row" style="width:600px;margin:0 auto;">
                                                     <div class="snippetbanner" style="padding:20px 0;">
                                                         <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
@@ -90,6 +81,54 @@
                                                     </div>
                                                 </div>
                                                 <div class="oe_structure"></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!-- Template Foooter -->
+                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="snippet_row">
+                                                    <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style="text-align:center">
+                                                                    &amp;nbsp;
+                                                                    <t t-if="website.social_facebook">
+                                                                        <a t-att-href="website.social_facebook" class="link-color">
+                                                                            <span class="odoo fa fa-facebook-square fa-2x"></span>
+                                                                        </a>
+                                                                    </t>
+                                                                    <t t-if="website.social_googleplus">
+                                                                        <a t-att-href="website.social_googleplus" style="padding-left:5px;" class="link-color">
+                                                                            <span class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                                        </a>
+                                                                    </t>
+                                                                    <t t-if="website.social_linkedin">
+                                                                        <a t-att-href="website.social_linkedin" style="padding-left:5px;" class="link-color">
+                                                                            <span class="odoo fa fa-linkedin-square fa-2x"></span>
+                                                                        </a>
+                                                                    </t>
+                                                                    <t t-if="website.social_twitter">
+                                                                        <a t-att-href="website.social_twitter" style="padding-left:5px;" class="link-color">
+                                                                            <span class="odoo fa fa-twitter-square fa-2x"></span>
+                                                                        </a>
+                                                                    </t>
+                                                                    &amp;nbsp;
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style="font-size:12px;text-align:center;padding:10px">
+                                                                    &amp;nbsp;
+                                                                    <a href="/unsubscribe_from_list" class="link-color">Unsubscribe</a> | <a href="/page/contactus" class="link-color">Contact</a>
+                                                                    &amp;nbsp;
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>

@@ -126,28 +126,28 @@
                                                     <t t-if="website.social_facebook">
                                                         <td align="right">
                                                             <a t-att-href="website.social_facebook">
-                                                              <span class="odoo fa fa-facebook-square fa-2x"></span>
+                                                              <span class="fa fa-facebook-square fa-2x"></span>
                                                             </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_googleplus">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_googleplus">
-                                                              <span class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                              <span class="fa fa-google-plus-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_linkedin">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_linkedin">
-                                                              <span class="odoo fa fa-linkedin-square fa-2x"></span>
+                                                              <span class="fa fa-linkedin-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_twitter">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_twitter">
-                                                              <span class="odoo fa fa-twitter-square fa-2x"></span>
+                                                              <span class="fa fa-twitter-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
@@ -198,28 +198,28 @@
                                                     <t t-if="website.social_facebook">
                                                         <td align="right">
                                                             <a t-att-href="website.social_facebook">
-                                                              <span class="odoo fa fa-facebook-square fa-2x"></span>
+                                                              <span class="fa fa-facebook-square fa-2x"></span>
                                                             </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_googleplus">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_googleplus">
-                                                              <span class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                              <span class="fa fa-google-plus-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_linkedin">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_linkedin">
-                                                              <span class="odoo fa fa-linkedin-square fa-2x"></span>
+                                                              <span class="fa fa-linkedin-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
                                                     <t t-if="website.social_twitter">
                                                         <td align="right" style="padding-left:5px">
                                                             <a t-att-href="website.social_twitter">
-                                                              <span class="odoo fa fa-twitter-square fa-2x"></span>
+                                                              <span class="fa fa-twitter-square fa-2x"></span>
                                                               </a>
                                                         </td>
                                                     </t>
@@ -305,7 +305,7 @@
                                     <tbody>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1" style="margin:0;">Check this out!</p>
+                                                <p class="display-1 no-margin">Check this out!</p>
                                                 <p class="no-margin">Apps That Help You Grow Your Business!</p>
                                             </td>
                                         </tr>
@@ -322,7 +322,7 @@
                                     <tbody>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding">
-                                                <p class="display-1" style="margin:0;">
+                                                <p class="display-1 no-margin">
                                                     Upgrade to Premium Account!
                                                 </p>
                                             </td>
@@ -345,17 +345,17 @@
                                     <tbody>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding">
-                                                <p style="margin:0" class="display-1">20% off for EVERY PRODUCT today!</p>
+                                                <p class="display-1 no-margin">20% off for EVERY PRODUCT today!</p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="horizontal-padding text-center">
-                                                <p style="margin:0" class="display-2">Hurry Up!</p>
+                                                <p class="display-2 no-margin">Hurry Up!</p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding"><br/>
-                                                <p style="margin:0">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button below.</p>
+                                                <p class="no-margin">We are continuing to grow and we miss seeing you be a part of it! We've increased store hours and have lot's of new brands available. To welcome you back please accept this 20% discount on you next purchase by clicking the button below.</p>
                                             </td>
                                         </tr>
                                         <tr>
@@ -386,7 +386,7 @@
                                         <td style="width:25%;height: 150px;" class="horizontal-padding vertical-padding text-center bg-delta">
                                             <div style="margin:27px auto">
                                                 &amp;nbsp;
-                                                <span class="odoo fa fa-calendar fa-5x"></span>
+                                                <span class="fa fa-calendar fa-5x"></span>
                                                 &amp;nbsp;
                                             </div>
                                         </td>
@@ -395,8 +395,8 @@
                                                 <tr style="padding-right:5px;">
                                                     <td style="padding-top:20px;padding-left:20px;float:left" width="90%">
                                                         <div style="min-height:100px;text-align:left">
-                                                            <p style="margin:0;font-size:18px">Your Event Name</p>
-                                                            <p style="margin:0;font-size:14px">Description</p>
+                                                            <p class="no-margin display-3">Your Event Name</p>
+                                                            <p class="no-margin">Description</p>
                                                         </div>
                                                         <div style="padding-left:0">
                                                             <p style="display: table-cell;cursor: pointer;font-size: 11px;font-weight: 300;padding: 3px 30px;">
@@ -412,21 +412,21 @@
                                                             <t t-if="website.social_facebook">
                                                                 <div style="width:33%;margin-left:0">
                                                                     <a t-att-href="website.social_facebook">
-                                                                      <span class="odoo fa fa-facebook-square fa-2x"></span>
+                                                                      <span class="fa fa-facebook-square fa-2x"></span>
                                                                     </a>
                                                                 </div>
                                                             </t>
                                                             <t t-if="website.social_twitter">
                                                                 <div style="width:34%;margin-left:0">
                                                                     <a t-att-href="website.social_twitter">
-                                                                      <span class="odoo fa fa-twitter-square fa-2x"></span>
+                                                                      <span class="fa fa-twitter-square fa-2x"></span>
                                                                     </a>
                                                                 </div>
                                                             </t>
                                                             <t t-if="website.social_googleplus">
                                                                 <div style="width:33%;margin-left:0">
                                                                     <a t-att-href="website.social_googleplus">
-                                                                      <span class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                                      <span class="fa fa-google-plus-square fa-2x"></span>
                                                                     </a>
                                                                 </div>
                                                             </t>
@@ -448,19 +448,19 @@
                                     <tr>
                                         <td class="horizontal-padding vertical-padding" style="text-align:center;width:30%">
                                             &amp;nbsp;
-                                            <span class="odoo fa fa-user fa-5x" style="margin: 5px 20px;"></span>
+                                            <span class="fa fa-user fa-5x" style="margin: 5px 20px;"></span>
                                             &amp;nbsp;
                                             <p>User: John Doe</p>
                                         </td>
                                         <td class="horizontal-padding vertical-padding">
-                                            <p style="margin:0">Hey Bob,</p>
-                                            <p style="margin:0">I set up an Odoo profile where I can do tons of really awesome stuff. I want you to follow me so we can keep in touch!</p>
-                                            <p style="margin:0">See you soon!</p>
+                                            <p class="no-margin">Hey Bob,</p>
+                                            <p class="no-margin">I set up an Odoo profile where I can do tons of really awesome stuff. I want you to follow me so we can keep in touch!</p>
+                                            <p class="no-margin">See you soon!</p>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="horizontal-padding vertical-padding" colspan="2">
-                                            <p style="margin:0">Because I've invited you, you can also use the below coupon code to receive a 50% discount on you first months subscription!</p>
+                                            <p class="no-margin">Because I've invited you, you can also use the below coupon code to receive a 50% discount on you first months subscription!</p>
                                         </td>
                                     </tr>
                                 </table>
@@ -479,8 +479,8 @@
                                                     <tbody>
                                                         <tr>
                                                             <td valign="top" width="300">
-                                                                <p style="margin:0"><strong>Bob Erlicious</strong></p>
-                                                                <p style="margin:0">
+                                                                <p class="no-margin"><strong>Bob Erlicious</strong></p>
+                                                                <p class="no-margin">
                                                                     123 Flower Drive<br/>
                                                                     Victoria, BC<br/>
                                                                     V9P 2E8<br/>
@@ -488,8 +488,8 @@
                                                                 </p>
                                                             </td>
                                                             <td valign="top" width="300">
-                                                                <p style="margin:0"><strong>Invoice: 00234</strong></p>
-                                                                <p style="margin:0">April 3, 2014</p>
+                                                                <p class="no-margin"><strong>Invoice: 00234</strong></p>
+                                                                <p class="no-margin">April 3, 2014</p>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -500,14 +500,14 @@
                                                             <td>
                                                                 <table width="560" cellspacing="0" cellpadding="0" class="table-styles" data-max-width="560px">
                                                                     <thead>
-                                                                        <tr style="background-color:#875a7b;" bgcolor="#875a7b" class="odoo row col">
-                                                                            <th style="padding: 10px 0px 10px 10px;color: #ffffff;color: #ffffff;" class="odoo mv">Plan</th>
-                                                                            <th style="padding: 10px 0px;color: #ffffff;" class="odoo mv">Period</th>
-                                                                            <th style="padding: 10px 10px 10px 0;color: #ffffff;text-align:right;" class="odoo mv">Amount</th>
+                                                                        <tr style="background-color:#875a7b;" bgcolor="#875a7b" class="row col">
+                                                                            <th style="padding: 10px 0px 10px 10px;color: #ffffff;color: #ffffff;" class="mv">Plan</th>
+                                                                            <th style="padding: 10px 0px;color: #ffffff;" class="mv">Period</th>
+                                                                            <th style="padding: 10px 10px 10px 0;color: #ffffff;text-align:right;" class="mv">Amount</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        <tr style="color:#464646" class="odoo row bg-color">
+                                                                        <tr style="color:#464646" class="row">
                                                                             <td style="padding: 10px 0px 10px 10px;">Silver Plan</td>
                                                                             <td style="padding:10px 0px;">August</td>
                                                                             <td style="padding:10px 10px 10px 0;text-align:right;">$50.00</td>
@@ -539,10 +539,10 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td style="vertical-align:top;width:270px;padding:20px 10px 20px 20px;" class="odoo col_mv">
+                                            <td style="vertical-align:top;width:270px;padding:20px 10px 20px 20px;" class="col_mv">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 1</p>
-                                                <p style="margin:0;" class="text-center">
+                                                <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
                                                 </p>
                                                 <div class="text-center" style="margin-top:15px;">
@@ -550,10 +550,10 @@
                                                 </div>
                                             </td>
 
-                                            <td style="vertical-align:top;width:270px;padding:20px 20px 20px 10px;" class="odoo col_mv">
+                                            <td style="vertical-align:top;width:270px;padding:20px 20px 20px 10px;" class="col_mv">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 2</p>
-                                                <p style="margin:0;" class="text-center">
+                                                <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
                                                 </p>
                                                 <div class="text-center" style="margin-top:15px;">
@@ -573,10 +573,10 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td style="vertical-align:top;width:180px;padding:20px 5px 20px 20px;" class="odoo col_mv">
+                                            <td style="vertical-align:top;width:180px;padding:20px 5px 20px 20px;" class="col_mv">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 1</p>
-                                                <p style="margin:0;" class="text-center">
+                                                <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
                                                 </p>
                                                 <div class="text-center" style="margin-top:15px;">
@@ -584,10 +584,10 @@
                                                 </div>
                                             </td>
 
-                                            <td style="vertical-align:top;width:180px;padding:20px 5px 20px 5px;" class="odoo col_mv">
+                                            <td style="vertical-align:top;width:180px;padding:20px 5px 20px 5px;" class="col_mv">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 2</p>
-                                                <p style="margin:0;" class="text-center">
+                                                <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
                                                 </p>
                                                 <div class="text-center" style="margin-top:15px;">
@@ -595,10 +595,10 @@
                                                 </div>
                                             </td>
 
-                                            <td style="vertical-align:top;width:180px;padding:20px 20px 20px 5px;" class="odoo col_mv">
+                                            <td style="vertical-align:top;width:180px;padding:20px 20px 20px 5px;" class="col_mv">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:180px;width:180px;" alt="Your Logo" />
                                                 <p class="display-2 text-center" style="margin-top:20px;">Step 3</p>
-                                                <p style="margin:0;" class="text-center">
+                                                <p class="text-center no-margin">
                                                     We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
                                                 </p>
                                                 <div class="text-center" style="margin-top:15px;">
@@ -618,12 +618,12 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td style="width:270px;text-align:center;vertical-align:middle" class="odoo col_mv horizontal-padding vertical-padding">
+                                            <td style="width:270px;text-align:center;vertical-align:middle" class="col_mv horizontal-padding vertical-padding">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/crm/crm_top_banner.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
                                             </td>
-                                            <td style="width:270px;vertical-align:middle;text-align:justify;" class="odoo col_mv bg-color horizontal-padding vertical-padding">
+                                            <td style="width:270px;vertical-align:middle;text-align:justify;" class="col_mv horizontal-padding vertical-padding">
                                                 <p class="display-2">Account Information</p>
-                                                <p style="margin:0">We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</p>
+                                                <p class="no-margin">We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</p>
                                                 <div class="text-center" style="margin-top:15px;">
                                                     <a href="#" class="link-color">Read More...</a>
                                                 </div>
@@ -641,14 +641,14 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td style="width:270px;vertical-align:middle;text-align:justify;" class="odoo col_mv bg-color horizontal-padding vertical-padding mobile-col">
+                                            <td style="width:270px;vertical-align:middle;text-align:justify;" class="col_mv horizontal-padding vertical-padding mobile-col">
                                                 <p class="display-2">Account Information</p>
-                                                <p style="margin:0">We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</p>
+                                                <p class="no-margin">We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</p>
                                                 <div class="text-center" style="margin-top:15px;">
                                                     <a href="#" class="link-color">Read More...</a>
                                                 </div>
                                             </td>
-                                            <td style="width:270px;text-align:center;vertical-align:middle" class="odoo col_mv horizontal-padding vertical-padding">
+                                            <td style="width:270px;text-align:center;vertical-align:middle" class="col_mv horizontal-padding vertical-padding">
                                                 <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/sales/sale_top_banner.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
                                             </td>
                                         </tr>
@@ -666,13 +666,13 @@
                                         <tr>
                                             <td width="100%" align="center" style="text-align:center" class="horizontal-padding vertical-padding">
                                                 &amp;nbsp;
-                                                <span class="odoo fa fa-camera fa-10x"></span>
+                                                <span class="fa fa-camera fa-10x"></span>
                                                 &amp;nbsp;
                                             </td>
                                         </tr>
                                         <tr>
                                             <td width="100%" class="horizontal-padding vertical-padding">
-                                                <p style="margin:0"><strong>We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</strong></p>
+                                                <p class="no-margin"><strong>We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.</strong></p>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -690,10 +690,10 @@
                                             <tr>
                                                 <td class="horizontal-padding vertical-padding">
                                                     <p><strong>Dear ${object.name}</strong></p>
-                                                    <p style="margin:0">Great stories have personality. Consider telling a great story that provides personality. Writing a story with personality for potential clients will assist with making a relationship connection. This shows up in small quirks like word choices or phrases. Write from your point of view, not from someone else's experience.<br/></p>
+                                                    <p class="no-margin">Great stories have personality. Consider telling a great story that provides personality. Writing a story with personality for potential clients will assist with making a relationship connection. This shows up in small quirks like word choices or phrases. Write from your point of view, not from someone else's experience.<br/></p>
                                                     <p>Great stories are for everyone even when only written for just one person. If you try to write with a wide general audience in mind, your story will ring false and be bland. No one will be interested. Write for one person. If it’s genuine for the one, it’s genuine for the rest.</p>
                                                     <p>Kind Regards,</p>
-                                                    <p style="margin:0">Michael Fletcher</p>
+                                                    <p class="no-margin">Michael Fletcher</p>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -709,7 +709,7 @@
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
                                         <tr>
-                                            <td class="col_mv bg-color horizontal-padding vertical-padding bg-delta">
+                                            <td class="col_mv horizontal-padding vertical-padding bg-delta">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -719,12 +719,12 @@
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0;" class="display-3">Step 1:</p>
-                                                            <p style="margin:0;">Place Order</p>
+                                                            <p class="no-margin">Place Order</p>
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td class="col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="col_mv horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -734,12 +734,12 @@
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0" class="display-3">Step 2:</p>
-                                                            <p style="margin:0">Shipping</p>
+                                                            <p class="no-margin">Shipping</p>
                                                         </td>
                                                     </tr>
                                                 </table>
                                             </td>
-                                            <td class="col_mv bg-color horizontal-padding vertical-padding">
+                                            <td class="col_mv horizontal-padding vertical-padding">
                                                 <table class="table-styles">
                                                     <tr>
                                                         <td rowspan="2">
@@ -749,7 +749,7 @@
                                                         </td>
                                                         <td style="padding-left:10px;">
                                                             <p style="font-weight:bold;margin:0 0 3px 0" class="display-3">Step 3:</p>
-                                                            <p style="margin:0">Payment</p>
+                                                            <p class="no-margin">Payment</p>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -788,7 +788,7 @@
                     </div>
 
                     <div name="Tag Line" class="o_mail_block_footer_tag_line">
-                        <div class="snippet_row bg-color">
+                        <div class="snippet_row">
                             <div class="snippet-general" bgcolor="#875a7b" style="background-color:#875a7b;width:600px;">
                                 <table class="table-styles" width="600" align="center" cellpadding="0" cellspacing="0">
                                     <tbody>
@@ -798,7 +798,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="horizontal-padding vertical-padding" style="padding:10px;">
+                                            <td class="horizontal-padding vertical-padding bg-beta" style="padding:10px;">
                                                 &amp;nbsp;
                                                 <a href="#" class="newsletter-btn">My Account</a>
                                                 &amp;nbsp;
@@ -828,8 +828,8 @@
                 </div>
                 <div class="o_panel_body">
 
-                    <div t-if="website" name="Social + Text" class="o_mail_block_footer_social">
-                        <div class="snippet_row bg-color">
+                    <div name="Text + Social" class="o_mail_block_footer_social">
+                        <div class="snippet_row">
                             <div class="snippet-general">
                                 <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
                                     <tbody>
@@ -838,22 +838,22 @@
                                                 &amp;nbsp;
                                                 <t t-if="website.social_facebook">
                                                     <a t-att-href="website.social_facebook" class="link-color">
-                                                        <span class="odoo fa fa-facebook-square fa-2x"></span>
+                                                        <span class="fa fa-facebook-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_googleplus">
                                                     <a t-att-href="website.social_googleplus" style="padding-left:5px;" class="link-color">
-                                                        <span class="odoo fa fa-google-plus-square fa-2x"></span>
+                                                        <span class="fa fa-google-plus-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_linkedin">
                                                     <a t-att-href="website.social_linkedin" style="padding-left:5px;" class="link-color">
-                                                        <span class="odoo fa fa-linkedin-square fa-2x"></span>
+                                                        <span class="fa fa-linkedin-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 <t t-if="website.social_twitter">
                                                     <a t-att-href="website.social_twitter" style="padding-left:5px;" class="link-color">
-                                                        <span class="odoo fa fa-twitter-square fa-2x"></span>
+                                                        <span class="fa fa-twitter-square fa-2x"></span>
                                                     </a>
                                                 </t>
                                                 &amp;nbsp;
@@ -887,7 +887,7 @@
                                         </tr>
                                         <tr>
                                             <td class="horizontal-padding vertical-padding">
-                                                <p style="margin:0;font-size:12px;text-align:center;">© 2014 All Rights Reserved</p>
+                                                <p style="font-size:12px;text-align:center;" class="no-margin">© 2014 All Rights Reserved</p>
                                             </td>
                                         </tr>
                                     </tbody>
