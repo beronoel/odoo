@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Odoo Template -->
+        <template name="Odoo Template" id="odoo_email_template">
+            <div class="o_mail_block_odoo_template">
+                <div class="o_layout odoo_template" style="width:100%;background-color: #ededed;padding:30px 0;">
+                    <div class="odoo_template_container" style="width:600px;margin:20px auto;">
+                        <div class="oe_structure"></div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </data>
+</odoo>

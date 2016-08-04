@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tech Template -->
+        <template name="Tech Template" id="tech_email_template">
+            <div class="o_mail_block_tech_template">
+                <table class="o_layout tech_template" style="width:100%;">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <!-- Template Header -->
+                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_header bg-black">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="snippet_row">
+                                                    <table align="center" width="600" cellspacing="0" cellpadding="0" class="table-styles">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="horizontal-padding vertical-padding text-center">
+                                                                    <a t-att-href="(company_id.website) or '#'">
+                                                                        <img border="0" src="http://www.odoocdn.com/openerp_website/static/src/img/2016/logos/odoo_logo_small.png" style="margin:0 auto;height:auto;max-width:600px;width:100px;" alt="Your Logo" />
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!-- Template Banner -->
+                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_header2 bg-black">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="snippet_row" style="width:600px;margin:0 auto;">
+                                                    <div class="snippetbanner" style="padding:20px 0;">
+                                                        <table align="center" cellspacing="0" cellpadding="0" border="0" class="table-styles" width="600">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <p class="display-1 text-center">The Future of Emails</p>
+                                                                    <td width="100%" valign="top">
+                                                                        <img src="http://www.odoocdn.com/openerp_website/static/src/img/content/website_blog_01.png" style="height:auto;max-width:600px;width:600px;" alt="Your Logo" />
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <!-- Template Body -->
+                                <table align="center" width="100%" cellspacing="0" cellpadding="0" class="table-styles tech_template_container">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="snippet_row vertical-padding">
+                                                    <div class="snippet-general">
+                                                        <table align="center" cellspacing="0" cellpadding="0" class="table-styles" width="600">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td style="vertical-align:top;width:270px;padding:20px 10px 20px 20px;" class="odoo col_mv">
+                                                                        <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_inspiral.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
+                                                                        <p class="display-2 text-center" style="margin-top:20px;">Step 1</p>
+                                                                        <p style="margin:0;" class="text-center">
+                                                                            We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
+                                                                        </p>
+                                                                        <div class="text-center" style="margin-top:15px;">
+                                                                            <a href="#" class="link-color">Read More...</a>
+                                                                        </div>
+                                                                    </td>
+
+                                                                    <td style="vertical-align:top;width:270px;padding:20px 20px 20px 10px;" class="odoo col_mv">
+                                                                        <img src="http://www.odoocdn.com/openerp_website/static/src/img/2016/project/case_study_universem.jpg" style="height:auto;max-width:270px;width:270px;" alt="Your Logo" />
+                                                                        <p class="display-2 text-center" style="margin-top:20px;">Step 2</p>
+                                                                        <p style="margin:0;" class="text-center">
+                                                                            We need you to update your account information. If there is ever a problem with your account, this information will make it easier for you to log back in.
+                                                                        </p>
+                                                                        <div class="text-center" style="margin-top:15px;">
+                                                                            <a href="#" class="link-color">Read More...</a>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="oe_structure"></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+    </data>
+</odoo>
