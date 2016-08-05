@@ -164,10 +164,11 @@ def check(f):
     return wrapper
 
 def execute_cr(cr, uid, obj, method, *args, **kw):
-    object = openerp.registry(cr.dbname).get(obj)
-    if object is None:
+    recs = openerp.api.Environment(cr, uid, {}).get(obj)
+    if recs is None:
         raise UserError(_("Object %s doesn't exist") % obj)
-    return getattr(object, method)(cr, uid, *args, **kw)
+    return openerp.api.call_kw(recs, method, args, kw)
+
 
 def execute_kw(db, uid, obj, method, args, kw=None):
     return execute(db, uid, obj, method, *args, **kw or {})

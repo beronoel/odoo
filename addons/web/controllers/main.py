@@ -27,7 +27,7 @@ from cStringIO import StringIO
 
 import odoo
 import odoo.modules.registry
-from odoo.api import Environment
+from odoo.api import call_kw, Environment
 from odoo.modules import get_resource_path
 from odoo.tools import topological_sort
 from odoo.tools.translate import _
@@ -847,7 +847,7 @@ class DataSet(http.Controller):
         if method.startswith('_'):
             raise AccessError(_("Underscore prefixed methods cannot be remotely called"))
 
-        return getattr(request.registry.get(model), method)(request.cr, request.uid, *args, **kwargs)
+        return call_kw(request.env[model], method, args, kwargs)
 
     @http.route('/web/dataset/call', type='json', auth="user")
     def call(self, model, method, args, domain_id=None, context_id=None):
