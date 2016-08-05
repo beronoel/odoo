@@ -22,6 +22,8 @@ DATE_LENGTH = len(date.today().strftime(DATE_FORMAT))
 DATETIME_LENGTH = len(datetime.now().strftime(DATETIME_FORMAT))
 EMPTY_DICT = frozendict()
 
+RENAMED_ATTRS = [('select', 'index'), ('digits_compute', 'digits')]
+
 _logger = logging.getLogger(__name__)
 
 Default = object()                      # default value for __init__() methods
@@ -452,6 +454,11 @@ class Field(object):
             attrs.pop('store', None)
 
         self.set_all_attrs(attrs)
+
+        for key1, key2 in RENAMED_ATTRS:
+            if key1 in attrs:
+                _logger.warning("Field %s: parameter %r is no longer supported; use %r instead.",
+                                self, key1, key2)
 
         if not self.string and not self.related:
             # related fields get their string from their parent field
