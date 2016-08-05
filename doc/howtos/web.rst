@@ -86,20 +86,29 @@ sub-folders are conventional and not strictly necessary.
     application (or at least its web-browser side) as javascript. It should
     currently look like::
 
-        openerp.oepetstore = function(instance, local) {
-            var _t = instance.web._t,
-                _lt = instance.web._lt;
-            var QWeb = instance.web.qweb;
+        odoo.define('oepetstore.homepage', function (require) {
+        "use_strict";
 
-            local.HomePage = instance.Widget.extend({
-                start: function() {
-                    console.log("pet store home page loaded");
-                },
-            });
+        var core = require('web.core');
+        var Widget = require('web.Widget');
 
-            instance.web.client_actions.add(
-                'petstore.homepage', 'instance.oepetstore.HomePage');
-        }
+
+        var _t = core._t;
+        var _lt = core._lt;
+        var QWeb = core.qweb;
+
+        var HomePage = Widget.extend({
+            start: function() {
+                console.log("pet store home page loaded");
+            },
+        });
+
+
+        core.action_registry.add('petstore_homepage', HomePage);
+
+        return {
+            HomePage: HomePage,
+        };
 
 Which only prints a small message in the browser's console.
 
@@ -142,9 +151,12 @@ in order to both namespace code and correctly order its loading.
 
 ``oepetstore/static/js/petstore.js`` contains a module declaration::
 
-    openerp.oepetstore = function(instance, local) {
-        local.xxx = ...;
-    }
+    odoo.define('oepetstore.homepage', function (require) {
+    "use_strict";
+
+    var xxx = ...;
+
+    });
 
 In Odoo web, modules are declared as functions set on the global ``openerp``
 variable. The function's name must be the same as the addon (in this case
@@ -176,7 +188,9 @@ system based on John Resig's `Simple JavaScript Inheritance`_.
 New classes are defined by calling the :func:`~openerp.web.Class.extend`
 method of :class:`openerp.web.Class`::
 
-    var MyClass = instance.web.Class.extend({
+    var Class = require('web.Class');
+
+    var MyClass = Class.extend({
         say_hello: function() {
             console.log("hello");
         },
@@ -193,8 +207,9 @@ Classes are instantiated using the ``new`` operator::
     // print "hello" in the console
 
 And attributes of the instance can be accessed via ``this``::
+    
 
-    var MyClass = instance.web.Class.extend({
+    var MyClass = Class.extend({
         say_hello: function() {
             console.log("hello", this.name);
         },
@@ -209,7 +224,8 @@ Classes can provide an initializer to perform the initial setup of the
 instance, by defining an ``init()`` method. The initializer receives the
 parameters passed when using the ``new`` operator::
 
-    var MyClass = instance.web.Class.extend({
+
+    var MyClass = Class.extend({
         init: function(name) {
             this.name = name;
         },
@@ -293,7 +309,7 @@ Your First Widget
 
 The initial demonstration module already provides a basic widget::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         start: function() {
             console.log("pet store home page loaded");
         },
@@ -305,8 +321,7 @@ It extends :class:`~openerp.Widget` and overrides the standard method
 
 This line at the end of the file::
 
-    instance.web.client_actions.add(
-        'petstore.homepage', 'instance.oepetstore.HomePage');
+    core.action_registry.add('petstore_homepage', HomePage);
 
 registers our basic widget as a client action. Client actions will be
 explained later, for now this is just what allows our widget to
@@ -343,7 +358,7 @@ on the page when ``HomePage`` is launched.
 
 Let's add some content to the widget's root element, using jQuery::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         start: function() {
             this.$el.append("<div>Hello dear Odoo user!</div>");
         },
@@ -360,7 +375,7 @@ That message will now appear when you open :menuselection:`Pet Store
 The ``HomePage`` widget is used by Odoo Web and managed automatically.
 To learn how to use a widget "from scratch" let's create a new one::
 
-    local.GreetingsWidget = instance.Widget.extend({
+    var GreetingsWidget = Widget.extend({
         start: function() {
             this.$el.append("<div>We are so happy to see you again in this menu!</div>");
         },
@@ -369,10 +384,10 @@ To learn how to use a widget "from scratch" let's create a new one::
 We can now add our ``GreetingsWidget`` to the ``HomePage`` by using the
 ``GreetingsWidget``'s :func:`~openerp.Widget.appendTo` method::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         start: function() {
             this.$el.append("<div>Hello dear Odoo user!</div>");
-            var greeting = new local.GreetingsWidget(this);
+            var greeting = new GreetingsWidget(this);
             return greeting.appendTo(this.$el);
         },
     });
@@ -392,11 +407,11 @@ DOM Explorer. But first let's alter our widgets slightly so we can more easily
 find where they are, by :attr:`adding a class to their root elements
 <openerp.Widget.className>`::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         className: 'oe_petstore_homepage',
         ...
     });
-    local.GreetingsWidget = instance.Widget.extend({
+    var GreetingsWidget = Widget.extend({
         className: 'oe_petstore_greetings',
         ...
     });
@@ -428,7 +443,7 @@ Widget Parents and Children
 
 In the previous part, we instantiated a widget using this syntax::
 
-    new local.GreetingsWidget(this);
+    new GreetingsWidget(this);
 
 The first argument is ``this``, which in that case was a ``HomePage``
 instance. This tells the widget being created which other widget is its
@@ -445,9 +460,10 @@ to know who is its parent and who are its children.
 :func:`~openerp.Widget.getParent`
     can be used to get the parent of a widget::
 
-        local.GreetingsWidget = instance.Widget.extend({
+        var GreetingsWidget = Widget.extend({
+            className: 'oe_petstore_greetings',
             start: function() {
-                console.log(this.getParent().$el );
+                console.log(this.getParent().$el);
                 // will print "div.oe_petstore_homepage" in the console
             },
         });
@@ -455,9 +471,10 @@ to know who is its parent and who are its children.
 :func:`~openerp.Widget.getChildren`
     can be used to get a list of its children::
 
-        local.HomePage = instance.Widget.extend({
+        var HomePage = Widget.extend({
+            className: 'oe_petstore_homepage',
             start: function() {
-                var greeting = new local.GreetingsWidget(this);
+                var greeting = new GreetingsWidget(this);
                 greeting.appendTo(this.$el);
                 console.log(this.getChildren()[0].$el);
                 // will print "div.oe_petstore_greetings" in the console
@@ -468,7 +485,7 @@ When overriding the :func:`~openerp.Widget.init` method of a widget it is
 *of the utmost importance* to pass the parent to the ``this._super()`` call,
 otherwise the relation will not be set up correctly::
 
-    local.GreetingsWidget = instance.Widget.extend({
+    var GreetingsWidget = Widget.extend({
         init: function(parent, name) {
             this._super(parent);
             this.name = name;
@@ -478,7 +495,7 @@ otherwise the relation will not be set up correctly::
 Finally, if a widget does not have a parent (e.g. because it's the root
 widget of the application), ``null`` can be provided as parent::
 
-    new local.GreetingsWidget(null);
+    new GreetingsWidget(null);
 
 Destroying Widgets
 ------------------
@@ -560,7 +577,7 @@ Now we can use this template inside of the ``HomePage`` widget. Using the
 ``QWeb`` loader variable defined at the top of the page, we can call to the
 template defined in the XML file::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         start: function() {
             this.$el.append(QWeb.render("HomePageTemplate"));
         },
@@ -573,7 +590,7 @@ However, because :class:`~openerp.Widget` has special integration for QWeb
 the template can be set directly on the widget via its
 :attr:`~openerp.Widget.template` attribute::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         template: "HomePageTemplate",
         start: function() {
             ...
@@ -635,7 +652,7 @@ essentially be that set up by :func:`~openerp.Widget.init`):
 
 ::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         template: "HomePageTemplate",
         init: function(parent) {
             this._super(parent);
@@ -850,20 +867,27 @@ Exercise
 
         ::
 
-            openerp.oepetstore = function(instance, local) {
-                var _t = instance.web._t,
-                    _lt = instance.web._lt;
-                var QWeb = instance.web.qweb;
+            odoo.define('oepetstore.homepage', function (require) {
+            "use_strict";
 
-                local.HomePage = instance.Widget.extend({
-                    start: function() {
-                        var products = new local.ProductsWidget(
-                            this, ["cpu", "mouse", "keyboard", "graphic card", "screen"], "#00FF00");
+            var core = require('web.core');
+            var Widget = require('web.Widget');
+
+
+            var _t = core._t
+            var _lt = core._lt
+            var QWeb = core.qweb;
+
+
+            var HomePage = Widget.extend({
+                start: function() {
+                    var products = new ProductsWidget(
+                        this, ["cpu", "mouse", "keyboard", "graphic card", "screen"], "#00FF00");
                         products.appendTo(this.$el);
-                    },
-                });
+                },
+            });
 
-                local.ProductsWidget = instance.Widget.extend({
+            var ProductsWidget = Widget.extend({
                     template: "ProductsWidget",
                     init: function(parent, products, color) {
                         this._super(parent);
@@ -872,9 +896,13 @@ Exercise
                     },
                 });
 
-                instance.web.client_actions.add(
-                    'petstore.homepage', 'instance.oepetstore.HomePage');
-            }
+            core.action_registry.add('petstore_homepage', HomePage);
+
+            return {
+                HomePage: HomePage,
+            };
+
+            });
 
         .. code-block:: xml
 
@@ -921,7 +949,7 @@ Selecting DOM elements within a widget can be performed by calling the
 But because it's a common operation, :class:`~openerp.Widget` provides an
 equivalent shortcut through the :func:`~openerp.Widget.$` method::
 
-    local.MyWidget = instance.Widget.extend({
+    var MyWidget = Widget.extend({
         start: function() {
             this.$("input.my_input")...
         },
@@ -942,7 +970,7 @@ Easier DOM Events Binding
 We have previously bound DOM events using normal jQuery event handlers (e.g.
 ``.click()`` or ``.change()``) on widget elements::
 
-    local.MyWidget = instance.Widget.extend({
+    var MyWidget = Widget.extend({
         start: function() {
             var self = this;
             this.$(".my_button").click(function() {
@@ -965,7 +993,7 @@ While this works it has a few issues:
 Widgets thus provide a shortcut to DOM event binding via
 :attr:`~openerp.Widget.events`::
 
-    local.MyWidget = instance.Widget.extend({
+    var MyWidget = Widget.extend({
         events: {
             "click .my_button": "button_clicked",
         },
@@ -1005,7 +1033,7 @@ Widgets provide an event system (separate from the DOM/jQuery event system
 described above): a widget can fire events on itself, and other widgets (or
 itself) can bind themselves and listen for these events::
 
-    local.ConfirmWidget = instance.Widget.extend({
+    var ConfirmWidget = Widget.extend({
         events: {
             'click button.ok_button': function () {
                 this.trigger('user_chose', true);
@@ -1032,9 +1060,9 @@ data and passed directly to listeners.
 We can then set up a parent event instantiating our generic widget and
 listening to the ``user_chose`` event using :func:`~openerp.Widget.on`::
 
-    local.HomePage = instance.Widget.extend({
+    var HomePage = Widget.extend({
         start: function() {
-            var widget = new local.ConfirmWidget(this);
+            var widget = new ConfirmWidget(this);
             widget.on("user_chose", this, this.user_chose);
             widget.appendTo(this.$el);
         },
@@ -1119,45 +1147,59 @@ Exercise
 
         ::
 
-            openerp.oepetstore = function(instance, local) {
-                var _t = instance.web._t,
-                    _lt = instance.web._lt;
-                var QWeb = instance.web.qweb;
+            odoo.define('oepetstore.homepage', function (require) {
+            "use_strict";
 
-                local.ColorInputWidget = instance.Widget.extend({
-                    template: "ColorInputWidget",
-                    events: {
-                        'change input': 'input_changed'
-                    },
-                    start: function() {
-                        this.input_changed();
-                        return this._super();
-                    },
-                    input_changed: function() {
-                        var color = [
-                            "#",
-                            this.$(".oe_color_red").val(),
-                            this.$(".oe_color_green").val(),
-                            this.$(".oe_color_blue").val()
-                        ].join('');
-                        this.set("color", color);
-                    },
-                });
+            var core = require('web.core');
+            var Widget = require('web.Widget');
 
-                local.HomePage = instance.Widget.extend({
-                    template: "HomePage",
-                    start: function() {
-                        this.colorInput = new local.ColorInputWidget(this);
-                        this.colorInput.on("change:color", this, this.color_changed);
-                        return this.colorInput.appendTo(this.$el);
-                    },
-                    color_changed: function() {
-                        this.$(".oe_color_div").css("background-color", this.colorInput.get("color"));
-                    },
-                });
 
-                instance.web.client_actions.add('petstore.homepage', 'instance.oepetstore.HomePage');
-            }
+            var _t = core._t
+            var _lt = core._lt
+            var QWeb = core.qweb;
+
+            var ColorInputWidget = Widget.extend({
+                template: "ColorInputWidget",
+                events: {
+                    'change input': 'input_changed'
+                },
+                start: function() {
+                    this.input_changed();
+                    return this._super();
+                },
+                input_changed: function() {
+                    var color = [
+                        "#",
+                        this.$(".oe_color_red").val(),
+                        this.$(".oe_color_green").val(),
+                        this.$(".oe_color_blue").val()
+                    ].join('');
+                    this.set("color", color);
+                },
+            });
+
+
+
+            var HomePage = Widget.extend({
+                template: "HomePage",
+                start: function() {
+                    this.colorInput = new ColorInputWidget(this);
+                    this.colorInput.on("change:color", this, this.color_changed);
+                    return this.colorInput.appendTo(this.$el);
+                },
+                color_changed: function() {
+                    this.$(".oe_color_div").css("background-color", this.colorInput.get("color"));
+                },
+            });
+
+            core.action_registry.add('petstore_homepage', HomePage);
+
+            return {
+                HomePage: HomePage,
+            };
+
+            });
+
 
         .. code-block:: xml
 
@@ -1191,9 +1233,11 @@ Modify existing widgets and classes
 The class system of the Odoo web framework allows direct modification of
 existing classes using the :func:`~openerp.web.Class.include` method::
 
-    var TestClass = instance.web.Class.extend({
+    var Class = require('web.Class');
+
+    var TestClass = Class.extend({
         testMethod: function() {
-            return "hello";
+            return "Hello";
         },
     });
 
@@ -1223,8 +1267,10 @@ The process to translate text in Python and JavaScript code is very
 similar. You could have noticed these lines at the beginning of the
 ``petstore.js`` file::
 
-    var _t = instance.web._t,
-        _lt = instance.web._lt;
+    var core = require('web.core');
+
+    var _t = core._t
+    var _lt = core._lt
 
 These lines are simply used to import the translation functions in the current
 JavaScript module. They are used thus::
@@ -1298,16 +1344,19 @@ returns a literal dictionary.
 
 Here is a sample widget that calls ``my_method()`` and displays the result::
 
-    local.HomePage = instance.Widget.extend({
-        start: function() {
-            var self = this;
-            var model = new instance.web.Model("oepetstore.message_of_the_day");
-            model.call("my_method", {context: new instance.web.CompoundContext()}).then(function(result) {
-                self.$el.append("<div>Hello " + result["hello"] + "</div>");
-                // will show "Hello world" to the user
-            });
-        },
-    });
+    var Model = require('web.Model');
+    var data = require('web.data')
+
+    var HomePage = Widget.extend({
+    start: function() {
+        var self = this;
+        var model = new Model("oepetstore.message_of_the_day");
+        model.call("my_method", {context: new data.CompoundContext()}).then(function(result) {
+            self.$el.append("<div>Hello " + result["hello"] + "</div>");
+            // will show "Hello world" to the user
+        });
+    },
+});
 
 The class used to call Odoo models is :class:`openerp.Model`. It is
 instantiated with the Odoo model's name as first parameter
@@ -1358,7 +1407,7 @@ CompoundContext
 The previous section used a ``context`` argument which was not explained in
 the method call::
 
-    model.call("my_method", {context: new instance.web.CompoundContext()})
+    model.call("my_method", {context: new data.CompoundContext()})
 
 The context is like a "magic" argument that the web client will always give to
 the server when calling a method. The context is a dictionary containing
@@ -1381,7 +1430,7 @@ merge all those contexts before sending them to the server.
 
 .. code-block:: javascript
 
-    model.call("my_method", {context: new instance.web.CompoundContext({'new_key': 'key_value'})})
+    model.call("my_method", {context: new data.CompoundContext({'new_key': 'key_value'})})
 
 .. code-block:: python
 
@@ -1453,35 +1502,50 @@ Exercises
 
         .. code-block:: javascript
 
-            openerp.oepetstore = function(instance, local) {
-                var _t = instance.web._t,
-                    _lt = instance.web._lt;
-                var QWeb = instance.web.qweb;
+            odoo.define('oepetstore.homepage', function (require) {
+            "use_strict";
 
-                local.HomePage = instance.Widget.extend({
-                    template: "HomePage",
-                    start: function() {
-                        return new local.MessageOfTheDay(this).appendTo(this.$el);
-                    },
-                });
+            var core = require('web.core');
+            var Widget = require('web.Widget');
+            var Class = require('web.Class');
+            var Model = require('web.Model');
 
-                instance.web.client_actions.add('petstore.homepage', 'instance.oepetstore.HomePage');
 
-                local.MessageOfTheDay = instance.Widget.extend({
-                    template: "MessageOfTheDay",
-                    start: function() {
-                        var self = this;
-                        return new instance.web.Model("oepetstore.message_of_the_day")
-                            .query(["message"])
-                            .order_by('-create_date', '-id')
-                            .first()
-                            .then(function(result) {
-                                self.$(".oe_mywidget_message_of_the_day").text(result.message);
-                            });
-                    },
-                });
 
-            }
+            var _t = core._t
+            var _lt = core._lt
+            var QWeb = core.qweb;
+
+            var HomePage = Widget.extend({
+                template: "HomePage",
+                start: function() {
+                    return new MessageOfTheDay(this).appendTo(this.$el);
+                },
+            });
+
+
+            var MessageOfTheDay = Widget.extend({
+                template: "MessageOfTheDay",
+                start: function() {
+                    var self = this;
+                    return new Model("oepetstore.message_of_the_day")
+                        .query(["message"])
+                        .order_by('-create_date', '-id')
+                        .first()
+                        .then(function(result) {
+                            self.$(".oe_mywidget_message_of_the_day").text(result.message);
+                        });
+                },
+            });
+
+            core.action_registry.add('petstore_homepage', HomePage);
+
+            return {
+                HomePage: HomePage,
+            };
+
+            });
+
 
         .. code-block:: xml
 
@@ -1531,53 +1595,72 @@ Exercises
 
         .. code-block:: javascript
 
-            openerp.oepetstore = function(instance, local) {
-                var _t = instance.web._t,
-                    _lt = instance.web._lt;
-                var QWeb = instance.web.qweb;
+            odoo.define('oepetstore.homepage', function (require) {
+            "use_strict";
 
-                local.HomePage = instance.Widget.extend({
-                    template: "HomePage",
-                    start: function () {
-                        return $.when(
-                            new local.PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
-                            new local.MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right'))
-                        );
-                    }
-                });
-                instance.web.client_actions.add('petstore.homepage', 'instance.oepetstore.HomePage');
+            var core = require('web.core');
+            var Widget = require('web.Widget');
+            var Class = require('web.Class');
+            var Model = require('web.Model');
 
-                local.MessageOfTheDay = instance.Widget.extend({
-                    template: 'MessageOfTheDay',
-                    start: function () {
-                        var self = this;
-                        return new instance.web.Model('oepetstore.message_of_the_day')
-                            .query(["message"])
-                            .order_by('-create_date', '-id')
-                            .first()
-                            .then(function (result) {
-                                self.$(".oe_mywidget_message_of_the_day").text(result.message);
+
+
+            var _t = core._t
+            var _lt = core._lt
+            var QWeb = core.qweb;
+
+            var HomePage = Widget.extend({
+                template: "HomePage",
+                start: function () {
+                    return $.when(
+                        new PetToysList(this).appendTo(this.$('.oe_petstore_homepage_left')),
+                        new MessageOfTheDay(this).appendTo(this.$('.oe_petstore_homepage_right'))
+                    );
+                },
+            });
+
+
+            var MessageOfTheDay = Widget.extend({
+                template: 'MessageOfTheDay',
+                start: function () {
+                    var self = this;
+                    return new Model('oepetstore.message_of_the_day')
+                        .query(["message"])
+                        .order_by('-create_date', '-id')
+                        .first()
+                        .then(function (result) {
+                            self.$(".oe_mywidget_message_of_the_day").text(result.message);
+                        });
+                },
+            });
+
+
+            var PetToysList = Widget.extend({
+                template: 'PetToysList',
+                start: function () {
+                    var self = this;
+                    return new Model('product.product')
+                        .query(['name', 'image'])
+                        .filter([['categ_id.name', '=', "Pet Toys"]])
+                        .limit(5)
+                        .all()
+                        .then(function (results) {
+                            _(results).each(function (item) {
+                                self.$el.append(QWeb.render('PetToy', {item: item}));
                             });
-                    }
-                });
+                        });
+                }
+            });
 
-                local.PetToysList = instance.Widget.extend({
-                    template: 'PetToysList',
-                    start: function () {
-                        var self = this;
-                        return new instance.web.Model('product.product')
-                            .query(['name', 'image'])
-                            .filter([['categ_id.name', '=', "Pet Toys"]])
-                            .limit(5)
-                            .all()
-                            .then(function (results) {
-                                _(results).each(function (item) {
-                                    self.$el.append(QWeb.render('PetToy', {item: item}));
-                                });
-                            });
-                    }
-                });
-            }
+
+            core.action_registry.add('petstore_homepage', HomePage);
+
+            return {
+                HomePage: HomePage,
+            };
+
+            });
+
 
         .. code-block:: xml
 
@@ -1669,7 +1752,7 @@ type, and calling an action manager instance with it.
 :func:`~openerp.Widget.do_action` is a shortcut of :class:`~openerp.Widget`
 looking up the "current" action manager and executing the action::
 
-    instance.web.TestWidget = instance.Widget.extend({
+    var TestWidget = Widget.extend({
         dispatch_to_new_action: function() {
             this.do_action({
                 type: 'ir.actions.act_window',
@@ -1711,14 +1794,14 @@ attributes are:
 
         .. code-block:: javascript
 
-            local.PetToysList = instance.Widget.extend({
+            var PetToysList = Widget.extend({
                 template: 'PetToysList',
                 events: {
                     'click .oe_petstore_pettoy': 'selected_item',
                 },
                 start: function () {
                     var self = this;
-                    return new instance.web.Model('product.product')
+                    return new Model('product.product')
                         .query(['name', 'image'])
                         .filter([['categ_id.name', '=', "Pet Toys"]])
                         .limit(5)
@@ -1763,7 +1846,7 @@ beyond that *everything* is handled by custom client code.
 
 Our widget is registered as the handler for the client action through this::
 
-    instance.web.client_actions.add('petstore.homepage', 'instance.oepetstore.HomePage');
+    core.action_registry.add('petstore_homepage', HomePage);
 
 
 ``instance.web.client_actions`` is a :class:`~openerp.web.Registry` in which
@@ -1785,7 +1868,7 @@ On the server side, we had simply defined an ``ir.actions.client`` action:
 .. code-block:: xml
 
     <record id="action_home_page" model="ir.actions.client">
-        <field name="tag">petstore.homepage</field>
+        <field name="tag">petstore_homepage</field>
     </record>
 
 and a menu opening the action:
@@ -1937,7 +2020,9 @@ user will not be able to modify the content of the field.
 
 .. code-block:: javascript
 
-    local.FieldChar2 = instance.web.form.AbstractField.extend({
+    var form_common = require('web.form_common');
+    
+    var FieldChar2 = form_common.AbstractField.extend({
         init: function() {
             this._super.apply(this, arguments);
             this.set("value", "");
@@ -1947,7 +2032,9 @@ user will not be able to modify the content of the field.
         },
     });
 
-    instance.web.form.widgets.add('char2', 'instance.oepetstore.FieldChar2');
+    core.form_widget_registry.add('char2', FieldChar2);s
+
+core.form_widget_registry.add('char2', FieldChar2);
 
 In this example, we declare a class named ``FieldChar2`` inheriting from
 ``AbstractField``. We also register this class in the registry
@@ -1984,7 +2071,7 @@ sets a widget property named ``effective_readonly``. The field should watch
 for changes in that widget property and display the correct mode
 accordingly. Example::
 
-    local.FieldChar2 = instance.web.form.AbstractField.extend({
+    var FieldChar2 = form_common.AbstractField.extend({
         init: function() {
             this._super.apply(this, arguments);
             this.set("value", "");
@@ -2015,7 +2102,7 @@ accordingly. Example::
         },
     });
 
-    instance.web.form.widgets.add('char2', 'instance.oepetstore.FieldChar2');
+    core.form_widget_registry.add('char2', FieldChar2);
 
 .. code-block:: xml
 
@@ -2073,7 +2160,9 @@ lot of verifications to know the state of the ``effective_readonly`` property:
 
         .. code-block:: javascript
 
-            local.FieldColor = instance.web.form.AbstractField.extend({
+            var form_common = require('web.form_common');
+
+            var FieldColor = form_common.AbstractField.extend({
                 events: {
                     'change input': function (e) {
                         if (!this.get('effective_readonly')) {
@@ -2104,7 +2193,8 @@ lot of verifications to know the state of the ``effective_readonly`` property:
                     }
                 },
             });
-            instance.web.form.widgets.add('color', 'instance.oepetstore.FieldColor');
+
+            core.form_widget_registry.add('color', FieldColor);
 
         .. code-block:: xml
 
@@ -2152,7 +2242,7 @@ Form widgets can interact with form fields by listening for their changes and
 fetching or altering their values. They can access form fields through
 their :attr:`~openerp.web.form.FormWidget.field_manager` attribute::
 
-    local.WidgetMultiplication = instance.web.form.FormWidget.extend({
+    var WidgetMultiplication = form_common.FormWidget.extend({
         start: function() {
             this._super();
             this.field_manager.on("field_changed:integer_a", this, this.display_result);
@@ -2165,8 +2255,7 @@ their :attr:`~openerp.web.form.FormWidget.field_manager` attribute::
             this.$el.text("a*b = " + result);
         }
     });
-
-    instance.web.form.custom_widgets.add('multiplication', 'instance.oepetstore.WidgetMultiplication');
+    core.form_custom_registry.add('multiplication', WidgetMultiplication);
 
 :attr:`~openerp.web.form.FormWidget` is generally the
 :class:`~openerp.web.form.FormView` itself, but features used from it should
@@ -2190,7 +2279,8 @@ the most useful being:
 
     .. code-block:: html
 
-        <iframe width="400" height="300" src="https://maps.google.com/?ie=UTF8&amp;ll=XXX,YYY&amp;output=embed">
+        <iframe width="400" height="300"
+            src="https://www.google.com/maps/embed/v1/view?zoom=14&amp;center=XXX,YYY&amp;key=MAPS_API_KEY">
         </iframe>
 
     where ``XXX`` should be replaced by the latitude and ``YYY`` by the
@@ -2203,30 +2293,32 @@ the most useful being:
 
         .. code-block:: javascript
 
-            local.WidgetCoordinates = instance.web.form.FormWidget.extend({
-                start: function() {
-                    this._super();
-                    this.field_manager.on("field_changed:provider_latitude", this, this.display_map);
-                    this.field_manager.on("field_changed:provider_longitude", this, this.display_map);
-                    this.display_map();
-                },
-                display_map: function() {
-                    this.$el.html(QWeb.render("WidgetCoordinates", {
-                        "latitude": this.field_manager.get_field_value("provider_latitude") || 0,
-                        "longitude": this.field_manager.get_field_value("provider_longitude") || 0,
-                    }));
-                }
-            });
+            var WidgetCoordinates = form_common.FormWidget.extend({
+            start: function() {
+                this._super();
+                this.field_manager.on("field_changed:provider_latitude", this, this.display_map);
+                this.field_manager.on("field_changed:provider_longitude", this, this.display_map);
+                this.display_map();
+            },
+            display_map: function() {
+                this.$el.html(QWeb.render("WidgetCoordinates", {
+                    "latitude": this.field_manager.get_field_value("provider_latitude") || 0,
+                    "longitude": this.field_manager.get_field_value("provider_longitude") || 0,
+                }));
+            },
+        });
 
-            instance.web.form.custom_widgets.add('coordinates', 'instance.oepetstore.WidgetCoordinates');
+
+        core.form_custom_registry.add('coordinates', WidgetCoordinates);
 
         .. code-block:: xml
 
             <t t-name="WidgetCoordinates">
                 <iframe width="400" height="300"
-                    t-attf-src="https://maps.google.com/?ie=UTF8&amp;ll={{latitude}},{{longitude}}&amp;output=embed">
+                    t-attf-src="https://www.google.com/maps/embed/v1/view?zoom=14&amp;center={{latitude}},{{longitude}}&amp;key=MAPS_API_KEY">
                 </iframe>
             </t>
+
 
 .. exercise:: Get the Current Coordinate
 
@@ -2252,7 +2344,7 @@ the most useful being:
 
         .. code-block:: javascript
 
-            local.WidgetCoordinates = instance.web.form.FormWidget.extend({
+            var WidgetCoordinates = form_common.FormWidget.extend({
                 events: {
                     'click button': function () {
                         navigator.geolocation.getCurrentPosition(
@@ -2282,13 +2374,14 @@ the most useful being:
                 },
             });
 
-            instance.web.form.custom_widgets.add('coordinates', 'instance.oepetstore.WidgetCoordinates');
+
+            core.form_custom_registry.add('coordinates', WidgetCoordinates);
 
         .. code-block:: xml
 
             <t t-name="WidgetCoordinates">
                 <iframe width="400" height="300"
-                    t-attf-src="https://maps.google.com/?ie=UTF8&amp;ll={{latitude}},{{longitude}}&amp;output=embed">
+                    t-attf-src="https://www.google.com/maps/embed/v1/view?zoom=14&amp;center={{latitude}},{{longitude}}&amp;key=MAPS_API_KEY">
                 </iframe>
                 <button>Get My Current Coordinate</button>
             </t>
