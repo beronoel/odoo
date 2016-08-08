@@ -295,8 +295,7 @@ def set_cookie_and_redirect(redirect_url):
     return redirect
 
 def load_actions_from_ir_values(action_slot, model, res_id):
-    ir_values = request.session.model('ir.values')
-    actions = ir_values.get_actions(action_slot=action_slot, model=model, res_id=res_id, context=request.context)
+    actions = request.env['ir.values'].get_actions(action_slot=action_slot, model=model, res_id=res_id, context=request.context)
     return [(id, name, clean_action(action)) for id, name, action in actions]
 
 def clean_action(action):
@@ -417,14 +416,16 @@ def xml2json_from_elementtree(el, preserve_whitespaces=False):
     res["children"] = kids
     return res
 
+
 def content_disposition(filename):
-    return request.registry['ir.http'].content_disposition(filename)
+    return request.env['ir.http'].content_disposition(filename)
 
 
 def binary_content(xmlid=None, model='ir.attachment', id=None, field='datas', unique=False, filename=None, filename_field='datas_fname', download=False, mimetype=None, default_mimetype='application/octet-stream', env=None):
-    return request.registry['ir.http'].binary_content(
+    return request.env['ir.http'].binary_content(
         xmlid=xmlid, model=model, id=id, field=field, unique=unique, filename=filename, filename_field=filename_field,
         download=download, mimetype=mimetype, default_mimetype=default_mimetype, env=env)
+
 
 #----------------------------------------------------------
 # Odoo Web web Controllers
@@ -609,6 +610,7 @@ class Proxy(http.Controller):
             return client.post('/' + path, base_url=base_url, query_string=query_string,
                                headers=headers, data=data)
 
+
 class Database(http.Controller):
 
     def _render_template(self, **d):
@@ -702,6 +704,7 @@ class Database(http.Controller):
             error = "Master password update error: %s" % e
             return self._render_template(error=error)
 
+
 class Session(http.Controller):
 
     @http.route('/web/session/get_session_info', type='json', auth="none")
@@ -718,16 +721,15 @@ class Session(http.Controller):
 
     @http.route('/web/session/change_password', type='json', auth="user")
     def change_password(self, fields):
-        old_password, new_password,confirm_password = operator.itemgetter('old_pwd', 'new_password','confirm_pwd')(
+        old_password, new_password, confirm_password = operator.itemgetter('old_pwd', 'new_password', 'confirm_pwd')(
                 dict(map(operator.itemgetter('name', 'value'), fields)))
         if not (old_password.strip() and new_password.strip() and confirm_password.strip()):
-            return {'error':_('You cannot leave any password empty.'),'title': _('Change Password')}
+            return {'error': _('You cannot leave any password empty.'), 'title': _('Change Password')}
         if new_password != confirm_password:
-            return {'error': _('The new password and its confirmation must be identical.'),'title': _('Change Password')}
+            return {'error': _('The new password and its confirmation must be identical.'), 'title': _('Change Password')}
         try:
-            if request.session.model('res.users').change_password(
-                old_password, new_password):
-                return {'new_password':new_password}
+            if request.env['res.users'].change_password(old_password, new_password):
+                return {'new_password': new_password}
         except Exception:
             return {'error': _('The old password you provided is incorrect, your password was not changed.'), 'title': _('Change Password')}
         return {'error': _('Error, password not changed !'), 'title': _('Change Password')}
@@ -785,6 +787,7 @@ class Session(http.Controller):
         request.session.logout(keep_db=True)
         return werkzeug.utils.redirect(redirect, 303)
 
+
 class Menu(http.Controller):
 
     @http.route('/web/menu/load_needaction', type='json', auth="user")
@@ -794,13 +797,15 @@ class Menu(http.Controller):
             :return: needaction data
             :rtype: dict(menu_id: {'needaction_enabled': boolean, 'needaction_counter': int})
         """
-        return request.session.model('ir.ui.menu').get_needaction_data(menu_ids, request.context)
+        return request.env['ir.ui.menu'].browse(menu_ids).get_needaction_data()
+
 
 class DataSet(http.Controller):
 
     @http.route('/web/dataset/search_read', type='json', auth="user")
     def search_read(self, model, fields=False, offset=0, limit=False, domain=None, sort=None):
         return self.do_search_read(model, fields, offset, limit, domain, sort)
+
     def do_search_read(self, model, fields=False, offset=0, limit=False, domain=None
                        , sort=None):
         """ Performs a search() followed by a read() (if needed) using the
@@ -818,10 +823,9 @@ class DataSet(http.Controller):
                   matching fields selection set)
         :rtype: list
         """
-        Model = request.session.model(model)
+        Model = request.env[model]
 
-        records = Model.search_read(domain, fields, offset or 0, limit or False, sort or False,
-                           request.context)
+        records = Model.search_read(domain, fields, offset or 0, limit or False, sort or False)
         if not records:
             return {
                 'length': 0,
@@ -838,11 +842,11 @@ class DataSet(http.Controller):
 
     @http.route('/web/dataset/load', type='json', auth="user")
     def load(self, model, id, fields):
-        m = request.session.model(model)
+        _model = request.env[model]
         value = {}
-        r = m.read([id], False, request.context)
-        if r:
-            value = r[0]
+        record_values = _model.browse(id).read()
+        if record_values:
+            value = record_values[0]
         return {'value': value}
 
     def call_common(self, model, method, args, domain_id=None, context_id=None):
@@ -888,31 +892,33 @@ class DataSet(http.Controller):
                            starting the resequencing from an arbitrary number,
                            defaults to ``0``
         """
-        m = request.session.model(model)
-        if not m.fields_get([field]):
+        _model = request.env[model]
+        if not _model.fields_get([field]):
             return False
         # python 2.6 has no start parameter
-        for i, id in enumerate(ids):
-            m.write(id, { field: i + offset })
+        for i, _id in enumerate(ids):
+            _model.browse(_id).write({field: i + offset})
         return True
+
 
 class View(http.Controller):
 
     @http.route('/web/view/add_custom', type='json', auth="user")
     def add_custom(self, view_id, arch):
-        CustomView = request.session.model('ir.ui.view.custom')
-        CustomView.create({
+        request.env['ir.ui.view.custom'].create({
             'user_id': request.session.uid,
             'ref_id': view_id,
             'arch': arch
-        }, request.context)
+        })
         return {'result': True}
+
 
 class TreeView(View):
 
     @http.route('/web/treeview/action', type='json', auth="user")
     def action(self, model, id):
         return load_actions_from_ir_values('tree_but_open', model, id)
+
 
 class Binary(http.Controller):
 
@@ -1014,27 +1020,26 @@ class Binary(http.Controller):
     @http.route('/web/binary/upload_attachment', type='http', auth="user")
     @serialize_exception
     def upload_attachment(self, callback, model, id, ufile):
-        Model = request.session.model('ir.attachment')
         out = """<script language="javascript" type="text/javascript">
                     var win = window.top.window;
                     win.jQuery(win).trigger(%s, %s);
                 </script>"""
         try:
-            attachment_id = Model.create({
+            attachment = request.env['ir.attachment'].create({
                 'name': ufile.filename,
                 'datas': base64.encodestring(ufile.read()),
                 'datas_fname': ufile.filename,
                 'res_model': model,
                 'res_id': int(id)
-            }, request.context)
+            })
             args = {
                 'filename': ufile.filename,
                 'mimetype': ufile.content_type,
-                'id':  attachment_id
+                'id':  attachment.id
             }
         except Exception:
             args = {'error': _("Something horrible happened")}
-            _logger.exception("Fail to upload attachment %s" % ufile.filename)
+            _logger.exception("Fail to upload attachment %s", ufile.filename)
         return out % (json.dumps(callback), json.dumps(args))
 
     @http.route([
@@ -1082,23 +1087,24 @@ class Binary(http.Controller):
 
         return response
 
+
 class Action(http.Controller):
 
     @http.route('/web/action/load', type='json', auth="user")
     def load(self, action_id, additional_context=None):
-        Actions = request.session.model('ir.actions.actions')
+        Actions = request.env['ir.actions.actions']
         value = False
         try:
             action_id = int(action_id)
         except ValueError:
             try:
                 module, xmlid = action_id.split('.', 1)
-                model, action_id = request.session.model('ir.model.data').get_object_reference(module, xmlid)
+                model, action_id = request.env['ir.model.data'].get_object_reference(module, xmlid)
                 assert model.startswith('ir.actions.')
             except Exception:
                 action_id = 0   # force failed read
 
-        base_action = Actions.read([action_id], ['type'], request.context)
+        base_action = Actions.browse(action_id).read(['type'])[0]
         if base_action:
             ctx = request.context
             action_type = base_action[0]['type']
@@ -1106,19 +1112,19 @@ class Action(http.Controller):
                 ctx.update({'bin_size': True})
             if additional_context:
                 ctx.update(additional_context)
-            action = request.session.model(action_type).read([action_id], False, ctx)
+            action = request.env[action_type].with_context(ctx).browse(action_id).read()
             if action:
                 value = clean_action(action[0])
         return value
 
     @http.route('/web/action/run', type='json', auth="user")
     def run(self, action_id):
-        return_action = request.session.model('ir.actions.server').run(
-            [action_id], request.context)
+        return_action = request.env['ir.actions.server'].browse(action_id).run()
         if return_action:
             return clean_action(return_action)
         else:
             return False
+
 
 class Export(http.Controller):
 
@@ -1140,7 +1146,7 @@ class Export(http.Controller):
         return fields
 
     @http.route('/web/export/get_fields', type='json', auth="user")
-    def get_fields(self, model, prefix='', parent_name= '',
+    def get_fields(self, model, prefix='', parent_name='',
                    import_compat=True, parent_field_type=None,
                    exclude=None):
 
@@ -1193,12 +1199,10 @@ class Export(http.Controller):
     @http.route('/web/export/namelist', type='json', auth="user")
     def namelist(self, model, export_id):
         # TODO: namelist really has no reason to be in Python (although itertools.groupby helps)
-        export = request.session.model("ir.exports").read([export_id])[0]
-        export_fields_list = request.session.model("ir.exports.line").read(
-            export['export_fields'])
+        export = request.env["ir.exports"].borwse(export_id).read()[0]
+        export_fields_list = request.env["ir.exports.line"].read(export['export_fields'])
 
-        fields_data = self.fields_info(
-            model, map(operator.itemgetter('name'), export_fields_list))
+        fields_data = self.fields_info(model, map(operator.itemgetter('name'), export_fields_list))
 
         return [
             {'name': field['name'], 'label': fields_data[field['name']]}
@@ -1260,6 +1264,7 @@ class Export(http.Controller):
             (prefix + '/' + k, prefix_string + '/' + v)
             for k, v in self.fields_info(model, export_fields).iteritems())
 
+
 class ExportFormat(object):
     raw_data = False
 
@@ -1292,27 +1297,28 @@ class ExportFormat(object):
                                 'import_compat')(
                 params)
 
-        Model = request.session.model(model)
-        context = dict(request.context or {}, **params.get('context', {}))
-        ids = ids or Model.search(domain, offset=0, limit=False, order=False, context=context)
+        Model = request.env[model].with_context(**params.get('context', {}))
+        #context = dict(request.context or {}, **params.get('context', {}))
+        if not ids:
+            ids = Model.search(domain, offset=0, limit=False, order=False).ids
 
         if not request.env[model]._is_an_ordinary_table():
             fields = [field for field in fields if field['name'] != 'id']
 
         field_names = map(operator.itemgetter('name'), fields)
-        import_data = Model.export_data(ids, field_names, self.raw_data, context=context).get('datas',[])
+        import_data = Model.browse(ids).export_data(field_names, self.raw_data).get('datas', [])
 
         if import_compat:
             columns_headers = field_names
         else:
             columns_headers = [val['label'].strip() for val in fields]
 
-
         return request.make_response(self.from_data(columns_headers, import_data),
-            headers=[('Content-Disposition',
-                            content_disposition(self.filename(model))),
+            headers=[('Content-Disposition', content_disposition(self.filename(model))),
                      ('Content-Type', self.content_type)],
-            cookies={'fileToken': token})
+            cookies={'fileToken': token}
+        )
+
 
 class CSVExport(ExportFormat, http.Controller):
 
@@ -1355,6 +1361,7 @@ class CSVExport(ExportFormat, http.Controller):
         data = fp.read()
         fp.close()
         return data
+
 
 class ExcelExport(ExportFormat, http.Controller):
     # Excel needs raw data to correctly handle numbers and date values
@@ -1402,6 +1409,7 @@ class ExcelExport(ExportFormat, http.Controller):
         fp.close()
         return data
 
+
 class Reports(http.Controller):
     POLLING_DELAY = 0.25
     TYPES_MAPPING = {
@@ -1413,6 +1421,7 @@ class Reports(http.Controller):
         'xls': 'application/vnd.ms-excel',
     }
 
+    #TODO RCO : remove session.proxy() and `Service` usage
     @http.route('/web/report', type='http', auth="user")
     @serialize_exception
     def index(self, action, token):
@@ -1468,11 +1477,13 @@ class Reports(http.Controller):
                  ('Content-Length', len(report))],
              cookies={'fileToken': token})
 
+
 class Apps(http.Controller):
+
     @http.route('/apps/<app>', auth='user')
     def get_app_url(self, req, app):
-        act_window_obj = request.session.model('ir.actions.act_window')
-        ir_model_data = request.session.model('ir.model.data')
+        act_window_obj = request.env['ir.actions.act_window']
+        ir_model_data = request.env['ir.model.data']
         try:
             action_id = ir_model_data.get_object_reference('base', 'open_module_tree')[1]
             action = act_window_obj.read(action_id, ['name', 'type', 'res_model', 'view_mode', 'view_type', 'context', 'views', 'domain'])
