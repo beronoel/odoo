@@ -124,7 +124,6 @@ return core.Class.extend({
         this.running_tour = local_storage.getItem(get_running_key());
         this.running_step_delay = parseInt(local_storage.getItem(get_running_delay_key()), 10) || 300;
         this.TourModel = new Model('web_tour.tour');
-        this.edition = (_.last(session.server_version_info) === 'e') ? 'enterprise' : 'community';
     },
     /**
      * Registers a tour described by the following arguments (in order)
@@ -136,7 +135,6 @@ return core.Class.extend({
      * @param [Array] dict of steps, each step being a dict containing a tip description
      */
     register: function() {
-        var self = this;
         var args = Array.prototype.slice.call(arguments);
         var last_arg = args[args.length - 1];
         var name = args[0];
@@ -148,10 +146,7 @@ return core.Class.extend({
         var steps = last_arg instanceof Array ? last_arg : [last_arg];
         var tour = {
             name: name,
-            current_step: parseInt(local_storage.getItem(get_step_key(name))) || 0,
-            steps: _.filter(steps, function (step) {
-                return !step.edition || step.edition === self.edition;
-            }),
+            steps: steps,
             url: options.url,
             test: options.test,
         };
@@ -163,13 +158,24 @@ return core.Class.extend({
             };
         }
         this.tours[name] = tour;
-        if (this.running_tour === name || (!tour.test && !_.contains(this.consumed_tours, name))) {
-            this._to_next_step(name, 0);
-        }
+    },
+    _register_all: function () {
+        var edition = (_.last(session.server_version_info) === 'e') ? 'enterprise' : 'community';
 
-        if (!this.running_tour || this.running_tour === name) {
-            this.update(name);
-        }
+        _.each(this.tours, (function (tour, name) {
+            tour.current_step = parseInt(local_storage.getItem(get_step_key(name))) || 0;
+            tour.steps = _.filter(tour.steps, function (step) {
+                return !step.edition || step.edition === edition;
+            });
+
+            if (this.running_tour === name || (!tour.test && !_.contains(this.consumed_tours, name))) {
+                this._to_next_step(name, 0);
+            }
+
+            tour.ready = true;
+        }).bind(this));
+
+        this.update();
     },
     run: function (tour_name, step_delay) {
         if (this.running_tour) {

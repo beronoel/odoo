@@ -46,12 +46,18 @@ return session.is_bound.then(function () {
         var observer = new MutationObserver(check_tooltip);
         var observe = function () {
             $(function () {
-                observer.observe(document.body, {
-                    attributes: true,
-                    childList: true,
-                    subtree: true,
+                /**
+                 * Once the DOM is ready, we still have to wait all the modules are loaded before completing the tours
+                 * registration and starting listening for DOM mutations.
+                 */
+                _.defer(function () {
+                    tour._register_all();
+                    observer.observe(document.body, {
+                        attributes: true,
+                        childList: true,
+                        subtree: true,
+                    });
                 });
-                tour.update();
             });
         };
 
