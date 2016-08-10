@@ -137,11 +137,7 @@ class AccountVoucher(models.Model):
                 self.account_id = self.journal_id.default_debit_account_id \
                     if self.voucher_type == 'sale' else self.journal_id.default_credit_account_id
 
-    # deprecated method
-    @api.multi
-    def button_proforma_voucher(self):
-        return {'type': 'ir.actions.act_window_close'}
-
+    # method should be renamed to action_[validate/confirm/post] as that's what it does.
     @api.multi
     def proforma_voucher(self):
         self.action_move_line_create()
