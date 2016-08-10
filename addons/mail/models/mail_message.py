@@ -340,7 +340,7 @@ class Message(models.Model):
             for partner in message.needaction_partner_ids.filtered(lambda partner: partner.partner_share):
                 # TMP
                 notif = message.notification_ids.filtered(lambda notif: notif.res_partner_id == partner)
-                print partner_tree[partner.id][0], partner_tree[partner.id][1], notif
+                # print partner_tree[partner.id][0], partner_tree[partner.id][1], notif
                 customer_data.append((partner_tree[partner.id][0], partner_tree[partner.id][1], notif.is_email, notif.email_state))
             attachment_ids = []
             for attachment in message.attachment_ids:
@@ -358,7 +358,7 @@ class Message(models.Model):
                 'attachment_ids': attachment_ids,
                 'tracking_value_ids': tracking_value_ids,
             })
-            print message_dict['customer_data']
+            # print message_dict['customer_data']
 
         return True
 

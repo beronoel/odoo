@@ -9,6 +9,7 @@ import json
 import lxml
 import logging
 import pytz
+import re
 import socket
 import time
 import xmlrpclib
@@ -928,6 +929,58 @@ class MailThread(models.AbstractModel):
         return (model, thread_id, route[2], route[3], None if self._context.get('drop_alias', False) else route[4])
 
     @api.model
+    def message_route_check_bounce_new(self, message):
+        """ UPDATE ME """
+        bounce_alias = self.env['ir.config_parameter'].get_param("mail.bounce.alias")
+        message_id = message.get('Message-Id')
+        email_from = tools.decode_message_header(message, 'From')
+        email_to = tools.decode_message_header(message, 'To')
+
+        # 0. Verify whether this is a bounced email (wrong destination,...) -> use it to collect data, such as dead leads
+        if bounce_alias and bounce_alias in email_to:
+            # Bounce regex
+            # Typical form of bounce is bounce_alias-128-crm.lead-34@domain
+            # group(1) = the mail ID; group(2) = the model (if any); group(3) = the record ID
+            bounce_re = re.compile("%s-(\d+)-?([\w.]+)?-?(\d+)?" % re.escape(bounce_alias), re.UNICODE)
+            bounce_match = bounce_re.search(email_to)
+            if bounce_match:
+                bounced_model, bounced_thread_id = bounce_match.group(2), bounce_match.group(3)
+                _logger.info('Routing mail from %s to %s with Message-Id %s: bounced mail from mail ??, model: %s, thread_id: %s',
+                             email_from, email_to, message_id, bounced_model, bounced_thread_id)
+                part = next((part for part in message.walk() if part.get_content_type() == 'message/rfc822'), None)
+
+                dsn_part = next((part for part in message.walk() if part.get_content_type() == 'message/delivery-status'), None)
+
+                partner_address = False
+                if dsn_part and len(dsn_part.get_payload()) > 1:
+                    dsn = dsn_part.get_payload()[1]
+                    final_recipient_data = tools.decode_message_header(dsn, 'Final-Recipient')
+                    partner_address = final_recipient_data.split(';', 1)[1].strip()
+
+                message = False
+                if part:
+                    msg = part.get_payload()[0]
+                    references = tools.mail_header_msgid_re.findall(tools.decode_message_header(msg, 'Message-Id'))
+                    message = self.env['mail.message'].sudo().search([('message_id', 'in', references)])
+
+                print 'Bounce for', partner_address, message
+
+                if partner_address and message:
+                    # partner = self.env['res.partner'].search([('email', 'like', partner_address)])
+                    # print partner
+                    notifications = self.env['mail.notification'].sudo().search([
+                        ('mail_message_id', '=', message.id),
+                        ('res_partner_id.email', 'like', partner_address)])
+                    print 'found', notifications, notifications.mapped('res_partner_id').mapped('name')
+                    notifications.write({
+                        'email_state': 'bounce'
+                    })
+
+                return False
+
+        return True
+
+    @api.model
     def message_route(self, message, message_dict, model=None, thread_id=None, custom_values=None):
         """Attempt to figure out the correct target model, thread_id,
         custom_values and user_id to use for an incoming message.
@@ -994,6 +1047,8 @@ class MailThread(models.AbstractModel):
             tools.decode_message_header(message, 'Resent-To'),
             tools.decode_message_header(message, 'Resent-Cc')])
         rcpt_tos_localparts = [e.split('@')[0] for e in tools.email_split(rcpt_tos)]
+
+        self.message_route_check_bounce_new(message)
 
         # 0. First check if this is a bounce message or not.
         #    See http://datatracker.ietf.org/doc/rfc3462/?include_text=1

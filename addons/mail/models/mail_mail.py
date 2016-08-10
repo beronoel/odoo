@@ -142,8 +142,8 @@ class MailMail(models.Model):
                 notifications.write({
                     'email_state': 'exception',
                 })
-        if mail_sent:
-            self.sudo().filtered(lambda self: self.auto_delete).unlink()
+        # if mail_sent:
+        #     self.sudo().filtered(lambda self: self.auto_delete).unlink()
         return True
 
     # ------------------------------------------------------
