@@ -137,9 +137,9 @@ class AccountVoucher(models.Model):
                 self.account_id = self.journal_id.default_debit_account_id \
                     if self.voucher_type == 'sale' else self.journal_id.default_credit_account_id
 
+    # deprecated method
     @api.multi
     def button_proforma_voucher(self):
-        self.signal_workflow('proforma_voucher')
         return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
@@ -148,7 +148,6 @@ class AccountVoucher(models.Model):
 
     @api.multi
     def action_cancel_draft(self):
-        self.create_workflow()
         self.write({'state': 'draft'})
 
     @api.multi
