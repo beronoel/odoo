@@ -11,6 +11,12 @@ _logger = logging.getLogger(__name__)
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
+    has_multi_company = fields.Boolean(readonly=True,
+        default=lambda self: self._default_has_multi_company())
+    sale_note = fields.Text(related='company_id.sale_note', default=lambda self: self.env.user.company_id.sale_note)
+
     group_product_variant = fields.Selection([
         (0, "No variants on products"),
         (1, 'Products can have several attributes, defining variants (Example: size, color,...)')
@@ -111,6 +117,10 @@ class SaleConfiguration(models.TransientModel):
         (0, 'Procurements and deliveries dates are based on the sale order dates'),
         (1, 'Allow to modify the sale order dates to postpone deliveries and procurements')
         ], "Date")
+
+    @api.model
+    def _default_has_multi_company(self):
+        return self.env.user.has_group('base.group_multi_company')
 
     @api.multi
     def set_sale_defaults(self):
