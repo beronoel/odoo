@@ -145,6 +145,11 @@ class ProductTemplate(models.Model):
         for template in self:
             template.currency_id = template.company_id.currency_id.id or main_company.currency_id.id
 
+    @api.constrains('categ_id')
+    def _check_category(self):
+        if self.categ_id.type == 'view':
+            raise ValidationError(_("You can not create product with 'view' type internal category."))
+
     @api.multi
     def _compute_template_price(self):
         prices = {}
