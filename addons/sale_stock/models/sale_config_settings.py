@@ -8,6 +8,8 @@ from odoo.exceptions import AccessError
 class SaleConfiguration(models.TransientModel):
     _inherit = 'sale.config.settings'
 
+    security_lead = fields.Float(related='company_id.security_lead', default=lambda self: self.env.user.company_id.security_lead)
+
     module_delivery = fields.Selection([
         (0, 'No shipping costs on sales orders'),
         (1, 'Allow adding shipping costs')
