@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class MrpConfigSettings(models.TransientModel):
     _name = 'mrp.config.settings'
     _inherit = 'res.config.settings'
+
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
+    has_multi_company = fields.Boolean(readonly=True,
+        default=lambda self: self._default_has_multi_company())
+    manufacturing_lead = fields.Float(related='company_id.manufacturing_lead', default=lambda self: self.env.user.company_id.manufacturing_lead)
 
     group_product_variant = fields.Selection([
         (0, "No variants on products"),
@@ -43,3 +49,7 @@ class MrpConfigSettings(models.TransientModel):
         help='Work Order Operations allow you to create and manage the manufacturing operations that should be followed '
              'within your work centers in order to produce a product. They are attached to bills of materials '
              'that will define the required raw materials.')
+
+    @api.model
+    def _default_has_multi_company(self):
+        return self.env.user.has_group('base.group_multi_company')

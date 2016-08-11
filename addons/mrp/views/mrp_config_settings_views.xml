@@ -10,6 +10,12 @@
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
                     </header>
+                    <field name="has_multi_company" invisible="1"/>
+                    <separator string="Logistics*" attrs="{'invisible': [('has_multi_company', '=', False)]}"/>
+                    <separator string="Logistics" attrs="{'invisible': [('has_multi_company', '=', True)]}"/>
+                    <group>
+                        <field name="manufacturing_lead" class="oe_inline"/>
+                    </group>
                     <group string="Manufacturing Order">
                         <field name="group_product_variant" widget="radio"/>
                         <field name="module_mrp_byproduct" widget="radio"/>
@@ -21,6 +27,9 @@
                         <field name="module_mrp_maintenance" widget="upgrade_radio"/>
                         <field name="module_quality_mrp" widget="upgrade_radio"/>
                     </group>
+                    <p class="text-muted" attrs="{'invisible': [('has_multi_company', '=', False)]}">
+                        (*) These fields are company-dependant, you are setting the config for the yourcompany only.
+                    </p>
                 </form>
             </field>
         </record>
