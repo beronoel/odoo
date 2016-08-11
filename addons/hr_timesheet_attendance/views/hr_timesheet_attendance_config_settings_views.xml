@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_config_settings_form_inherit_hr_timesheet_attendance" model="ir.ui.view">
+        <field name="name">project.config.settings.form.inherit.timesheet.attendance</field>
+        <field name="model">project.config.settings</field>
+        <field name="inherit_id" ref="hr_timesheet_sheet.view_config_settings_form_inherit_hr_timesheet_sheet"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='timesheet_range']" position="inside">
+                <field name="timesheet_max_difference" required="1" class="oe_inline"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

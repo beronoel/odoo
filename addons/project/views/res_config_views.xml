@@ -10,6 +10,12 @@
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
                     </header>
+                    <field name="has_multi_company" invisible="1"/>
+                    <separator string="Projects*" attrs="{'invisible': [('has_multi_company', '=', False)]}"/>
+                    <separator string="Projects" attrs="{'invisible': [('has_multi_company', '=', True)]}"/>
+                    <group name="projects">
+                        <field name="project_time_mode_id" domain="[('category_id','=', %(product.uom_categ_wtime)d)]" groups="base.group_no_one" class="oe_inline"/>
+                    </group>
                     <group string="Project Management" name="project_management">
                         <field name="module_pad" widget="radio"/>
                         <label for="id" string="Forecasts"/>
@@ -23,6 +29,9 @@
                         <field name="module_rating_project" widget="radio"/>
                     </group>
                     <group name="timesheets"/>
+                    <p class="text-muted" attrs="{'invisible': [('has_multi_company', '=', False)]}">
+                        (*) These fields are company-dependant, you are setting the config for the yourcompany only.
+                    </p>
                 </form>
             </field>
         </record>
