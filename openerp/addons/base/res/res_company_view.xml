@@ -50,7 +50,7 @@
                         </page>
                         <page name="configuration" string="Configuration">
                             <group>
-                                <group name="account_grp" string="Accounting"/>
+                                <group name="account_grp"/>
                             </group>
                         </page>
                         <page name="report" string="Report Configuration">

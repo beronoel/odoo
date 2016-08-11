@@ -29,6 +29,10 @@ class AccountConfigSettings(models.TransientModel):
         default=lambda self: self.env.user.company_id)
     has_default_company = fields.Boolean(readonly=True,
         default=lambda self: self._default_has_default_company())
+
+    has_multi_company = fields.Boolean(readonly=True,
+        default=lambda self: self._default_has_multi_company())
+
     expects_chart_of_accounts = fields.Boolean(related='company_id.expects_chart_of_accounts',
         string='This company has its own chart of accounts',
         help='Check this box if this company is a legal entity.')
@@ -150,6 +154,9 @@ class AccountConfigSettings(models.TransientModel):
         count = self.env['res.company'].search_count([])
         return bool(count == 1)
 
+    @api.model
+    def _default_has_multi_company(self):
+        return self.env.user.has_group('base.group_multi_company')
 
     @api.onchange('company_id')
     def onchange_company_id(self):
