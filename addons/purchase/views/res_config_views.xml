@@ -9,6 +9,27 @@
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
                     </header>
+                    <field name="has_multi_company" invisible="1"/>
+                    <separator string="Logistics*" attrs="{'invisible': [('has_multi_company', '=', False)]}"/>
+                    <separator string="Logistics" attrs="{'invisible': [('has_multi_company', '=', True)]}"/>
+                    <group>
+                        <label for="po_lead"/>
+                        <div>
+                            <field name="po_lead" class="oe_inline"/>
+                        </div>
+                        <label for="po_lock"/>
+                        <div>
+                            <field name="po_lock" widget="radio" class="oe_inline"/>
+                        </div>
+                        <label for="po_double_validation"/>
+                        <div>
+                            <field name="po_double_validation" widget="radio" class="oe_inline"/>
+                        </div>
+                        <label for="po_double_validation_amount" attrs="{'invisible': [('po_double_validation', '=', 'one_step')]}"/>
+                        <div  attrs="{'invisible': [('po_double_validation', '=', 'one_step')]}">
+                            <field name="po_double_validation_amount" class="oe_inline"/>
+                        </div>
+                    </group>
                     <group string="Purchase Order">
                         <field name="group_product_variant" widget="radio"/>
                         <field name="group_uom" widget="radio"/>
@@ -20,6 +41,9 @@
                     <group string="Location &amp; Warehouse">
                         <field name="module_stock_dropshipping" widget="radio"/>
                     </group>
+                    <p class="text-muted" attrs="{'invisible': [('has_multi_company', '=', False)]}">
+                        (*) These fields are company-dependant, you are setting the config for the yourcompany only.
+                    </p>
                 </form>
             </field>
         </record>

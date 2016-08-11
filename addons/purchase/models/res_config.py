@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class PurchaseConfigSettings(models.TransientModel):
     _name = 'purchase.config.settings'
     _inherit = 'res.config.settings'
+
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
+    has_multi_company = fields.Boolean(readonly=True,
+        default=lambda self: self._default_has_multi_company())
+    po_lead = fields.Float(related='company_id.po_lead', default=lambda self: self.env.user.company_id.po_lead)
+    po_lock = fields.Selection(related='company_id.po_lock', default=lambda self: self.env.user.company_id.po_lock)
+    po_double_validation = fields.Selection(related='company_id.po_double_validation', default=lambda self: self.env.user.company_id.po_double_validation)
+    po_double_validation_amount = fields.Monetary(related='company_id.po_double_validation_amount', default=lambda self: self.env.user.company_id.po_double_validation_amount, currency_field='company_currency_id')
+    company_currency_id = fields.Many2one('res.currency', related='company_id.currency_id', readonly=True,
+        help='Utility field to express amount currency')
 
     group_product_variant = fields.Selection([
         (0, "No variants on products"),
@@ -48,6 +59,10 @@ class PurchaseConfigSettings(models.TransientModel):
         (1, 'Allow using and importing vendor pricelists')
         ], "Vendor Price",
         implied_group="purchase.group_manage_vendor_price")
+
+    @api.model
+    def _default_has_multi_company(self):
+        return self.env.user.has_group('base.group_multi_company')
 
 
 class AccountConfigSettings(models.TransientModel):
