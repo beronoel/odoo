@@ -276,8 +276,8 @@ class HttpCase(TransactionCase):
             return
 
         db = get_db_name()
-        Users = self.registry['res.users']
-        uid = Users.authenticate(db, user, password, None)
+        uid = self.registry['res.users'].authenticate(db, user, password, None)
+        env = api.Environment(self.cr, uid, {})
 
         # self.session.authenticate(db, user, password, uid=uid)
         # OpenERPSession.authenticate accesses the current request, which we
@@ -288,7 +288,7 @@ class HttpCase(TransactionCase):
         session.uid = uid
         session.login = user
         session.password = password
-        session.context = Users.context_get(self.cr, uid) or {}
+        session.context = env['res.users'].context_get() or {}
         session.context['uid'] = uid
         session._fix_lang(session.context)
 

@@ -1208,14 +1208,12 @@ class BaseModel(object):
 
         # old-style constraint methods
         trans = self.env['ir.translation']
-        cr, uid, context = self.env.args
-        ids = self.ids
         errors = []
-        for fun, msg, names in self._constraints:
+        for func, msg, names in self._constraints:
             try:
-                # validation must be context-independent; call ``fun`` without context
+                # validation must be context-independent; call ``func`` without context
                 valid = names and not (set(names) & field_names)
-                valid = valid or fun(self._model, cr, uid, ids)
+                valid = valid or func(self)
                 extra_error = None
             except Exception, e:
                 _logger.debug('Exception while validating constraint', exc_info=True)
@@ -1223,7 +1221,7 @@ class BaseModel(object):
                 extra_error = tools.ustr(e)
             if not valid:
                 if callable(msg):
-                    res_msg = msg(self._model, cr, uid, ids, context=context)
+                    res_msg = msg(self)
                     if isinstance(res_msg, tuple):
                         template, params = res_msg
                         res_msg = template % params
@@ -5315,13 +5313,6 @@ class BaseModel(object):
         prefetch[cls._name].update(ids)
         return records
 
-    @api.v7
-    def browse(self, cr, uid, arg=None, context=None):
-        ids = _normalize_ids(arg)
-        #assert all(isinstance(id, IdType) for id in ids), "Browsing invalid ids: %s" % ids
-        return self._browse(ids, Environment(cr, uid, context or {}))
-
-    @api.v8
     def browse(self, arg=None, prefetch=None):
         """ browse([ids]) -> records
 
