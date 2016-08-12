@@ -48,11 +48,6 @@
                                 </group>
                             </group>
                         </page>
-                        <page name="configuration" string="Configuration">
-                            <group>
-                                <group name="account_grp"/>
-                            </group>
-                        </page>
                         <page name="report" string="Report Configuration">
                             <group string="Configuration">
                                 <group col="2" colspan="2">
