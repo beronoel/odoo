@@ -105,6 +105,9 @@
                             </div>
                         </div>
                     </group>
+                    <p class="text-muted" id="company_footnote" invisible="1">
+                        (*) These fields are company-dependant, you are setting the config for the yourcompany only.
+                    </p>
                 </form>
             </field>
         </record>

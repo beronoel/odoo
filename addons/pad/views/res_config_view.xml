@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_general_configuration_form_inherit_pad" model="ir.ui.view">
+        <field name="name">base.config.settings.form.inherit</field>
+        <field name="model">base.config.settings</field>
+        <field name="inherit_id" ref="base_setup.view_general_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='google']" position="before">
+                <separator string="Pads*" attrs="{'invisible': [('has_multi_company', '=', False)]}"/>
+                <separator string="Pads" attrs="{'invisible': [('has_multi_company', '=', True)]}"/>
+                <group>
+                    <field name="pad_server" placeholder="e.g. beta.primarypad.com" class="oe_inline"/>
+                    <field name="pad_key" class="oe_inline"/>
+                </group>
+            </xpath>
+            <xpath expr="//p[@id='company_footnote']" position="attributes">
+                <attribute name="attrs">{'invisible': [('has_multi_company', '=', False)]}</attribute>
+                <attribute name="invisible">0</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>
