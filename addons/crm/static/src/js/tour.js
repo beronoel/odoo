@@ -5,7 +5,7 @@ var core = require('web.core');
 var tour = require('web_tour.tour');
 
 var _t = core._t;
-
+return;
 tour.register('crm_tour', {
     url: "/web",
 }, [tour.STEPS.MENU_MORE, {

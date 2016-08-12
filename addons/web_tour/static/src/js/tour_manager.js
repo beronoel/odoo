@@ -119,11 +119,19 @@ return core.Class.extend({
         var tour = {
             name: name,
             current_step: parseInt(local_storage.getItem(get_step_key(name))) || 0,
+            registered_steps: steps,
             steps: _.filter(steps, function (step) {
                 return !step.edition || step.edition === self.edition;
             }),
             url: options.url,
             test: options.test,
+            modify: _.bind(function (steps) {
+                this._deactivate_tip(this.active_tooltips[name]);
+                delete this.tours[name];
+                delete this.active_tooltips[name];
+                local_storage.setItem(get_step_key(name), 0);
+                this.register(name, options, steps);
+            }, this),
         };
         if (options.skip_enabled) {
             tour.skip_link = '<p><span class="o_skip_tour">' + _t('Skip tour') + '</span></p>';
