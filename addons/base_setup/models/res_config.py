@@ -11,6 +11,10 @@ class BaseConfigSettings(models.TransientModel):
     group_multi_company = fields.Boolean(string='Manage multiple companies',
         help='Work in multi-company environments, with appropriate security access between companies.',
         implied_group='base.group_multi_company')
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+        default=lambda self: self.env.user.company_id)
+    has_multi_company = fields.Boolean(readonly=True,
+        default=lambda self: self._default_has_multi_company())
     module_share = fields.Boolean(string='Allow documents sharing',
         help="""Share or embbed any screen of Odoo.""")
     module_portal = fields.Boolean(string='Activate the customer portal',
@@ -31,6 +35,10 @@ class BaseConfigSettings(models.TransientModel):
     group_multi_currency = fields.Boolean(string='Allow multi currencies',
             implied_group='base.group_multi_currency',
             help="Allows to work in a multi currency environment")
+
+    @api.model
+    def _default_has_multi_company(self):
+        return self.env.user.has_group('base.group_multi_company')
 
     @api.multi
     def open_company(self):
