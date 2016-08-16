@@ -99,10 +99,7 @@ class BaseCase(unittest.TestCase):
         :raise: ValueError if not found
         :returns: registered id
         """
-        assert "." in xid, "this method requires a fully qualified parameter, in the following form: 'module.identifier'"
-        module, xid = xid.split('.')
-        _, id = self.registry('ir.model.data').get_object_reference(self.cr, self.uid, module, xid)
-        return id
+        return self.browse_ref(xid).id
 
     def browse_ref(self, xid):
         """ Returns a record object for the provided
@@ -114,8 +111,7 @@ class BaseCase(unittest.TestCase):
         :returns: :class:`~openerp.models.BaseModel`
         """
         assert "." in xid, "this method requires a fully qualified parameter, in the following form: 'module.identifier'"
-        module, xid = xid.split('.')
-        return self.registry('ir.model.data').get_object(self.cr, self.uid, module, xid)
+        return self.env.ref(xid)
 
     @contextmanager
     def _assertRaises(self, exception):
