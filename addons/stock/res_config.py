@@ -3,6 +3,7 @@
 
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
+from openerp import SUPERUSER_ID
 
 class res_company(osv.osv):
     _inherit = "res.company"
@@ -141,6 +142,7 @@ class stock_config_settings(osv.osv_memory):
             help="""This option supplements the warehouse application by effectively implementing Push and Pull inventory flows through Routes."""),
         'decimal_precision': fields.integer('Decimal precision on weight', help="As an example, a decimal precision of 2 will allow weights like: 9.99 kg, whereas a decimal precision of 4 will allow weights like:  0.0231 kg."),
         'propagation_minimum_delta': fields.related('company_id', 'propagation_minimum_delta', type='integer', string="Minimum days to trigger a propagation of date change in pushed/pull flows."),
+        'weight_unit': fields.selection([('KGS', "Kilogram"), ('LBS', 'Pound')], string="Unit of Weight"),
         'module_stock_dropshipping': fields.selection([
             (0, 'Suppliers always deliver to your warehouse(s)'),
             (1, "Allow suppliers to deliver directly to your customers")
@@ -182,6 +184,17 @@ class stock_config_settings(osv.osv_memory):
         dp = self.pool.get('ir.model.data').get_object(cr, uid, 'product', 'decimal_stock_weight')
         dp.write({'digits': config.decimal_precision})
 
+    def get_default_sale_config(self, cr, uid, fields, context=None):
+        default_weight_unit = self.pool.get('ir.values').get_default(cr, uid, 'stock.config.settings', 'weight_unit_setting')
+        return {
+            'weight_unit': default_weight_unit
+        }
+
+    def set_weight_unit_defaults(self, cr, uid, ids, context=None):
+        config = self.browse(cr, uid, ids[0], context)
+        self.pool.get('ir.values').set_default(cr, SUPERUSER_ID, 'stock.config.settings', 'weight_unit_setting', config.weight_unit)
+
     _defaults = {
         'company_id': _default_company,
+        'weight_unit': 'KGS',
     }
