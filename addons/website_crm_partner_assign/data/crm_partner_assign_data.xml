@@ -33,7 +33,7 @@
 
 <p>Thanks,</p>
 
-<pre t-esc="ctx.get('partner_id').user_id and ctx.get('partner_id').user_id.signature or safe"/>
+<pre t-esc="ctx.get('partner_id').user_id and ctx.get('partner_id').user_id.signature"/>
 <t t-if="not ctx.get('partner_id').user_id">
 PS: It looks like you do not have an account manager assigned to you, please contact us.
 </t>

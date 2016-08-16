@@ -5,7 +5,7 @@
         <!--Email template -->
         <record id="email_template_edi_sale" model="mail.template">
             <field name="name">Sales Order - Send by Email</field>
-            <field name="email_from">${(object.user_id.email and '%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) or '')|safe}</field>
+            <field name="email_from">${('%s &lt;%s&gt;' % (object.user_id.name, object.user_id.email) if object.user_id.email else '')|safe}</field>
             <field name="subject">${object.company_id.name} ${object.state in ('draft', 'sent') and 'Quotation' or 'Order'} (Ref ${object.name or 'n/a' })</field>
             <field name="partner_to">${object.partner_invoice_id.id}</field>
             <field name="model_id" ref="sale.model_sale_order"/>
@@ -44,7 +44,7 @@ from <t t-esc="record.company_id.name"/>.
 
 <p style="color:#eeeeee;">
 <t t-if=record.user_id and record.user_id.signature">
-    <t t-raw="record.user_id.signature or safe"/>
+    <t t-raw="record.user_id.signature"/>
 </t>
 </p>
 </p>
@@ -84,7 +84,7 @@ from <t t-esc="record.company_id.name"/>.
                         <td align="center" style="min-width: 590px;">
                           <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px;">
                             <tbody>
-                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;" t-raw="record.body or safe"/>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;" t-raw="record.body"/>
                             </tbody>
                           </table>
                         </td>

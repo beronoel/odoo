@@ -87,7 +87,7 @@
                     </tr>
                 </table>
             </td></tr>
-            <tr><td style="padding:15px 20px 10px 20px;" t-raw="record.user_id.signature or safe"/></tr>
+            <tr><td style="padding:15px 20px 10px 20px;" t-raw="record.user_id.signature"/></tr>
         </tbody>
     </table>
     <table style="width:600px;margin:auto;text-align:center;font-size:12px;">

@@ -10,7 +10,7 @@
             <field name="lang">${object.user_id.lang}</field>
             <field name="body_html"><![CDATA[
     <p>
-        <strong>Reminder <t t-value="record.name or safe"/></strong>
+        <strong>Reminder <t t-value="record.name"/></strong>
     </p>
     
     <p>You have not updated your progress for the goal <t t-esc="record.definition_id.name"/> (currently reached at <t t-esc="record.completeness"/>%) for at least <t t-esc="record.remind_update_delay"/> days. Do not forget to do it.</p>

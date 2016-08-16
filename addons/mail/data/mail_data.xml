@@ -106,11 +106,11 @@
         </tbody></table>
     </div>
 </t>
-<t t-raw="record.body or safe"/>
+<t t-raw="record.body"/>
 <ul t-if="ctx.get('tracking')">
     <li t-foreach="ctx.get('tracking')" t-as="tracking"><t t-esc="tracking[0]"/> : <t t-esc="tracking[1]"/> -&gt; <t t-esc="tracking[2]"/></li>
 </ul>
-<t t-if="ctx.get('signature')" t-raw="ctx.get('signature') or safe"/>
+<t t-if="ctx.get('signature')" t-raw="ctx.get('signature')"/>
 <br/>
 <p style="color: #555555;">
     Sent by
