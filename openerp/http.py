@@ -1027,57 +1027,6 @@ class AuthenticationError(Exception):
 class SessionExpiredException(Exception):
     pass
 
-class Service(object):
-    """
-        .. deprecated:: 8.0
-            Use :func:`dispatch_rpc` instead.
-    """
-    def __init__(self, session, service_name):
-        self.session = session
-        self.service_name = service_name
-
-    def __getattr__(self, method):
-        def proxy_method(*args):
-            result = dispatch_rpc(self.service_name, method, args)
-            return result
-        return proxy_method
-
-class Model(object):
-    """
-        .. deprecated:: 8.0
-            Use the registry and cursor in :data:`request` instead.
-    """
-    def __init__(self, session, model):
-        self.session = session
-        self.model = model
-        self.proxy = self.session.proxy('object')
-
-    def __getattr__(self, method):
-        self.session.assert_valid()
-        def proxy(*args, **kw):
-            # Can't provide any retro-compatibility for this case, so we check it and raise an Exception
-            # to tell the programmer to adapt his code
-            if not request.db or not request.uid or self.session.db != request.db \
-                or self.session.uid != request.uid:
-                raise Exception("Trying to use Model with badly configured database or user.")
-                
-            if method.startswith('_'):
-                raise Exception("Access denied")
-            mod = request.registry[self.model]
-            meth = getattr(mod, method)
-            # make sure to instantiate an environment
-            cr = request.env.cr
-            result = meth(cr, request.uid, *args, **kw)
-            # reorder read
-            if method == "read":
-                if isinstance(result, list) and len(result) > 0 and "id" in result[0]:
-                    index = {}
-                    for r in result:
-                        index[r['id']] = r
-                    result = [index[x] for x in args[0] if x in index]
-            return result
-        return proxy
-
 class OpenERPSession(werkzeug.contrib.sessions.Session):
     def __init__(self, *args, **kwargs):
         self.inited = False
@@ -1217,77 +1166,25 @@ class OpenERPSession(werkzeug.contrib.sessions.Session):
         self.password = value
 
     def send(self, service_name, method, *args):
-        """
-        .. deprecated:: 8.0
-            Use :func:`dispatch_rpc` instead.
-        """
-        return dispatch_rpc(service_name, method, args)
+        raise NotImplementedError("session.send() is gone; use dispatch_rpc() instead")
 
     def proxy(self, service):
-        """
-        .. deprecated:: 8.0
-            Use :func:`dispatch_rpc` instead.
-        """
-        return Service(self, service)
+        raise NotImplementedError("session.proxy() is gone; use dispatch_rpc() instead")
 
     def assert_valid(self, force=False):
-        """
-        .. deprecated:: 8.0
-            Use :meth:`check_security` instead.
-
-        Ensures this session is valid (logged into the openerp server)
-        """
-        if self.uid and not force:
-            return
-        # TODO use authenticate instead of login
-        self.uid = self.proxy("common").login(self.db, self.login, self.password)
-        if not self.uid:
-            raise AuthenticationError("Authentication failure")
+        raise NotImplementedError("session.assert_valid() is gone; use session.check_security() instead")
 
     def ensure_valid(self):
-        """
-        .. deprecated:: 8.0
-            Use :meth:`check_security` instead.
-        """
-        if self.uid:
-            try:
-                self.assert_valid(True)
-            except Exception:
-                self.uid = None
+        raise NotImplementedError("session.ensure_valid() is gone; use session.check_security() instead")
 
     def execute(self, model, func, *l, **d):
-        """
-        .. deprecated:: 8.0
-            Use the registry and cursor in :data:`request` instead.
-        """
-        model = self.model(model)
-        r = getattr(model, func)(*l, **d)
-        return r
+        raise NotImplementedError("session.execute() is gone; use request.env instead")
 
     def exec_workflow(self, model, id, signal):
-        """
-        .. deprecated:: 8.0
-            Use the registry and cursor in :data:`request` instead.
-        """
-        self.assert_valid()
-        r = self.proxy('object').exec_workflow(self.db, self.uid, self.password, model, signal, id)
-        return r
+        raise NotImplementedError("session.exec_workflow() is gone; use request.env instead")
 
     def model(self, model):
-        """
-        .. deprecated:: 8.0
-            Use the registry and cursor in :data:`request` instead.
-
-        Get an RPC proxy for the object ``model``, bound to this session.
-
-        :param model: an OpenERP model name
-        :type model: str
-        :rtype: a model object
-        """
-        if not self.db:
-            raise SessionExpiredException("Session expired")
-
-        return Model(self, model)
+        raise NotImplementedError("session.model() is gone; use request.env instead")
 
     def save_action(self, action):
         """
