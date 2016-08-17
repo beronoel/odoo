@@ -44,33 +44,34 @@ return session.is_bound.then(function () {
             }
         }, 500);
         var observer = new MutationObserver(check_tooltip);
-        var observe = function () {
+        var register_and_observe = function (observe) {
             $(function () {
                 /**
                  * Once the DOM is ready, we still have to wait all the modules are loaded before completing the tours
                  * registration and starting listening for DOM mutations.
                  */
                 _.defer(function () {
-                    tour._register_all();
-                    observer.observe(document.body, {
-                        attributes: true,
-                        childList: true,
-                        subtree: true,
-                    });
+                    tour._register_all(observe);
+                    if (observe) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            childList: true,
+                            subtree: true,
+                        });
+                    }
                 });
             });
         };
 
         // Enable the MutationObserver for the admin or if a tour is running, when the DOM is ready
-        if (session.is_superuser || tour.running_tour) {
-            observe();
-        }
+        register_and_observe(session.is_superuser || tour.running_tour);
+
         // Override the TourManager so that it enables/disables the observer when necessary
         if (!session.is_superuser) {
             var run = tour.run;
             tour.run = function () {
                 run.apply(this, arguments);
-                if (this.running_tour) { observe(); }
+                if (this.running_tour) { register_and_observe(true); }
             };
             var _consume_tour = tour._consume_tour;
             tour._consume_tour = function () {
