@@ -968,105 +968,102 @@ class MailThread(models.AbstractModel):
         Alias = self.env['mail.alias']
         fallback_model = model
 
-        # Get email.message.Message variables for future processing
+        # get email.message.Message variables for future processing
+        fallback_model = model
+        local_hostname = socket.gethostname()
         message_id = message.get('Message-Id')
-        email_from = tools.decode_message_header(message, 'From')
-        email_to = tools.decode_message_header(message, 'To')
+
+        # compute references to find if message is a reply to an existing thread
         references = tools.decode_message_header(message, 'References')
         in_reply_to = tools.decode_message_header(message, 'In-Reply-To').strip()
         thread_references = references or in_reply_to
+        reply_match, reply_model, reply_thread_id, reply_hostname, reply_private = tools.email_references(thread_references)
+
+        # author and recipients
+        email_from = tools.decode_message_header(message, 'From')
+        email_from_localpart = (tools.email_split(email_from) or [''])[0].split('@', 1)[0].lower()
+        email_to = tools.decode_message_header(message, 'To')
+        email_to_localpart = (tools.email_split(email_to) or [''])[0].split('@', 1)[0].lower()
+
+        # Delivered-To is a safe bet in most modern MTAs, but we have to fallback on To + Cc values
+        # for all the odd MTAs out there, as there is no standard header for the envelope's `rcpt_to` value.
+        rcpt_tos = ','.join([
+            tools.decode_message_header(message, 'Delivered-To'),
+            tools.decode_message_header(message, 'To'),
+            tools.decode_message_header(message, 'Cc'),
+            tools.decode_message_header(message, 'Resent-To'),
+            tools.decode_message_header(message, 'Resent-Cc')])
+        rcpt_tos_localparts = [e.split('@')[0] for e in tools.email_split(rcpt_tos)]
 
         # 0. First check if this is a bounce message or not.
         #    See http://datatracker.ietf.org/doc/rfc3462/?include_text=1
         #    As all MTA does not respect this RFC (googlemail is one of them),
         #    we also need to verify if the message come from "mailer-daemon"
-        localpart = (tools.email_split(email_from) or [''])[0].split('@', 1)[0].lower()
-        if message.get_content_type() == 'multipart/report' or localpart == 'mailer-daemon':
+        if message.get_content_type() == 'multipart/report' or email_from_localpart == 'mailer-daemon':
             _logger.info("Not routing bounce email from %s to %s with Message-Id %s",
                          email_from, email_to, message_id)
             return []
 
         # 1. message is a reply to an existing message (exact match of message_id)
-        ref_match, reply_model, reply_thread_id, reply_hostname = tools.email_references(thread_references)
-        msg_references = tools.mail_header_msgid_re.findall(thread_references)
-        mail_messages = MailMessage.sudo().search([('message_id', 'in', msg_references)], limit=1)
-        if ref_match and mail_messages:
-            model, thread_id = mail_messages.model, mail_messages.res_id
-            alias = Alias.search([('alias_name', '=', (tools.email_split(email_to) or [''])[0].split('@', 1)[0].lower())])
-            alias = alias[0] if alias else None
-            route = self.with_context(drop_alias=True).message_route_verify(
-                message, message_dict,
-                (model, thread_id, custom_values, self._uid, alias),
-                update_author=True, assert_model=False, create_fallback=True)
-            if route:
-                _logger.info(
-                    'Routing mail from %s to %s with Message-Id %s: direct reply to msg: model: %s, thread_id: %s, custom_values: %s, uid: %s',
-                    email_from, email_to, message_id, model, thread_id, custom_values, self._uid)
-                return [route]
-            elif route is False:
-                return []
+        if reply_match:
+            msg_references = tools.mail_header_msgid_re.findall(thread_references)
+            mail_messages = MailMessage.sudo().search([('message_id', 'in', msg_references)], limit=1)
 
-        # 2. message is a reply to an existign thread (6.1 compatibility)
-        if ref_match:
-            local_hostname = socket.gethostname()
+            # message is a reply to an existing thread (6.1 compatibility)
             # do not match forwarded emails from another OpenERP system (thread_id collision!)
-            if local_hostname == reply_hostname:
-                thread_id, model = reply_thread_id, reply_model
-                if thread_id and model in self.env:
-                    record = self.env[model].browse(thread_id)
-                    compat_mail_msg_ids = MailMessage.search([
-                        ('message_id', '=', False),
-                        ('model', '=', model),
-                        ('res_id', '=', thread_id)])
-                    if compat_mail_msg_ids and record.exists() and hasattr(record, 'message_update'):
-                        route = self.message_route_verify(
-                            message, message_dict,
-                            (model, thread_id, custom_values, self._uid, None),
-                            update_author=True, assert_model=True, create_fallback=True)
-                        if route:
-                            # parent is invalid for a compat-reply
-                            message_dict.pop('parent_id', None)
-                            _logger.info(
-                                'Routing mail from %s to %s with Message-Id %s: direct thread reply (compat-mode) to model: %s, thread_id: %s, custom_values: %s, uid: %s',
-                                email_from, email_to, message_id, model, thread_id, custom_values, self._uid)
-                            return [route]
-                        elif route is False:
-                            return []
+            if not mail_messages and local_hostname == reply_hostname and reply_thread_id and reply_model in self.env:
+                mail_messages = MailMessage.search([
+                    ('message_id', '=', False),
+                    ('model', '=', reply_model),
+                    ('res_id', '=', reply_thread_id)])
 
-        # 3. Reply to a private message
-        if in_reply_to:
-            mail_message_ids = MailMessage.search([
-                ('message_id', '=', in_reply_to),
-                '!', ('message_id', 'ilike', 'reply_to')
-            ], limit=1)
-            if mail_message_ids:
-                route = self.message_route_verify(
+            # message is a reply to an existing message (exact match of message_id)
+            if mail_messages:
+                model, thread_id = mail_messages.model, mail_messages.res_id
+                alias = Alias.search([('alias_name', '=', email_to_localpart)])
+                alias = alias[0] if alias else None
+                # TDE note2: private mode -> no alias search
+                # TDE Note: compat mode = withotu context key, why ? because
+                route = self.with_context(drop_alias=True).message_route_verify(
                     message, message_dict,
-                    (mail_message_ids.model, mail_message_ids.res_id, custom_values, self._uid, None),
-                    update_author=True, assert_model=True, create_fallback=True, allow_private=True)
+                    (model, thread_id, custom_values, self._uid, alias),
+                    update_author=True, assert_model=reply_private, create_fallback=True, allow_private=reply_private)
                 if route:
+                    # TDE Note: compat mode: parent is invalid for a compat-reply
+                    # message_dict.pop('parent_id', None)
+                    # TDE note: add compat mode for compat mode in debug
                     _logger.info(
-                        'Routing mail from %s to %s with Message-Id %s: direct reply to a private message: %s, custom_values: %s, uid: %s',
-                        email_from, email_to, message_id, mail_message_ids.id, custom_values, self._uid)
+                        'Routing mail from %s to %s with Message-Id %s: direct reply to msg: model: %s, thread_id: %s, custom_values: %s, uid: %s',
+                        email_from, email_to, message_id, model, thread_id, custom_values, self._uid)
                     return [route]
                 elif route is False:
                     return []
+
+        # 3. Reply to a private message
+        # if in_reply_to:
+        #     mail_message_ids = MailMessage.search([
+        #         ('message_id', '=', in_reply_to),
+        #         '!', ('message_id', 'ilike', 'reply_to')
+        #     ], limit=1)
+        #     if mail_message_ids:
+        #         route = self.message_route_verify(
+        #             message, message_dict,
+        #             (mail_message_ids.model, mail_message_ids.res_id, custom_values, self._uid, None),
+        #             update_author=True, assert_model=True, create_fallback=True, allow_private=True)
+        #         if route:
+        #             _logger.info(
+        #                 'Routing mail from %s to %s with Message-Id %s: direct reply to a private message: %s, custom_values: %s, uid: %s',
+        #                 email_from, email_to, message_id, mail_message_ids.id, custom_values, self._uid)
+        #             return [route]
+        #         elif route is False:
+        #             return []
 
         # no route found for a matching reference (or reply), so parent is invalid
         message_dict.pop('parent_id', None)
 
         # 4. Look for a matching mail.alias entry
-        # Delivered-To is a safe bet in most modern MTAs, but we have to fallback on To + Cc values
-        # for all the odd MTAs out there, as there is no standard header for the envelope's `rcpt_to` value.
-        rcpt_tos = \
-             ','.join([tools.decode_message_header(message, 'Delivered-To'),
-                       tools.decode_message_header(message, 'To'),
-                       tools.decode_message_header(message, 'Cc'),
-                       tools.decode_message_header(message, 'Resent-To'),
-                       tools.decode_message_header(message, 'Resent-Cc')])
-        local_parts = [e.split('@')[0] for e in tools.email_split(rcpt_tos)]
-        if local_parts:
-            aliases = Alias.search([('alias_name', 'in', local_parts)])
+        if rcpt_tos_localparts:
+            aliases = Alias.search([('alias_name', 'in', rcpt_tos_localparts)])
             if aliases:
                 routes = []
                 for alias in aliases:
@@ -1100,15 +1097,16 @@ class MailThread(models.AbstractModel):
                 thread_id = int(thread_id)
             except:
                 thread_id = False
-        route = self.message_route_verify(
-            message, message_dict,
-            (fallback_model, thread_id, custom_values, self._uid, None),
-            update_author=True, assert_model=True)
-        if route:
-            _logger.info(
-                'Routing mail from %s to %s with Message-Id %s: fallback to model:%s, thread_id:%s, custom_values:%s, uid:%s',
-                email_from, email_to, message_id, fallback_model, thread_id, custom_values, self._uid)
-            return [route]
+        if fallback_model:
+            route = self.message_route_verify(
+                message, message_dict,
+                (fallback_model, thread_id, custom_values, self._uid, None),
+                update_author=True, assert_model=True)
+            if route:
+                _logger.info(
+                    'Routing mail from %s to %s with Message-Id %s: fallback to model:%s, thread_id:%s, custom_values:%s, uid:%s',
+                    email_from, email_to, message_id, fallback_model, thread_id, custom_values, self._uid)
+                return [route]
 
         # ValueError if no routes found and if no bounce occured
         raise ValueError(
