@@ -38,8 +38,9 @@
                 </div>
                 <div t-if="doc.date_order" class="col-xs-3">
                     <strong t-if="doc.state not in ['draft','sent']">Date Ordered:</strong>
+                    <p t-if="doc.state not in ['draft','sent']" t-field="doc.confirmation_date"/>
                     <strong t-if="doc.state in ['draft','sent']">Quotation Date:</strong>
-                    <p t-field="doc.date_order"/>
+                    <p t-if="doc.state in ['draft','sent']" t-field="doc.date_order"/>
                 </div>
                 <div t-if="doc.user_id.name" class="col-xs-3">
                     <strong>Salesperson:</strong>
