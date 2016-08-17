@@ -1020,7 +1020,7 @@ class MailThread(models.AbstractModel):
             # message is a reply to an existing message (exact match of message_id)
             if mail_messages:
                 model, thread_id = mail_messages.model, mail_messages.res_id
-                alias = Alias.search([('alias_name', '=', email_to_localpart)])
+                alias = Alias.search([('alias_name', 'in', rcpt_tos_localparts)])
                 alias = alias[0] if alias else None
                 # TDE note2: private mode -> no alias search
                 # TDE Note: compat mode = withotu context key, why ? because
