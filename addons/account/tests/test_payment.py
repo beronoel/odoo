@@ -6,6 +6,7 @@ class TestPayment(AccountingTestCase):
     def setUp(self):
         super(TestPayment, self).setUp()
         self.register_payments_model = self.env['account.register.payments']
+        self.validate_payments_model = self.env['validate.payment']
         self.payment_model = self.env['account.payment']
         self.invoice_model = self.env['account.invoice']
         self.invoice_line_model = self.env['account.invoice.line']
@@ -126,6 +127,11 @@ class TestPayment(AccountingTestCase):
         payment = self.payment_model.search([], order="id desc", limit=1)
 
         self.assertAlmostEquals(payment.amount, 300)
+
+        ctx = {'active_model': 'account.payment', 'active_ids': [payment.id]}
+        validate_payments = self.validate_payments_model.with_context(ctx).create({})
+        validate_payments.with_context(ctx).validate_payment()
+
         self.assertEqual(payment.state, 'posted')
         self.assertEqual(inv_1.state, 'paid')
         self.assertEqual(inv_2.state, 'paid')

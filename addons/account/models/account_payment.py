@@ -101,6 +101,8 @@ class account_register_payments(models.TransientModel):
     _inherit = 'account.abstract.payment'
     _description = "Register payments on multiple invoices"
 
+    n_invoices = fields.Integer('Number of invoices')
+
     @api.onchange('payment_type')
     def _onchange_payment_type(self):
         if self.payment_type:
@@ -126,8 +128,6 @@ class account_register_payments(models.TransientModel):
         invoices = self.env[active_model].browse(active_ids)
         if any(invoice.state != 'open' for invoice in invoices):
             raise UserError(_("You can only register payments for open invoices"))
-        if any(inv.commercial_partner_id != invoices[0].commercial_partner_id for inv in invoices):
-            raise UserError(_("In order to pay multiple invoices at once, they must belong to the same commercial partner."))
         if any(MAP_INVOICE_TYPE_PARTNER_TYPE[inv.type] != MAP_INVOICE_TYPE_PARTNER_TYPE[invoices[0].type] for inv in invoices):
             raise UserError(_("You cannot mix customer invoices and vendor bills in a single payment."))
         if any(inv.currency_id != invoices[0].currency_id for inv in invoices):
@@ -138,31 +138,41 @@ class account_register_payments(models.TransientModel):
             'amount': abs(total_amount),
             'currency_id': invoices[0].currency_id.id,
             'payment_type': total_amount > 0 and 'inbound' or 'outbound',
-            'partner_id': invoices[0].commercial_partner_id.id,
             'partner_type': MAP_INVOICE_TYPE_PARTNER_TYPE[invoices[0].type],
+            'n_invoices': len(invoices)
         })
         return rec
 
-    def get_payment_vals(self):
+    def get_payment_vals(self, invoice):
         """ Hook for extension """
         return {
             'journal_id': self.journal_id.id,
             'payment_method_id': self.payment_method_id.id,
             'payment_date': self.payment_date,
             'communication': self.communication,
-            'invoice_ids': [(4, inv.id, None) for inv in self._get_invoices()],
+            'invoice_ids': [(4, invoice.id, None)],
             'payment_type': self.payment_type,
             'amount': self.amount,
             'currency_id': self.currency_id.id,
-            'partner_id': self.partner_id.id,
             'partner_type': self.partner_type,
+            'partner_id': invoice.commercial_partner_id.id,
         }
 
     @api.multi
     def create_payment(self):
-        payment = self.env['account.payment'].create(self.get_payment_vals())
-        payment.post()
-        return {'type': 'ir.actions.act_window_close'}
+        payments = self.env['account.payment']
+        for invoice in self._get_invoices():
+            payment = self.env['account.payment'].create(self.get_payment_vals(invoice))
+            payments |= payment
+        return {
+            'name': _('Payments'),
+            'view_type': 'form',
+            'view_mode': 'tree',
+            'res_model': 'account.payment',
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            'domain': [('id', 'in', payments.ids)],
+        }
 
 
 class account_payment(models.Model):

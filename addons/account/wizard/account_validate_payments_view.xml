@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!--Account Move lines-->
+        <record id="validate_payments_view" model="ir.ui.view">
+            <field name="name">Validate Payments</field>
+            <field name="model">validate.payment</field>
+            <field name="arch" type="xml">
+                <form string="Validate Payments">
+                    <label string="All selected payments will be validated and posted. You won't be able to modify them afterwards."/>
+                    <footer>
+                        <button string="Validate Payments" name="validate_payment" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_validate_payment" model="ir.actions.act_window">
+            <field name="name">Validate Payments</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">validate.payment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="validate_payments_view"/>
+            <field name="context">{}</field>
+            <field name="target">new</field>
+            <field name="help">This wizard will validate all selected payments. Once payments are validated, you can not update them anymore.</field>
+        </record>
+
+        <record model="ir.values" id="validate_payment_values">
+            <field name="model_id" ref="account.model_account_payment" />
+            <field name="name">Validate Payments</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_validate_payment'))" />
+            <field name="key">action</field>
+            <field name="model">account.payment</field>
+        </record>
+
+    </data>
+</openerp>

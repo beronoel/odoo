@@ -237,7 +237,6 @@
                 <form string="Register Payment" version="7">
                     <field name="payment_type" invisible="1"/>
                     <field name="partner_type" invisible="1"/>
-                    <field name="partner_id" invisible="1"/>
                     <group>
                         <group>
                             <field name="journal_id" widget="selection"/>
@@ -245,6 +244,7 @@
                             <field name="payment_method_id" widget="radio" attrs="{'invisible': [('hide_payment_method', '=', True)]}"/>
                             <field name="payment_method_code" invisible="1"/>
                             <field name="amount"/>
+                            <field name="n_invoices" attrs="{'readonly': True}"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                         <group>
