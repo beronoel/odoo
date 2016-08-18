@@ -222,7 +222,17 @@ class Partner(models.Model):
         #      using the command-line.
         if force_send and recipients_nbr < recipients_max and \
                 (not self.pool._init or getattr(threading.currentThread(), 'testing', False)):
-            emails.send()
+            email_ids = emails.ids
+            dbname = self.env.cr.dbname
+
+            def send_notifications():
+                from odoo import registry, SUPERUSER_ID
+                db_registry = registry(dbname)
+                with db_registry.cursor() as cr:
+                    env = api.Environment(cr, SUPERUSER_ID, {})
+                    env['mail.mail'].browse(email_ids).send()
+
+            self._cr.after('commit', send_notifications)
 
         return True
 
