@@ -1765,7 +1765,6 @@ class BaseModel(object):
             for name, field in self._fields.iteritems()
             if name not in values
             if name not in MAGIC_COLUMNS
-            if field.base_field.column
             if not (field.inherited and field.related_field.model_name in avoid_models)
         }
 
