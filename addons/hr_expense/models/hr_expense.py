@@ -39,7 +39,7 @@ class HrExpense(models.Model):
                               ('refused', 'Refused')
         ], compute='_compute_state', default="draft", string='Status', index=True, readonly=True, copy=False, required=True, store=True,
         help="Status of the expense.")
-    sheet_id = fields.Many2one('hr.expense.sheet', string="Expense Report", readonly=True)
+    sheet_id = fields.Many2one('hr.expense.sheet', string="Expense Report", readonly=True, copy=False)
     reference = fields.Char(string="Bill Reference")
 
     @api.depends('sheet_id', 'sheet_id.account_move_id', 'sheet_id.state')
@@ -107,6 +107,8 @@ class HrExpense(models.Model):
     def submit_expenses(self):
         if any(expense.state != 'draft' for expense in self):
             raise UserError(_("You cannot report twice the same line!"))
+        if any(expense.employee_id != self[0].employee_id for expense in self):
+            raise UserError(_("You cannot report expenses for different employees in the same report!"))
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -375,7 +377,7 @@ class HrExpenseSheet(models.Model):
         help="The journal used when the expense is done.")
     bank_journal_id = fields.Many2one('account.journal', string='Bank Journal', states={'done': [('readonly', True)], 'post': [('readonly', True)]}, default=lambda self: self.env['account.journal'].search([('type', 'in', ['case', 'bank'])], limit=1), help="The payment method used when the expense is paid by the company.")
     accounting_date = fields.Date(string="Accounting Date")
-    account_move_id = fields.Many2one('account.move', string='Journal Entry', copy=False, track_visibility="onchange")
+    account_move_id = fields.Many2one('account.move', string='Journal Entry', copy=False)
     department_id = fields.Many2one('hr.department', string='Department', states={'post': [('readonly', True)], 'done': [('readonly', True)]})
 
     @api.multi
@@ -416,6 +418,8 @@ class HrExpenseSheet(models.Model):
             return 'hr_expense.mt_expense_confirmed'
         elif 'state' in init_values and self.state == 'cancel':
             return 'hr_expense.mt_expense_refused'
+        elif 'state' in init_values and self.state == 'done':
+            return 'hr_expense.mt_expense_paid'
         return super(HrExpenseSheet, self)._track_subtype(init_values)
 
     def _add_followers(self):
@@ -468,15 +472,7 @@ class HrExpenseSheet(models.Model):
 
     @api.multi
     def approve_expense_sheets(self):
-        self.message_post(body=_("The expense has been validated by %s") % (self.env.user.name))
         self.write({'state': 'approve', 'responsible_id': self.env.user.id})
-
-    @api.multi
-    def refuse_expense_sheets(self, reason):
-        self.write({'state': 'cancel'})
-        for sheet in self:
-            body = (_("Your Expense %s has been refused.<br/><ul class=o_timeline_tracking_value_list><li>Reason<span> : </span><span class=o_timeline_tracking_value>%s</span></li></ul>") % (sheet.name, reason))
-            sheet.message_post(body=body)
 
     @api.multi
     def paid_expense_sheets(self):
