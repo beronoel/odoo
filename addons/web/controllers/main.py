@@ -749,7 +749,7 @@ class Session(http.Controller):
         :return: A key identifying the saved action.
         :rtype: integer
         """
-        return request.httpsession.save_action(the_action)
+        return request.session.save_action(the_action)
 
     @http.route('/web/session/get_session_action', type='json', auth="user")
     def get_session_action(self, key):
@@ -762,7 +762,7 @@ class Session(http.Controller):
         :return: The saved action or None.
         :rtype: anything
         """
-        return request.httpsession.get_action(key)
+        return request.session.get_action(key)
 
     @http.route('/web/session/check', type='json', auth="user")
     def check(self):

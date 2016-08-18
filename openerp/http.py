@@ -184,7 +184,6 @@ class WebRequest(object):
     def __init__(self, httprequest):
         self.httprequest = httprequest
         self.httpresponse = None
-        self.httpsession = httprequest.session
         self.disable_db = False
         self.endpoint = None
         self.endpoint_arguments = None
@@ -349,18 +348,6 @@ class WebRequest(object):
         warnings.warn('please use request.registry and request.cr directly', DeprecationWarning)
         yield (self.registry, self.cr)
 
-    @lazy_property
-    def session_id(self):
-        """
-        opaque identifier for the :class:`OpenERPSession` instance of
-        the current request
-
-        .. deprecated:: 8.0
-
-            Use the ``sid`` attribute on :attr:`.session`
-        """
-        return self.session.sid
-
     @property
     def registry(self):
         """
@@ -371,7 +358,7 @@ class WebRequest(object):
 
             use :attr:`.env`
         """
-        return openerp.modules.registry.RegistryManager.get(self.db) if self.db else None
+        return openerp.registry(self.db) if self.db else None
 
     @property
     def db(self):
@@ -380,16 +367,6 @@ class WebRequest(object):
         if the current request uses the ``none`` authentication.
         """
         return self.session.db if not self.disable_db else None
-
-    @lazy_property
-    def httpsession(self):
-        """ HTTP session data
-
-        .. deprecated:: 8.0
-
-            Use :attr:`.session` instead.
-        """
-        return self.session
 
     def csrf_token(self, time_limit=3600):
         """ Generates and returns a CSRF token for the current session
@@ -748,16 +725,6 @@ def to_jsonable(o):
         return tmp
     return ustr(o)
 
-def jsonrequest(f):
-    """ 
-        .. deprecated:: 8.0
-            Use the :func:`~openerp.http.route` decorator instead.
-    """
-    base = f.__name__.lstrip('/')
-    if f.__name__ == "index":
-        base = ""
-    return route([base, base + "/<path:_ignored_path>"], type="json", auth="user", combine=True)(f)
-
 class HttpRequest(WebRequest):
     """ Handler for the ``http`` request type.
 
@@ -900,17 +867,6 @@ more details.
         response
         """
         return werkzeug.exceptions.NotFound(description)
-
-def httprequest(f):
-    """ 
-        .. deprecated:: 8.0
-
-        Use the :func:`~openerp.http.route` decorator instead.
-    """
-    base = f.__name__.lstrip('/')
-    if f.__name__ == "index":
-        base = ""
-    return route([base, base + "/<path:_ignored_path>"], type="http", auth="user", combine=True)(f)
 
 #----------------------------------------------------------
 # Controller and route registration
@@ -1141,37 +1097,6 @@ class OpenERPSession(werkzeug.contrib.sessions.Session):
             lang = babel.core.LOCALE_ALIASES[lang]
 
         context['lang'] = lang or 'en_US'
-
-    # Deprecated to be removed in 9
-
-    """
-        Damn properties for retro-compatibility. All of that is deprecated,
-        all of that.
-    """
-    @property
-    def _db(self):
-        return self.db
-    @_db.setter
-    def _db(self, value):
-        self.db = value
-    @property
-    def _uid(self):
-        return self.uid
-    @_uid.setter
-    def _uid(self, value):
-        self.uid = value
-    @property
-    def _login(self):
-        return self.login
-    @_login.setter
-    def _login(self, value):
-        self.login = value
-    @property
-    def _password(self):
-        return self.password
-    @_password.setter
-    def _password(self, value):
-        self.password = value
 
     def send(self, service_name, method, *args):
         raise NotImplementedError("session.send() is gone; use dispatch_rpc() instead")
