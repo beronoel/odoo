@@ -39,6 +39,24 @@ class SaleOrder(models.Model):
                 'amount_total': amount_untaxed + amount_tax,
             })
 
+    @api.model
+    def _address_get(self):
+        address = {}
+        if self.partner_shipping_id == self.partner_invoice_id:
+            if self.partner_invoice_id == self.partner_id:
+                address['partner_id'] = self.partner_id
+            else:
+                address['address_label'] = 'Invoicing and shipping address:'
+                address['partner_id'] = self.partner_id
+                address['partner_invoice_id'] = self.partner_invoice_id
+        else:
+            address['address_label'] = 'Invoicing address:'
+            address['partner_id'] = self.partner_id
+            address['partner_shipping_id'] = self.partner_shipping_id
+            address['partner_invoice_id'] = self.partner_invoice_id
+        return address
+
+
     @api.depends('state', 'order_line.invoice_status')
     def _get_invoiced(self):
         """
