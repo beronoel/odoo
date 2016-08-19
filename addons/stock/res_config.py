@@ -142,7 +142,7 @@ class stock_config_settings(osv.osv_memory):
             help="""This option supplements the warehouse application by effectively implementing Push and Pull inventory flows through Routes."""),
         'decimal_precision': fields.integer('Decimal precision on weight', help="As an example, a decimal precision of 2 will allow weights like: 9.99 kg, whereas a decimal precision of 4 will allow weights like:  0.0231 kg."),
         'propagation_minimum_delta': fields.related('company_id', 'propagation_minimum_delta', type='integer', string="Minimum days to trigger a propagation of date change in pushed/pull flows."),
-        'weight_unit': fields.selection([('KGS', "Kilogram"), ('LBS', 'Pound')], string="Unit of Weight"),
+        'weight_unit': fields.selection([('KGS', 'Kilogram'), ('LBS', 'Pound')], string="Unit of Weight"),
         'module_stock_dropshipping': fields.selection([
             (0, 'Suppliers always deliver to your warehouse(s)'),
             (1, "Allow suppliers to deliver directly to your customers")

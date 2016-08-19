@@ -76,8 +76,9 @@ class DeliveryCarrier(models.Model):
 
     @api.multi
     def _get_weight_unit_config(self):
+        IrValues = self.env['ir.values']
         for record in self:
-            record.weight_unit_config = self.env['ir.values'].get_default('stock.config.settings', 'weight_unit_setting')
+            record.weight_unit_config = IrValues.get_default('stock.config.settings', 'weight_unit_setting')
 
     @api.depends('product_id.list_price', 'product_id.product_tmpl_id.list_price')
     def _compute_fixed_price(self):
