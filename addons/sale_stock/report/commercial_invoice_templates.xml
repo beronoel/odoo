@@ -6,8 +6,10 @@
                 <t t-call="report.external_layout">
                     <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
                     <div class="page">
-                        <h3 class="text-center"> Commercial Invoice </h3>
                         <table class="table table-bordered">
+                            <tr>
+                                <td colspan="7"><h2 class="text-center"><strong>Commercial Invoice</strong></h2></td>
+                            </tr>
                             <tr>
                                 <td colspan="2"><strong>Date: </strong><span t-field="o.date_done"/></td>
                                 <td colspan="5"><strong>Invoice No: </strong><span t-field="o.origin"/>/<span t-field="o.name"/></td>
@@ -35,10 +37,10 @@
                             </tr>
                             <tr>
                                 <td colspan="1" name="incoterm">
-                                    Terms of Trade (Incoterm):<br/>
+                                    <strong>Terms of Trade (Incoterm):</strong><br/>
                                     <span t-field="o.sale_id.incoterm"/>
                                 </td>
-                                <td colspan="3">Transportation:<br/>
+                                <td colspan="3"><strong>Transportation:</strong><br/>
                                     <span name="transport"></span><br/>
                                 AWB/BL #:
                                 </td>
@@ -47,16 +49,16 @@
                                     <t t-foreach="o.pack_operation_product_ids" t-as="l">
                                         <t t-set="weight_total" t-value="weight_total + l.product_id.weight"/>
                                     </t>
-                                   Total Gross Weight:<br/>
+                                    <strong>Total Gross Weight:</strong><br/>
                                     <span t-esc="weight_total"/> kgs
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="1">
-                                    Other
+                                    <strong>Other</strong>
                                 </td>
                                 <td colspan="2">
-                                    Currency: 
+                                    <strong>Currency:</strong>
                                     <span t-field="o.sale_id.currency_id"/>
                                 </td>
                                 <td colspan="4">
@@ -64,7 +66,7 @@
                                     <t t-foreach="o.pack_operation_product_ids" t-as="l">
                                         <t t-set="qty_total" t-value="qty_total + l.product_qty"/>
                                     </t>
-                                    Total # of Pieces: 
+                                    <strong>Total # of Pieces:</strong>
                                     <span t-esc="qty_total"/>
                                 </td>
                             </tr>
@@ -155,25 +157,25 @@
                                 <td rowspan="4" colspan="3">
                                     These commodities, technologies, or softwares were exported from the United States in accordance with export administration regulations. Diversion contrary to United States law prohibited. We certify that this commercial invoice is true and correct.
                                 </td>
-                                <td colspan="3">Subtotal</td>
+                                <td colspan="3"><strong>Subtotal</strong></td>
                                 <td class="text-right">
                                     <span t-esc="sum_of_amount_total" t-field-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: &quot;o.sale_id.currency_id&quot;}"/>
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3">Freight Cost</td>
+                                <td colspan="3"><strong>Freight Cost</strong></td>
                                 <td class="text-right">
                                     <span name="freight_cost"/> 
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3">Insurance Cost</td>
+                                <td colspan="3"><strong>Insurance Cost</strong></td>
                                 <td class="text-right">
                                     <span />
                                 </td>
                             </tr>
                             <tr>
-                                <td colspan="3">Total Invoice Value</td>
+                                <td colspan="3"><strong>Total Invoice Value</strong></td>
                                 <td class="text-right">
                                     <span name="total_value"/>
                                 </td>
@@ -185,13 +187,13 @@
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    Name
+                                    <strong>Name</strong>
                                 </td>
                                 <td colspan="2">
-                                    Signature
+                                    <strong>Signature</strong>
                                 </td>
                                 <td colspan="3">
-                                    Date
+                                    <strong>Date</strong>
                                 </td>
                             </tr>
                         </table>
