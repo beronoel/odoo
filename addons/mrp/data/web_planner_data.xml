@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <template id="inventory_planner">
+        <t t-call="web_planner.pages">
+            <t t-call="web_planner.page">
+                <t t-set="page_title">Welcome</t>
+                <t t-set="hide_mark_as_done" t-value="True"/>
+                <div class="o_planner_intro">
+                    <p>
+                        This guide will help you get started with Odoo MRP. Once you're done, you'll benefit from: 
+                    </p>
+                    <ul>
+                        <li><strong>Planing Manufacturing</strong>: No need to plan manually manufacturing product, minimum stock Rule, make-to-order</li>
+                        <li><strong>Maintain Manufacture Product</strong>: Easy to maintain, beautiful and full featured Manufacturing.</li>
+                        <li><strong>Automated documents sending</strong>: Automatically send your Production Order by email or snail mail.</li>
+                        <li><strong>Quality</strong>: You can check quality of finished product with different perimeters.</li>
+                    </ul>
+                    <p>
+                        In short, you will get a more efficient Manufacture Resource Planing that leads to Manufacturing Product and better efficiencies in your daily operations.
+                    </p>
+                    <div class="mt32">
+                        <img class="signature mb8" src="/web_planner/static/src/img/fabien_signature.png"/>
+                        <address>
+                            For the Odoo Team,<br/>
+                            Fabien Pinckaers, Founder
+                        </address>
+                    </div>
+                </div>
+            </t>
+            <t t-call="web_planner.category">
+                <t t-set="menu_categorytitle">Your Situation</t>
+                <t t-set="menu_categoryclasses" t-value="'fa-building-o'"/>
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">Manage your BOM</t>
+                    <div class="alert alert-info">
+                        <p><strong>BOM</strong></p>
+                        <p>
+                            In order to start production orders for a certain product, you will need to define a Bill of Material with its components. If you have quite complex BoMs, you can decide to put a reusable part as a Kit or create half-products with their separate BoMs
+                        </p>
+                    </div>
+                    <h4> The first step is to setup bill of material for finish product:</h4>
+                    <ul>
+                        <li>
+                            <strong>Create <i><a t-att-href="prepare_backend_url('mrp.mrp_bom_form_action', 'from')">Bill of Materials</a> for manufacturing product.</i>
+                            </strong>
+                        </li>
+                    </ul>
+                    <p>
+                        By default a Bill of Material has no routing. In that case, the entire processing of the manufacturing order will happen on the manufacturing order itself. For simple productions, this is ideal as in 2 clicks you can process the entire manufacturing order.
+                    </p>
+                    <p>
+                        It can be interesting however to handle your manufacturing order in a more detailed way by defining the operations in a routing.
+                    </p>
+                    <div class="alert alert-info info_icon o_row" role="alert">
+                        <span class="fa fa-lightbulb-o fa-lg"></span>
+                        <p> You can manage different type of bill of materials , Like BoM in BoM/ Phantom BoM</p>
+                    </div>
+                </t>
+
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">Register Quantities</t>
+                    <p class="text-muted">
+                        Production Order without routing:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Produce button</strong>
+                        </li>
+                    </ul>
+                    <p>
+                     To register quantity without routing, you don't have to set any
+                     configuration, You can directly register quantity from "Produce"
+                     button.
+                    </p>
+                    <div class="alert alert-warning">
+                        <strong>Produce button</strong>
+                        <span> To register quantity without routing, you don't have to set any configuration, You can directly register quantity from "Produce"
+                     button on production order.</span>
+                    </div>
+                    <p class="text-muted">
+                        Production Order with routing:
+                    </p>
+                    <ul>
+                        <li>
+                            <strong>Work Orders</strong>
+                        </li>
+                    </ul>
+                    <p>
+                    To generate work order from production order, You have to configure routing and planning.
+                    </p>
+                     <div class="alert alert-warning">
+                        <strong>Register quantity from work orders</strong>
+                        <span>To register quantity from work order, You just need to press "Done" button on the top left corner on work order. Ones registered quantity work order next work order will be in "ready" state.</span>
+                    </div>
+                </t>
+
+                <t t-call="web_planner.page">
+                    <t t-set="page_title">Routings &amp; Planning</t>
+                    <p>
+                        This is in handy e.g. when you produce a table: you need some time on the Cutting Machine to cut out the table head, you need some time on the Drilling Machine to cut the holes and you need some time at the Assembly Station to put the parts together. You will spend some time on each of these machines and that will be configured in the routing (which will be related to the bom). In these cases, the production order will be handled mainly from the work orders on each machine.
+                    </p>
+                    <p>
+                        routing (which will be related to the bom). In these cases, the production order will be handled mainly from the work orders on each machine.
+                    </p>
+                    <p>
+                    <strong>Why we use work orders:</strong>
+                    </p>
+                    <ul>
+                        <li>
+                            <p>You want to follow the work on different machines (work centers)</p>
+                        </li>
+                        <li>
+                            <p>If production is divided in multiple steps and you want to follow them actively</p>
+                        </li>
+                        <li>
+                            <p>If you want to plan capacity of your machines</p>
+                        </li>
+                    </ul>
+                    <p>To use workorder, you have to set <strong>manage production by workorder</strong> in <a t-att-href="prepare_backend_url('mrp.action_mrp_configuration')">Manufacturing settings.</a></p>
+                    <p>When you decide to use work orders, you need to define the several work centers used in your company.</p>
+                    <p groups="mrp.group_mrp_routings">
+                        <a t-att-href="prepare_backend_url('mrp.mrp_workcenter_action')">Create your workcenters </a>.
+                    </p>
+                </t>
+            </t>
+            <t t-call="web_planner.page">
+                <t t-set="page_title">Improve your efficiency</t>
+                <t t-set="hide_title" t-value="True"/>
+                <t t-set="hide_from_menu" t-value="True"/>
+                <t t-set="hide_mark_as_done" t-value="True"/>
+                <h1 class="text-center o_planner_trophy" data-icon="&#xe006;" />
+                <div class="text-center">
+                    <h1>Congratulations!</h1>
+                    <h4>We hope this guide helped you implement Odoo Inventory.</h4>
+                    <p>Do not hesitate to send us an email to describe your experience or to suggest improvements!</p>
+                    <p>Once it's fully working, give us some feedback: we love to hear from our customer. It would be great if you could send us a photo of your warehouse to <a href="mailto:feedback@mail.odoo.com?subject=Inventory%20Planner" target="_blank">feedback@mail.odoo.com</a></p>
+                    <p><strong>Enjoy your Inventory management with Odoo!</strong></p>
+                    <p>- The Odoo Team</p>
+                    <img src="/web_planner/static/src/img/odoo_logo.png"/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="planner_mrp" model="web.planner">
+        <field name="name">Inventory planner</field>
+        <field name="view_id" ref="inventory_planner"/>
+        <field name="menu_id" ref="base.menu_mrp_root"/>
+        <field name="planner_application">planner_mrp</field>
+        <field name="tooltip_planner"><![CDATA[
+            Inventory Configuration: a step-by-step guide.]]>
+        </field>
+    </record>
+
+</odoo>

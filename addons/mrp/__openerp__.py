@@ -65,6 +65,7 @@ Dashboard / Reports for MRP will include:
         'report/mrp_production_templates.xml',
         'report/mrp_bom_structure_report_templates.xml',
         'report/mrp_bom_cost_report_templates.xml',
+        'data/web_planner_data.xml',
     ],
     'demo': [
         'data/mrp_demo.xml',
