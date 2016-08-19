@@ -44,7 +44,7 @@ class MassMailingList(models.Model):
     active = fields.Boolean(default=True)
     create_date = fields.Datetime(string='Creation Date')
     contact_nbr = fields.Integer(compute="_compute_contact_nbr", string='Number of Contacts')
-    popup_content = fields.Html(string="Website Popup Content", translate=True, sanitize=False, default=_default_popup_content)
+    popup_content = fields.Html(string="Website Popup Content", translate=True, sanitize_attributes=False, default=_default_popup_content)
     popup_redirect_url = fields.Char(string="Website Popup Redirect URL", default='/')
 
     def _compute_contact_nbr(self):
@@ -312,7 +312,7 @@ class MassMailing(models.Model):
     create_date = fields.Datetime(string='Creation Date')
     sent_date = fields.Datetime(string='Sent Date', oldname='date', copy=False)
     schedule_date = fields.Datetime(string='Schedule in the Future')
-    body_html = fields.Html(string='Body', translate=True, sanitize=False)
+    body_html = fields.Html(string='Body', translate=True, sanitize_attributes=False)
     attachment_ids = fields.Many2many('ir.attachment', 'mass_mailing_ir_attachments_rel',
         'mass_mailing_id', 'attachment_id', string='Attachments')
     keep_archives = fields.Boolean(string='Keep Archives')

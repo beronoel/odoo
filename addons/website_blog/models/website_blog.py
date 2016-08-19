@@ -110,7 +110,7 @@ class BlogPost(models.Model):
         default='{"background-image": "none", "background-color": "oe_none", "opacity": "0.6", "resize_class": ""}')
     blog_id = fields.Many2one('blog.blog', 'Blog', required=True, ondelete='cascade')
     tag_ids = fields.Many2many('blog.tag', string='Tags')
-    content = fields.Html('Content', default=_default_content, translate=html_translate, sanitize=False)
+    content = fields.Html('Content', default=_default_content, translate=html_translate, sanitize_attributes=False)
     teaser = fields.Text('Teaser', compute='_compute_teaser', inverse='_set_teaser')
     teaser_manual = fields.Text(string='Teaser Content')
 
