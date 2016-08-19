@@ -17,6 +17,10 @@ class hr_job(osv.osv):
         self.write(cr, uid, ids, {'website_published': False}, context=context)
         return super(hr_job, self).set_open(cr, uid, ids, context)
 
+    def _get_default_website_description(self):
+        default_description = self.env["ir.model.data"].xmlid_to_object("website_hr_recruitment.default_website_description")
+        return (default_description.render() if default_description else "")
+
     _columns = {
-        'website_description': fields.html('Website description', translate=html_translate, sanitize=False),
+        'website_description': fields.html('Website description', translate=html_translate, sanitize=False, default=_get_default_website_description),
     }
