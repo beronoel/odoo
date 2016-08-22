@@ -167,6 +167,8 @@ class ProductTemplate(models.Model):
                 pricelist = self.env['product.pricelist'].name_search(pricelist_id_or_name, operator='=', limit=1)
             elif isinstance(pricelist_id_or_name, (int, long)):
                 pricelist = self.env['product.pricelist'].browse(pricelist_id_or_name)
+            else:
+                pricelist = pricelist_id_or_name
 
             if pricelist:
                 quantities = [quantity] * len(self)

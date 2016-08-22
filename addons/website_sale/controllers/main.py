@@ -201,9 +201,9 @@ class WebsiteSale(http.Controller):
         pricelist_context = dict(request.env.context)
         if not pricelist_context.get('pricelist'):
             pricelist = request.website.get_current_pricelist()
-            pricelist_context['pricelist'] = pricelist.id
+            pricelist_context['pricelist'] = pricelist
         else:
-            pricelist = request.env['product.pricelist'].browse(pricelist_context['pricelist'])
+            pricelist = pricelist_context['pricelist']
 
         request.env = request.env(context=dict(pricelist=pricelist.id, partner=request.env.user.partner_id))
 
@@ -291,7 +291,7 @@ class WebsiteSale(http.Controller):
         rating_product = product.rating_get_stats([('website_published', '=', True)])
 
         if not product_context.get('pricelist'):
-            product_context['pricelist'] = pricelist.id
+            product_context['pricelist'] = pricelist
             product = product.with_context(product_context)
 
         values = {
