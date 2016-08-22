@@ -49,6 +49,7 @@ class IrQWeb(models.AbstractModel, QWeb):
 
         context = dict(self.env.context, dev_mode='qweb' in tools.config['dev_mode'])
         context.update(options)
+        context['profile'] = 5
 
         return super(IrQWeb, self).render(id_or_xml_id, values=values, **context)
 
