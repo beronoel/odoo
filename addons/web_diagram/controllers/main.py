@@ -69,8 +69,8 @@ class DiagramView(http.Controller):
             _sourceid, label = graphs['label'][transition_id]
             t = connectors[transition_id]
             t.update(
-                source=tr[src_node][1],
-                destination=tr[des_node][1],
+                source=tr[src_node],
+                destination=tr[des_node],
                 options={},
                 signal=label
             )
