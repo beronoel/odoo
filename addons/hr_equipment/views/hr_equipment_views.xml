@@ -246,12 +246,12 @@
                             </group>
                         </page>
                         <page string="Qualifications">
-                            <field name="qualification_lines" nolabel="1" colspan="4" >
+                            <!--<field name="qualification_lines" nolabel="1" colspan="4" >
                                 <tree string="qualification_ids">
-                                    <!--<field name="name"/>
-                                    <field name="duration"/>-->
+                                    <field name="name"/>
+                                    <field name="duration"/>
                                 </tree>
-                            </field>
+                            </field>-->
                         </page>
                     </notebook>
                 </sheet>
