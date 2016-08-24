@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+        <!-- QUALIFICATION -->
+
+        <record model="ir.ui.view" id="action_qualification_form">
+            <field name="name">qualification.form</field>
+            <field name="model">membership.qualification</field>
+            <field name="arch" type="xml">
+                <form string="Qualification Form">
+                    <group>
+                        <field name="name"/>
+                        <field name="duration"/>
+                        <field name="machines">
+                            <tree string="Applicable Machines">
+                                <field name="name"/>
+                            </tree>
+                        </field>
+                    </group>
+                </form>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_qualification_view">
+            <field name="name">Qualifications</field>
+            <field name="res_model">membership.qualification</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <!-- QUALIFICATION LINES -->
+        
+        <record model="ir.ui.view" id="action_qualification_line_form">
+            <field name="name">membership.qualification_line.view.form</field>
+            <field name="model">membership.qualification_line</field>
+            <field name="arch" type="xml">
+                <form string="Add Qualification">
+                    <group>
+                        <field name="qualification" widget="selection" required="1"/>
+                        <field name="qualification_date_from"/>
+                        <field name="qualification_date_to" invisible="1"/>
+                        <field name="valid" invisible="1"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_qualification_line_view">
+            <field name="name">Add Qualification</field>
+            <field name="res_model">membership.qualification_line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="action_qualification_line_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <act_window name="Invoice Membership"
+            res_model="membership.qualification_line"
+            src_model="res.partner"
+            multi="True"
+            key2="client_action_multi"
+            view_mode="form"
+            id="action_qualification_line_view"/>
+<!--
+        <record model="ir.ui.view" id="action_qualification_line_add">
+            <field name="name">membership.qualification.view.form</field>
+            <field name="model">membership.qualification</field>
+            <field name="arch" type="xml">
+                <form string="Membership Invoice">
+                    <group>
+                        <field name="duration"/>
+                    </group>
+                    <footer>
+                        <button string="Invoice Membership" name="membership_invoice" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <act_window name="Add Qualification"
+            res_model="membership.qualification_line"
+            src_model="res.partner"
+            multi="True"
+            key2="client_action_multi"
+            view_mode="form"
+            id="action_qualification_form"/>
+-->
+        <record model="ir.ui.view" id="view_qualification_form">
+            <field name="name">res.partner.form.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Qualifications">
+<!--                        <group>
+                            <div>
+                                <button name="%(action_qualification_line_view)d" type="action" string="Add Qualification"/>
+                            </div>
+                        </group>-->
+                        <field name="qualification_lines" nolabel="1" colspan="4" >
+                            <tree string="Qualifications">
+                                <field name="qualification"/>
+                                <field name="qualification_date_from"/>
+                                <field name="qualification_date_to"/>
+                                <field name="valid"/>
+                                <button string="Renew" type="object" name="renew_qualification"
+                                attrs="{'invisible':[('valid','=',True)]}"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <menuitem name="Qualifications" id="base.menu_qualification" parent="base.menu_association" action="action_qualification_view"/>
+</odoo>
