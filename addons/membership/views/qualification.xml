@@ -60,30 +60,7 @@
             key2="client_action_multi"
             view_mode="form"
             id="action_qualification_line_view"/>
-<!--
-        <record model="ir.ui.view" id="action_qualification_line_add">
-            <field name="name">membership.qualification.view.form</field>
-            <field name="model">membership.qualification</field>
-            <field name="arch" type="xml">
-                <form string="Membership Invoice">
-                    <group>
-                        <field name="duration"/>
-                    </group>
-                    <footer>
-                        <button string="Invoice Membership" name="membership_invoice" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-default" special="cancel" />
-                    </footer>
-                </form>
-            </field>
-        </record>
-        <act_window name="Add Qualification"
-            res_model="membership.qualification_line"
-            src_model="res.partner"
-            multi="True"
-            key2="client_action_multi"
-            view_mode="form"
-            id="action_qualification_form"/>
--->
+
         <record model="ir.ui.view" id="view_qualification_form">
             <field name="name">res.partner.form.inherit</field>
             <field name="model">res.partner</field>
@@ -91,11 +68,6 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Qualifications">
-<!--                        <group>
-                            <div>
-                                <button name="%(action_qualification_line_view)d" type="action" string="Add Qualification"/>
-                            </div>
-                        </group>-->
                         <field name="qualification_lines" nolabel="1" colspan="4" >
                             <tree string="Qualifications">
                                 <field name="qualification"/>
