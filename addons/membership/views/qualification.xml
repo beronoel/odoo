@@ -29,7 +29,7 @@
         
         <!-- QUALIFICATION LINES -->
         
-        <record model="ir.ui.view" id="action_qualification_line_form">
+        <record model="ir.ui.view" id="action_qualification_line_form2">
             <field name="name">membership.qualification_line.view.form</field>
             <field name="model">membership.qualification_line</field>
             <field name="arch" type="xml">
@@ -49,7 +49,7 @@
             <field name="res_model">membership.qualification_line</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="action_qualification_line_form"/>
+            <field name="view_id" ref="action_qualification_line_form2"/>
             <field name="target">new</field>
         </record>
 
