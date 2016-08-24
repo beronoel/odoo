@@ -245,13 +245,13 @@
                                 </group>
                             </group>
                         </page>
-                        <page string="Qualifications">
+                        <page string="Qualifications"><!--
                             <field name="qualification_ids">
                                 <tree string="Related qualifications">
                                     <field name="name"/>
                                     <field name="duration"/>
                                 </tree>
-                            </field>
+                            </field>-->
                         </page>
                     </notebook>
                 </sheet>
