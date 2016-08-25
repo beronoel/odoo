@@ -1,5 +1,5 @@
 [options]
-addons_path = /home/ubuntu/odoo/addons
+addons_path = /home/ubuntu/odoo/addons,/home/ubuntu/odoo/modules
 admin_passwd = 116pvoVRcm6c0ndlMWlEKuPkAWQ
 csv_internal_sep = ,
 data_dir = /home/ubuntu/.local/share/Odoo
