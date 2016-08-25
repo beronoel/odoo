@@ -1,6 +1,9 @@
 <openerp>
     <data>
-        <!-- <template id="listing"> -->
+        <template id="index">
+            <t t-call="website.layout">
+
+            </t>
         <!--   <ul> -->
         <!--     <li t-foreach="objects" t-as="object"> -->
         <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
@@ -17,6 +20,6 @@
         <!--       <dd><t t-esc="object[field]"/></dd> -->
         <!--     </t> -->
         <!--   </dl> -->
-        <!-- </template> -->
+        </template>
     </data>
 </openerp>
