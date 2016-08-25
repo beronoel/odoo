@@ -8,10 +8,12 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class Partner(models.Model):
     _inherit = 'res.partner'
     
     qualification_lines = fields.Many2many('membership.qualification_line', 'partner', string='Qualification')
+
 
 class Qualification(models.Model):
     _name = 'membership.qualification'
@@ -19,6 +21,7 @@ class Qualification(models.Model):
     name = fields.Char(string='Identifier')
     machines = fields.Many2many(comodel_name='hr.equipment', relation='equipment_qualification', column1='qualification_id', column2='equipment_id', string='Machines')
     duration = fields.Integer(string='Duration (month)')
+
     
 class QualificationLine(models.Model):
     _name = 'membership.qualification_line'
@@ -33,6 +36,9 @@ class QualificationLine(models.Model):
                                         help='Date until which qualification remains valid.')
     valid = fields.Boolean(compute='compute_valid',
                            default=True)
+
+    note = fields.Char(string='Note',
+                       help='Comments on qualification')
     
     @api.onchange('qualification_date_from')
     def check_change(self):

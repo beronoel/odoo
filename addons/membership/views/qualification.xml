@@ -68,12 +68,13 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Qualifications">
-                        <field name="qualification_lines" nolabel="1" colspan="4" >
+                        <field name="qualification_lines" nolabel="1" colspan="5" >
                             <tree string="Qualifications">
                                 <field name="qualification"/>
                                 <field name="qualification_date_from"/>
                                 <field name="qualification_date_to"/>
                                 <field name="valid"/>
+                                <field name="note"/>
                                 <button string="Renew" type="object" name="renew_qualification"
                                 attrs="{'invisible':[('valid','=',True)]}"/>
                             </tree>
