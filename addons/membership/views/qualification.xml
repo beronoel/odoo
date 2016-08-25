@@ -39,6 +39,7 @@
                         <field name="qualification_date_from"/>
                         <field name="qualification_date_to" invisible="1"/>
                         <field name="valid" invisible="1"/>
+                        <field name="note"/>
                     </group>
                 </form>
             </field>
