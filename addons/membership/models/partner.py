@@ -11,7 +11,7 @@ import membership
 class Partner(models.Model):
     _inherit = 'res.partner'
     associate_member = fields.Many2one('res.partner', string='Associate Member', help="A member with whom you want to associate your membership. It will consider the membership state of the associated member.")
-    partner_id_membership = fields.Integer(string='Unique Identification Number', help='The barcode number of the member.')
+    partner_id_membership = fields.Char(size=14, string='Unique Identification Number', help='The barcode number of the member.')
     member_lines = fields.One2many('membership.membership_line', 'partner', string='Membership')
     free_member = fields.Boolean(help="Select if you want to give free membership.")
     membership_amount = fields.Float(digits=(16, 2), help='The price negotiated by the partner')
