@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Members",
+    'name': "Members check-in system",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+        This module implements a web-based system for members check-in, based on a unique identification number.""",
 
     'description': """
         Long description of module's purpose
     """,
 
-    'author': "My Company",
-    'website': "http://www.yourcompany.com",
+    'author': "PolyFab",
+    'website': "http://polyfab.polymtl.ca/",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
