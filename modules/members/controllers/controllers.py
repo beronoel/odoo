@@ -10,5 +10,5 @@ class Members(http.Controller):
 
         print partner_ids
 
-        return http.request.render('members.member_display', partner_ids)
+        return http.request.render('members.member_display', 'test')
 
