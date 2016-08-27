@@ -8,6 +8,8 @@ class Members(http.Controller):
     def access(self, **kw):
         partner_ids = 'test'
 
+
+    
         print partner_ids
 
         return http.request.render('members.member_display', partner_ids)
