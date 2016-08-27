@@ -1,5 +1,18 @@
 <openerp>
     <data>
+
+<template id="search" name="Search hidden fields">
+  <form t-att-action="keep('/members'+ ('/category/'+slug(category)) if category else '', search=0)" method="get" t-att-class="search_class">
+
+    <t t-if="attrib_values">
+      <t t-foreach="attrib_values" t-as="a">
+        <input type="hidden" name="attrib" t-att-value="'%s-%s' % (a[0], a[1])"/>
+      </t>
+    </t>
+    <t t-call="members.members_search_box"/>
+  </form>
+</template>
+
         <template id="index">
             <t t-call="website.layout">
                 <t t-set="title">Members</t>
