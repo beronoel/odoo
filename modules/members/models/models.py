@@ -9,6 +9,7 @@ class members(models.Model):
     #partner = fields.One2many('res.partner')
     #member_UID = fields.Char(string='Unique identification number')
 
+    """
     @api.depends('member_UID')
     def _search_partner(self):
         """Return info of membership"""
@@ -36,3 +37,4 @@ class members(models.Model):
                                 p.id""", (tuple(ids_to_search),))
             for record in self.env.cr.dictfetchall():
                 partner = self.browse(record.pop('id')).update(record)
+    """
