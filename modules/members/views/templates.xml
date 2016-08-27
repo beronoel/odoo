@@ -19,6 +19,7 @@
             <title>Member</title>
             <t t-foreach="teachers" t-as="teacher">
               <p><t t-esc="teacher"/></p>
+            </t>
         </template>
 
 
