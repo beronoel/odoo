@@ -17,8 +17,8 @@
 -->
         <template id="member_display">
             <title>Member</title>
-            <t t-foreach="teachers" t-as="teacher">
-              <p><t t-esc="teacher.id"/> <t t-esc="teacher.name"/></p>
+            <t t-foreach="members" t-as="member">
+              <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
             </t>
         </template>
 

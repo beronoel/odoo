@@ -1,12 +1,12 @@
 <openerp>
     <data>
-        <record id="padilla" model="members.teachers">
+        <record id="padilla" model="members.members">
             <field name="name">Diana Padilla</field>
         </record>
-        <record id="carroll" model="members.teachers">
+        <record id="carroll" model="members.members">
             <field name="name">Jody Carroll</field>
         </record>
-        <record id="vaughn" model="members.teachers">
+        <record id="vaughn" model="members.members">
             <field name="name">Lester Vaughn</field>
         </record>
     </data>

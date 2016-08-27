@@ -6,6 +6,8 @@ from openerp import models, fields, api
 class members(models.Model):
     _name = 'members.members'
 
+    name = fields.Char()
+
     #partner = fields.One2many('res.partner')
     #member_UID = fields.Char(string='Unique identification number')
 
