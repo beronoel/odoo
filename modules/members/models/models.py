@@ -4,12 +4,8 @@ from openerp import models, fields, api
 
 
 class members(models.Model):
+    _inherits = 'res.partner'
     _name = 'members.members'
-
-    name = fields.Char()
-
-    #partner = fields.One2many('res.partner')
-    #member_UID = fields.Char(string='Unique identification number')
 
     """
     @api.depends('member_UID')
