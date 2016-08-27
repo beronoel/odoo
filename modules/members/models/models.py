@@ -12,7 +12,7 @@ class members(models.Model):
     """
     @api.depends('member_UID')
     def _search_partner(self):
-        """Return info of membership"""
+        # Return info of membership
         if self.ids:
             ids_to_search = []
             for partner in self:
@@ -20,7 +20,7 @@ class members(models.Model):
                     ids_to_search.append(partner.associate_member.partner_id_membership)
                 else:
                     ids_to_search.append(partner.partner_id_membership)
-            self.env.cr.execute("""
+            self.env.cr.execute('''
                             SELECT
                                 p.id as id,
                                 MIN(m.date_from) as membership_start,
@@ -34,7 +34,7 @@ class members(models.Model):
                             WHERE
                                 p.id IN %s
                             GROUP BY
-                                p.id""", (tuple(ids_to_search),))
+                                p.id''', (tuple(ids_to_search),))
             for record in self.env.cr.dictfetchall():
                 partner = self.browse(record.pop('id')).update(record)
     """
