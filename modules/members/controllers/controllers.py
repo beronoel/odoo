@@ -4,7 +4,7 @@ from openerp.http import request
 
 
 class Members(http.Controller):
-    @http.route('/members', type='http', auth='public', website=True)
+    @http.route('/members/', auth='public')
     def access(self, **kw):
         cr, uid, context, pool = request.cr, request.uid, request.context, request.registry
 
@@ -12,8 +12,7 @@ class Members(http.Controller):
         partner_ids = partner_obj.search(cr, uid, [], context=context)
         print partner_ids
 
-
-        return http.request.render('members.display', partner_obj)
+        return http.request.render('members.member_display', partner_ids)
 
     def display(self):
 

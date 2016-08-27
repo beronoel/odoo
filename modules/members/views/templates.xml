@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
 
@@ -13,79 +14,11 @@
   </form>
 </template>
 
-        <template id="index">
-            <t t-call="website.layout">
-                <t t-set="title">Members</t>
-                <div class="oe_structure">
-                    <div class="container">
-                        <field name="member_UID"/>
-                        <!--
-                        <record model="ir.ui.view" id="view_members_form">
-                            <field name="name">res.partner.form.inherit</field>
-                            <field name="model">res.partner</field>
-                            <field name="inherit_id" ref="base.view_partner_form"/>
-                            <field name="arch" type="xml">
-                                <notebook position="inside">
-                                    <page string="Membership">
-                                        <group>
-                                            <group>
-                                                <field name="free_member"/>
-                                                <field name="partner_id_membership"/>
-                                                <label for="membership_state"/>
-                                                <div>
-                                                    <field name="membership_state"/>
-                                                    <button name="%(action_membership_invoice_view)d" type="action" string="Buy Membership"
-                                                        attrs="{'invisible':[('free_member','=',True)]}" class="oe_link"/>
-                                                </div>
-                                            </group>
-                                            <group>
-                                                <field name="associate_member" attrs="{'invisible':[('free_member','=',True)]}"/>
-                                                <field name="membership_start" attrs="{'invisible':[('membership_start','=',False)]}"/>
-                                                <field name="membership_stop" attrs="{'invisible':[('membership_stop','=',False)]}"/>
-                                                <field name="membership_cancel" attrs="{'invisible':[('membership_cancel','=',False)]}"/>
-                                            </group>
-                                        </group>
-                                        <field name="member_lines" nolabel="1" colspan="4" readonly="1">
-                                            <tree string="Memberships">
-                                                <field name="date"/>
-                                                <field name="membership_id"/>
-                                                <field name="member_price"/>
-                                                <field name="account_invoice_id"/>
-                                                <field name="state"/>
-                                            </tree>
-                                            <form string="Memberships">
-                                                <field name="date"/>
-                                                <field name="member_price"/>
-                                                <field name="membership_id"/>
-                                                <field name="account_invoice_id" context="{'form_view_ref': 'account.invoice_form'}"/>
-                                                <field name="state" colspan="4"/>
-                                            </form>
-                                        </field>
-
-                                    </page>
-                                </notebook>
-                            </field>
-                        </record>
-                        -->
-                    </div>
-                </div>
-            </t>
-        <!--   <ul> -->
-        <!--     <li t-foreach="objects" t-as="object"> -->
-        <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
-        <!--         <t t-esc="object.display_name"/> -->
-        <!--       </a> -->
-        <!--     </li> -->
-        <!--   </ul> -->
-        <!-- </template> -->
-        <!-- <template id="object"> -->
-        <!--   <h1><t t-esc="object.display_name"/></h1> -->
-        <!--   <dl> -->
-        <!--     <t t-foreach="object._fields" t-as="field"> -->
-        <!--       <dt><t t-esc="field"/></dt> -->
-        <!--       <dd><t t-esc="object[field]"/></dd> -->
-        <!--     </t> -->
-        <!--   </dl> -->
+        <template id="member_display">
+            <title>Member</title>
+            <p><t t-esc="teacher"/></p>
         </template>
+
+
     </data>
 </openerp>
