@@ -2,6 +2,7 @@
 <openerp>
     <data>
 
+        <!---
 <template id="search" name="Search hidden fields">
   <form t-att-action="keep('/members'+ ('/category/'+slug(category)) if category else '', search=0)" method="get" t-att-class="search_class">
 
@@ -13,10 +14,10 @@
     <t t-call="members.members_search_box"/>
   </form>
 </template>
-
+-->
         <template id="member_display">
             <title>Member</title>
-            <p><t t-esc="teacher"/></p>
+            <p><t t-esc="partner_ids"/></p>
         </template>
 
 

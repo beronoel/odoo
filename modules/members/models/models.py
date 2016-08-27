@@ -6,8 +6,8 @@ from openerp import models, fields, api
 class members(models.Model):
     _name = 'members.members'
 
-    partner = fields.One2many('res.partner')
-    member_UID = fields.Char(string='Unique identification number')
+    #partner = fields.One2many('res.partner')
+    #member_UID = fields.Char(string='Unique identification number')
 
     @api.depends('member_UID')
     def _search_partner(self):
