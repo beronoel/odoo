@@ -5,8 +5,9 @@ from odoo.exceptions import UserError
 
 
 class members(models.Model):
-    _inherits = 'res.partner'
     _name = "res.partner"
+    _inherits = 'res.partner'
+
     #_name = 'members.members'
 
     """
