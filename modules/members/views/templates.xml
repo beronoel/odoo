@@ -18,7 +18,7 @@
         <template id="member_display">
             <title>Member</title>
             <t t-foreach="members" t-as="member">
-              <p><t t-esc="member.id"/> <t t-esc="member.partner_id_membership"/></p>
+              <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
             </t>
         </template>
 
