@@ -4,7 +4,7 @@ from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 
 
-class members(models.Model):
+class Partner(models.Model):
     _inherits = 'res.partner'
 
     #_name = 'members.members'
