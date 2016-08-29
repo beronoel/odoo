@@ -211,7 +211,7 @@
                         <group>
                             <group>
                                 <field name="free_member"/>
-                                <field name="isin"/>
+                                <field name="is_in"/>
                                 <field name="partner_id_membership"/>
                                 <label for="membership_state"/>
                                 <div>

@@ -14,7 +14,7 @@ class Partner(models.Model):
 
     # addons by Benjamin De Leener, for check-in management
     partner_id_membership = fields.Char(string='Unique Identification Number', help='The barcode number of the member.')
-    isin = fields.Boolean(help="Is the member inside PolyFab room?")
+    is_in = fields.Boolean(string='Is the member inside PolyFab room?', help="Is the member inside PolyFab room?")
 
     member_lines = fields.One2many('membership.membership_line', 'partner', string='Membership')
     free_member = fields.Boolean(help="Select if you want to give free membership.")
