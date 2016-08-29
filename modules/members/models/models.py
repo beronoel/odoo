@@ -22,7 +22,7 @@ class members(models.Model):
 
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
-            p.write({'is_in': not partner.is_in})
+            p.write({'is_in': not p.is_in})
 
         scheduler_line_obj = self.pool.get('members.members')
         #record_members = http.request.env['res.partner']
