@@ -14,7 +14,7 @@ class Members(http.Controller):
 
             return http.request.render('members.search_partner', {'form': form, 'members': result_record})
 
-        return http.request.render('members.search_partner', {'form': form, 'members': None})
+        return http.request.render('members.search_partner', {'form': form, 'members': []})
 
 class SearchForm(Form):
     unique_id = StringField('unique_id')
