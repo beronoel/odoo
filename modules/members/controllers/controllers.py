@@ -8,5 +8,5 @@ class Members(http.Controller):
     def access(self, **kw):
         Members = http.request.env['res.partner']
 
-        return http.request.render('members.member_display', {'members': Members.browse(['29334011400439'])})
+        return http.request.render('members.member_display', {'members': Members.search([[('name','==','Benjamin De Leener')]])})
 
