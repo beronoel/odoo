@@ -9,8 +9,8 @@ class Members(http.Controller):
         cr, uid, context = request.cr, request.uid, request.context
         record_members = http.request.env['res.partner']
 
-        if not record_members:
-            return http.request.render('members.member_display', {'id': 'None', 'name': 'None'})
+        result_record = record_members.search(cr, SUPERUSER_ID, [('name', '=', 'Benjamin De Leener')], context=context)
+        print result_record
 
-        return http.request.render('members.member_display', {'members': record_members.search(cr, SUPERUSER_ID, [('name', '=', 'Benjamin De Leener')], context=context)})
+        return http.request.render('members.member_display', {'members': result_record})
 
