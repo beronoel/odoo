@@ -22,13 +22,11 @@
                 </form>
             </div>
         </div>
-    </t>
-</template>
-
-<template id="member_display">
-    <title>Member</title>
-    <t t-foreach="members" t-as="member">
-      <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
+        <div class="row">
+            <t t-foreach="members" t-as="member">
+              <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
+            </t>
+        </div>
     </t>
 </template>
 

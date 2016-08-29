@@ -13,7 +13,7 @@ class Members(http.Controller):
             record_members = http.request.env['res.partner'].sudo()
             result_record = record_members.search([('partner_id_membership', '=', str(unique_id))])
 
-            return http.request.render('members.member_display', {'members': result_record})
+            return http.request.render('members.search_partner', {'form': form, 'members': result_record})
 
         return http.request.render('members.search_partner', {'form': form})
 
