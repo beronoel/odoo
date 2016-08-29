@@ -26,7 +26,7 @@
         'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
-        'data/scheduler_data.py'
+        'data/scheduler_data.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
