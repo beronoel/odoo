@@ -3,7 +3,7 @@ from openerp import http
 from wtforms import Form, StringField
 
 class Members(http.Controller):
-    @http.route('/members/members/', website=True)
+    @http.route('/members/', auth='public', website=True)
     def create(self, **post_data):
         form = SearchForm(http.request.httprequest.form)
         if http.request.httprequest.method == 'POST':

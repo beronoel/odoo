@@ -13,7 +13,7 @@
     <t t-call="website.layout">
         <div class="row">
             <div class="col-md-6 col-md-offset-2">
-                <form role="form" action="/members/members" method="POST">
+                <form role="form" action="/members" method="POST">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <t t-foreach="form" t-as="field">
                         <t t-call="members.field_render" />
