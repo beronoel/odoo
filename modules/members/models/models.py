@@ -18,13 +18,13 @@ class members(models.Model):
     def process_scheduler_queue(self, cr, uid, context=None):
         record_members = self.pool.get('res.partner')
         #record_members = http.request.env['res.partner']
-        result_record = record_members.search([('is_in', '=', True)])
+        result_record = record_members.search(cr, uid, [('is_in', '=', True)], context=context)
 
         for partner in result_record:
             p = record_members.browse(partner.id)
             p.write({'is_in': not partner.is_in})
 
-        record_members = self.pool.get('members.members')
+        scheduler_line_obj = self.pool.get('members.members')
         #record_members = http.request.env['res.partner']
         scheduler_line_ids = scheduler_line_obj.search(cr, uid, [])
         # Loops over every record in the model scheduler.demo
