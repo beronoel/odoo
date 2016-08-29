@@ -9,7 +9,7 @@ class Members(http.Controller):
         cr, uid, context = request.cr, SUPERUSER_ID, request.context
         record_members = http.request.env['res.partner']
 
-        result_record = record_members.search(cr, uid, [('id', '=', '0')], context=context)
+        result_record = record_members.search(cr, uid, [('id', '=', '1')], context=context)
         print result_record
 
         return http.request.render('members.member_display', {'members': result_record})
