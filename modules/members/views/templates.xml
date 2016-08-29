@@ -31,11 +31,13 @@
                     <p><t t-esc="member.email"/></p>
                     <p><t t-esc="member.membership_state"/></p>
                     <t t-foreach="member.qualification_lines" t-as="qualification">
-                        <p><t t-esc="qualification.qualification"/>
-                        <t t-esc="qualification.qualification_date_from"/>
-                        <t t-esc="qualification.qualification_date_to"/>
-                        <t t-esc="qualification.valid"/>
-                        <t t-esc="qualification.note"/></p>
+                        <div class="col-md-5 col-md-offset-2">
+                            <t t-esc="qualification.qualification.name"/>
+                            <t t-esc="qualification.qualification_date_from"/>
+                            <t t-esc="qualification.qualification_date_to"/>
+                            <t t-esc="qualification.valid"/>
+                            <t t-esc="qualification.note"/>
+                        </div>
                     </t>
                 </t>
             </div>
