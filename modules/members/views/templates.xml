@@ -24,22 +24,24 @@
             </div>
         </div>
         <div class="row">
-            <p>Member informations</p>
             <div class="col-md-8 col-md-offset-2">
+                <p>Member informations</p>
                 <t t-foreach="members" t-as="member">
                     <p>Nom: <t t-esc="member.name"/></p>
                     <p>Email: <t t-esc="member.email"/></p>
                     <p>Statut Membership: <t t-esc="member.membership_state"/></p>
-                    Qualifications: \n
-                    <t t-foreach="member.qualification_lines" t-as="qualification">
-                        <div class="col-md-6">
-                            <t t-esc="qualification.qualification.name"/>
-                            <t t-esc="qualification.qualification_date_from"/>
-                            <t t-esc="qualification.qualification_date_to"/>
-                            <t t-esc="qualification.valid"/>
-                            <t t-esc="qualification.note"/>
-                        </div>
-                    </t>
+                    <p>Qualifications:</p>
+                    <p>
+                        <t t-foreach="member.qualification_lines" t-as="qualification">
+                            <div class="col-md-6">
+                                <t t-esc="qualification.qualification.name"/>
+                                <t t-esc="qualification.qualification_date_from"/>
+                                <t t-esc="qualification.qualification_date_to"/>
+                                <t t-esc="qualification.valid"/>
+                                <t t-esc="qualification.note"/>
+                            </div>
+                        </t>
+                    </p>
                 </t>
             </div>
         </div>
