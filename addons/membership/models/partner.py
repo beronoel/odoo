@@ -31,6 +31,8 @@ class Partner(models.Model):
     membership_stop = fields.Date(compute='_compute_membership_date', store=True, help='Date until which membership remains active.')
     membership_cancel = fields.Date(compute='_compute_membership_date', store=True, help='Date on which membership has been cancelled')
 
+    qualification_lines = fields.One2many('membership.qualification_line', 'partner', string='Qualifications')
+
     @api.depends('free_member', 'member_lines')
     def _compute_membership_date(self):
         """Return  date of membership"""

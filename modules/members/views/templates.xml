@@ -30,6 +30,7 @@
                     <p><t t-esc="member.name"/></p>
                     <p><t t-esc="member.email"/></p>
                     <p><t t-esc="member.membership_state"/></p>
+                    <t t-foreach="member.qualifications" t-as="qualification">
                 </t>
             </div>
         </div>
