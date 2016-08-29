@@ -6,7 +6,7 @@ class Members(http.Controller):
     def access(self, **kw):
         record_members = http.request.env['res.partner'].sudo()
 
-        result_record = record_members.search([('partner_id_membership', '=', '29334011400439')])
+        result_record = record_members.search([('partner_id_membership', '=', '29334011400432')])
 
         return http.request.render('members.member_display', {'members': result_record})
 
