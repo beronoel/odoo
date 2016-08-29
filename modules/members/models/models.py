@@ -23,8 +23,8 @@ class members(models.Model):
             p = record_members.browse(partner.id)
             p.write({'is_in': not partner.is_in})
 
-        scheduler_line_obj = self.pool.get('members.members')
-        scheduler_line_ids = self.pool.get('members.members').search(cr, uid, [])
+        scheduler_line_obj = http.request.env['res.partner'].sudo()
+        scheduler_line_ids = scheduler_line_obj.search(cr, uid, [])
         # Loops over every record in the model scheduler.demo
         for scheduler_line_id in scheduler_line_ids:
             # Contains all details from the record in the variable scheduler_line
