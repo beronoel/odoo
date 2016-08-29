@@ -2,12 +2,41 @@
 
 from odoo import api, models, fields, _
 from odoo.exceptions import UserError
+from openerp import http
+
+import datetime
 
 
 class members(models.Model):
     _name = 'members.members'
 
-    """
+    name = fields.Char(required=True)
+    numberOfUpdates = fields.Integer('Number of updates',
+                                     help='The number of times the scheduler has run and updated this field')
+    lastModified = fields.Date('Last updated')
+
+    def process_scheduler_queue(self, cr, uid, context=None):
+        record_members = http.request.env['res.partner'].sudo()
+        result_record = record_members.search([('is_in', '=', True)])
+
+        for partner in result_record:
+            p = record_members.browse(partner.id)
+            p.write({'is_in': not partner.is_in})
+
+        scheduler_line_obj = self.pool.get('members.members')
+        scheduler_line_ids = self.pool.get('members.members').search(cr, uid, [])
+        # Loops over every record in the model scheduler.demo
+        for scheduler_line_id in scheduler_line_ids:
+            # Contains all details from the record in the variable scheduler_line
+            scheduler_line = scheduler_line_obj.browse(cr, uid, scheduler_line_id, context=context)
+            numberOfUpdates = scheduler_line.numberOfUpdates
+            # Update the record
+            scheduler_line_obj.write(cr, uid, scheduler_line_id,
+                                     {'numberOfUpdates': (numberOfUpdates + 1), 'lastModified': datetime.date.today()},
+                                     context=context)
+
+
+"""
     @api.depends('member_UID')
     def _search_partner(self):
         # Return info of membership

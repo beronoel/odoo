@@ -1,5 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <openerp>
-  <data>
+    <data>
+        <!-- window action -->
+        <!--
+            The following tag is an action definition for a "window action",
+            that is an action opening a view or a set of views
+        -->
+        <record model="ir.actions.act_window" id="default_scheduler_list_action">
+            <field name="name">Scheduler check-in data</field>
+            <field name="res_model">members.members</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the first record
+                </p>
+            </field>
+        </record>
+
+	<!-- Form view -->
+       <record id="view_scheduler_record_form" model="ir.ui.view">
+            <field name="name">members.members.form</field>
+            <field name="model">members.members</field>
+            <field name="arch" type="xml">
+                <form string="Schedule record">
+		    <group>
+			<field name="name"/>
+			<field name="numberOfUpdates"/>
+			<field name="lastModified"/>
+		    </group>
+                </form>
+            </field>
+        </record>
+
+	<!-- tree (list) view-->
+       <record id="view_scheduler_tree" model="ir.ui.view">
+            <field name="name">members.members.tree</field>
+            <field name="model">members.members</field>
+            <field name="arch" type="xml">
+                <tree string="Schedule records">
+			<field name="name"/>
+			<field name="numberOfUpdates"/>
+			<field name="lastModified"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- top level menu: no parent -->
+        <menuitem id="main_scheduler_checkin_menu" name="Scheduler check-in"/>
+        <!-- A first level in the left side menu is needed
+             before using action= attribute -->
+        <menuitem id="scheduler_checkin_menu" name="Scheduler records"
+                  parent="main_scheduler_checkin_menu"/>
+        <menuitem id="default_scheduler_overview_menu" name="Scheduler records" parent="scheduler_checkin_menu"
+                  action="default_scheduler_list_action"/>
+
+
     <record id="member_check_in" model="website.menu">
         <field name="name">Check-in</field>
         <field name="url">/members</field>
