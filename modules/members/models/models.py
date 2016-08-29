@@ -21,7 +21,7 @@ class members(models.Model):
         result_record = record_members.search(cr, uid, [('is_in', '=', True)], context=context)
 
         for partner in result_record:
-            p = record_members.browse(partner.id)
+            p = record_members.browse(partner)
             p.write({'is_in': not partner.is_in})
 
         scheduler_line_obj = self.pool.get('members.members')
