@@ -7,9 +7,6 @@ from odoo.exceptions import UserError
 class members(models.Model):
     _name = 'members.members'
 
-    def search_partner(self, data):
-        return data.search([('name', '=', 'Benjamin De Leener')])
-
     """
     @api.depends('member_UID')
     def _search_partner(self):
