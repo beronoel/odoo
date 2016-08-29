@@ -2,7 +2,7 @@
 from openerp import http
 
 class Members(http.Controller):
-    @http.route('/members/members/', auth='public')
+    @http.route('/members/members/', auth='public', website=True)
     def access(self, **kw):
 
         record_members = http.request.env['res.partner'].sudo()
