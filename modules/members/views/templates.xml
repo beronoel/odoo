@@ -13,7 +13,7 @@
     <t t-call="website.layout">
         <t t-set="title">PolyFab Check-in</t>
         <div class="row">
-            <div class="col-md-6 col-md-offset-2">
+            <div class="col-md-8 col-md-offset-2">
                 <form role="form" action="/members" method="POST">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <t t-foreach="form" t-as="field">
@@ -30,7 +30,13 @@
                     <p><t t-esc="member.name"/></p>
                     <p><t t-esc="member.email"/></p>
                     <p><t t-esc="member.membership_state"/></p>
-                    <!--<t t-foreach="member.qualifications" t-as="qualification">-->
+                    <t t-foreach="member.qualification_lines" t-as="qualification">
+                        <p><t t-esc="qualification.qualification"/>
+                        <t t-esc="qualification.qualification_date_from"/>
+                        <t t-esc="qualification.qualification_date_to"/>
+                        <t t-esc="qualification.valid"/>
+                        <t t-esc="qualification.note"/></p>
+                    </t>
                 </t>
             </div>
         </div>
