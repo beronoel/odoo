@@ -24,9 +24,12 @@
             </div>
         </div>
         <div class="row">
+            <div></div>
             <div class="col-md-6 col-md-offset-2">
                 <t t-foreach="members" t-as="member">
-                  <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
+                    <p><t t-esc="member.name"/></p>
+                    <p><t t-esc="member.email"/></p>
+                    <p><t t-esc="member.membership_state"/></p>
                 </t>
             </div>
         </div>
