@@ -14,7 +14,7 @@ class Members(http.Controller):
 
             for partner in result_record:
                 p = record_members.browse(partner.id)
-                p.write({'is_in': True})
+                p.write({'is_in': not partner.is_in})
 
             return http.request.render('members.search_partner', {'form': form, 'members': result_record})
 
