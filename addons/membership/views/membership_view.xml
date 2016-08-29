@@ -134,6 +134,8 @@
                     <field name="category_id"/>
                     <field name="membership_start" invisible="1"/>
                     <field name="membership_stop" string="End Membership Date"/>
+                    <filter string="Inside PolyFab" name="are_in" domain="[('is_in','=',True)]"/>
+                    <separator/>
                     <filter string="Customers" name="customer" domain="[('customer','=',1)]"/>
                     <separator/>
                     <filter string="Vendors" name="supplier" domain="[('supplier','=',1)]"/>
