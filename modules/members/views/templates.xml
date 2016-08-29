@@ -2,25 +2,34 @@
 <openerp>
     <data>
 
-        <!---
-<template id="search" name="Search hidden fields">
-  <form t-att-action="keep('/members'+ ('/category/'+slug(category)) if category else '', search=0)" method="get" t-att-class="search_class">
-
-    <t t-if="attrib_values">
-      <t t-foreach="attrib_values" t-as="a">
-        <input type="hidden" name="attrib" t-att-value="'%s-%s' % (a[0], a[1])"/>
-      </t>
-    </t>
-    <t t-call="members.members_search_box"/>
-  </form>
+<template id="field_render" name="Render Form Field">
+    <div t-attf-class="form-group">
+        <t t-raw="field.label" />
+        <t t-raw="field(class_='form-control')" />
+    </div>
 </template>
--->
-        <template id="member_display">
-            <title>Member</title>
-            <t t-foreach="members" t-as="member">
-              <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
-            </t>
-        </template>
+
+<template id="search_partner" name="Search Partner">
+    <t t-call="website.layout">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-2">
+                <form role="form" action="/members/search" method="POST">
+                    <t t-foreach="form" t-as="field">
+                        <t t-call="members.field_render" />
+                    </t>
+                    <button type="submit" class="btn btn-primary mt8">Search</button>
+                </form>
+            </div>
+        </div>
+    </t>
+</template>
+
+<template id="member_display">
+    <title>Member</title>
+    <t t-foreach="members" t-as="member">
+      <p><t t-esc="member.id"/> <t t-esc="member.name"/></p>
+    </t>
+</template>
 
 
     </data>
