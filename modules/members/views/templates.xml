@@ -26,8 +26,8 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <t t-foreach="members" t-as="member">
-                    <table border="0" style="width:50%">
-                        <tr><td rowspan="3"><span t-field="member.image_small" t-field-options='{"widget": "image"}'/></td><td>Nom:</td><td><t t-esc="member.name"/></td></tr>
+                    <table border="0" style="width:80%">
+                        <tr><td rowspan="3"><span t-field="member.image_medium" t-field-options='{"widget": "image"}'/></td><td>Nom:</td><td><t t-esc="member.name"/></td></tr>
                         <tr><td>Email:</td><td><t t-esc="member.email"/></td></tr>
                         <tr><td>Statut Membership:</td><td><t t-esc="member.membership_state"/></td></tr>
                     </table>
@@ -38,7 +38,10 @@
                             <td><t t-esc="qualification.qualification.name"/></td>
                             <td><t t-esc="qualification.qualification_date_from"/></td>
                             <td><t t-esc="qualification.qualification_date_to"/></td>
-                            <td><t t-esc="qualification.valid"/></td>
+                            <td>
+                                <t t-if="qualification.valid">Oui</t>
+                                <t t-if="not qualification.valid">Non</t>
+                            </td>
                             <td><t t-esc="qualification.note"/></td>
                             </tr>
                         </t>
