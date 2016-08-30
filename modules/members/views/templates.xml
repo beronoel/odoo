@@ -32,7 +32,7 @@
                     <p>Statut Membership: <t t-esc="member.membership_state"/></p>
                     <p>Qualifications:</p>
                     <p>
-                        <table border="1">
+                        <table border="0" style="width:100%">
                             <tr><th>Qualification</th><th>From</th><th>To</th><th>Is Valid</th><th>Note</th></tr>
                             <t t-foreach="member.qualification_lines" t-as="qualification">
                                 <tr>
