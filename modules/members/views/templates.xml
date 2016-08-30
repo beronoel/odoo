@@ -26,15 +26,16 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <t t-foreach="members" t-as="member">
-                    <p>Nom: <t t-esc="member.name"/></p>
-                    <p>Email: <t t-esc="member.email"/></p>
-                    <p>Statut Membership: <t t-esc="member.membership_state"/></p>
-                    <p>
+                    <table border="0" style="width:80%">
+                        <tr><td>Nom:</td><td><t t-esc="member.name"/></td><td rowspan="3"><t t-esc="member.image"/></td></tr>
+                        <tr><td>Email:</td><td><t t-esc="member.email"/></td></tr>
+                        <tr><td>Statut Membership:</td><td><t t-esc="member.membership_state"/></td></tr>
+                    </table>
                         <table border="0" style="width:80%">
                             <tr><th>Qualification</th><th>Début</th><th>Fin</th><th>Est valide?</th><th>Note</th></tr>
                             <t t-foreach="member.qualification_lines" t-as="qualification">
                                 <tr>
-                                <td><em><t t-esc="qualification.qualification.name"/></em></td>
+                                <td><t t-esc="qualification.qualification.name"/></td>
                                 <td><t t-esc="qualification.qualification_date_from"/></td>
                                 <td><t t-esc="qualification.qualification_date_to"/></td>
                                 <td><t t-esc="qualification.valid"/></td>
