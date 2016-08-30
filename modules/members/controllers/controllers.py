@@ -16,8 +16,9 @@ class Members(http.Controller):
             for partner in result_record:
                 p = record_members.browse(partner.id)
                 p.write({'is_in': not partner.is_in})
-                if partner.valid: partner.valid = 'Oui'
-                else: partner.valid = 'Non'
+                for qualification in partner.qualification_lines:
+                    if qualification.valid: qualification.valid = 'Oui'
+                    else: qualification.valid = 'Non'
 
             return http.request.render('members.search_partner', {'form': form, 'members': result_record})
 
