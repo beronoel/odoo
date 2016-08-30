@@ -32,15 +32,18 @@
                     <p>Statut Membership: <t t-esc="member.membership_state"/></p>
                     <p>Qualifications:</p>
                     <p>
-                        <t t-foreach="member.qualification_lines" t-as="qualification">
-                            <p>
-                            <div class="col"><t t-esc="qualification.qualification.name"/></div>
-                            <div class="col"><t t-esc="qualification.qualification_date_from"/></div>
-                            <div class="col"><t t-esc="qualification.qualification_date_to"/></div>
-                            <div class="col"><t t-esc="qualification.valid"/></div>
-                            <div class="col"><t t-esc="qualification.note"/></div>
-                            </p>
-                        </t>
+                        <table border="1">
+                            <tr><th>Qualification</th><th>From</th><th>To</th><th>Is Valid</th><th>Note</th></tr>
+                            <t t-foreach="member.qualification_lines" t-as="qualification">
+                                <tr>
+                                <td><em><t t-esc="qualification.qualification.name"/></em></td>
+                                <td><t t-esc="qualification.qualification_date_from"/></td>
+                                <td><t t-esc="qualification.qualification_date_to"/></td>
+                                <td><t t-esc="qualification.valid"/></td>
+                                <td><t t-esc="qualification.note"/></td>
+                                </tr>
+                            </t>
+                        </table>
                     </p>
                 </t>
             </div>
