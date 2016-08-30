@@ -33,13 +33,13 @@
                     <p>Qualifications:</p>
                     <p>
                         <t t-foreach="member.qualification_lines" t-as="qualification">
-                            <div class="col-md-3">
-                                <p><t t-esc="qualification.qualification.name"/></p>
-                                <p><t t-esc="qualification.qualification_date_from"/></p>
-                                <p><t t-esc="qualification.qualification_date_to"/></p>
-                                <p><t t-esc="qualification.valid"/></p>
-                                <p><t t-esc="qualification.note"/></p>
-                            </div>
+                            <p>
+                            <div class="col"><t t-esc="qualification.qualification.name"/></div>
+                            <div class="col"><t t-esc="qualification.qualification_date_from"/></div>
+                            <div class="col"><t t-esc="qualification.qualification_date_to"/></div>
+                            <div class="col"><t t-esc="qualification.valid"/></div>
+                            <div class="col"><t t-esc="qualification.note"/></div>
+                            </p>
                         </t>
                     </p>
                 </t>
