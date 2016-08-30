@@ -5,7 +5,7 @@
 <template id="field_render" name="Render Form Field">
     <div t-attf-class="form-group">
         <!--<t t-raw="field.label" />-->
-        <t t-raw="field(class_='form-control')" />
+        <t id="search_field" t-raw="field(class_='form-control')" />
     </div>
 </template>
 
@@ -13,17 +13,18 @@
     <t t-call="website.layout">
         <t t-set="title">PolyFab Check-in</t>
         <div class="row">
-            <div class="col-md-3 col-md-offset-2">
-                <form role="form" action="/members" method="POST">
+            <div class="col-md-5 col-md-offset-2">
+                <form id="search_form" role="form" action="/members" method="POST">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <t t-foreach="form" t-as="field">
-                        Entrez votre numéro d'identification ou scannez votre carte:
+                        <b>Entrez votre numéro d'identification ou scannez votre carte:</b>
                         <t t-call="members.field_render" />
                     </t>
                     <button type="submit" class="btn btn-primary mt8">Search</button>
                 </form>
             </div>
         </div>
+        <script type="text/javascript">document.search_form.search_field.focus();</script>
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <t t-foreach="members" t-as="member">
