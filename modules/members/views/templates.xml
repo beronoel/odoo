@@ -5,7 +5,7 @@
 <template id="field_render" name="Render Form Field">
     <div t-attf-class="form-group">
         <!--<t t-raw="field.label" />-->
-        <t t-att-autofocus="autofocus" t-raw="field(class_='form-control')"/>
+        <t t-att="['autofocus', 'autofocus']" t-raw="field(class_='form-control')"/>
     </div>
 </template>
 
