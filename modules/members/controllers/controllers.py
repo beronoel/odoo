@@ -7,7 +7,8 @@ class Members(http.Controller):
     def create(self, **post_data):
         form = SearchForm(http.request.httprequest.form)
         if http.request.httprequest.method == 'POST':
-            unique_id = form.unique_id.data  # '29334011400439'
+            unique_id = form.unique_id.data
+            form.unique_id.data = ''
 
             record_members = http.request.env['res.partner'].sudo()
             result_record = record_members.search([('partner_id_membership', '=', str(unique_id))])

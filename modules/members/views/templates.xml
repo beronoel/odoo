@@ -12,7 +12,6 @@
 <template id="search_partner" name="Search Partner">
     <t t-call="website.layout">
         <t t-set="title">PolyFab Check-in</t>
-        &#xD;
         <div class="row">
             <div class="col-md-6 col-md-offset-2">
                 <form role="form" action="/members" method="POST">
@@ -24,7 +23,6 @@
                 </form>
             </div>
         </div>
-        &#xD;
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
                 <t t-foreach="members" t-as="member">
