@@ -32,7 +32,7 @@
                                 <t t-if="member.membership_state=='canceled'">Membership annulé</t>
                                 <t t-if="member.membership_state=='old'">Ancien membre</t>
                                 <t t-if="member.membership_state=='waiting'">Membership en attente</t>
-                                <t t-if="member.membership_state=='invoiced'">Membre, payement en attente</t>
+                                <t t-if="member.membership_state=='invoiced'">Membre, paiement en attente</t>
                                 <t t-if="member.membership_state=='free'">Membre (gratuit)</t>
                                 <t t-if="member.membership_state=='paid'">Membre</t>
                             </td>
@@ -53,6 +53,9 @@
                             </tr>
                         </t>
                     </table>
+                    <br></br>
+                    <t t-if="member.is_in">Bonjour!</t>
+                    <t t-if="not member.is_in">Aurevoir!</t>
                 </t>
             </div>
         </div>
