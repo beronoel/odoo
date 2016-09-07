@@ -5,7 +5,7 @@
 <template id="field_render" name="Render Form Field">
     <div t-attf-class="form-group">
         <!--<t t-raw="field.label" />-->
-        <t t-att="['default_focus', '1']" t-raw="field(class_='form-control')"/>
+        <t t-raw="field(class_='form-control')"/>
     </div>
 </template>
 
@@ -18,7 +18,7 @@
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <t t-foreach="form" t-as="field">
                         <b>Entrez votre numéro d'identification ou scannez votre carte:</b>
-                        <t t-call="members.field_render" />
+                        <t t-att="['default_focus', '1']" t-call="members.field_render" />
                     </t>
                     <button type="submit" class="btn btn-primary mt8">Search</button>
                 </form>
