@@ -313,6 +313,8 @@ class AccountInvoice(models.Model):
     payments_widget = fields.Text(compute='_get_payment_info_JSON')
     has_outstanding = fields.Boolean(compute='_get_outstanding_info_JSON')
 
+    partner_id_membership = fields.Many2one('res.partner.partner_id_membership', string="Partner UID")
+    
     _sql_constraints = [
         ('number_uniq', 'unique(number, company_id, journal_id, type)', 'Invoice Number must be unique per Company!'),
     ]
