@@ -9,6 +9,7 @@ from odoo.exceptions import ValidationError
 
 class Invoice(models.Model):
     _inherit = 'account.invoice'
+    partner_id_membership = fields.One2one('res.partner.partner_id_membership', string="Partner UID", store=True, states={'posted': [('readonly', True)]})
    
     @api.multi
     def action_cancel(self):
