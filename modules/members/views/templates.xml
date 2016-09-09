@@ -55,7 +55,7 @@
                     </table>
                     <br></br>
                     <font size="20"><b><t t-if="member.is_in">Bonjour!</t></b></font>
-                    <font size="20"><b><t t-if="not member.is_in">Aurevoir!</t></b></font>
+                    <font size="20"><b><t t-if="not member.is_in">Au revoir!</t></b></font>
                 </t>
             </div>
         </div>
