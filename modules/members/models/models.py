@@ -14,8 +14,8 @@ class members_checkin(models.Model):
     partner = fields.Many2one('res.partner', string='Partner', ondelete='cascade', index=1)
     #membership_id = fields.Many2one('membership.membership_line', string="Membership", required=True)
 
-    date_check_in = fields.DateTime(string='Check-in date', readonly=True)
-    date_check_out = fields.DateTime(string='Check-out date', readonly=True)
+    date_check_in = fields.Datetime(string='Check-in date', readonly=True)
+    date_check_out = fields.Datetime(string='Check-out date', readonly=True)
 
 
 class members(models.Model):
