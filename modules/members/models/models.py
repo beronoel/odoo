@@ -7,6 +7,17 @@ from openerp import http
 import datetime
 
 
+class members_checkin(models.Model):
+    _name = 'members.checkin'
+    _order = 'id desc'
+
+    partner = fields.Many2one('res.partner', string='Partner', ondelete='cascade', index=1)
+    #membership_id = fields.Many2one('membership.membership_line', string="Membership", required=True)
+
+    date_check_in = fields.DateTime(string='Check-in date', readonly=True)
+    date_check_out = fields.DateTime(string='Check-out date', readonly=True)
+
+
 class members(models.Model):
     _name = 'members.members'
 
@@ -22,6 +33,13 @@ class members(models.Model):
 
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
+
+            # modify the latest entry of the member in the check-in history
+            record_checkin = self.pool.get('members.checkin')
+            result_record_checkin = record_checkin.search(cr, uid, [('partner.partner_id_membership', '=', p.partner_id_membership)], context=context)
+            latest_record_checkin = record_checkin.browse(cr, uid, result_record_checkin[-1], context=context)
+            latest_record_checkin.write({'date_check_out': fields.DateTime.now()})
+
             p.write({'is_in': not p.is_in})
 
         scheduler_line_obj = self.pool.get('members.members')
