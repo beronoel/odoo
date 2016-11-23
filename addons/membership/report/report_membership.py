@@ -56,6 +56,9 @@ class ReportCheckin(models.Model):
               ml.membership_id,
               ml.state,
               ml.id
+              mc.id
+              mc.date_check_in
+              mc.date_check_out
         ) AS foo
         GROUP BY
             partner_id,
