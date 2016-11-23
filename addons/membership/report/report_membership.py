@@ -27,13 +27,13 @@ class ReportCheckin(models.Model):
         SELECT
         MIN(id) AS id,
         partner_id,
-        count(check_id) as quantity_checkin
+        count(check_id) as quantity_checkin,
         count(membership_id) as quantity_members,
         membership_state,
         associate_member_id,
         membership_id,
         date_check_in,
-        date_check_out,
+        date_check_out
         FROM
         (SELECT
             MIN(p.id) AS id,
@@ -41,8 +41,8 @@ class ReportCheckin(models.Model):
             p.membership_state AS membership_state,
             p.associate_member AS associate_member_id,
             ml.membership_id AS membership_id,
-            mc.id AS check_id
-            mc.date_check_in AS date_check_in
+            mc.id AS check_id,
+            mc.date_check_in AS date_check_in,
             mc.date_check_out AS date_check_out
             FROM res_partner p
             LEFT JOIN membership_membership_line ml ON (ml.partner = p.id)
