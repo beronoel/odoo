@@ -36,8 +36,8 @@
             <field name="model">report.membership</field>
             <field name="arch" type="xml">
                 <pivot string="Membership" disable_linking="True">
-                    <field name="membership_id" type="row"/>
-                    <field name="join_date" interval="week" type="col"/>
+                    <field name="membership_id" type="col"/>
+                    <field name="join_date" interval="week" type="row"/>
                     <field name="quantity" type="measure"/>
                     <field name="num_paid" type="measure"/>
                     <field name="num_invoiced" type="measure"/>
@@ -52,8 +52,8 @@
             <field name="model">report.membership</field>
             <field name="arch" type="xml">
                 <graph string="Membership">
-                    <field name="membership_id" type="row"/>
-                    <field name="join_date" interval="week" type="col"/>
+                    <field name="membership_id" type="col"/>
+                    <field name="join_date" interval="week" type="row"/>
                     <field name="quantity" type="measure"/>
                 </graph>
             </field>
