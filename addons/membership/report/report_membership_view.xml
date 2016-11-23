@@ -22,12 +22,12 @@
                             context="{'group_by':'membership_state'}"/>
                         <filter string="Company"
                             context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
-                        <filter string="Month" name="start_date"
-                            context="{'group_by':'start_date:month'}"/>
-                        <filter string="Week" name="start_date"
-                            context="{'group_by':'start_date:week'}"/>
-                        <filter string="Day" name="start_date"
-                            context="{'group_by':'start_date:day'}"/>
+                        <filter string="Month" name="join_date"
+                            context="{'group_by':'join_date:month'}"/>
+                        <filter string="Week" name="join_date"
+                            context="{'group_by':'join_date:week'}"/>
+                        <filter string="Day" name="join_date"
+                            context="{'group_by':'join_date:day'}"/>
                     </group>
                 </search>
             </field>
@@ -39,7 +39,7 @@
             <field name="arch" type="xml">
                 <pivot string="Membership" disable_linking="True">
                     <field name="membership_id" type="col"/>
-                    <field name="start_date" interval="week" type="row"/>
+                    <field name="join_date" interval="week" type="row"/>
                     <field name="quantity" type="measure"/>
                     <field name="num_paid" type="measure"/>
                     <field name="num_invoiced" type="measure"/>
@@ -55,7 +55,7 @@
             <field name="arch" type="xml">
                 <graph string="Membership">
                     <field name="membership_id" type="row"/>
-                    <field name="start_date" interval="week" type="col"/>
+                    <field name="join_date" interval="week" type="col"/>
                     <field name="quantity" type="measure"/>
                 </graph>
             </field>

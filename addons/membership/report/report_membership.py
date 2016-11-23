@@ -13,6 +13,7 @@ class ReportMembership(models.Model):
     _auto = False
     _rec_name = 'start_date'
     start_date = fields.Date(readonly=True)
+    join_date = fields.Date('Join Date', readonly=True)
     date_to = fields.Date('End Date', readonly=True, help="End membership date")
     num_waiting = fields.Integer('# Waiting', readonly=True)
     num_invoiced = fields.Integer('# Invoiced', readonly=True)
@@ -42,6 +43,7 @@ class ReportMembership(models.Model):
         membership_amount,
         date_to,
         start_date,
+        join_date
         COUNT(num_waiting) AS num_waiting,
         COUNT(num_invoiced) AS num_invoiced,
         COUNT(num_paid) AS num_paid,
@@ -65,6 +67,7 @@ class ReportMembership(models.Model):
             CASE WHEN ml.state IN ('waiting', 'invoiced') THEN SUM(il.price_subtotal) ELSE 0 END AS tot_pending,
             CASE WHEN ml.state = 'paid' OR p.membership_state = 'old' THEN SUM(il.price_subtotal) ELSE 0 END AS tot_earned,
             ml.membership_id AS membership_id,
+            ml.date AS join_date,
             p.company_id AS company_id
             FROM res_partner p
             LEFT JOIN membership_membership_line ml ON (ml.partner = p.id)
@@ -86,6 +89,7 @@ class ReportMembership(models.Model):
         GROUP BY
             start_date,
             date_to,
+            join_date,
             partner_id,
             user_id,
             membership_id,
