@@ -43,7 +43,7 @@ class ReportMembership(models.Model):
         membership_amount,
         date_to,
         start_date,
-        join_date
+        join_date,
         COUNT(num_waiting) AS num_waiting,
         COUNT(num_invoiced) AS num_invoiced,
         COUNT(num_paid) AS num_paid,
