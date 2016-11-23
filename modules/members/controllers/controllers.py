@@ -25,7 +25,6 @@ class Members(http.Controller):
                     latest_record_checkin = record_checkin.browse(result_record_checkin[-1].id)
                     latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
                 else:
-                    print p
                     # add a new entry to check-in history
                     record_checkin.create({'partner': partner.id, 'date_check_in': fields.Datetime.now(), 'date_check_out': fields.Datetime.now()})
 
@@ -37,6 +36,7 @@ class Members(http.Controller):
             return http.request.render('members.search_partner', {'form': form, 'members': result_record})
 
         return http.request.render('members.search_partner', {'form': form, 'members': []})
+
 
 class SearchForm(Form):
     unique_id = StringField('Unique Identification Number')
