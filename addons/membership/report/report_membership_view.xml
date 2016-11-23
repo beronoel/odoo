@@ -51,7 +51,7 @@
             <field name="arch" type="xml">
                 <graph string="Membership">
                     <field name="membership_id" type="row"/>
-                    <field name="start_date" interval="month" type="col"/>
+                    <field name="date" interval="week" type="col"/>
                     <field name="quantity" type="measure"/>
                 </graph>
             </field>

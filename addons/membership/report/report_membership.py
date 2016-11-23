@@ -85,6 +85,7 @@ class ReportMembership(models.Model):
         ) AS foo
         GROUP BY
             start_date,
+            date,
             date_to,
             partner_id,
             user_id,
