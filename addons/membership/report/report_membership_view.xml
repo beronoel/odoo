@@ -12,8 +12,6 @@
                     <field name="membership_id"/>
                     <field name="user_id"/>
                     <group expand="1" string="Group By">
-                        <filter string="Salesperson" name="salesman"
-                            context="{'group_by':'user_id'}"/>
                         <filter string="Associated Partner" name="associate_member_id"
                             context="{'group_by':'associate_member_id'}"/>
                         <filter string="Membership Product" name="product"
