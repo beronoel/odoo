@@ -26,7 +26,7 @@ class Members(http.Controller):
                     latest_record_checkin.write({'date_check_out': fields.DateTime.now()})
                 else:
                     # add a new entry to check-in history
-                    record_checkin.create({'partner': partner, 'date_check_in': fields.Datetime.now(), 'date_check_out': fields.Datetime.now()})
+                    record_checkin.create({'partner': p, 'date_check_in': fields.Datetime.now(), 'date_check_out': fields.Datetime.now()})
 
                 p.write({'is_in': not partner.is_in})
                 for qualification in partner.qualification_lines:
