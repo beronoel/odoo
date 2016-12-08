@@ -21,7 +21,6 @@ class Department(models.Model):
     total_employee = fields.Integer(
         compute='_compute_total_employee', string='Total Employee')
 
-    @api.multi
     def _compute_leave_count(self):
         Holiday = self.env['hr.holidays']
         today_date = datetime.datetime.utcnow().date()
@@ -50,7 +49,6 @@ class Department(models.Model):
             department.allocation_to_approve_count = res_allocation.get(department.id, 0)
             department.absence_of_today = res_absence.get(department.id, 0)
 
-    @api.multi
     def _compute_total_employee(self):
         emp_data = self.env['hr.employee'].read_group([('department_id', 'in', self.ids)], ['department_id'], ['department_id'])
         result = dict((data['department_id'][0], data['department_id_count']) for data in emp_data)
@@ -99,13 +97,11 @@ class Employee(models.Model):
             GROUP BY h.employee_id""", (tuple(self.ids),))
         return dict((row['employee_id'], row['days']) for row in self._cr.dictfetchall())
 
-    @api.multi
     def _compute_remaining_leaves(self):
         remaining = self._get_remaining_leaves()
         for employee in self:
             employee.remaining_leaves = remaining.get(employee.id, 0.0)
 
-    @api.multi
     def _inverse_remaining_leaves(self):
         status_list = self.env['hr.holidays.status'].search([('limit', '=', False)])
         # Create leaves (adding remaining leaves) or raise (reducing remaining leaves)
@@ -138,7 +134,6 @@ class Employee(models.Model):
             elif difference < 0:
                 raise UserError(_('You cannot reduce validated allocation requests'))
 
-    @api.multi
     def _compute_leave_status(self):
         # Used SUPERUSER_ID to forcefully get status of other user's leave, to bypass record rule
         holidays = self.env['hr.holidays'].sudo().search([
@@ -162,18 +157,16 @@ class Employee(models.Model):
             employee.current_leave_state = leave_data.get(employee.id, {}).get('current_leave_state')
             employee.current_leave_id = leave_data.get(employee.id, {}).get('current_leave_id')
 
-    @api.multi
     def _compute_leaves_count(self):
         leaves = self.env['hr.holidays'].read_group([
             ('employee_id', 'in', self.ids),
             ('holiday_status_id.limit', '=', False),
             ('state', '=', 'validate')
         ], fields=['number_of_days', 'employee_id'], groupby=['employee_id'])
-        mapping = dict([(leave['employee_id'][0], leave['number_of_days']) for leave in leaves])
+        mapping = {leave['employee_id'][0]: leave['number_of_days'] for leave in leaves}
         for employee in self:
             employee.leaves_count = mapping.get(employee.id)
 
-    @api.multi
     def _compute_show_leaves(self):
         show_leaves = self.env['res.users'].has_group('base.group_hr_user')
         for employee in self:
@@ -182,7 +175,6 @@ class Employee(models.Model):
             else:
                 employee.show_leaves = False
 
-    @api.multi
     def _compute_absent_employee(self):
         today_date = datetime.datetime.utcnow().date()
         today_start = fields.Datetime.to_string(today_date)  # get the midnight of the current utc day
@@ -199,18 +191,17 @@ class Employee(models.Model):
             if item['employee_id_count'] >= 1:
                 result[item['employee_id'][0]] = True
         for employee in self:
-            employee.is_absent_totay = result.get(employee.id)
+            employee.is_absent_totay = result[employee.id]
 
-    @api.multi
     def _search_absent_employee(self, operator, value):
         today_date = datetime.datetime.utcnow().date()
         today_start = fields.Datetime.to_string(today_date)  # get the midnight of the current utc day
         today_end = fields.Datetime.to_string(today_date + relativedelta(hours=23, minutes=59, seconds=59))
-        holiday_values = self.env['hr.holidays'].search_read([
+        holidays = self.env['hr.holidays'].search([
+            ('employee_id', '!=', False),
             ('state', 'not in', ['cancel', 'refuse']),
             ('date_from', '<=', today_end),
             ('date_to', '>=', today_start),
             ('type', '=', 'remove')
-        ], ['employee_id'])
-        absent_employee_ids = [holiday['employee_id'][0] for holiday in holiday_values if holiday['employee_id']]
-        return [('id', 'in', absent_employee_ids)]
+        ])
+        return [('id', 'in', holidays.mapped('employee_id').ids)]

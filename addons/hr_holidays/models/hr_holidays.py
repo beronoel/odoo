@@ -67,7 +67,9 @@ class HolidaysType(models.Model):
     @api.multi
     def get_days(self, employee_id):
         # need to use `dict` constructor to create a dict per id
-        result = dict((id, dict(max_leaves=0, leaves_taken=0, remaining_leaves=0, virtual_remaining_leaves=0)) for id in self.ids)
+        result = dict.fromkeys(self.ids, {'max_leaves': 0, 'leaves_taken': 0, 'remaining_leaves': 0, 'virtual_remaining_leaves': 0})
+        if not employee_id:
+            return result
 
         holidays = self.env['hr.holidays'].search([
             ('employee_id', '=', employee_id),
@@ -92,23 +94,18 @@ class HolidaysType(models.Model):
                     status_dict['remaining_leaves'] -= holiday.number_of_days_temp
         return result
 
-    @api.multi
     def _compute_leaves(self):
-        data_days = {}
         if 'employee_id' in self._context:
             employee_id = self._context['employee_id']
         else:
-            employee = self.env['hr.employee'].search([('user_id', '=', self.env.user.id)], limit=1)
-            employee_id = employee.id if employee else False
-        if employee_id:
-            data_days = self.get_days(employee_id)
+            employee_id = self.env['hr.employee'].search([('user_id', '=', self._uid)], limit=1).id
+        data_days = self.get_days(employee_id)
 
         for holiday_status in self:
-            result = data_days.get(holiday_status.id, {})
-            holiday_status.max_leaves = result.get('max_leaves', 0)
-            holiday_status.leaves_taken = result.get('leaves_taken', 0)
-            holiday_status.remaining_leaves = result.get('remaining_leaves', 0)
-            holiday_status.virtual_remaining_leaves = result.get('virtual_remaining_leaves', 0)
+            holiday_status.max_leaves = data_days[holiday_status.id]['max_leaves']
+            holiday_status.leaves_taken = data_days[holiday_status.id]['leaves_taken']
+            holiday_status.remaining_leaves = data_days[holiday_status.id]['remaining_leaves']
+            holiday_status.virtual_remaining_leaves = data_days[holiday_status.id]['virtual_remaining_leaves']
 
     @api.multi
     def name_get(self):
@@ -124,8 +121,8 @@ class HolidaysType(models.Model):
         return res
 
     @api.model
-    def _search(self, args, offset=0, limit=None, order=None, count=False, access_rights_uid=None):
-        """ Override _search to order the results, according to some employee.
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+        """ Override search to order the results, according to some employee.
         The order is the following
 
          - limit (limited leaves first, such as Legal Leaves)
@@ -136,12 +133,11 @@ class HolidaysType(models.Model):
         is an employee_id in context and that no other order has been given
         to the method.
         """
-        leave_ids = super(HolidaysType, self)._search(args, offset=offset, limit=limit, order=order, count=count, access_rights_uid=access_rights_uid)
+        leaves = super(HolidaysType, self).search(args, offset=offset, limit=limit, order=order, count=count)
         if not count and not order and self._context.get('employee_id'):
-            leaves = self.browse(leave_ids)
             sort_key = lambda l: (not l.limit, l.virtual_remaining_leaves)
-            return map(int, leaves.sorted(key=sort_key, reverse=True))
-        return leave_ids
+            return leaves.sorted(key=sort_key, reverse=True)
+        return leaves
 
 
 class Holidays(models.Model):
@@ -209,7 +205,6 @@ class Holidays(models.Model):
     double_validation = fields.Boolean('Apply Double Validation', related='holiday_status_id.double_validation')
     can_reset = fields.Boolean('Can reset', compute='_compute_can_reset')
 
-    @api.multi
     @api.depends('number_of_days_temp', 'type')
     def _compute_number_of_days(self):
         for holiday in self:
@@ -218,7 +213,6 @@ class Holidays(models.Model):
             else:
                 holiday.number_of_days = holiday.number_of_days_temp
 
-    @api.multi
     def _compute_can_reset(self):
         """ User can reset a leave request if it is its own leave request
             or if he is an Hr Manager.
@@ -287,7 +281,7 @@ class Holidays(models.Model):
                     return self.env['product.uom']._compute_qty_obj(uom_hour, hours[0], uom_day)
 
         time_delta = to_dt - from_dt
-        return math.ceil(time_delta.days + float(time_delta.seconds) / 86400)
+        return time_delta.days + 1 if time_delta.seconds != 0 else time_delta.days
 
     @api.onchange('date_from')
     def _onchange_date_from(self):
