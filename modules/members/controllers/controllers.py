@@ -22,8 +22,9 @@ class Members(http.Controller):
                 if p.is_in:
                     # modify the latest entry of the member in the check-in history
                     result_record_checkin = record_checkin.search([('partner.partner_id_membership', '=', p.partner_id_membership)])
-                    latest_record_checkin = record_checkin.browse(result_record_checkin[-1].id)
-                    latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
+                    if len(result_record_checkin) != 0:
+                        latest_record_checkin = record_checkin.browse(result_record_checkin[-1].id)
+                        latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
                 else:
                     # add a new entry to check-in history
                     record_checkin.create({'partner': partner.id, 'date_check_in': fields.Datetime.now(), 'date_check_out': fields.Datetime.now()})

@@ -38,8 +38,9 @@ class members(models.Model):
             # modify the latest entry of the member in the check-in history
             record_checkin = self.pool.get('members.checkin')
             result_record_checkin = record_checkin.search(cr, uid, [('partner.partner_id_membership', '=', p.partner_id_membership)], context=context)
-            latest_record_checkin = record_checkin.browse(cr, uid, result_record_checkin[-1], context=context)
-            latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
+            if len(result_record_checkin) != 0:
+                latest_record_checkin = record_checkin.browse(cr, uid, result_record_checkin[-1], context=context)
+                latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
 
             p.write({'is_in': not p.is_in})
 
