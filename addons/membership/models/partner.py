@@ -90,7 +90,7 @@ class Partner(models.Model):
 
             state = 4
             for mline in partner.member_lines:
-                if fields.Date.from_string(mline.date_to) >= today_date:
+                if fields.Date.from_string(mline.date_to) >= today_date and fields.Date.from_string(mline.date_from) <= today_date:
                     if mline.account_invoice_line.invoice_id:
                         mstate = mline.account_invoice_line.invoice_id.state
                         if mstate == 'paid':
@@ -122,11 +122,11 @@ class Partner(models.Model):
                 partner.membership_state = 'old'
             elif state == 6:
                 partner.membership_state = 'none'
-        if partner.free_member and state != 0:
-            partner.membership_state = 'free'
-        if partner.associate_member:
-            partner.membership_state = partner.associate_member._membership_state()
-        return partner.membership_state
+            if partner.free_member and state != 0:
+                partner.membership_state = 'free'
+            if partner.associate_member:
+                partner.membership_state = partner.associate_member._membership_state()
+            return partner.membership_state
 
     def create_membership_invoice(self, product_id=None, datas=None):
         """ Create Customer Invoice of Membership for partners.
