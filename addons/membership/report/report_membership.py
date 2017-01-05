@@ -127,7 +127,7 @@ class ReportMembership(models.Model):
             MIN(p.id) AS id,
             p.id AS partner_id,
             p.user_id AS user_id,
-            p.partner_group AS partner_group
+            p.partner_group AS partner_group,
             p.membership_state AS membership_state,
             p.associate_member AS associate_member_id,
             p.membership_amount AS membership_amount,
