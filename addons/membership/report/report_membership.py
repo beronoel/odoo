@@ -55,7 +55,7 @@ class ReportCheckin(models.Model):
               p.membership_state,
               p.associate_member,
               p.membership_start,
-              p.partner_group
+              p.partner_group,
               ml.membership_id,
               ml.state,
               ml.id,
