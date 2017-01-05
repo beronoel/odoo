@@ -203,8 +203,9 @@
             <field name="arch" type="xml">
                 <search string="Membership Partners">
                     <field name="name"
-                       filter_domain="['|','|','|','|',('name','ilike',self),('parent_id','ilike',self),('partner.partner_group','ilike',self),('partner.partner_id_membership', 'ilike', self),('ref','=',self)]"/>
+                       filter_domain="['|','|','|','|',('name','ilike',self),('parent_id','ilike',self),('partner','child_of',self),('partner.partner_group','ilike',self),('partner.partner_id_membership', 'ilike', self),('ref','=',self)]"/>
                     <field name="category_id"/>
+                    <field name="partner" operator="child_of"/>
                     <field name="membership_start" invisible="1"/>
                     <field name="membership_stop" string="End Membership Date"/>
                     <filter string="Inside PolyFab" name="are_in" domain="[('is_in','=',True)]"/>
