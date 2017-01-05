@@ -27,6 +27,7 @@ class ReportCheckin(models.Model):
         SELECT
         MIN(id) AS id,
         partner_id,
+        partner_group,
         count(check_id) as quantity_checkin,
         count(membership_id) as quantity_members,
         membership_state,
@@ -38,6 +39,7 @@ class ReportCheckin(models.Model):
         (SELECT
             MIN(p.id) AS id,
             p.id AS partner_id,
+            p.partner_group AS partner_group,
             p.membership_state AS membership_state,
             p.associate_member AS associate_member_id,
             ml.membership_id AS membership_id,
@@ -53,6 +55,7 @@ class ReportCheckin(models.Model):
               p.membership_state,
               p.associate_member,
               p.membership_start,
+              p.partner_group
               ml.membership_id,
               ml.state,
               ml.id,
@@ -62,6 +65,7 @@ class ReportCheckin(models.Model):
         ) AS foo
         GROUP BY
             partner_id,
+            partner_group,
             membership_id,
             membership_state,
             associate_member_id,
@@ -102,6 +106,7 @@ class ReportMembership(models.Model):
         SELECT
         MIN(id) AS id,
         partner_id,
+        partner_group,
         count(membership_id) as quantity,
         user_id,
         membership_state,
@@ -122,6 +127,7 @@ class ReportMembership(models.Model):
             MIN(p.id) AS id,
             p.id AS partner_id,
             p.user_id AS user_id,
+            p.partner_group AS partner_group
             p.membership_state AS membership_state,
             p.associate_member AS associate_member_id,
             p.membership_amount AS membership_amount,
@@ -142,6 +148,7 @@ class ReportMembership(models.Model):
             WHERE p.membership_state != 'none' and p.active = 'true'
             GROUP BY
               p.id,
+              p.partner_group,
               p.user_id,
               p.membership_state,
               p.associate_member,
@@ -157,6 +164,7 @@ class ReportMembership(models.Model):
             date_to,
             join_date,
             partner_id,
+            partner_group,
             user_id,
             membership_id,
             company_id,

@@ -123,6 +123,79 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="membership_members_kanban">
+            <field name="name">Members</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <kanban string="Members">
+                    <field name="name"/>
+                    <field name="membership_state"/>
+                    <field name="user_id" invisible="1"/>
+                    <field name="color"/>
+                    <field name="display_name"/>
+                    <field name="title"/>
+                    <field name="email"/>
+                    <field name="parent_id"/>
+                    <field name="is_company"/>
+                    <field name="function"/>
+                    <field name="phone"/>
+                    <field name="street"/>
+                    <field name="street2"/>
+                    <field name="zip"/>
+                    <field name="city"/>
+                    <field name="country_id"/>
+                    <field name="mobile"/>
+                    <field name="state_id"/>
+                    <field name="category_id"/>
+                    <field name="image_small"/>
+                    <field name="type"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_res_partner_kanban">
+                                <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                                <div class="o_kanban_image">
+                                    <t t-if="record.image_small.raw_value">
+                                        <img t-att-src="kanban_image('res.partner', 'image_small', record.id.value)"/>
+                                    </t>
+                                    <t t-if="!record.image_small.raw_value">
+                                        <t t-if="record.type.raw_value === 'delivery'">
+                                            <img t-att-src='_s + "/base/static/src/img/truck.png"' class="o_kanban_image oe_kanban_avatar_smallbox"/>
+                                        </t>
+                                        <t t-if="record.type.raw_value === 'invoice'">
+                                            <img t-att-src='_s + "/base/static/src/img/money.png"' class="o_kanban_image oe_kanban_avatar_smallbox"/>
+                                         </t>
+                                        <t t-if="record.type.raw_value != 'invoice' &amp;&amp; record.type.raw_value != 'delivery'">
+                                            <t t-if="record.is_company.raw_value === true">
+                                                <img t-att-src='_s + "/base/static/src/img/company_image.png"'/>
+                                            </t>
+                                            <t t-if="record.is_company.raw_value === false">
+                                                <img t-att-src='_s + "/base/static/src/img/avatar.png"'/>
+                                            </t>
+                                        </t>
+                                    </t>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="oe_partner_heading"><field name="display_name"/></strong>
+                                    <ul>
+                                        <li t-if="record.parent_id.raw_value and !record.function.raw_value"><field name="parent_id"/></li>
+                                        <li t-if="!record.parent_id.raw_value and record.function.raw_value"><field name="function"/></li>
+                                        <li t-if="record.parent_id.raw_value and record.function.raw_value"><field name="function"/> at <field name="parent_id"/></li>
+                                        <li t-if="record.city.raw_value and !record.country_id.raw_value"><field name="city"/></li>
+                                        <li t-if="!record.city.raw_value and record.country_id.raw_value"><field name="country_id"/></li>
+                                        <li t-if="record.city.raw_value and record.country_id.raw_value"><field name="city"/>, <field name="country_id"/></li>
+                                        <li t-if="record.email.raw_value" class="o_text_overflow"><field name="email"/></li>
+                                        <li t-if="record.partner_group.raw_value" class="o_text_overflow"><field name="partner_group"/></li>
+                                    </ul>
+                                    <div class="oe_kanban_partner_links"/>
+                                </div>
+                            </div>
+
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
         <record id="view_res_partner_member_filter" model="ir.ui.view">
             <field name="name">res.partner.select</field>
             <field name="model">res.partner</field>
@@ -184,7 +257,7 @@
          <record model="ir.actions.act_window.view" id="action_membership_members_view_kanban">
             <field name="sequence" eval="1"/>
             <field name="view_mode">kanban</field>
-            <field name="view_id" ref="base.res_partner_kanban_view"/>
+            <field name="view_id" ref="membership_members_kanban"/>
             <field name="act_window_id" ref="action_membership_members"/>
         </record>
         <menuitem name="Members" id="menu_membership" sequence="0" parent="base.menu_association" action="action_membership_members"/>
@@ -214,6 +287,7 @@
                             <group>
                                 <field name="free_member"/>
                                 <field name="is_in"/>
+                                <field name="partner_group"/>
                                 <field name="partner_id_membership"/>
                                 <label for="membership_state"/>
                                 <div>
