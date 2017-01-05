@@ -203,7 +203,7 @@
             <field name="arch" type="xml">
                 <search string="Membership Partners">
                     <field name="name"
-                       filter_domain="['|','|',('name','ilike',self),('parent_id','ilike',self),('ref','=',self)]"/>
+                       filter_domain="['|','|',('name','ilike',self),('parent_id','ilike',self),('partner_id.partner_group','ilike',self),('partner_id.partner_id_membership', 'ilike', self),('ref','=',self)]"/>
                     <field name="category_id"/>
                     <field name="membership_start" invisible="1"/>
                     <field name="membership_stop" string="End Membership Date"/>

@@ -18,6 +18,7 @@ class ReportCheckin(models.Model):
     membership_state = fields.Selection(membership.STATE, 'Current Membership State', readonly=True)
     quantity_checkin = fields.Integer(readonly=True)
     quantity_members = fields.Integer(readonly=True)
+    partner_group = fields.Selection('res.partner.partner_group', 'Member group / university', readonly=True)
 
     def init(self, cr):
         '''Create the view'''
@@ -94,6 +95,7 @@ class ReportMembership(models.Model):
     associate_member_id = fields.Many2one('res.partner', 'Associate Member', readonly=True)
     membership_id = fields.Many2one('product.product', 'Membership Product', readonly=True)
     membership_state = fields.Selection(membership.STATE, 'Current Membership State', readonly=True)
+    partner_group = fields.Selection('res.partner.partner_group', 'Member group / university', readonly=True)
     user_id = fields.Many2one('res.users', 'Salesperson', readonly=True)
     company_id = fields.Many2one('res.company', 'Company', readonly=True)
     quantity = fields.Integer(readonly=True)
