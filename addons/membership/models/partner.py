@@ -63,8 +63,11 @@ class Partner(models.Model):
                 partner = self.browse(record.pop('id')).update(record)
 
     @api.depends('member_lines.account_invoice_id.state', 'membership_state', 'associate_member', 'free_member')
-    def compute_membership_state(self):
+    def _compute_membership_state(self):
         return self._membership_state()
+
+    def compute_membership_state(self):
+        return self._compute_membership_state()
 
     @api.constrains('associate_member')
     def _check_associate_member(self):
@@ -75,13 +78,7 @@ class Partner(models.Model):
 
     @api.model
     def _cron_update_membership(self):
-        self._membership_state()
-        self._compute_membership_date()
-        """
-        partners = self.search([('membership_state', '=', 'paid'), ('membership_state', '=', 'invoiced'),
-                                ('membership_state', '=', 'canceled'), ('membership_state', '=', 'waiting'),
-                                ('membership_state', '=', 'old'), ('membership_state', '=', 'none')])._model._store_set_values(self.env.cr, self.env.uid, self.ids, ['membership_state'], context=self.env.context)
-        """
+        partners = self.search([('membership_state', '=', 'paid')])._model._store_set_values(self.env.cr, self.env.uid, self.ids, ['membership_state'], context=self.env.context)
 
     def _membership_state(self):
         """This Function return Membership State For Given Partner. """
