@@ -4,6 +4,9 @@ from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 from openerp import http
 
+import logging
+_logger = logging.getLogger(__name__)
+
 import datetime
 
 
@@ -42,10 +45,10 @@ class members(models.Model):
                 latest_record_checkin = record_checkin.browse(cr, uid, result_record_checkin[-1], context=context)
                 latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
 
-            print "HELLOOOOO"
+            _logger.debug("HELLOOOOO")
             m_status = p.compute_membership_state()
 
-            print m_status
+            _logger.debug(m_status)
             p.write({'membership_state': m_status})
 
             p.write({'is_in': not p.is_in})
