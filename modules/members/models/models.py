@@ -70,7 +70,7 @@ class members(models.Model):
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
 
-            p.write({'membership_state': not p._membership_state()})
+            p.write({'membership_state': p._membership_state()})
 
 
 """
