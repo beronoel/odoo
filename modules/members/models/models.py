@@ -44,6 +44,10 @@ class members(models.Model):
 
             p.write({'is_in': not p.is_in})
 
+            p.compute_membership_state()
+
+            p.write({'membership_state': p.membership_state})
+
         scheduler_line_obj = self.pool.get('members.members')
         #record_members = http.request.env['res.partner']
         scheduler_line_ids = scheduler_line_obj.search(cr, uid, [])
@@ -56,23 +60,6 @@ class members(models.Model):
             scheduler_line_obj.write(cr, uid, scheduler_line_id,
                                      {'numberOfUpdates': (numberOfUpdates + 1), 'lastModified': datetime.date.today()},
                                      context=context)
-
-    def process_membership_state(self, cr, uid, context=None):
-        record_members = self.pool.get('res.partner')
-        # record_members = http.request.env['res.partner']
-        result_record = record_members.search(cr, uid, [('membership_state', '=', 'paid'),
-                                                        ('membership_state', '=', 'invoiced'),
-                                                        ('membership_state', '=', 'canceled'),
-                                                        ('membership_state', '=', 'waiting'),
-                                                        ('membership_state', '=', 'old'),
-                                                        ('membership_state', '=', 'none')], context=context)
-
-        for partner in result_record:
-            p = record_members.browse(cr, uid, partner, context=context)
-            p.compute_membership_state()
-
-            p.write({'membership_state': p.membership_state})
-
 
 """
     @api.depends('member_UID')
