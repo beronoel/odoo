@@ -75,7 +75,8 @@ class Partner(models.Model):
 
     @api.model
     def _cron_update_membership(self):
-        partners = self.search([('membership_state', '=', 'paid')])._model._store_set_values(self.env.cr, self.env.uid, self.ids, ['membership_state'], context=self.env.context)
+        self._compute_membership_state()
+        #partners = self.search([('membership_state', '=', 'paid')])._model._store_set_values(self.env.cr, self.env.uid, self.ids, ['membership_state'], context=self.env.context)
 
     def _membership_state(self):
         """This Function return Membership State For Given Partner. """
