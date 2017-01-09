@@ -43,10 +43,7 @@ class members(models.Model):
                 latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
 
             p.write({'is_in': not p.is_in})
-
-            p.compute_membership_state()
-
-            p.write({'membership_state': p.membership_state})
+            p.write({'membership_state': p.compute_membership_state()})
 
         scheduler_line_obj = self.pool.get('members.members')
         #record_members = http.request.env['res.partner']
