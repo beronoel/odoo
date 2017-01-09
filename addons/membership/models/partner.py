@@ -63,7 +63,7 @@ class Partner(models.Model):
                 partner = self.browse(record.pop('id')).update(record)
 
     @api.depends('member_lines.account_invoice_id.state', 'membership_state', 'associate_member', 'free_member')
-    def _compute_membership_state(self):
+    def compute_membership_state(self):
         return self._membership_state()
 
     @api.constrains('associate_member')

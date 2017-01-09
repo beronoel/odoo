@@ -69,8 +69,9 @@ class members(models.Model):
 
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
+            p.compute_membership_state()
 
-            p.write({'membership_state': p._membership_state()})
+            p.write({'membership_state': p.membership_state()})
 
 
 """
