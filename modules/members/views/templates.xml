@@ -2,35 +2,6 @@
 <openerp>
     <data>
 
-<style type="text/css">
-.blink {
-
-animation:1s blinker linear infinite;
--webkit-animation:1s blinker linear infinite;
--moz-animation:1s blinker linear infinite;
-
- color: red;
-}
-
-@-moz-keyframes blinker {
- 0% { opacity: 1.0; }
- 50% { opacity: 0.0; }
- 100% { opacity: 1.0; }
- }
-
-@-webkit-keyframes blinker {
- 0% { opacity: 1.0; }
- 50% { opacity: 0.0; }
- 100% { opacity: 1.0; }
- }
-
-@keyframes blinker {
- 0% { opacity: 1.0; }
- 50% { opacity: 0.0; }
- 100% { opacity: 1.0; }
- }
- </style>
-
 <template id="search_partner" name="Search Partner">
     <t t-call="website.layout">
         <t t-set="title">PolyFab Check-in</t>
@@ -56,11 +27,11 @@ animation:1s blinker linear infinite;
                         <tr>
                             <td>Statut Membership:</td>
                             <td>
-                                <t t-if="member.membership_state=='none'"><span style="text-decoration: blink;"><font color="red" size="10">Non membre</font></span></t>
+                                <t t-if="member.membership_state=='none'"><font color="red" size="10">Non membre</font></t>
                                 <t t-if="member.membership_state=='canceled'"><font color="red" size="10">Membership annulé</font></t>
                                 <t t-if="member.membership_state=='old'"><font color="red" size="10">Ancien membre</font></t>
                                 <t t-if="member.membership_state=='waiting'"><font color="red" size="10">Membership en attente</font></t>
-                                <t t-if="member.membership_state=='invoiced'"><span style="text-decoration: blink;"><font color="red" size="10">Membre, paiement en attente</font></span></t>
+                                <t t-if="member.membership_state=='invoiced'"><font color="red" size="10">Membre, paiement en attente</font></t>
                                 <t t-if="member.membership_state=='free'">Membre (gratuit)</t>
                                 <t t-if="member.membership_state=='paid'">Membre</t>
                             </td>
