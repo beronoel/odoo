@@ -57,6 +57,21 @@ class members(models.Model):
                                      {'numberOfUpdates': (numberOfUpdates + 1), 'lastModified': datetime.date.today()},
                                      context=context)
 
+    def process_membership_state(self, cr, uid, context=None):
+        record_members = self.pool.get('res.partner')
+        # record_members = http.request.env['res.partner']
+        result_record = record_members.search(cr, uid, [('membership_state', '=', 'paid'),
+                                                        ('membership_state', '=', 'invoiced'),
+                                                        ('membership_state', '=', 'canceled'),
+                                                        ('membership_state', '=', 'waiting'),
+                                                        ('membership_state', '=', 'old'),
+                                                        ('membership_state', '=', 'none')], context=context)
+
+        for partner in result_record:
+            p = record_members.browse(cr, uid, partner, context=context)
+
+            p.write({'membership_state': not p._membership_state()})
+
 
 """
     @api.depends('member_UID')
