@@ -31,6 +31,9 @@ class members(models.Model):
     lastModified = fields.Date('Last updated')
 
     def process_scheduler_queue(self, cr, uid, context=None):
+
+        _logger.debug("Test log debug")
+
         record_members = self.pool.get('res.partner')
         #record_members = http.request.env['res.partner']
         result_record = record_members.search(cr, uid, [('is_in', '=', True)], context=context)
