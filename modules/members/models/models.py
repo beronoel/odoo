@@ -48,14 +48,15 @@ class members(models.Model):
                 latest_record_checkin = record_checkin.browse(cr, uid, result_record_checkin[-1], context=context)
                 latest_record_checkin.write({'date_check_out': fields.Datetime.now()})
 
-            _logger.debug("HELLOOOOO")
-            m_status = p.compute_membership_state()
-
-            _logger.debug(m_status)
-            p.write({'membership_state': m_status})
-
             p.write({'is_in': not p.is_in})
 
+        result_record = record_members.search(cr, uid, [('is_in', '=', False)], context=context)
+        for partner in result_record:
+            p = record_members.browse(cr, uid, partner, context=context)
+            m_status = p.compute_membership_state()
+            _logger.debug(p.name)
+            _logger.debug(p.membership_state)
+            p.write({'membership_state': p.membership_state})
 
         scheduler_line_obj = self.pool.get('members.members')
         #record_members = http.request.env['res.partner']
