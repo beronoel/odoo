@@ -87,7 +87,7 @@ class Partner(models.Model):
         """This Function return Membership State For Given Partner. """
         today_date = date.today()
         for partner in self:
-            _logger.debug('Member name: ' + partner.name)
+            _logger.debug('Member name: ' + str(partner.name))
             _logger.debug('Actual membership status: ' + str(partner.membership_state))
 
             partner.membership_state = 'none'
@@ -101,10 +101,10 @@ class Partner(models.Model):
             state = 4
             _logger.debug('Membership line: ')
             for mline in partner.member_lines:
-                _logger.debug(mline.date_from)
-                _logger.debug(mline.date_to)
-                _logger.debug(today_date)
-                _logger.debug(mline.account_invoice_line.invoice_id.state)
+                _logger.debug(str(mline.date_from))
+                _logger.debug(str(mline.date_to))
+                _logger.debug(str(today_date))
+                _logger.debug(str(mline.account_invoice_line.invoice_id.state))
 
                 if fields.Date.from_string(mline.date_to) >= today_date and fields.Date.from_string(mline.date_from) <= today_date:
                     if mline.account_invoice_line.invoice_id:
