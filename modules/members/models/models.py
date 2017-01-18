@@ -53,7 +53,7 @@ class members(models.Model):
         result_record = record_members.search(cr, uid, [('is_in', '=', False)], context=context)
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
-            m_status = p.compute_membership_state()
+            p.compute_membership_state()
             _logger.debug(p.name)
             _logger.debug(p.membership_state)
             p.write({'membership_state': p.membership_state})
