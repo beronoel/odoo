@@ -88,7 +88,7 @@ class Partner(models.Model):
         today_date = date.today()
         for partner in self:
             _logger.debug('Member name: ' + partner.name)
-            _logger.debug('Actual membership status: ' + partner.membership_state)
+            _logger.debug('Actual membership status: ' + str(partner.membership_state))
 
             partner.membership_state = 'none'
             if partner.membership_cancel and today_date > fields.Date.from_string(partner.membership_cancel):
@@ -120,7 +120,7 @@ class Partner(models.Model):
                             state = 2
                         elif (mstate == 'draft' or mstate == 'proforma') and state != 0 and state != 1:
                             state = 3
-                            
+
             if state == 4:
                 for mline in partner.member_lines:
                     if fields.Date.from_string(mline.date_from) < today_date and fields.Date.from_string(mline.date_to) < today_date and mline.date_from <= mline.date_to and (mline.account_invoice_line.invoice_id.state) == 'paid':
