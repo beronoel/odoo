@@ -7,6 +7,9 @@ from odoo import api, models, fields, _
 from odoo.exceptions import UserError
 import membership
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class Partner(models.Model):
     _inherit = 'res.partner'
@@ -84,6 +87,9 @@ class Partner(models.Model):
         """This Function return Membership State For Given Partner. """
         today_date = date.today()
         for partner in self:
+            _logger.debug('Member name: ' + partner.name)
+            _logger.debug('Actual membership status: ' + partner.membership_state)
+
             partner.membership_state = 'none'
             if partner.membership_cancel and today_date > fields.Date.from_string(partner.membership_cancel):
                 partner.membership_state = 'free' if partner.free_member else 'canceled'
@@ -93,7 +99,13 @@ class Partner(models.Model):
                 continue
 
             state = 4
+            _logger.debug('Membership line: ')
             for mline in partner.member_lines:
+                _logger.debug(mline.date_from)
+                _logger.debug(mline.date_to)
+                _logger.debug(today_date)
+                _logger.debug(mline.account_invoice_line.invoice_id.state)
+
                 if fields.Date.from_string(mline.date_to) >= today_date and fields.Date.from_string(mline.date_from) <= today_date:
                     if mline.account_invoice_line.invoice_id:
                         mstate = mline.account_invoice_line.invoice_id.state
@@ -108,12 +120,14 @@ class Partner(models.Model):
                             state = 2
                         elif (mstate == 'draft' or mstate == 'proforma') and state != 0 and state != 1:
                             state = 3
+                            
             if state == 4:
                 for mline in partner.member_lines:
                     if fields.Date.from_string(mline.date_from) < today_date and fields.Date.from_string(mline.date_to) < today_date and mline.date_from <= mline.date_to and (mline.account_invoice_line.invoice_id.state) == 'paid':
                         state = 5
                     else:
                         state = 6
+
             if state == 0:
                 partner.membership_state = 'paid'
             elif state == 1:
@@ -126,10 +140,12 @@ class Partner(models.Model):
                 partner.membership_state = 'old'
             elif state == 6:
                 partner.membership_state = 'none'
+
             if partner.free_member and state != 0:
                 partner.membership_state = 'free'
             if partner.associate_member:
                 partner.membership_state = partner.associate_member._membership_state()
+
             return partner.membership_state
 
     def create_membership_invoice(self, product_id=None, datas=None):
