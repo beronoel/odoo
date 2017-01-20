@@ -31,9 +31,6 @@ class members(models.Model):
     lastModified = fields.Date('Last updated')
 
     def process_scheduler_queue(self, cr, uid, context=None):
-
-        _logger.debug("Test log debug")
-
         record_members = self.pool.get('res.partner')
         #record_members = http.request.env['res.partner']
         result_record = record_members.search(cr, uid, [('is_in', '=', True)], context=context)
@@ -54,8 +51,8 @@ class members(models.Model):
         for partner in result_record:
             p = record_members.browse(cr, uid, partner, context=context)
             p.compute_membership_state()
-            _logger.debug(p.name)
-            _logger.debug(p.membership_state)
+            #_logger.debug(p.name)
+            #_logger.debug(p.membership_state)
             p.write({'membership_state': p.membership_state})
 
         scheduler_line_obj = self.pool.get('members.members')
