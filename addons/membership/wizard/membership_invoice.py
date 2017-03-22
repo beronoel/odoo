@@ -25,8 +25,8 @@ class MembershipInvoice(models.TransientModel):
             self.duration = 0
         else:
             self.member_price = self.product_id.price_get()[self.product_id.id]
-            self.date_from = self.product_id.date_from
-            self.date_to = self.product_id.date_to
+            self.date_from = self.product_id.membership_date_from
+            self.date_to = self.product_id.membership_date_to
             self.duration = self.product_id.membership_duration
 
     @api.multi
