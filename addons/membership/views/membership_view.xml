@@ -65,6 +65,7 @@
                             <div>
                                 <field name="membership_date_from" required="1" class="oe_inline"/> -
                                 <field name="membership_date_to" required="1" class="oe_inline"/>
+                                <field name="membership_duration" required="1" class="oe_inline"/>
                             </div>
                             <field name="list_price" string="Membership Fee"/>
                             <field
