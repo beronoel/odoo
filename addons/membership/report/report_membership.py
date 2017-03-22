@@ -100,7 +100,7 @@ class ReportMembership(models.Model):
 
     def init(self, cr):
         '''Create the view'''
-        tools.drop_view_if_exists(cr, 'report_membership')
+        #tools.drop_view_if_exists(cr, 'report_membership')
         cr.execute("""
         CREATE OR REPLACE VIEW report_membership AS (
         SELECT
