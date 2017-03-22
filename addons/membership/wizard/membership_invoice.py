@@ -14,6 +14,7 @@ class MembershipInvoice(models.TransientModel):
     member_price = fields.Float('Member Price', digits=dp.get_precision('Product Price'), required=True)
     date_from = fields.Date(string='From', required=True)
     date_to = fields.Date(string='To', required=True)
+    duration = fields.Integer(string='Duration (days)', help='The duration in days of the membership. If equal to 0, start and stop date are fixed.')
 
     @api.onchange('product_id')
     def onchange_product(self):
@@ -21,8 +22,12 @@ class MembershipInvoice(models.TransientModel):
         """
         if not self.product_id:
             self.member_price = False
+            self.duration = 0
         else:
             self.member_price = self.product_id.price_get()[self.product_id.id]
+            self.date_from = self.product_id.date_from
+            self.date_to = self.product_id.date_to
+            self.duration = self.product_id.duration
 
     @api.multi
     def membership_invoice(self):
