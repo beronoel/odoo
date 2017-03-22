@@ -298,8 +298,8 @@
                             </group>
                             <group>
                                 <field name="associate_member" attrs="{'invisible':[('free_member','=',True)]}"/>
-                                <field name="membership_start" attrs="{'invisible':[('membership_start','=',True)]}"/>
-                                <field name="membership_stop" attrs="{'invisible':[('membership_stop','=',True)]}"/>
+                                <field name="membership_start" attrs="{'invisible':[('membership_start','=',False)]}"/>
+                                <field name="membership_stop" attrs="{'invisible':[('membership_stop','=',False)]}"/>
                                 <field name="membership_cancel" attrs="{'invisible':[('membership_cancel','=',False)]}"/>
                             </group>
                         </group>
