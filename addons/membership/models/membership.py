@@ -29,6 +29,7 @@ class MembershipLine(models.Model):
     date_to = fields.Date(string='To', readonly=True)
     date_cancel = fields.Date(string='Cancel date')
     date = fields.Date(string='Join Date', help="Date on which member has joined the membership")
+    duration = fields.Integer(string='Duration (days)', help='The duration in days of the membership. If equal to 0, start and stop date are fixed.')
     member_price = fields.Float(string='Membership Fee', digits=dp.get_precision('Product Price'), required=True, help='Amount for the membership')
     account_invoice_line = fields.Many2one('account.invoice.line', string='Account Invoice line', readonly=True)
     account_invoice_id = fields.Many2one('account.invoice', related='account_invoice_line.invoice_id', string='Invoice', readonly=True)

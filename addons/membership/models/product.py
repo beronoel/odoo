@@ -10,6 +10,7 @@ class Product(models.Model):
     membership = fields.Boolean(help='Check if the product is eligible for membership.')
     membership_date_from = fields.Date(string='Membership Start Date', help='Date from which membership becomes active.')
     membership_date_to = fields.Date(string='Membership End Date', help='Date until which membership remains active.')
+    membership_duration = fields.Integer(string='Duration (days)', help='The duration in days of the membership. If equal to 0, start and stop date are fixed.')
 
     # Removed this function because this should be take default form_view and tree_view of membership_product.
 

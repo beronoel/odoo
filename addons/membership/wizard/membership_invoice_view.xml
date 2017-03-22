@@ -9,8 +9,8 @@
                     <group>
                         <field name="product_id" domain="[('membership','=',True)]" widget="selection"/>
                         <field name="member_price"/>
-                        <field name="date_from"/>
-                        <field name="date_to"/>
+                        <field name="date_from" attrs="{'invisible':[('duration','=',0)]}"/>
+                        <field name="date_to" attrs="{'invisible':[('duration','=',0)]}"/>
                     </group>
                     <footer>
                         <button string="Invoice Membership" name="membership_invoice" type="object" class="btn-primary"/>
