@@ -157,6 +157,8 @@ class Partner(models.Model):
         InvoiceLine = self.env['account.invoice.line']
         product_id = product_id or datas.get('membership_product_id', False)
         amount = datas.get('amount', 0.0)
+        date_from = datas.get('date_from', 0.0)
+        date_to = datas.get('date_to', 0.0)
         invoice_list = []
         for partner in self:
             account_id = partner.property_account_receivable_id.id
@@ -182,7 +184,7 @@ class Partner(models.Model):
             invoice_line._onchange_product_id()
             line_values = invoice_line._convert_to_write(invoice_line._cache)
             line_values['price_unit'] = amount
-            invoice_id.write({'invoice_line_ids': [(0, 0, line_values)]})
+            invoice_id.write({'invoice_line_ids': [(0, 0, line_values)], 'date_from': date_from, 'date_to': date_to})
             invoice_list.append(invoice_id.id)
             invoice_id.compute_taxes()
         return invoice_list

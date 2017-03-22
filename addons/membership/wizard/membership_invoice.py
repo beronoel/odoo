@@ -12,10 +12,12 @@ class MembershipInvoice(models.TransientModel):
     _description = "Membership Invoice"
     product_id = fields.Many2one('product.product', 'Membership', required=True)
     member_price = fields.Float('Member Price', digits=dp.get_precision('Product Price'), required=True)
+    date_from = fields.Date(string='From', required=True)
+    date_to = fields.Date(string='To', required=True)
 
     @api.onchange('product_id')
     def onchange_product(self):
-        """This function returns value of  product's member price based on product id.
+        """This function returns value of product's member price based on product id.
         """
         if not self.product_id:
             self.member_price = False
@@ -28,7 +30,10 @@ class MembershipInvoice(models.TransientModel):
         datas = {}
         pid = self.env.context.get('active_ids')
         if self:
-            datas.update(membership_product_id=self.product_id.id, amount=self.member_price)
+            datas.update(membership_product_id=self.product_id.id,
+                         amount=self.member_price,
+                         date_from=self.date_from,
+                         date_to=self.date_to)
         if pid:
             invoice_list = self.env['res.partner'].browse(pid).create_membership_invoice(datas=datas)
 

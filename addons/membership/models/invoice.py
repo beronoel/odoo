@@ -26,13 +26,20 @@ class AccountInvoiceLine(models.Model):
     @api.multi
     def write(self, vals):
         res = super(AccountInvoiceLine, self).write(vals)
+        date_from, date_to = None, None
+        if 'date_from' in vals:
+            date_from = vals['date_from']
+        if 'date_to' in vals:
+            date_to = vals['date_to']
         MembershipLine = self.env['membership.membership_line']
         for line in self.filtered(lambda l: l.invoice_id.type == 'out_invoice'):
             membership_lines = MembershipLine.search([('account_invoice_line', '=', line.id)])
             if line.product_id.membership and not membership_lines:
                 # Product line has changed to a membership product
-                date_from = line.product_id.membership_date_from
-                date_to = line.product_id.membership_date_to
+                if date_from is None:
+                    date_from = line.product_id.membership_date_from
+                if date_to is None:
+                    date_to = line.product_id.membership_date_to
                 if line.invoice_id.date_invoice > date_from and line.invoice_id.date_invoice < date_to:
                     date_from = line.invoice_id.date_invoice
                 MembershipLine.create({
@@ -59,13 +66,20 @@ class AccountInvoiceLine(models.Model):
 
     @api.model
     def create(self, vals):
+        date_from, date_to = None, None
+        if 'date_from' in vals:
+            date_from = vals['date_from']
+        if 'date_to' in vals:
+            date_to = vals['date_to']
         MembershipLine = self.env['membership.membership_line']
         result = super(AccountInvoiceLine, self).create(vals)
         membership_lines = MembershipLine.search([('account_invoice_line', '=', result.id)])
         if result.invoice_id.type == 'out_invoice' and result.product_id.membership and not membership_lines:
             # Product line is a membership product
-            date_from = result.product_id.membership_date_from
-            date_to = result.product_id.membership_date_to
+            if date_from is None:
+                date_from = result.product_id.membership_date_from
+            if date_to is None:
+                date_to = result.product_id.membership_date_to
             if result.invoice_id.date_invoice > date_from and result.invoice_id.date_invoice < date_to:
                 date_from = result.invoice_id.date_invoice
             MembershipLine.create({
