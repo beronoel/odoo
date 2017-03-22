@@ -31,7 +31,7 @@
                     <field name="name"/>
                     <field name="membership_date_from"/>
                     <field name="membership_date_to"/>
-                    <field name="duration"/>
+                    <field name="membership_duration"/>
                     <field name="list_price" string="Membership Fee"/>
                     <field name="categ_id" invisible="1"/>
                     <field name="uom_id" invisible="1"/>
