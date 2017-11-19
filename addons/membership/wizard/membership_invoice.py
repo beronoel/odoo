@@ -37,7 +37,7 @@ class MembershipInvoice(models.TransientModel):
         datas = {}
         pid = self.env.context.get('active_ids')
         date3 = date.today();
-		date4 = date3 + relativedelta(months=+1))
+	date4 = date3 + relativedelta(months=+1));
         if self:
             if self.duration = 0 
 			datas.update(membership_product_id=self.product_id.id,
