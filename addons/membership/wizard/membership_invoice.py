@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
+from datetime import date
+from dateutil.relativedelta import relativedelta
 import odoo.addons.decimal_precision as dp
 
 
@@ -34,7 +36,15 @@ class MembershipInvoice(models.TransientModel):
         partner_id = None
         datas = {}
         pid = self.env.context.get('active_ids')
+        date3 = date.today();
+		date4 = date3 + relativedelta(months=+1))
         if self:
+            if self.duration = 0 
+			datas.update(membership_product_id=self.product_id.id,
+                         amount=self.member_price,
+                         date_from= date3,
+                         date_to= date4)
+			else
             datas.update(membership_product_id=self.product_id.id,
                          amount=self.member_price,
                          date_from=self.date_from,
